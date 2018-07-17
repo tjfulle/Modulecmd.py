@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/tjfulle/pymod/branch/master/graph/badge.svg)](https://codecov.io/gh/tjfulle/Modulecmd.py/branch/master)
+[![codecov](https://codecov.io/gh/tjfulle/Modulecmd.py/branch/master/graph/badge.svg)](https://codecov.io/gh/tjfulle/Modulecmd.py/branch/master)
 
 # Introduction
 
