@@ -1,12 +1,8 @@
 [run]
 omit =
-  test_*.py
+  Contents/Tests/*.py
+  Contents/Resources/Python/pymod/tcl2py.py
   */shell/*.py
   */user_env.py
-  ./tools.py
-  tools.py
-
-#include =
-#  modulecmd.py
 
 #branch = true
