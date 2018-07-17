@@ -1,0 +1,12 @@
+[run]
+omit =
+  test_*.py
+  */shell/*.py
+  */user_env.py
+  ./tools.py
+  tools.py
+
+#include =
+#  modulecmd.py
+
+#branch = true

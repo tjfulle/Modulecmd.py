@@ -1,0 +1,7 @@
+.cache
+.coverage
+.testing
+coverage.xml
+htmlcov
+__pycache__
+*.pyc
