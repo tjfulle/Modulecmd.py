@@ -450,7 +450,7 @@ class MasterController(object):
 
     @trace
     def load(self, modulename, options=None, increment_refcnt_if_loaded=0,
-             do_not_register=False):
+             do_not_register=False, insert_at=None):
         """Load the module given by `modulename`"""
 
         # Execute the module
@@ -475,7 +475,44 @@ class MasterController(object):
                 logging.warning(msg.format(module.fullname, 'module reload'))
             return None
 
-        return self._load(module, do_not_register=do_not_register)
+        if insert_at is None:
+            return self._load(module, do_not_register=do_not_register)
+
+        my_opts = {}
+        loaded = self.get_loaded_modules()
+        to_unload_and_reload = loaded[(insert_at)-1:]
+        for other in to_unload_and_reload[::-1]:
+            my_opts[other.fullname] = self.environ.get_loaded_modules('opts', module=other)
+            self.execmodule(UNLOAD, other)
+
+        returncode = self._load(module, do_not_register=do_not_register)
+
+        # Reload any that need to be unloaded first
+        for other in to_unload_and_reload:
+            this_module = self.modulepath.get_module_by_filename(other.filename)
+            if this_module is None:
+                m_tmp = self.modulepath.get_module_by_name(other.name)
+                if m_tmp is not None:
+                    this_module = m_tmp
+                else:
+                    # The only way this_module is None is if inserting
+                    # caused a change to MODULEPATH making this module
+                    # unavailable.
+                    on_mp_changed = self.m_state_changed.setdefault('MP', {})
+                    on_mp_changed.setdefault('U', []).append(other)
+                    continue
+
+            if this_module.filename != other.filename:
+                on_mp_changed = self.m_state_changed.setdefault('MP', {})
+                on_mp_changed.setdefault('Up', []).append((other, this_module))
+
+            # Check for module options to set.  If they were not explicitly set
+            # on the command line, set them from the previously loaded version
+            if not self.moduleopts.get(this_module.fullname):
+                self.moduleopts[this_module.fullname] = my_opts[other.fullname]
+            self.execmodule(LOAD, this_module)
+
+        return returncode
 
     @trace
     def is_loaded(self, modulename):

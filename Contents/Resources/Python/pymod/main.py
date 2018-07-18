@@ -78,12 +78,14 @@ help_page = """\
 
 {dp}With the {U}--terse{u} option, output is displayed in terse format.
 
-{sp}load (add) <name> [name...] [-x] [options]
+{sp}load (add) <name> [name...] [-x] [--insert-at <i>] [options]
 {sp}unload (rm) <name> [name...]
 {sp}reload <name> [name...]
 {dp}Load, unload, or reload the module[s] {U}name [name...]{u}
 
 {dp}With the {U}-x{u} option, the module will not be added to the list of loaded modules.
+
+{dp}With the {U}--insert-at <i>{u} option, the module will be loaded as the {I}i{i}th module.
 
 {dp}Additional options can be sent directly to the module using the syntax,
 {dp}{U}+option[=value]{u}.  See the section on module options for more details.
@@ -453,6 +455,7 @@ def main(argv=None):
     p.add_argument('--dryrun', action='store_true', default=False)
     p.add_argument('-x', dest='do_not_register',
                    action='store_true', default=False)
+    p.add_argument('-i', '--insert-at', type=int, default=None)
     p.add_argument(axo, nargs='+', metavar=mx, help='Valid module name[s]')
 
     p = sub_p.add_parser(LOAD_FROM_FILE, parents=[pp], help='Load module[s] from file')
@@ -869,7 +872,8 @@ def main(argv=None):
 
     elif args.subparser == LOAD:
         for (name, opts) in argv:
-            mc.load(name, options=opts, do_not_register=args.do_not_register)
+            mc.load(name, options=opts, do_not_register=args.do_not_register,
+                    insert_at=args.insert_at)
         mc.dump(stream=sys.stdout)
         return 0
 
