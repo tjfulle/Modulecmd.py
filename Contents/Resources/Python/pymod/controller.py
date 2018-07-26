@@ -90,8 +90,9 @@ class MasterController(object):
 
         mp, extra = get_unique(split(self.environ[MP_KEY], os.pathsep))
         if extra:
-            logging.warning('Duplicate paths in MODULEPATH: '
-                            '{0!r}'.format(','.join(extra)))
+            logging.warning('Removing duplicate paths in MODULEPATH: '
+                            '{0!r}'.format(','.join(extra)),
+                            minverbosity=2)
         lm_files = self.environ.get_loaded_modules('filenames')
         self.modulepath = Modulepath(mp)
         self.modulepath.apply(self.mark_loaded_module)

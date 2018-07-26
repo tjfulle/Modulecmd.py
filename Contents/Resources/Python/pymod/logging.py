@@ -33,7 +33,7 @@ class logging(object):  # pragma: no cover
         write_to_console('{0}'.format(arg), 1, end=end)
 
     @staticmethod
-    def warning(arg, filename=None, end='\n'):
+    def warning(arg, filename=None, end='\n', minverbosity=1):
         """Write a warning to console"""
         if not cfg['warn_all']:
             return
@@ -41,7 +41,7 @@ class logging(object):  # pragma: no cover
         string += ' {0}'.format(arg)
         if filename is not None:
             string += '\n   [Reported from {0!r}]'.format(filename)
-        write_to_console(string, 1, end=end)
+        write_to_console(string, minverbosity=minverbosity, end=end)
 
     @staticmethod
     def error(arg, filename=None, end='\n', noraise=0):
