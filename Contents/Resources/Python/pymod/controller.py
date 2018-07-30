@@ -869,6 +869,13 @@ class MasterController(object):
     @trace
     def show(self, modulename, options=None):
 
+        if modulename.lower() == 'modulepath':
+            _, width = get_console_dims()
+            string = '{0}'.format(' MODULEPATH '.center(width, '=')) + '\n'
+            string += wrap2(self.modulepath.path, width, numbered=True)
+            sys.stderr.write(string+'\n')
+            return 0
+
         warn_all_cache = cfg['warn_all']
         cfg['warn_all'] = False
 
