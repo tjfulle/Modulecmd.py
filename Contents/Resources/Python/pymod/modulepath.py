@@ -44,7 +44,7 @@ class Modulepath:
                 continue
             if not os.path.isdir(directory):
                 logging.warning('Modulepath: nonexistent directory '
-                             '{0!r}'.format(directory))
+                             '{0!r}'.format(directory), minverbosity=2)
             else:
                 self.path.append(directory)
         self.modules = None
@@ -138,7 +138,7 @@ class Modulepath:
             modules_in_directory = self.discover_modules_in_directory(directory)
             if modules_in_directory is None:
                 logging.warning('Modulepath: no modules found in '
-                                '{0}'.format(directory))
+                                '{0}'.format(directory), minverbosity=2)
                 continue
             self.modules[directory] = modules_in_directory
             for module in modules_in_directory:
@@ -157,13 +157,15 @@ class Modulepath:
         path = os.path.join(dirname, name)
         if not os.path.islink(path):
             logging.warning('Modulepath: expected file named default '
-                            'in {0} to be a link to a modulefile'.format(dirname))
+                            'in {0} to be a link to a modulefile'.format(dirname),
+                            minverbosity=2)
             return None
 
         source = os.path.realpath(path)
         if os.path.dirname(source) != dirname:
             logging.warning('Modulepath: expected file named default in {0} to be '
-                            'a link to a modulefile in the same directory'.format(dirname))
+                            'a link to a modulefile in the same directory'.format(dirname),
+                            minverbosity=2)
             return None
 
         return source
@@ -190,14 +192,14 @@ class Modulepath:
                     break
             if default is None:
                 logging.warning('Could not determine .version default '
-                                'in {0}'.format(dirname))
+                                'in {0}'.format(dirname), minverbosity=2)
             elif not os.path.exists(default):
                 logging.warning('{0!r}: versioned default does not '
-                                'exist'.format(default))
+                                'exist'.format(default), minverbosity=2)
             else:
                 return default
         except:
-            logging.warning('Could not read {0}'.format(path))
+            logging.warning('Could not read {0}'.format(path), minverbosity=2)
 
         return None
 
@@ -234,7 +236,8 @@ class Modulepath:
             versioned_default = self.find_versioned_default(dirname, files)
             if linked_default and versioned_default:
                 logging.warning('A linked and versioned default exist for {0}, '
-                                'choosing the linked'.format(os.path.basename(dirname)))
+                                'choosing the linked'.format(os.path.basename(dirname)),
+                                minverbosity=2)
                 default = linked_default
             else:
                 default = linked_default or versioned_default
@@ -257,7 +260,7 @@ class Modulepath:
         modules_in_directory = self.discover_modules_in_directory(directory)
         if modules_in_directory is None:
             logging.warning('Modulepath: no modules found in '
-                            '{0}'.format(directory))
+                            '{0}'.format(directory), minverbosity=2)
             return None
         self.path.append(directory)
         self.modules[directory] = modules_in_directory
@@ -294,7 +297,7 @@ class Modulepath:
         modules_in_directory = self.discover_modules_in_directory(directory)
         if modules_in_directory is None:
             logging.warning('Modulepath: no modules found in '
-                            '{0}'.format(directory))
+                            '{0}'.format(directory), minverbosity=2)
             return None
         self.path.insert(0, directory)
         fullnames = [m.fullname for m in modules_in_directory]

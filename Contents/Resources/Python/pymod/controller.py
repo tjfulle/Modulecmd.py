@@ -24,7 +24,7 @@ from .shell import get_shell
 from .cfg import cfg
 from .environ import Environ
 from .modulepath import Modulepath
-from .module_collections import Collections
+from .collections2 import Collections
 
 
 class InconsistentModuleState(Exception):
@@ -321,6 +321,7 @@ class MasterController(object):
         if not module_a.is_loaded:
             self.execmodule(LOAD, module_b)
             return
+        assert module_a.is_loaded
         self.swap2(module_a, module_b)
 
     @trace
@@ -546,6 +547,7 @@ class MasterController(object):
         loaded = self.get_loaded_modules()
         for (i, other) in enumerate(loaded):
             if other.name == module.name:
+                assert other.is_loaded
                 self.swap2(other, module)
                 key = 'VersionChanged'
                 to_swap = [other.fullname, module.fullname]
@@ -567,6 +569,7 @@ class MasterController(object):
             logging.warning('{0} is not loaded!'.format(module.fullname))
             return
         options = self.environ.get_loaded_modules('opts', module=module)
+        assert module.is_loaded
         self.swap2(module, module, options_b=options, maintain_state=1)
         return
 
@@ -629,6 +632,7 @@ class MasterController(object):
                     continue
                 m2 = self.modulepath.get_module_by_name(m1.name)
                 if m1.filename != m2.filename:
+                    assert m1.is_loaded
                     self.swap2(m1, m2)
                     on_mp_changed = self.m_state_changed.setdefault('MP', {})
                     on_mp_changed.setdefault('Up', []).append((m1, m2))
@@ -695,6 +699,7 @@ class MasterController(object):
         if module_b.is_loaded:
             logging.warning('{0} is already loaded!'.format(module_b.fullname))
             return
+        assert module_a.is_loaded
         self.swap2(module_a, module_b)
 
         self.m_state_changed.setdefault('Swapped', []).append(
@@ -831,13 +836,13 @@ class MasterController(object):
         self.collections[name] = json.loads(snew)
 
     @trace
-    def show_available_collections(self, terse=False):
+    def show_available_collections(self, terse=False, stream=sys.stderr):
         s = self.collections.describe(terse=terse)
-        sys.stderr.write(s)
+        stream.write(s)
         return None
 
     @trace
-    def show_collection(self, name):
+    def show_collection(self, name, stream=sys.stderr):
         """Show the high-level commands executed by
 
             module show <collection>
@@ -849,7 +854,7 @@ class MasterController(object):
 
         loaded = self.environ.get_loaded_modules('names', reverse=True)
         for m in loaded:
-            sys.stderr.write("unload('{0}')\n".format(m))
+            stream.write("unload('{0}')\n".format(m))
 
         text = []
         for (directory, modules) in collection:
@@ -867,13 +872,13 @@ class MasterController(object):
         return 0
 
     @trace
-    def show(self, modulename, options=None):
+    def show(self, modulename, options=None, stream=sys.stderr):
 
         if modulename.lower() == 'modulepath':
             _, width = get_console_dims()
             string = '{0}'.format(' MODULEPATH '.center(width, '=')) + '\n'
             string += wrap2(self.modulepath.path, width, numbered=True)
-            sys.stderr.write(string+'\n')
+            stream.write(string+'\n')
             return 0
 
         warn_all_cache = cfg['warn_all']
@@ -897,10 +902,11 @@ class MasterController(object):
         return 0
 
     @trace
-    def show_available_modules(self, terse=False, regex=None, fulloutput=False):
+    def show_available_modules(self, terse=False, regex=None, fulloutput=False,
+                               stream=sys.stderr):
         s = self.modulepath.describe(terse=terse, regex=regex,
                                      fulloutput=fulloutput)
-        sys.stderr.write(s)
+        stream.write(s)
         return None
 
     @trace
@@ -946,13 +952,13 @@ class MasterController(object):
         stream.write(s)
 
     @trace
-    def list_envar(self, envar=None):
+    def list_envar(self, envar=None, stream=sys.stderr):
         """List environment variable"""
         for (key, val) in self.environ.items():
             if envar is None:
-                sys.stderr.write('module shell env {0}={1}\n'.format(key, val))
+                stream.write('module shell env {0}={1}\n'.format(key, val))
             elif key.upper() == envar.upper():
-                sys.stderr.write('module shell env {0}={1}\n'.format(key, val))
+                stream.write('module shell env {0}={1}\n'.format(key, val))
                 break
 
     @trace
@@ -969,7 +975,7 @@ class MasterController(object):
         self.set_envar(envar, None)
 
     @trace
-    def display_info(self, modulename):
+    def display_info(self, modulename, stream=sys.stderr):
         """Display 'whatis' message for the module given by `modulename`"""
         module = self.get_module(modulename)
         if module is None:
@@ -981,10 +987,10 @@ class MasterController(object):
         s = '{0}'.format(x.center(width, '=')) + '\n'
         s += module.whatis + '\n'
         s += '=' * width
-        sys.stderr.write(s + '\n')
+        stream.write(s + '\n')
 
     @trace
-    def display_help(self, modulename):
+    def display_help(self, modulename, stream=sys.stderr):
         """Display 'help' message for the module given by `modulename`"""
         module = self.get_module(modulename)
         if module is None:
@@ -995,7 +1001,7 @@ class MasterController(object):
         s = '{0}'.format(x.center(width, '=')) + '\n'
         s += module.helpstr + '\n'
         s += '=' * width
-        sys.stderr.write(s + '\n')
+        stream.write(s + '\n')
 
     @trace
     def edit(self, modulename):
@@ -1046,6 +1052,7 @@ class MasterController(object):
             other = self.modulepath.get_module_by_name(e.args[0])
             args = [other.family, other.fullname, module.fullname]
             self.m_state_changed.setdefault('FamilyChange', []).append(args)
+            assert other.is_loaded
             self.swap2(other, module)
 
     @trace
@@ -1213,7 +1220,7 @@ class MasterController(object):
 
     def wrap_mf_unsetenv(self, mode):
         """Set value of environment variable `name`"""
-        def mf_unsetenv(name):
+        def mf_unsetenv(name, *args, **kwargs):
             if mode in (LOAD,):
                 self.unsetenv(name)
             else:
@@ -1647,7 +1654,7 @@ class MasterController(object):
         return
 
     @trace
-    def display_clones(self, terse=False):
+    def display_clones(self, terse=False, stream=sys.stderr):
         string = []
         filename = defaults.clones_filename()
         clones = self.read_clones(filename)
@@ -1664,4 +1671,4 @@ class MasterController(object):
                 string.append('\n'.join(c for c in names))
 
         string = '\n'.join(string)
-        sys.stderr.write(string)
+        stream.write(string)

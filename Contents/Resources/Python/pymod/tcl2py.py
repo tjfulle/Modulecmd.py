@@ -41,14 +41,15 @@ def tcl2py(module, mode, env):
         stdout, stderr = comm
 
     name = module.name
-    if name.endswith('python'):
-        family = 'python'
-    elif name.endswith(('gcc', 'intel', 'pgi')):
-        family = 'compiler'
-    elif name.endswith(('openmpi', 'mpich', )):
-        family = 'mpi'
-    else:
-        family = None
+    family = None
+    #if name.endswith('python'):
+    #    family = 'python'
+    #elif name.startswith(('gcc', 'intel', 'pgi')):
+    #    family = 'compiler'
+    #elif name.startswith(('openmpi', 'mpich', )):
+    #    family = 'mpi'
+    #else:
+    #    family = None
 
     if family is not None:
         stdout = 'family("{0}")\n'.format(family) + stdout

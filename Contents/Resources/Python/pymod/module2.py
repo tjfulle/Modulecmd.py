@@ -48,7 +48,9 @@ def read_metadata(filename):
 
 
 def create_module_from_file(modulepath, path, is_explicit_default):
-    assert os.path.isfile(path), '{0} does not exist'.format(path)
+    if not os.path.isfile(path):
+        logging.warning('{0} does not exist'.format(path), minverbosity=2)
+        return None
     dirname, f = os.path.split(path)
     if f.endswith('.py'):
         m_type = M_PY
