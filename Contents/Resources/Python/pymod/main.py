@@ -125,7 +125,7 @@ help_page = """\
 
 {B}MODULE COLLECTION COMMANDS{b}
 
-{sp}collection save [name]
+{sp}collection save [name|-f name]
 {sp}collection restore <name>
 {sp}collection avail
 {sp}collection show <name>
@@ -136,12 +136,14 @@ help_page = """\
 {dp}with a single command.
 
 {dp}The subcommand {I}save{i} saves the currently loaded modules to the collection
-{dp} {U}name{u}, if {U}name{u} is supplied; otherwise, the modules are saved to the
-{dp}user's default collection.
+{dp} {U}name{u}, if {U}name{u} is supplied; if {U}-f name{u} is supplied, the collection
+{dp}is saved to a file named {U}name{u}.collection in the current working directory;
+{dp}otherwise, the modules are saved to the {dp}user's default collection.
 
 {dp}{I}restore{i} loads the modules saved to collection {U}name{u} after unloading
 {dp}any loaded modules.  If {U}name{u} is not supplied, the user's default
-{dp}collection is restored.
+{dp}collection is restored.  If {U}name{u} is a file, the collection is loaded from
+{dp}the file.
 
 {dp}{I}avail{i} lists saved collections.
 
@@ -405,13 +407,13 @@ def main(argv=None):
     detailed help"""
 
     pp = ArgumentParser(add_help=False)
-    pp.add_argument('--time', action='store_true', default=False)
-    pp.add_argument('--verbosity', '-v', action='count', default=None)
-    pp.add_argument('--debug', action='store_true', default=False)
-    pp.add_argument('--version', action='version', version='%(prog)s '+version)
 
     ax, axo, mx = 'argv', 'argvo', 'modulename'
     p1 = ArgumentParser(prog='module', usage=usage, description=description)
+    p1.add_argument('--time', action='store_true', default=False)
+    p1.add_argument('--verbosity', '-v', action='count', default=None)
+    p1.add_argument('--debug', action='store_true', default=False)
+    p1.add_argument('--version', action='version', version='%(prog)s '+version)
 
     p1.add_argument(SHELL, choices=('bash', 'csh', 'python'), help=SUPPRESS)
 
@@ -553,6 +555,7 @@ def main(argv=None):
     p = sub_p2.add_parser(SAVE, parents=[pp],
                           help='Save currently loaded modules to a collection')
     p.add_argument('--dryrun', action='store_true', default=False)
+    p.add_argument('-f', default=None)
     p.add_argument('name', nargs='?',
                    help='The name of the collection.  If not given, defaults '
                         'to user\'s default collection')
@@ -703,9 +706,15 @@ def main(argv=None):
             return 0
 
         elif args.subcommand == SAVE:
-            if args.name is None:
-                args.name = defaults.DEFAULT_USER_COLLECTION_NAME
-            mc.save_collection(args.name)
+            if args.f is not None:
+                name = args.f
+                if args.name is not None:
+                    sys.exit('Do not specify both -f F and NAME')
+            elif args.name is None:
+                name = defaults.DEFAULT_USER_COLLECTION_NAME
+            else:
+                name = args.name
+            mc.save_collection(name, isolate=args.f is not None)
             return 0
 
         elif args.subcommand == SHOW:

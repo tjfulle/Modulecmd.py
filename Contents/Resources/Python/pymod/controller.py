@@ -395,10 +395,10 @@ class MasterController(object):
         return self.unuse(dirname)
 
     @trace
-    def save_collection(self, name):
+    def save_collection(self, name, isolate=False):
         loaded = self.get_loaded_modules()
         module_opts = self.environ.get_loaded_modules('opts')
-        self.collections.save(name, loaded, module_opts)
+        self.collections.save(name, loaded, module_opts, isolate=isolate)
 
     @trace
     def remove_collection(self, name):
@@ -589,15 +589,11 @@ class MasterController(object):
             return None
 
         # Module is not loaded!
-        m = self.modulepath.get_module_by_name(modulename)
-        if m is None:
+        msg = 'Requesting to unload {0}, but {0} is not loaded'.format(modulename)
+        if self.modulepath.get_module_by_name(modulename) is None:
             # and modulename is not a module!
-            # is it a collection?
-            if not tolerant:
-                raise ModuleNotFoundError(modulename)
-        elif not tolerant:
-            logging.warning('Requesting to unload {0}, but {0} '
-                            'is not loaded'.format(modulename))
+            msg += ' (nor is it a module)'
+        logging.warning(msg)
         return None
 
     @trace

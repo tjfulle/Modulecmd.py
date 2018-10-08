@@ -28,15 +28,15 @@ class Collections:
         self.write(items)
 
     @trace
-    def read(self):
-        filename = defaults.collections_filename()
+    def read(self, filename=None):
+        filename = filename or defaults.collections_filename()
         if os.path.isfile(filename):
             return json.load(open(filename))
         return {}
 
     @trace
-    def write(self, collections):
-        filename = defaults.collections_filename()
+    def write(self, collections, filename=None):
+        filename = filename or defaults.collections_filename()
         with open(filename, 'w') as fh:
             json.dump(collections, fh, default=serialize, indent=2)
         return
@@ -48,20 +48,32 @@ class Collections:
         return self._items
 
     @trace
-    def save(self, name, modules, module_opts):
+    def save(self, name, modules, module_opts, isolate=False):
         this_collection = OrderedDict()
         for module in modules:
             d = module.asdict()
             d['options'] = module_opts.get(module.fullname) or []
             this_collection.setdefault(module.modulepath, []).append(d)
-        items = self.items
-        items[name] = list(this_collection.items())
-        self.write(items)
+        this_collection = list(this_collection.items())
+        if not isolate:
+            items = self.items
+            items[name] = this_collection
+            self.write(items)
+        else:
+            self.write({'collection': this_collection},
+                       filename=name+'.collection')
         return None
 
     @trace
     def get(self, name):
-        return self.items.get(name)
+        collection = None
+        if os.path.isfile(name):
+            collection = self.read(name).get('collection')
+        else:
+            collection = self.items.get(name)
+            if collection is None and os.path.isfile(name+'.collection'):
+                collection = self.read(name+'.collection').get('collection')
+        return collection
 
     @trace
     def remove(self, name):
