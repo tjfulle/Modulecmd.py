@@ -72,11 +72,12 @@ help_page = """\
 {sp}file <module> [module...]
 {dp}Show the file path[s] to {U}module [...]{u}.
 
-{sp}list (l) [regex] [--terse]
+{sp}list (l) [regex] [--terse] [--show-command] [-c]
 {dp}Displays loaded modules.  {U}regex{u} is a regular expression highlighted
 {dp}in the output.
 
 {dp}With the {U}--terse{u} option, output is displayed in terse format.
+{dp}With the {U}--show-command{u} or {U}-c{u} option, output displays load commands
 
 {sp}load (add) <name> [name...] [-x] [--insert-at <i>] [options]
 {sp}unload (rm) <name> [name...]
@@ -450,6 +451,8 @@ def main(argv=None):
                    help='Highlight loaded modules matching "regex"')
     p.add_argument('-t', '--terse', default=False, action='store_true',
                    help='Display output in terse format [default: %(default)s]')
+    p.add_argument('-c', '--show-command', default=False, action='store_true',
+                   help='Display output in show command format [default: %(default)s]')
 
     p = sub_p.add_parser(LOAD, parents=[pp], help='Load module[s]')
     p.add_argument('--dryrun', action='store_true', default=False)
@@ -848,7 +851,8 @@ def main(argv=None):
         return 0
 
     elif args.subparser == LIST:
-        mc.show_loaded_modules(terse=args.terse, regex=args.regex)
+        mc.show_loaded_modules(terse=args.terse, regex=args.regex,
+                               show_command=args.show_command)
         return 0
 
     elif args.subparser == WHATIS:
@@ -883,10 +887,15 @@ def main(argv=None):
         mc.dump(stream=sys.stdout)
         return 0
 
-    elif args.subparser in (POP, UNLOAD):
-        pop = args.subparser == POP
+    elif args.subparser == UNLOAD:
         for name in argv:
-            mc.unload(name, pop=pop)
+            mc.unload(name)
+        mc.dump(stream=sys.stdout)
+        return 0
+
+    elif args.subparser == POP:
+        for name in argv:
+            mc.pop(name)
         mc.dump(stream=sys.stdout)
         return 0
 

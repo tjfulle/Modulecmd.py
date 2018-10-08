@@ -62,7 +62,7 @@ class ModuleNotFoundError(Exception):
 
 def assert_known_mode(mode):
     """Valid modes for loading/unloading modules"""
-    assert mode in (LOAD, UNLOAD, NULLOP, WHATIS, HELP, SWAP, SHOW, POP)
+    assert mode in (LOAD, UNLOAD, NULLOP, WHATIS, HELP, SWAP, SHOW)
 
 
 # --------------------------------------------------------------------------- #
@@ -347,11 +347,7 @@ class MasterController(object):
         assert modulename is not None
         s = UNLOAD if mode == UNLOAD else LOAD
         InstructionLogger.append('{0}({1!r})'.format(s, modulename))
-        if mode == POP:
-            # We are in pop (unload) mode and the module was requested to be loaded.
-            # So, we we *don't* unload it
-            pass
-        elif mode == UNLOAD:
+        if mode == UNLOAD:
             # We are in unload mode and the module was requested to be loaded.
             # So, we reverse the action and unload it
             return self.cb_unload(NULLOP, modulename)
@@ -574,12 +570,21 @@ class MasterController(object):
         return
 
     @trace
-    def unload(self, modulename, tolerant=False, pop=False):
+    def pop(self, modulename):
+        loaded = self.get_loaded_modules(names_and_short_names=True)
+        module = loaded.get(modulename)
+        if module is None:
+            return None
+        self.remove_module(module)
+        return None
+
+    @trace
+    def unload(self, modulename, tolerant=False):
         """Unload the module given by `modulename`"""
         loaded = self.get_loaded_modules(names_and_short_names=True)
         module = loaded.get(modulename)
         if module is not None:
-            mode = POP if pop else UNLOAD
+            mode = UNLOAD
             self.execmodule(mode, module)
             return None
 
@@ -910,7 +915,7 @@ class MasterController(object):
         return None
 
     @trace
-    def show_loaded_modules(self, terse=False, regex=None):
+    def show_loaded_modules(self, terse=False, regex=None, show_command=False):
 
         def cat(m):
             opts = loaded_opts.get(m)
@@ -930,6 +935,11 @@ class MasterController(object):
             s = '\n'.join(x.strip() for x in loaded_modules)
             if regex is not None:
                 s = grep_pat_in_string(s, regex)
+            logging.info(s)
+            return
+
+        elif show_command:
+            s = '\n'.join('module load {0}'.format(x.strip()) for x in loaded_modules)
             logging.info(s)
             return
 
@@ -1032,7 +1042,7 @@ class MasterController(object):
             lm_refcnt = str2dict(self.environ.get(LM_REFCNT_KEY()))
             if mode == LOAD:
                 lm_refcnt[module.fullname] = 1
-            elif mode in (UNLOAD, POP):
+            elif mode in (UNLOAD, ):
                 lm_refcnt.pop(module.fullname, None)
             self.environ[LM_REFCNT_KEY()] = dict2str(lm_refcnt)
 
@@ -1063,7 +1073,7 @@ class MasterController(object):
             logging.error('Module {0!r} has unknown module type: '
                           '{1!r}'.format(module.fullname, module.type))
 
-        if mode in (POP, UNLOAD):
+        if mode in (UNLOAD,):
             opts = self.environ.get_loaded_modules('opts', module=module)
         else:
             opts = self.get_moduleopts(module)
@@ -1077,7 +1087,7 @@ class MasterController(object):
         else:
             if mode == LOAD:
                 self.on_module_load(module, do_not_register=do_not_register)
-            elif mode in (POP, UNLOAD):
+            elif mode in (UNLOAD,):
                 self.on_module_unload(module)
 
         return None
@@ -1393,8 +1403,9 @@ class MasterController(object):
 
     def wrap_mf_logging_error(self, mode, filename):
         @trace(name='log_error')
-        def mf_logging_error(message):
-            logging.error(message, filename, noraise=self.load_for_show)
+        def mf_logging_error(message, noraise=0):
+            noraise = noraise or self.load_for_show
+            logging.error(message, filename, noraise=noraise)
         return mf_logging_error
 
     # ---------------- FUNCTIONS THAT MODIFY THE ENVIRONMENT ---------------- #

@@ -172,7 +172,11 @@ class Module2(object):
         if self.type == M_TCL:
             if not has_tclsh:
                 raise TCLModulesNotFoundError
-            return tcl2py(self, mode, env)
+            try:
+                return tcl2py(self, mode, env)
+            except Exception as e:
+                logging.error(e.args[0])
+                return ''
         return open(self.filename, 'r').read()
 
     def deactivate(self):

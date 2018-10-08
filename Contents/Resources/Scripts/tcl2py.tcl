@@ -740,7 +740,7 @@ proc module { command args } {
 
 proc reportError {message} {
     global ModulesCurrentModulefile g_fullName
-    puts stdout "log_error(\"$ModulesCurrentModulefile: ($g_fullName): $message\")"
+    puts stdout "log_error(\"\"\"$ModulesCurrentModulefile: ($g_fullName): $message\"\"\", noraise=1)"
 }
 
 proc execute-modulefile {modfile } {
