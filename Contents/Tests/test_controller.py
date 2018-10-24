@@ -722,9 +722,6 @@ class TestController(tools.TestBase):
         mc = tools.t_controller(modulepath=':'.join([d1, d2]))
         mc.cb_load('load', load_first_of=('a', 'b'))
         assert mc.get_module('a').is_loaded
-        mc.cb_load('pop', 'a')
-        assert mc.get_module('a').is_loaded
-        assert mc.cb_is_loaded('a')
         mc.unload('a')
         assert not mc.get_module('a').is_loaded
         mc.cb_load('load', 'b')
