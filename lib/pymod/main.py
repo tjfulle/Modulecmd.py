@@ -641,7 +641,7 @@ def main(argv=None):
         # py.test writes help to stdout. But, we need it to be stderr since
         # this file should be `eval`d by the shell.
 
-        tests_dir = os.path.join(PYMOD_DIR, 'Contents/Tests/')
+        tests_dir = os.path.join(PYMOD_DIR, 'test/')
         assert os.path.isdir(tests_dir)
         cov_cfg_file = os.path.join(tests_dir, '.coveragerc')
         assert os.path.isfile(cov_cfg_file)
@@ -952,9 +952,9 @@ def initshell(shellname, modulepath, isolate):  # pragma: no cover
     """Initialize the shell"""
     shell = get_shell(shellname)
     mydir = os.path.dirname(os.path.realpath(__file__))
-    moduleshome = os.path.normpath(os.path.join(mydir, '../../../../Contents'))
-    assert os.path.isdir(moduleshome)
-    modulecmd = os.path.join(moduleshome, 'Modulecmd/modulecmd.py')
+    moduleshome = os.path.normpath(os.path.join(mydir, '../..'))
+    assert os.path.isfile(os.path.join(moduleshome, '.pymod'))
+    modulecmd = os.path.join(moduleshome, 'bin/modulecmd.py')
     s = shell.initshell(moduleshome, modulecmd, modulepath, isolate)
     sys.stdout.write('{0}; pymod restore'.format(s))
     return

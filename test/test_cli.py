@@ -6,7 +6,6 @@ import pymod
 from pymod.defaults import MP_KEY, LM_KEY, LM_FILES_KEY, LM_OPTS_KEY, DEFAULT_USER_COLLECTION_NAME
 from pymod.compat import import_module_by_filepath
 from pymod.utils import dict2str
-from pymod.resources import pymod_contents_dir
 
 
 class TestCommandLineInterface(tools.TestBase):

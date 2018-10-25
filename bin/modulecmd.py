@@ -7,7 +7,7 @@ import atexit
 import argparse
 
 __this_dir__ = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0, os.path.join(__this_dir__, '../Resources/Python'))
+sys.path.insert(0, os.path.join(__this_dir__, '../lib'))
 
 import pymod
 

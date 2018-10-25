@@ -16,7 +16,7 @@ class Csh(Shell):
     def initshell(moduleshome, modulecmd, modulepath, isolate):
         mh_key = pymod_env_key('MODULESHOME', isolate=isolate)
         mp_key = pymod_env_key('MODULEPATH', isolate=isolate)
-        pymod_pkg = os.path.join(moduleshome, 'Contents/Resources/Python/pymod')
+        pymod_pkg = os.path.join(moduleshome, 'lib/pymod')
         l = ['setenv PYMOD_DIR {0}'.format(moduleshome),
              'setenv PYMOD_PKG_DIR {0}'.format(pymod_pkg),
              'setenv {0} {1}'.format(mh_key, moduleshome),

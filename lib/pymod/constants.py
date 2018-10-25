@@ -5,9 +5,9 @@ PYMOD_VERSION = (1, 1, 2)
 version = '.'.join('{0}'.format(x) for x in PYMOD_VERSION)
 
 __D = os.path.dirname(os.path.realpath(__file__))
-PYMOD_DIR = os.path.realpath(os.path.join(__D, '../../../../../Modulecmd.py'))
-assert os.path.isdir(PYMOD_DIR)
-PYMOD_PKG_DIR = os.path.join(PYMOD_DIR, 'Contents/Resources/Python/pymod')
+PYMOD_DIR = os.path.realpath(os.path.join(__D, '../..'))
+assert os.path.isfile(os.path.join(PYMOD_DIR, '.pymod'))
+PYMOD_PKG_DIR = os.path.join(PYMOD_DIR, 'lib/pymod')
 assert os.path.isdir(PYMOD_PKG_DIR)
 
 # --------------------------------------------------------------------------- #

@@ -5,8 +5,7 @@ import tempfile
 
 sys._pytest_in_progress_ = True
 __D = os.path.dirname(os.path.realpath(__file__))
-pymod_resources_dir = os.path.realpath(os.path.join(__D, '../Resources'))
-pymod_pkg_dir = os.path.join(pymod_resources_dir, 'Python')
+pymod_pkg_dir = os.path.realpath(os.path.join(__D, '../lib'))
 assert os.path.isdir(pymod_pkg_dir)
 sys.path.insert(0, pymod_pkg_dir)
 

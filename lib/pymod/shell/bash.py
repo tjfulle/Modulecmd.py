@@ -13,7 +13,7 @@ class Bash(Shell):
         modulefun = '{ eval `python -B -E %s bash "$@";`; }' % modulecmd
         mh_key = pymod_env_key('MODULESHOME', isolate=isolate)
         mp_key = pymod_env_key('MODULEPATH', isolate=isolate)
-        pymod_pkg = os.path.join(moduleshome, 'Contents/Resources/Python/pymod')
+        pymod_pkg = os.path.join(moduleshome, 'lib/pymod')
         l = ['export PYMOD_DIR={0}'.format(moduleshome),
              'export PYMOD_PKG_DIR={0}'.format(pymod_pkg),
              'export {0}={1}'.format(mh_key, moduleshome),
