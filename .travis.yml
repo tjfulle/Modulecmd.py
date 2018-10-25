@@ -11,7 +11,7 @@ install:
   - pip install pytest-cov
   - pip install codecov
 
-script: py.test --cov=./ --cov-config=./Contents/Tests/.coveragerc
+script: py.test --cov=./ --cov-config=./test/.coveragerc
 
 after_success:
   - codecov --token=402daea0-aa6a-4dca-b448-5400fb883d38

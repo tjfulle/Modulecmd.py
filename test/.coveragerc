@@ -1,7 +1,7 @@
 [run]
 omit =
-  Contents/Tests/*.py
-  Contents/Resources/Python/pymod/tcl2py.py
+  test/*.py
+  lib/pymod/tcl2py.py
   */shell/*.py
   */user_env.py
 
