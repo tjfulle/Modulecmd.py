@@ -1,33 +1,11 @@
 import os
 from .shell import Shell
-from ..user import pymod_env_key
 
 # --------------------------------------------------------------------------- #
 # --  B  A  S  H    S  H  E  L  L-------------------------------------------- #
 # --------------------------------------------------------------------------- #
 class Bash(Shell):
     name = 'bash'
-
-    @staticmethod
-    def initshell(moduleshome, modulecmd, modulepath, isolate):
-        modulefun = '{ eval `python -B -E %s bash "$@";`; }' % modulecmd
-        mh_key = pymod_env_key('MODULESHOME', isolate=isolate)
-        mp_key = pymod_env_key('MODULEPATH', isolate=isolate)
-        pymod_pkg = os.path.join(moduleshome, 'lib/pymod')
-        l = ['export PYMOD_DIR={0}'.format(moduleshome),
-             'export PYMOD_PKG_DIR={0}'.format(pymod_pkg),
-             'export {0}={1}'.format(mh_key, moduleshome),
-             'export PYMOD_CMD={0}'.format(modulecmd),
-             'export {0}={1}'.format(mp_key, modulepath),
-             'pymod() {0}'.format(modulefun),
-             'export -f pymod',
-             'export __PYMOD_ISOLATED__={0}'.format(Bash.onoff(isolate))]
-        if not isolate:
-            l.extend(['unset -f module',
-                      'module() {0}'.format(modulefun),
-                      'export -f module',
-                      ])
-        return '; '.join(l)
 
     def format_environment_variable(self, key, val=None):
         """Define variable in bash syntax"""

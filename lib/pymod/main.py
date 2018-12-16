@@ -446,7 +446,6 @@ def main(argv=None):
 
     p = sub_p.add_parser(INIT, parents=[pp], help='Initialize modulecmd')
     p.add_argument('--mp', help='Modulepath', default=os.getenv('MODULEPATH', ''))
-    p.add_argument('--isolate', default='false', help='Isolate pymod or not')
 
     p = sub_p.add_parser(LIST, parents=[pp], help='Display loaded modules')
     p.add_argument('regex', nargs='?', metavar='regex',
@@ -662,11 +661,7 @@ def main(argv=None):
         cfg['debug'] = args.debug
     mc = MasterController(shell=args.shell, dryrun=dryrun)
 
-    if args.subparser == INIT:
-        isolate = True if args.isolate.lower() in ('true', '1', 'on') else False
-        return initshell(args.shell, args.mp, isolate)
-
-    elif args.subparser == AVAIL:
+    if args.subparser == AVAIL:
         mc.show_available_modules(terse=args.terse, regex=args.regex,
                                   fulloutput=args.F)
         return 0
@@ -946,18 +941,6 @@ def get_entity_text(mc, name):
     elif os.path.isfile(os.path.join(user.dot_dir(), name + '.json')):
         return open(os.path.join(user.dot_dir(), name + '.json')).read()
     sys.exit('Unknown named entity {0!r}'.format(name))
-
-
-def initshell(shellname, modulepath, isolate):  # pragma: no cover
-    """Initialize the shell"""
-    shell = get_shell(shellname)
-    mydir = os.path.dirname(os.path.realpath(__file__))
-    moduleshome = os.path.normpath(os.path.join(mydir, '../..'))
-    assert os.path.isfile(os.path.join(moduleshome, '.pymod'))
-    modulecmd = os.path.join(moduleshome, 'bin/modulecmd.py')
-    s = shell.initshell(moduleshome, modulecmd, modulepath, isolate)
-    sys.stdout.write('{0}; pymod restore'.format(s))
-    return
 
 
 if __name__ == '__main__':

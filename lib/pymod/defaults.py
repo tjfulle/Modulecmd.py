@@ -1,6 +1,6 @@
 import os
 
-from .user import user_env, _dot_dir, pymod_env_key
+from .user import user_env, _dot_dir
 
 
 def collections_filename():
@@ -26,15 +26,15 @@ def clones_filename():
 
 
 dot_dir = _dot_dir
-LM_KEY = pymod_env_key('LOADEDMODULES')
-LM_OPTS_KEY = pymod_env_key('_LMOPTS_')
-MP_KEY = pymod_env_key('MODULEPATH')
-MH_KEY = pymod_env_key('MODULESHOME')
-LM_FILES_KEY = pymod_env_key('_LMFILES_')
+LM_KEY = 'LOADEDMODULES'
+LM_OPTS_KEY = '_LMOPTS_'
+MP_KEY = 'MODULEPATH'
+MH_KEY = 'MODULESHOME'
+LM_FILES_KEY = '_LMFILES_'
 DEFAULT_USER_COLLECTION_NAME = 'default'
 DEFAULT_SYS_COLLECTION_NAME = 'system'
 def LM_REFCNT_KEY(name=None):
-    key = pymod_env_key('_LMREFCNT_')
+    key = '_LMREFCNT_'
     if name is None:
         return key
     return '{0}{1}_'.format(key, name.upper())

@@ -56,12 +56,3 @@ def _dot_dir(memo=[None], reset=0):
             else:
                 memo[0] = None
     return memo[0]
-
-
-def pymod_env_key(item, isolate=None):
-    if isolate is None:
-        isolate = os.getenv('__PYMOD_ISOLATED__') == '1'
-    key = item if not isolate else '__PYMOD_{0}__'.format(item.strip('_'))
-    return key
-
-

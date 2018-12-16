@@ -2,7 +2,6 @@ import os
 import re
 
 from .shell import Shell
-from ..user import pymod_env_key
 
 CSH_LIMIT = 4000
 
@@ -11,23 +10,6 @@ CSH_LIMIT = 4000
 # --------------------------------------------------------------------------- #
 class Csh(Shell):
     name = 'csh'
-
-    @staticmethod
-    def initshell(moduleshome, modulecmd, modulepath, isolate):
-        mh_key = pymod_env_key('MODULESHOME', isolate=isolate)
-        mp_key = pymod_env_key('MODULEPATH', isolate=isolate)
-        pymod_pkg = os.path.join(moduleshome, 'lib/pymod')
-        l = ['setenv PYMOD_DIR {0}'.format(moduleshome),
-             'setenv PYMOD_PKG_DIR {0}'.format(pymod_pkg),
-             'setenv {0} {1}'.format(mh_key, moduleshome),
-             'setenv PYMOD_CMD {0}'.format(modulecmd),
-             'setenv {0} {1}'.format(mp_key, modulepath),
-             'alias pymod eval `python -B -E {0} csh !*`'.format(modulecmd),
-             'setenv __PYMOD_ISOLATED__ {0}'.format(Csh.onoff(isolate)),
-             ]
-        if not isolate:
-            l.append('alias module eval `python -B -E {0} csh !*`'.format(modulecmd))
-        return '; '.join(l)
 
     def format_environment_variable(self, key, val=None):
         """Define variable in bash syntax"""
