@@ -350,7 +350,10 @@ class Modulepath:
         return colorized
 
     @trace
-    def describe(self, terse=False, regex=None, fulloutput=False):
+    def describe(self, terse=False, regex=None, fulloutput=False, pathonly=False):
+        if pathonly:
+            return '\n'.join(_[0] for _ in self)
+
         description = []
         if not terse:
             _, width = get_console_dims()

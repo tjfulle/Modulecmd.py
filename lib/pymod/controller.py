@@ -108,6 +108,15 @@ class MasterController(object):
     def __contains__(self, key):
         return key in self.environ
 
+    def post_init(self, modulepath=None):
+        for path in modulepath.split(os.pathsep):
+            if not path.split():
+                continue
+            d = os.path.normpath(path)
+            if os.path.isdir(d):
+                self.use(d)
+        self.restore_collection(DEFAULT_USER_COLLECTION_NAME)
+
     def mark_loaded_module(self, module):
         lm_files = self.environ.get_loaded_modules('filenames')
         module.is_loaded = module.filename in lm_files
@@ -901,6 +910,12 @@ class MasterController(object):
         cfg['warn_all'] = warn_all_cache
 
         return 0
+
+    @trace
+    def show_modulepath(self, stream=sys.stderr):
+        s = self.modulepath.describe(pathonly=True)
+        stream.write(s)
+        return None
 
     @trace
     def show_available_modules(self, terse=False, regex=None, fulloutput=False,

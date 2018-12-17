@@ -72,6 +72,15 @@ help_page = """\
 {sp}file <module> [module...]
 {dp}Show the file path[s] to {U}module [...]{u}.
 
+{sp}init [--mp=MP]
+{dp}Initialize the module command.  This command is a shortcut for calling
+
+{dp}{sp}module use <PATH1>
+{dp}{sp}module use <PATH2>
+{dp}{sp}...
+{dp}{sp}module use <PATHN>
+{dp}{sp}module restore default
+
 {sp}list (l) [regex] [--terse] [--show-command] [-c]
 {dp}Displays loaded modules.  {U}regex{u} is a regular expression highlighted
 {dp}in the output.
@@ -95,6 +104,9 @@ help_page = """\
 {dp}print {U}name{u} to the console output on page at a time.  Allows movement
 {dp}through files similar to shell's {I}less{i} program.  {U}name{i} can be the name
 {dp}of a module, collection, or one of {I}avail{i} or {I}collections{i}.
+
+{sp}path
+{dp}Show the module path
 
 {sp}purge
 {dp}Unload all loaded modules
@@ -465,6 +477,8 @@ def main(argv=None):
     p = sub_p.add_parser(LOAD_FROM_FILE, parents=[pp], help='Load module[s] from file')
     p.add_argument('filename', help='Valid filename')
 
+    p = sub_p.add_parser(PATH, parents=[pp], help='Show module path')
+
     p = sub_p.add_parser(PURGE, parents=[pp], help='Unload all modules')
     p.add_argument('--dryrun', action='store_true', default=False)
 
@@ -665,6 +679,13 @@ def main(argv=None):
         mc.show_available_modules(terse=args.terse, regex=args.regex,
                                   fulloutput=args.F)
         return 0
+
+    elif args.subparser == INIT:
+        mc.post_init(modulepath=args.mp)
+        mc.dump(stream=sys.stdout)
+
+    elif args.subparser == PATH:
+        mc.show_modulepath()
 
     elif args.subparser == PURGE:
         mc.purge()
