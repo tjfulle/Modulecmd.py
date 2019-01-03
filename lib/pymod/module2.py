@@ -52,6 +52,9 @@ def create_module_from_file(modulepath, path, is_explicit_default):
         logging.warning('{0} does not exist'.format(path), minverbosity=2)
         return None
     dirname, f = os.path.split(path)
+    if f.endswith('~'):
+        # Don't backup files
+        return None
     if f.endswith('.py'):
         m_type = M_PY
     else:
