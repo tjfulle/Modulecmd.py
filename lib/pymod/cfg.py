@@ -108,4 +108,14 @@ class GlobalConfiguration:
     def user_env_filename(self, arg):
         self._user_env_filename = arg
 
+    @property
+    def load_after_purge(self):
+        return self._load_after_purge
+
+    @load_after_purge.setter
+    def load_after_purge(self, arg):
+        if arg is not None:
+            arg = [x.strip() for x in arg.split(',') if x.split()]
+        self._load_after_purge = arg
+
 cfg = GlobalConfiguration()

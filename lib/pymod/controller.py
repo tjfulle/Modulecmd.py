@@ -603,11 +603,14 @@ class MasterController(object):
         return None
 
     @trace
-    def purge(self):
+    def purge(self, allow_load_after_purge=True):
         """Purge all modules from environment"""
         loaded = self.get_loaded_modules(reverse=True)
         for module in loaded:
             self.execmodule(UNLOAD, module)
+        if allow_load_after_purge and cfg.load_after_purge is not None:
+            for modulename in cfg.load_after_purge:
+                self.load(modulename)
         return None
 
     @trace
