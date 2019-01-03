@@ -60,9 +60,18 @@ class Modulepath:
         return path in self.path
 
     @trace
-    def reset(self):
+    def reset(self, directories=None):
         self.modules = None
         self.grouped_by_name = None
+        if directories is not None:
+            for directory in directories:
+                if not os.access(directory, os.R_OK):
+                    continue
+                if not os.path.isdir(directory):
+                    logging.warning('Modulepath: nonexistent directory '
+                                 '{0!r}'.format(directory), minverbosity=2)
+                else:
+                    self.path.append(directory)
         self.discover_modules_on_path()
 
     @trace

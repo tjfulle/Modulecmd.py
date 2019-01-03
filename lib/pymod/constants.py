@@ -20,7 +20,7 @@ PREPEND, PURGE, REFRESH, RELOAD = 'prepend', 'purge', 'refresh', 'reload'
 REMOVE, RESTORE, RM, SAVE, SHELL = 'remove', 'restore', 'rm', 'save', 'shell'
 SHOW, SWAP, UNLOAD, UNUSE, USE = 'show', 'swap', 'unload', 'unuse', 'use'
 WHATIS, WHICH, LOAD_FROM_FILE, CLONE = 'whatis', 'which', 'loadfile', 'clone'
-TEST, POP, PATH = 'test', 'pop', 'path'
+TEST, POP, PATH, LOAD_PARTIAL = 'test', 'pop', 'path', '*load*'
 
 PLATFORM = sys.platform.lower()
 IS_DARWIN = 'darwin' in PLATFORM

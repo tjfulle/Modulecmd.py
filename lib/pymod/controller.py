@@ -61,7 +61,7 @@ class ModuleNotFoundError(Exception):
 
 def assert_known_mode(mode):
     """Valid modes for loading/unloading modules"""
-    assert mode in (LOAD, UNLOAD, NULLOP, WHATIS, HELP, SWAP, SHOW)
+    assert mode in (LOAD, UNLOAD, NULLOP, WHATIS, HELP, SWAP, SHOW, LOAD_PARTIAL)
 
 
 # --------------------------------------------------------------------------- #
@@ -1197,24 +1197,32 @@ class MasterController(object):
     def wrap_mf_unload(self, mode):
         """Function to pass to modules to unload other modules"""
         def mf_unload(modulename):
+            if mode == LOAD_PARTIAL:
+                return
             self.cb_unload(mode, modulename)
         return mf_unload
 
     def wrap_mf_load(self, mode):
         """Function to pass to modules to load other modules"""
         def mf_load(modulename, options=None):
+            if mode == LOAD_PARTIAL:
+                return
             self.cb_load(mode, modulename, options=options)
         return mf_load
 
     def wrap_mf_swap(self, mode):
         """Function to pass to modules to load other modules"""
         def mf_swap(m1, m2):
+            if mode == LOAD_PARTIAL:
+                return
             self.cb_swap(mode, m1, m2)
         return mf_swap
 
     def wrap_mf_load_first(self, mode):
         """Function to pass to modules to load other modules"""
         def mf_load_first(*modulenames):
+            if mode == LOAD_PARTIAL:
+                return
             self.cb_load(mode, load_first_of=modulenames)
         return mf_load_first
 
@@ -1270,7 +1278,7 @@ class MasterController(object):
     def wrap_mf_set_alias(self, mode):
         """Set value of environment variable `name`"""
         def mf_set_alias(name, value):
-            if mode in (LOAD,):
+            if mode in (LOAD, LOAD_PARTIAL):
                 self.set_alias(name, value)
             elif mode in (UNLOAD,):
                 self.unset_alias(name)
@@ -1282,7 +1290,7 @@ class MasterController(object):
     def wrap_mf_unset_alias(self, mode):
         """Set value of environment variable `name`"""
         def mf_unset_alias(name):
-            if mode in (LOAD,):
+            if mode in (LOAD, LOAD_PARTIAL):
                 self.unset_alias(name)
             else:
                 # in all other modes, setenv is a null op
@@ -1292,7 +1300,7 @@ class MasterController(object):
     def wrap_mf_set_shell_function(self, mode):
         """Set value of environment variable `name`"""
         def mf_set_shell_function(name, value):
-            if mode in (LOAD,):
+            if mode in (LOAD, LOAD_PARTIAL):
                 self.set_shell_function(name, value)
             elif mode in (UNLOAD,):
                 self.unset_shell_function(name)
@@ -1304,7 +1312,7 @@ class MasterController(object):
     def wrap_mf_unset_shell_function(self, mode):
         """Set value of environment variable `name`"""
         def mf_unset_shell_function(name):
-            if mode in (LOAD,):
+            if mode in (LOAD, LOAD_PARTIAL):
                 self.unset_shell_function(name)
             else:
                 # in all other modes, setenv is a null op
@@ -1653,15 +1661,25 @@ class MasterController(object):
         if name not in clones:
             logging.error('{0!r} is not a cloned environment'.format(name))
         the_clone = dict(clones[name])
+
         # Purge current environment
-        self.purge()
-        # Load modules to make sure aliases/functions are restored
-        module_files = split(the_clone[LM_FILES_KEY], os.pathsep)
-        for filename in module_files:
-            self.loadfile(filename)
+        self.purge(allow_load_after_purge=False)
+        self.modulepath.reset(directories=the_clone[MP_KEY].split(os.pathsep))
+
         # Make sure environment matches clone
         for (key, val) in the_clone.items():
             self.environ[key] = val
+
+        # Load modules to make sure aliases/functions are restored
+        module_files = split(the_clone[LM_FILES_KEY], os.pathsep)
+        module_opts = str2dict(the_clone[LM_OPTS_KEY])
+
+        for (i, filename) in enumerate(module_files):
+            module = self.modulepath.get_module_by_filename(filename)
+            if module is None:
+                raise ModuleNotFoundError(filename, self.modulepath)
+            self.set_moduleopts(module, module_opts[module.fullname])
+            self.execmodule(LOAD_PARTIAL, module, do_not_register=True)
 
     @trace
     def remove_clone(self, name):
