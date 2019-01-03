@@ -8,7 +8,7 @@ import platform
 from .trace import trace_calls
 
 
-class GlobalConfiguration:
+class GlobalConfiguration(object):
     def __init__(self):
         # Load default settings
         d = os.path.dirname(os.path.realpath(__file__))
@@ -18,7 +18,7 @@ class GlobalConfiguration:
 
         if self.tests_in_progress:
             for (key, value) in defaults.items():
-                setattr(self, key, value)
+                self.set_attribute(key, value)
 
         else:
             self.dot_dir = os.environ.get('PYMOD_DOT_DIR', defaults['dot_dir'])
@@ -46,7 +46,10 @@ class GlobalConfiguration:
 
             for key in defaults:
                 value = user.get(key, defaults[key])
-                setattr(self, key, value)
+                self.set_attribute(key, value)
+
+    def set_attribute(self, name, value):
+        object.__setattr__(self, name, value)
 
     @property
     def verbosity(self):
