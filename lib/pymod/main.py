@@ -108,8 +108,11 @@ help_page = """\
 {sp}path
 {dp}Show the module path
 
-{sp}purge
+{sp}purge [-F]
 {dp}Unload all loaded modules
+
+{dp}With the {U}-F{u} option, no modules will be loaded after purging, even if the variable
+{dp}load_after_purge is set in the rc file.
 
 {sp}refresh
 {dp}Refresh (unload/reload) all modules
@@ -481,6 +484,7 @@ def main(argv=None):
 
     p = sub_p.add_parser(PURGE, parents=[pp], help='Unload all modules')
     p.add_argument('--dryrun', action='store_true', default=False)
+    p.add_argument('-F', action='store_true', default=False)
 
     p = sub_p.add_parser(REFRESH, parents=[pp],
                          help='Refresh (unload/reload) all modules')
@@ -688,7 +692,7 @@ def main(argv=None):
         mc.show_modulepath()
 
     elif args.subparser == PURGE:
-        mc.purge()
+        mc.purge(allow_load_after_purge=not args.F)
         mc.dump(stream=sys.stdout)
         return 0
 
