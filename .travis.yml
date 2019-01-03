@@ -11,7 +11,7 @@ python:
 install:
   - pip install pytest-cov
   - pip install codecov
-  - pip install yaml
+  - pip install ruamel.yaml
 
 script: py.test --cov=./ --cov-config=./test/.coveragerc
 
