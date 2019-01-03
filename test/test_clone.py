@@ -2,7 +2,7 @@ import os
 import pytest
 
 import tools
-from pymod.defaults import clones_filename
+from pymod.cfg import cfg
 
 class TestClone(tools.TestBase):
     def test_write_read_clones(self):
@@ -18,7 +18,7 @@ class TestClone(tools.TestBase):
 
         env1 = mc.environ.copy()
         mc.clone_current_environment('myclone')
-        assert os.path.isfile(clones_filename())
+        assert os.path.isfile(cfg.clones_filename)
         mc.unload('a')
         mc.unload('b')
         mc.restore_clone('myclone')

@@ -10,6 +10,7 @@ python:
 install:
   - pip install pytest-cov
   - pip install codecov
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install yaml; fi
 
 script: py.test --cov=./ --cov-config=./test/.coveragerc
 

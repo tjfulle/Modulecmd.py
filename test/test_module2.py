@@ -17,7 +17,7 @@ class TestModule2(tools.TestBase):
         # Check that warning is fired for non-symlink default
         modulepath = tools.t_make_temp_directory(self.datadir)
         filename = os.path.join(modulepath, 'a.py')
-        cfg['verbosity'] = 5
+        cfg.verbosity = 5
         with open(filename, 'w') as fh:
             fh.write("setenv('spam', 'baz')")
         with open(os.path.join(modulepath, 'default'), 'w') as fh:
@@ -29,7 +29,7 @@ class TestModule2(tools.TestBase):
         # Check metadata
         modulepath = tools.t_make_temp_directory(self.datadir)
         filename = os.path.join(modulepath, 'a.py')
-        cfg['verbosity'] = 5
+        cfg.verbosity = 5
         with open(filename, 'w') as fh:
             fh.write("#pymod: enable_if=True, foo=str('baz'), "
                      "do_not_register=False, \nsetenv('spam', 'baz')")
@@ -41,7 +41,7 @@ class TestModule2(tools.TestBase):
         # Check metadata
         modulepath = tools.t_make_temp_directory(self.datadir)
         filename = os.path.join(modulepath, 'a.py')
-        cfg['verbosity'] = 5
+        cfg.verbosity = 5
         with open(filename, 'w') as fh:
             # enable_if must be a bool
             fh.write("#pymod: enable_if='Foo'")

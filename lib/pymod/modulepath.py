@@ -3,7 +3,7 @@ import re
 import sys
 import json
 
-from . import defaults
+from .cfg import cfg
 from .trace import trace
 from .color import colorize
 from .logging import logging
@@ -70,15 +70,22 @@ class Modulepath:
         modules = self.grouped_by_name.get(name)
         if modules is not None:
             return modules[0]
+        candidates = {}
         for (directory, modules) in self:
             for module in modules:
                 if module.fullname == name:
                     return module
                 if os.path.sep in name:
-                    # a more qualified path
+                    # a more qualified path?
                     root = os.path.join(module.modulepath, module.fullname)
                     if root.endswith(name):
-                        return module
+                        # store just the length of the intersection of root and key
+                        key = len(root.replace(name, ''))
+                        if key not in candidates:
+                            candidates[key] = module
+        if not cfg.strict_modulename_matching and candidates:
+            key = min(list(candidates.keys()))
+            return candidates[key]
         return None
 
     @trace
@@ -352,7 +359,7 @@ class Modulepath:
     @trace
     def describe(self, terse=False, regex=None, fulloutput=False, pathonly=False):
         if pathonly:
-            return '\n'.join(_[0] for _ in self)
+            return '\n'.join('{0}) {1}'.format(i,_[0]) for i,_ in enumerate(self, start=1))
 
         description = []
         if not terse:
@@ -425,13 +432,13 @@ class Modulepath:
                 d_cache[module.filename] = {'st_mtime': int(t),
                                             'kwds': module.asdict('load', env)}
             cache[directory] = d_cache
-        filename = os.path.join(defaults.dot_dir(), 'modulepath.json')
+        filename = os.path.join(cfg.dot_dir, 'modulepath.json')
         with open(filename, 'w') as fh:
             json.dump(cache, fh, indent=2)
 
     @trace
     def read_cache(self):
-        filename = os.path.join(defaults.dot_dir(), 'modulepath.json')
+        filename = os.path.join(cfg.dot_dir, 'modulepath.json')
         if os.path.isfile(filename):
             with open(filename, 'r') as fh:
                 return json.load(fh)

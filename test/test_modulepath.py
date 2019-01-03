@@ -150,6 +150,7 @@ class TestModulepath(tools.TestBase):
         # More qualified name should work
         d = os.path.basename(os.path.realpath(d2))
         m = mp.get_module_by_name(d+'/a/2.0')
+        assert m is not None, d
         assert m.filename == os.path.realpath(f2_2), m.filename
 
     def test_modulepath_module_loaded(self):

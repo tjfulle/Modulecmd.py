@@ -19,7 +19,7 @@ has_tclsh = which('tclsh') is not None
 class TCLModulesNotFoundError(Exception):
     def __init__(self):
         msg = 'TCL modules not installed'
-        if cfg['verbosity'] < 2:
+        if cfg.verbosity < 2:
             logging.error(msg)
         else:
             super(TCLModulesNotFoundError, self).__init__(msg)

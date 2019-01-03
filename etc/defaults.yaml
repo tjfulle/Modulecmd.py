@@ -1,0 +1,26 @@
+pymod:
+  dot_dir: "~/.pymod.d"
+  debug: false
+  verbosity: 1
+  warn_all: true
+  cache_avail: true
+  stop_on_error: true
+  resolve_conflicts: false
+  editor: "vim"
+
+  # Only load modules that match module name exactly. Otherwise, you can
+  # specify a more qualified module name. e.g., to load ucc/1.0 you can specify
+  #    module load ucc/1.0
+  # or
+  #    module load <path>/ucc/1.0
+  # <path> need not be the full path, just a partial path.
+  strict_modulename_matching: false
+
+  # when loading devpacks, do not add the devpack module to list of loaded
+  # modules
+  skip_add_devpack: false
+
+  # Files to store collections and clones.  Files stored in dot_dir
+  collections_filename: "collections.json"
+  clones_filename: "clones.json"
+  user_env_filename: "user.py"

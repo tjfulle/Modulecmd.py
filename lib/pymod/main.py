@@ -670,9 +670,9 @@ def main(argv=None):
 
     dryrun = getattr(args, 'dryrun', False)
     if args.verbosity is not None:
-        cfg['verbosity'] = args.verbosity
+        cfg.verbosity = args.verbosity
     if args.debug:
-        cfg['debug'] = args.debug
+        cfg.debug = args.debug
     mc = MasterController(shell=args.shell, dryrun=dryrun)
 
     if args.subparser == AVAIL:
@@ -706,7 +706,7 @@ def main(argv=None):
             mc.show_available_collections(terse=args.terse)
 
         elif args.subcommand == RESTORE:
-            cfg['stop_on_error'] = not bool(args.I)
+            cfg.stop_on_error = not bool(args.I)
             warn_if_missing = True
             if args.name is None:
                 # Restore default collection
@@ -959,8 +959,8 @@ def get_entity_text(mc, name):
     elif name in mc.collections:
         collection = mc.collections.get(name)
         return json.dumps(collection, default=serialize, indent=2)
-    elif os.path.isfile(os.path.join(user.dot_dir(), name + '.json')):
-        return open(os.path.join(user.dot_dir(), name + '.json')).read()
+    elif os.path.isfile(os.path.join(cfg.dot_dir, name + '.json')):
+        return open(os.path.join(cfg.dot_dir, name + '.json')).read()
     sys.exit('Unknown named entity {0!r}'.format(name))
 
 

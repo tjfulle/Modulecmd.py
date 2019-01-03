@@ -13,8 +13,8 @@ class TestCommandLineInterface(tools.TestBase):
     def setup_class(self):
 
         self.datadir = tools.t_make_temp_directory()
-        self.dotdir = os.path.join(self.datadir, 'pymod.d')
-        tools.t_make_directory(self.dotdir)
+        dotdir = os.path.join(self.datadir, 'pymod.d')
+        tools.t_make_directory(dotdir)
 
         self.modulepath = os.path.join(self.datadir, 'modules')
 
@@ -23,7 +23,8 @@ class TestCommandLineInterface(tools.TestBase):
         self.old[LM_KEY] = os.environ.pop(LM_KEY, None)
         self.old['VAR_0'] = None
 
-        os.environ['PYMOD_DOT_DIR'] = self.dotdir
+        os.environ['PYMOD_DOT_DIR'] = dotdir
+        pymod.cfg.dot_dir = dotdir
         os.environ[MP_KEY] = self.modulepath
         os.environ[LM_KEY] = 'f0'
         os.environ[LM_FILES_KEY] = os.path.join(self.modulepath, 'f0.py')
@@ -31,8 +32,6 @@ class TestCommandLineInterface(tools.TestBase):
         os.environ['VAR_0'] = 'VAL_0'
 
         tools.t_make_directory(self.modulepath)
-
-        pymod.user._dot_dir(reset=1)
 
         for i in (0, 1, 2):
             with open(os.path.join(self.modulepath, 'f{0}.py'.format(i)), 'w') as fh:
@@ -110,7 +109,7 @@ class TestCommandLineInterface(tools.TestBase):
     def test_collection(self, capsys):
         name = DEFAULT_USER_COLLECTION_NAME
         self.main(['bash', 'save'])
-        filename = os.path.join(self.dotdir, 'collections.json')
+        filename = os.path.join(pymod.cfg.dot_dir, 'collections.json')
         assert os.path.isfile(filename)
 
         name = 'test'

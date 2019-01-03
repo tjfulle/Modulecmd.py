@@ -9,6 +9,7 @@ from . import defaults
 from .utils import serialize, get_console_dims, wrap2, strip_quotes, grep_pat_in_string
 from .color import colorize
 from .logging import logging
+from .cfg import cfg
 
 
 # --------------------------------------------------------------------------- #
@@ -29,14 +30,14 @@ class Collections:
 
     @trace
     def read(self, filename=None):
-        filename = filename or defaults.collections_filename()
+        filename = filename or cfg.collections_filename
         if os.path.isfile(filename):
             return json.load(open(filename))
         return {}
 
     @trace
     def write(self, collections, filename=None):
-        filename = filename or defaults.collections_filename()
+        filename = filename or cfg.collections_filename
         with open(filename, 'w') as fh:
             json.dump(collections, fh, default=serialize, indent=2)
         return

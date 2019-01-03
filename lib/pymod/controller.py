@@ -9,7 +9,6 @@ from collections import OrderedDict
 
 from .constants import *
 from .utils import *
-from . import defaults
 from . import user
 from .defaults import *
 from .color import colorize
@@ -34,7 +33,7 @@ class InconsistentModuleState(Exception):
             'This is probably due to a module modifying MODULEPATH and ' \
             'causing automatic changes in loaded/unloaded modules'
         msg = m.format(module.fullname)
-        if cfg['verbosity'] < 2:
+        if cfg.verbosity < 2:
             logging.error(msg)
         else:
             super(InconsistentModuleState, self).__init__(msg)
@@ -54,7 +53,7 @@ class ModuleNotFoundError(Exception):
                 msg += '\n\nDid you mean one of these?'
                 msg += '\n\t{0}'.format('\t'.join(candidates))
         super(ModuleNotFoundError, self).__init__(msg)
-        if cfg['verbosity'] < 2:
+        if cfg.verbosity < 2:
             logging.error(msg)
         else:
             super(ModuleNotFoundError, self).__init__(msg)
@@ -75,7 +74,7 @@ class MasterController(object):
             env = os.environ
 
         if verbosity is not None:
-            cfg['verbosity'] = int(verbosity)
+            cfg.verbosity = int(verbosity)
 
         self.moduleopts = {}
 
@@ -85,8 +84,6 @@ class MasterController(object):
         self.load_for_show = False
         self.aliases = OrderedDict()
         self.shell_functions = OrderedDict()
-        self.resolve_conflicts = self.environ.defined('PYMOD_RESOLVE_CONFLICTS')
-        self.skip_add_devpack = self.environ.defined('PYMOD_SKIP_ADD_DEVPACK')
 
         mp, extra = get_unique(split(self.environ[MP_KEY], os.pathsep))
         if extra:
@@ -244,7 +241,7 @@ class MasterController(object):
         # Update the environment
         if module.modulepath not in self.modulepath:
             raise InconsistentModuleState(module)
-        if self.skip_add_devpack and module.name.startswith('devpack'):
+        if cfg.skip_add_devpack and module.name.startswith('devpack'):
             return
         if do_not_register:
             return
@@ -441,7 +438,7 @@ class MasterController(object):
                 module = self.modulepath.get_module_by_filename(m_dict['filename'])
                 if module is None:
                     msg = 'Saved module {0!r} does not exist'.format(m_dict['name'])
-                    if cfg['stop_on_error']:
+                    if cfg.stop_on_error:
                         logging.error(msg)
                     else:
                         logging.warning(msg)
@@ -891,8 +888,8 @@ class MasterController(object):
             stream.write(string+'\n')
             return 0
 
-        warn_all_cache = cfg['warn_all']
-        cfg['warn_all'] = False
+        warn_all_cache = cfg.warn_all
+        cfg.warn_all = False
 
         module = self.get_module(modulename)
         if module is None:
@@ -907,7 +904,7 @@ class MasterController(object):
         self.execmodule(LOAD, module)
 
         # Restore old values
-        cfg['warn_all'] = warn_all_cache
+        cfg.warn_all = warn_all_cache
 
         return 0
 
@@ -1033,13 +1030,10 @@ class MasterController(object):
             raise ModuleNotFoundError(modulename, self.modulepath)
 
         filename = module.filename
-        if cfg.pytest_in_progress:
+        if cfg.tests_in_progress:
             sys.stdout.write('vim {0}'.format(filename))
             return
-        try:
-            user.user_env.edit_modulefile(filename)
-        except AttributeError:
-            edit_file_in_vim(filename)
+        edit_file(filename)
 
     # -------------------------- SANDBOX FUNCTIONS -------------------------- #
     @trace
@@ -1498,7 +1492,7 @@ class MasterController(object):
         loaded = self.get_loaded_modules(names_and_short_names=True)
         for modulename in modulenames:
             if modulename in loaded:
-                if self.resolve_conflicts:
+                if cfg.resolve_conflicts:
                     # Unload the conflicting module
                     self.unload(modulename)
                 else:
@@ -1642,7 +1636,7 @@ class MasterController(object):
     @trace
     def clone_current_environment(self, name):
         env = self.shell.filter_environ(self.environ)
-        filename = defaults.clones_filename()
+        filename = cfg.clones_filename
         clones = self.read_clones(filename)
         clones[name] = [(key, val) for (key, val) in env.items()]
         with open(filename, 'w') as fh:
@@ -1651,7 +1645,7 @@ class MasterController(object):
 
     @trace
     def restore_clone(self, name):
-        filename = defaults.clones_filename()
+        filename = cfg.clones_filename
         clones = self.read_clones(filename)
         if name not in clones:
             logging.error('{0!r} is not a cloned environment'.format(name))
@@ -1668,7 +1662,7 @@ class MasterController(object):
 
     @trace
     def remove_clone(self, name):
-        filename = defaults.clones_filename()
+        filename = cfg.clones_filename
         clones = self.read_clones(filename)
         clones.pop(name, None)
         with open(filename, 'w') as fh:
@@ -1678,7 +1672,7 @@ class MasterController(object):
     @trace
     def display_clones(self, terse=False, stream=sys.stderr):
         string = []
-        filename = defaults.clones_filename()
+        filename = cfg.clones_filename
         clones = self.read_clones(filename)
         names = sorted([x for x in clones.keys()])
         if not terse:

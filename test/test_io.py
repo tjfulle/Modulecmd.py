@@ -6,12 +6,12 @@ class TestIO(tools.TestBase):
         string = 'string'
         write_to_console(string)
         write_to_console(string, end='')
-        write_to_console(string, minverbosity=cfg['verbosity']+1)
-        write_to_console(string, end='', minverbosity=cfg['verbosity']+1)
+        write_to_console(string, minverbosity=cfg.verbosity+1)
+        write_to_console(string, end='', minverbosity=cfg.verbosity+1)
         logging.info('arg')
         logging.debug('arg')
         logging.warning('arg')
-        cfg['verbosity'] = 5
+        cfg.verbosity = 5
         logging.info('arg', filename='foo')
         logging.debug('arg', filename='foo')
         logging.warning('arg', filename='foo')

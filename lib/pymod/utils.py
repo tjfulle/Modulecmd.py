@@ -11,6 +11,7 @@ from textwrap import fill
 
 from .color import colorize
 from . import compat
+from .cfg import cfg
 
 
 execfun = compat.execfun
@@ -217,6 +218,16 @@ def edit_string_in_vim(string):  # pragma: no cover
 def edit_file_in_vim(filename):  # pragma: no cover
     subprocess.call(['vim', '-u', 'NONE', filename], stdout=sys.stderr)
     return None
+
+
+def edit_file(filename):  # pragma: no cover
+    if cfg.editor == 'vim':
+        return edit_file_in_vim(filename)
+    elif cfg.editor == 'user.edit_file':
+        from .user import user_env
+        user_env.edit_file(filename)
+    else:
+        subprocess.call([cfg.editor, filename], stdout=sys.stderr)
 
 
 def serialize(obj, *args):  # pragma: no cover
