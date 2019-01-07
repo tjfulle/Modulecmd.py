@@ -4,7 +4,7 @@ import pytest
 
 import tools
 from pymod.utils import *
-from pymod.cfg import cfg
+from pymod.config import cfg
 
 class TestDefaults(tools.TestBase):
 

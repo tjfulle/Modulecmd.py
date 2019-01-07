@@ -11,7 +11,7 @@ from textwrap import fill
 
 from .color import colorize
 from . import compat
-from .cfg import cfg
+from .config import cfg
 
 
 execfun = compat.execfun

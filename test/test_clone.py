@@ -2,7 +2,7 @@ import os
 import pytest
 
 import tools
-from pymod.cfg import cfg
+from pymod.config import cfg
 
 class TestClone(tools.TestBase):
     def test_write_read_clones(self):

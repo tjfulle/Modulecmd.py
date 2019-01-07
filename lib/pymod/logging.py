@@ -1,6 +1,6 @@
 import sys
 
-from .cfg import cfg
+from .config import cfg
 from .color import colorize
 
 # --------------------------------------------------------------------------- #

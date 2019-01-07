@@ -1,7 +1,7 @@
 import os
 import sys
 from .utils import import_module_by_filepath
-from .cfg import cfg
+from .config import cfg
 
 class UserEnv:
     def __init__(self):

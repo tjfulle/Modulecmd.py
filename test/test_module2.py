@@ -2,7 +2,7 @@ import os
 import sys
 import tools
 from pymod.module2 import Module2, read_metadata
-from pymod.cfg import cfg
+from pymod.config import cfg
 
 class TestModule2(tools.TestBase):
     def test_module2_1(self):

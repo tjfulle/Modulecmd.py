@@ -9,7 +9,7 @@ from . import defaults
 from .utils import serialize, get_console_dims, wrap2, strip_quotes, grep_pat_in_string
 from .color import colorize
 from .logging import logging
-from .cfg import cfg
+from .config import cfg
 
 
 # --------------------------------------------------------------------------- #

@@ -20,7 +20,7 @@ from .instruction_logger import InstructionLogger
 from .pager import pager
 from .trace import trace
 from .shell import get_shell
-from .cfg import cfg
+from .config import cfg
 from .environ import Environ
 from .modulepath import Modulepath
 from .collections2 import Collections

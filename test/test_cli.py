@@ -24,7 +24,7 @@ class TestCommandLineInterface(tools.TestBase):
         self.old['VAR_0'] = None
 
         os.environ['PYMOD_DOT_DIR'] = dotdir
-        pymod.cfg.dot_dir = dotdir
+        pymod.config.dot_dir = dotdir
         os.environ[MP_KEY] = self.modulepath
         os.environ[LM_KEY] = 'f0'
         os.environ[LM_FILES_KEY] = os.path.join(self.modulepath, 'f0.py')
@@ -109,7 +109,7 @@ class TestCommandLineInterface(tools.TestBase):
     def test_collection(self, capsys):
         name = DEFAULT_USER_COLLECTION_NAME
         self.main(['bash', 'save'])
-        filename = os.path.join(pymod.cfg.dot_dir, 'collections.json')
+        filename = os.path.join(pymod.config.dot_dir, 'collections.json')
         assert os.path.isfile(filename)
 
         name = 'test'

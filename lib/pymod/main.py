@@ -8,7 +8,7 @@ import argparse
 
 from . import defaults
 from .constants import *
-from .cfg import cfg
+from .config import cfg
 from .trace import trace
 from .pager import pager
 from .shell import get_shell

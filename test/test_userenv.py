@@ -10,7 +10,7 @@ class TestUserEnv(tools.TestBase):
         assert m.empty()
 
     def test_load_user_env_exist(self):
-        from pymod.cfg import cfg
+        from pymod.config import cfg
         import pymod.user
         filename = cfg.user_env_filename
         with open(filename, 'w') as fh:

@@ -1,5 +1,5 @@
 import tools
-from pymod.cfg import cfg
+from pymod.config import cfg
 from pymod.logging import logging, write_to_console
 class TestIO(tools.TestBase):
     def test_write_to_console(self):

@@ -11,7 +11,7 @@ sys.path.insert(0, pymod_pkg_dir)
 
 
 import pymod
-pymod.cfg.cfg.tests_in_progress = True
+pymod.config.cfg.tests_in_progress = True
 
 
 class TestBase(object):
@@ -21,7 +21,7 @@ class TestBase(object):
         dotdir = os.path.join(self.datadir, 'pymod.d')
         t_make_directory(dotdir)
         os.environ['PYMOD_DOT_DIR'] = dotdir
-        pymod.cfg.cfg.dot_dir = dotdir
+        pymod.config.cfg.dot_dir = dotdir
         self.dotdir = dotdir
 
     def teardown_class(self):

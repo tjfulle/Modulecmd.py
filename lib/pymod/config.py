@@ -21,18 +21,22 @@ class GlobalConfiguration(object):
                 self.set_attribute(key, value)
 
         else:
-            self.dot_dir = os.environ.get('PYMOD_DOT_DIR', defaults['dot_dir'])
+            self.dot_dir = os.path.expanduser(
+                os.environ.get('PYMOD_DOT_DIR', defaults['dot_dir']))
             # Load user specific settings, if testing not in progress
             user = {}
-            for f in ('rc.yaml', platform.uname()[0].lower()+'.yaml'):
-                filename = os.path.join(os.path.expanduser(self.dot_dir), f)
-                if os.path.isfile(filename):
+            files_to_search = (
+                os.path.join(self.dot_dir, 'config.yaml'),
+                os.path.join(self.dot_dir, platform.uname()[0].lower(), 'config.yaml'),
+                os.getenv('PYMOD_CONFIG_FILE'))
+            for filename in files_to_search:
+                if filename and os.path.isfile(filename):
                     dikt = yaml.load(open(filename))
-                    if 'pymod' not in dikt:
+                    if 'config' not in dikt:
                         s = 'Warning: Unable to find pymod configuration in {0}\n'
                         sys.stderr.write(s.format(filename))
                         continue
-                    user.update(dikt['pymod'])
+                    user.update(dikt['config'])
 
             # check environment for user specific settings
             for key in defaults:

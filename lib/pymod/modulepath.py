@@ -3,7 +3,7 @@ import re
 import sys
 import json
 
-from .cfg import cfg
+from .config import cfg
 from .trace import trace
 from .color import colorize
 from .logging import logging

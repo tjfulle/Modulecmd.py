@@ -5,7 +5,7 @@ from textwrap import fill
 import platform
 
 from .constants import *
-from .cfg import cfg
+from .config import cfg
 from .trace import trace
 from .tcl2py import tcl2py
 from .logging import logging
