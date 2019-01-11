@@ -437,7 +437,7 @@ class MasterController(object):
             for m_dict in modules:
                 module = self.modulepath.get_module_by_filename(m_dict['filename'])
                 if module is None:
-                    msg = 'Saved module {0!r} does not exist'.format(m_dict['name'])
+                    msg = 'Saved module {0!r} does not exist ({1})'.format(m_dict['name'], m_dict['filename'])
                     if cfg.stop_on_error:
                         logging.error(msg)
                     else:
@@ -922,6 +922,9 @@ class MasterController(object):
                                stream=sys.stderr):
         s = self.modulepath.describe(terse=terse, regex=regex,
                                      fulloutput=fulloutput)
+        stream.write(s)
+        stream.write("\n")
+        s = self.collections.describe(terse=terse)
         stream.write(s)
         return None
 

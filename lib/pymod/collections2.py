@@ -95,6 +95,7 @@ class Collections:
                 s = '(None)'.center(width)
             else:
                 s = wrap2(names, width)
+            string.append(' Saved collections '.center(width, '-'))
             string.append(s+'\n')
         else:
             if names:
