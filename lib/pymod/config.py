@@ -11,46 +11,66 @@ from .trace import trace_calls
 class GlobalConfiguration(object):
     def __init__(self):
         # Load default settings
+        __d = '~/.pymod.d'
+        __f = 'config.yaml'
+
         d = os.path.dirname(os.path.realpath(__file__))
         etc_d = os.path.join(d, '..', '..', 'etc')
-        defaults = yaml.load(open(os.path.join(etc_d, 'defaults.yaml')))['pymod']
+        defaults = self.read_config(os.path.join(etc_d, __f))
+        if defaults is None:
+            raise Exception('Default configuration has been moved!')
+
+        # Load user specific settings, if testing not in progress
+        user = {}
         self.tests_in_progress = getattr(sys, '_pytest_in_progress_', False)
+        if not self.tests_in_progress:
 
-        if self.tests_in_progress:
-            for (key, value) in defaults.items():
-                self.set_attribute(key, value)
+            self.dot_dir = os.path.expanduser(os.environ.get('PYMOD_DOT_DIR', __d))
 
-        else:
-            self.dot_dir = os.path.expanduser(
-                os.environ.get('PYMOD_DOT_DIR', defaults['dot_dir']))
-            # Load user specific settings, if testing not in progress
             user = {}
             files_to_search = (
-                os.path.join(self.dot_dir, 'config.yaml'),
-                os.path.join(self.dot_dir, platform.uname()[0].lower(), 'config.yaml'),
-                os.getenv('PYMOD_CONFIG_FILE'))
+                os.path.join(self.dot_dir, __f),
+                os.path.join(self.dot_dir, platform.uname()[0].lower(), __f),
+                os.environ.get('PYMOD_CONFIG_FILE', os.getenv('pymod_config_file')))
             for filename in files_to_search:
                 if filename and os.path.isfile(filename):
-                    dikt = yaml.load(open(filename))
-                    if 'config' not in dikt:
-                        s = 'Warning: Unable to find pymod configuration in {0}\n'
-                        sys.stderr.write(s.format(filename))
+                    __cfg = self.read_config(filename)
+                    if __cfg is None:
+                        sys.stderr.write('Warning: pymod configuration file '
+                                         '{0!r} does not define a \'config\' entry\n'
+                                         .format(filename))
                         continue
-                    user.update(dikt['config'])
+                    user.update(__cfg)
 
             # check environment for user specific settings
             for key in defaults:
-                if os.getenv('PYMOD_'.format(key.upper())):
-                    value = environ['PYMOD_'.format(key.upper())]
-                    if value.lower() in ('0', 'false', 'off'):
-                        value = False
-                    elif value.lower() in ('1', 'true', 'on'):
-                        value = True
-                    user[key] = value
+                envar = 'pymod_{0}'.format(key)
+                if os.getenv(envar):
+                    value = os.environ[envar]
+                elif os.getenv(envar.upper()):
+                    value = os.environ[envar.upper()]
+                else:
+                    continue
+                if value.lower() in ('0', 'false', 'off'):
+                    value = False
+                elif value.lower() in ('1', 'true', 'on'):
+                    value = True
+                elif not value.split():
+                    value = None
+                user[key] = value
 
-            for key in defaults:
-                value = user.get(key, defaults[key])
-                self.set_attribute(key, value)
+        for (key, value) in defaults.items():
+            value = user.get(key, value)
+            self.set_attribute(key, value)
+
+    @staticmethod
+    def config_key(filename):
+        return os.path.splitext(os.path.basename(filename))[0]
+
+    @staticmethod
+    def read_config(filename, key='config'):
+        dikt = yaml.load(open(filename))
+        return dikt.get(key)
 
     def set_attribute(self, name, value):
         object.__setattr__(self, name, value)
@@ -85,7 +105,10 @@ class GlobalConfiguration(object):
 
     @property
     def collections_filename(self):
-        return os.path.join(self.dot_dir, self._collections_filename)
+        dirname = os.path.join(self.dot_dir, 'collections')
+        if not os.path.isdir(dirname):
+            os.makedirs(dirname)
+        return os.path.join(dirname, self._collections_filename)
 
     @collections_filename.setter
     def collections_filename(self, arg):
@@ -93,7 +116,10 @@ class GlobalConfiguration(object):
 
     @property
     def clones_filename(self):
-        return os.path.join(self.dot_dir, self._clones_filename)
+        dirname = os.path.join(self.dot_dir, 'clones')
+        if not os.path.isdir(dirname):
+            os.makedirs(dirname)
+        return os.path.join(dirname, self._clones_filename)
 
     @clones_filename.setter
     def clones_filename(self, arg):

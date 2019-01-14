@@ -1,12 +1,26 @@
-pymod:
-  dot_dir: "~/.pymod.d"
+config:
+
+  # Do extra debug checking
   debug: false
+
+  # Verbosity > 2 gives a lot of output
   verbosity: 1
+
+  # Emit all warnings
   warn_all: true
+
+  # Cache available modules for faster lookup.  Cache needs to be rebuilt if
+  # modules are added or removed.
   cache_avail: true
+
+  # Stop on first error encountered
   stop_on_error: true
   resolve_conflicts: false
+
+  # Editor to open for modifying files
   editor: "vim"
+
+  # Modules to load after calling `module purge`
   load_after_purge: null
 
   # Only load modules that match module name exactly. Otherwise, you can
@@ -18,10 +32,10 @@ pymod:
   strict_modulename_matching: false
 
   # when loading devpacks, do not add the devpack module to list of loaded
-  # modules
+  # modules.  Useful for smart MODULEPATH updating and switching.
   skip_add_devpack: false
 
-  # Files to store collections and clones.  Files stored in dot_dir
+  # Files to store collections and clones.  Paths relative to dot_dir.
   collections_filename: "collections.json"
   clones_filename: "clones.json"
   user_env_filename: "user.py"
