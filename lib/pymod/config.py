@@ -105,10 +105,7 @@ class GlobalConfiguration(object):
 
     @property
     def collections_filename(self):
-        dirname = os.path.join(self.dot_dir, 'collections')
-        if not os.path.isdir(dirname):
-            os.makedirs(dirname)
-        return os.path.join(dirname, self._collections_filename)
+        return os.path.join(self.dot_dir, self._collections_filename)
 
     @collections_filename.setter
     def collections_filename(self, arg):
@@ -116,10 +113,7 @@ class GlobalConfiguration(object):
 
     @property
     def clones_filename(self):
-        dirname = os.path.join(self.dot_dir, 'clones')
-        if not os.path.isdir(dirname):
-            os.makedirs(dirname)
-        return os.path.join(dirname, self._clones_filename)
+        return os.path.join(self.dot_dir, self._clones_filename)
 
     @clones_filename.setter
     def clones_filename(self, arg):
