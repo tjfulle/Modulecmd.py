@@ -4,7 +4,6 @@ try:
     import yaml
 except ImportError:
     import tpl.yaml as yaml
-import platform
 from .trace import trace_calls
 
 
@@ -30,7 +29,6 @@ class GlobalConfiguration(object):
             user = {}
             files_to_search = (
                 os.path.join(self.dot_dir, __f),
-                os.path.join(self.dot_dir, platform.uname()[0].lower(), __f),
                 os.environ.get('PYMOD_CONFIG_FILE', os.getenv('pymod_config_file')))
             for filename in files_to_search:
                 if filename and os.path.isfile(filename):
