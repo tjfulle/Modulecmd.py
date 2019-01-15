@@ -10,35 +10,22 @@ from .trace import trace_calls
 class GlobalConfiguration(object):
     def __init__(self):
         # Load default settings
-        __d = '~/.pymod.d'
-        __f = 'config.yaml'
 
         d = os.path.dirname(os.path.realpath(__file__))
         etc_d = os.path.join(d, '..', '..', 'etc')
-        defaults = self.read_config(os.path.join(etc_d, __f))
+        defaults = self.read_config(os.path.join(etc_d, 'config.yaml'))
         if defaults is None:
             raise Exception('Default configuration has been moved!')
 
         # Load user specific settings, if testing not in progress
-        user = {}
+        user_cfg = {}
         self.tests_in_progress = getattr(sys, '_pytest_in_progress_', False)
         if not self.tests_in_progress:
 
-            self.dot_dir = os.path.expanduser(os.environ.get('PYMOD_DOT_DIR', __d))
-
-            user = {}
-            files_to_search = (
-                os.path.join(self.dot_dir, __f),
-                os.environ.get('PYMOD_CONFIG_FILE', os.getenv('pymod_config_file')))
-            for filename in files_to_search:
-                if filename and os.path.isfile(filename):
-                    __cfg = self.read_config(filename)
-                    if __cfg is None:
-                        sys.stderr.write('Warning: pymod configuration file '
-                                         '{0!r} does not define a \'config\' entry\n'
-                                         .format(filename))
-                        continue
-                    user.update(__cfg)
+            default_d = '~/.pymod.d'
+            d_from_env = os.getenv('PYMOD_DOT_DIR')
+            self.dot_dir = os.path.expanduser(d_from_env or default_d)
+            user_cfg.update(self.load_user_cfg(self.dot_dir))
 
             # check environment for user specific settings
             for key in defaults:
@@ -55,11 +42,40 @@ class GlobalConfiguration(object):
                     value = True
                 elif not value.split():
                     value = None
-                user[key] = value
+                user_cfg[key] = value
 
         for (key, value) in defaults.items():
-            value = user.get(key, value)
+            value = user_cfg.get(key, value)
             self.set_attribute(key, value)
+
+    def load_user_cfg(self, dirname):
+        def warn(s):
+            sys.stderr.write('Modulecmd.py: warning: ' + s + '\n')
+
+        user_cfg = {}
+
+        # check default
+        filename = os.path.join(dirname, 'config.yaml')
+        if os.path.isfile(filename):
+            __cfg = self.read_config(filename)
+            if __cfg is None:
+                warn("{0!r} does not define a 'config' entry".format(filename))
+            else:
+                user_cfg.update(__cfg)
+
+        # Check environment variable
+        filename = os.environ.get('PYMOD_CONFIG_FILE', os.getenv('pymod_config_file'))
+        if filename:
+            if not os.path.isfile(filename):
+                warn('config file {0!r} does not exist'.format(filename))
+            else:
+                __cfg = self.read_config(filename)
+                if __cfg is None:
+                    warn("{0!r} does not define a 'config' entry".format(filename))
+                else:
+                    user_cfg.update(__cfg)
+
+        return user_cfg
 
     @staticmethod
     def config_key(filename):
