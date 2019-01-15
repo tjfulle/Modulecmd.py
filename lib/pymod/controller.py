@@ -846,8 +846,9 @@ class MasterController(object):
         self.collections[name] = json.loads(snew)
 
     @trace
-    def show_available_collections(self, terse=False, stream=sys.stderr):
-        s = self.collections.describe(terse=terse)
+    def show_available_collections(self, terse=False, regex=None,
+                                   stream=sys.stderr):
+        s = self.collections.describe(terse=terse, regex=regex)
         stream.write(s)
         return None
 
@@ -924,7 +925,7 @@ class MasterController(object):
                                      fulloutput=fulloutput)
         stream.write(s)
         stream.write("\n")
-        s = self.collections.describe(terse=terse)
+        s = self.collections.describe(terse=terse, regex=regex)
         stream.write(s)
         return None
 

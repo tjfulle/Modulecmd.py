@@ -9,6 +9,7 @@ import argparse
 from . import defaults
 from .constants import *
 from .config import cfg
+from .color import colorize
 from .trace import trace
 from .pager import pager
 from .shell import get_shell

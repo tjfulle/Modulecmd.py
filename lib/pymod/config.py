@@ -145,4 +145,16 @@ class GlobalConfiguration(object):
             arg = [x.strip() for x in arg.split(',') if x.split()]
         self._load_after_purge = arg
 
+    @property
+    def color_output(self):
+        return self._color_output
+
+    @color_output.setter
+    def color_output(self, arg):
+        if arg is None:
+            arg = 'never'
+        if not arg in ('always', 'auto', 'never'):
+            raise ValueError('color: must be one of always, auto, never')
+        self._color_output = arg
+
 cfg = GlobalConfiguration()

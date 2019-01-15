@@ -6,7 +6,7 @@ from collections import OrderedDict
 from .constants import *
 from .trace import trace
 from . import defaults
-from .utils import serialize, get_console_dims, wrap2, strip_quotes, grep_pat_in_string
+from .utils import serialize, get_console_dims, wrap2, grep_pat_in_string
 from .color import colorize
 from .logging import logging
 from .config import cfg
@@ -82,13 +82,22 @@ class Collections:
         items.pop(name, None)
         self.write(items)
 
+    def filter_collections_by_regex(self, collections, regex):
+        if regex:
+            collections = [c for c in collections if re.search(regex, c)]
+        return collections
+
     @trace
-    def describe(self, terse=False):
+    def describe(self, terse=False, regex=None):
         string = []
         items = self.items
         skip = (defaults.DEFAULT_USER_COLLECTION_NAME,
                 defaults.DEFAULT_SYS_COLLECTION_NAME)
         names = sorted([x for x in items.keys() if x not in skip])
+        if regex:
+            names = self.filter_collections_by_regex(names, regex)
+            if not names:
+                return ''
         if not terse:
             _, width = get_console_dims()
             if not names:
@@ -102,4 +111,6 @@ class Collections:
                 string.append('\n'.join(c for c in names))
 
         string = '\n'.join(string)
+        if regex is not None:
+            string = grep_pat_in_string(string, regex)
         return string
