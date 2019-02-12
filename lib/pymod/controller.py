@@ -1574,6 +1574,11 @@ class MasterController(object):
             values = reversed(values)
 
         curpath = split(self.environ.get(name), sep)
+        if name.endswith('LD_LIBRARY_PATH'):
+            # sometimes python doesn't pick up ld_library_path :(
+            backup_curpath = split(self.environ.get('__ld_library_path__'), sep)
+            if not curpath and backup_curpath:
+                curpath = backup_curpath
 
         for path_val in values:
             refcount = None
@@ -1608,8 +1613,12 @@ class MasterController(object):
             rc_d[path_val] = refcount
             self.environ[LM_REFCNT_NAME] = dict2str(rc_d)
         self.environ[name] = join(curpath, sep)
+        if name.endswith('LD_LIBRARY_PATH'):
+            # sometimes python doesn't pick up ld_library_path :(
+            self.setenv('__ld_library_path__', join(curpath, sep))
         if action == REMOVE and not self.environ[name]:
             self.environ[name] = None
+
 
     @trace
     def family(self, mode, family_name, module):
