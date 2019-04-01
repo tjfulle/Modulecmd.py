@@ -401,6 +401,19 @@ class MasterController(object):
         return self.unuse(dirname)
 
     @trace
+    def cb_source(self, mode, filename):
+        """Source a script"""
+        key = 'PYMOD_SOURCED_FILES'
+        is_sourced = split(self.environ.get(key))
+        if mode == LOAD and filename not in is_sourced:
+            if not os.path.isfile(filename):
+                logging.error('{0}: no such file to source'.format(filename))
+            command = self.shell.source_command(filename)
+            is_sourced.append(filename)
+            self.environ[key] = os.pathsep.join(is_sourced)
+            sys.stdout.write(command + ';\n')
+
+    @trace
     def save_collection(self, name, isolate=False):
         loaded = self.get_loaded_modules()
         module_opts = self.environ.get_loaded_modules('opts')
@@ -1170,6 +1183,8 @@ class MasterController(object):
             HELP: self.wrap_mf_help(mode, module),
             'which': which,
             'check_output': check_output,
+            #
+            'source': self.wrap_mf_source(mode),
         }
 
         # Execute the environment
@@ -1235,6 +1250,12 @@ class MasterController(object):
         def mf_is_loaded(modulename):
             return self.cb_is_loaded(modulename)
         return mf_is_loaded
+
+    def wrap_mf_source(self, mode):
+        """Function to pass to modules to load other modules"""
+        def mf_source(filename):
+            return self.cb_source(mode, filename)
+        return mf_source
 
     def wrap_mf_setenv(self, mode):
         """Set value of environment variable `name`"""

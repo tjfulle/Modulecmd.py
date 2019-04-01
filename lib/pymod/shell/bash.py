@@ -42,3 +42,5 @@ class Bash(Shell):
             env[key] = val
         return env
 
+    def source_command(self, filename):
+        return 'source {0}'.format(filename)

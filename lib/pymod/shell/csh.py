@@ -52,3 +52,6 @@ class Csh(Shell):
         # Convert $* -> \!*
         val = re.sub(r'\$\*', r'\!*', val)
         return "alias {0} '{1}';".format(key, val)
+
+    def source_command(self, filename):
+        return 'source {0}'.format(filename)
