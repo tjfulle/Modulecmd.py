@@ -2,44 +2,26 @@ import os
 import re
 import sys
 from textwrap import fill
-import platform
 
-from .constants import *
 import pymod.config
-from .trace import trace
-from pymod.util.tcl2py import tcl2py
-import pymod.environment as environ
+import pymod.names
+from pymod.module.meta import read_metadata
+from pymod.module.tcl2py import tcl2py
+
+import contrib.util.misc as misc
+import pymod.environ as environ
 import contrib.util.logging as logging
-from contrib.util.executable import which_string  #, split
-from pymod.module.optparse import ModuleOptionParser
+from contrib.util.executable import which
+from pymod.module.option import ModuleOptionParser
 
 
-has_tclsh = which_string('tclsh') is not None
+has_tclsh = which('tclsh') is not None
+python = 'PYTHON'
+tcl = 'TCL'
 
 
-def read_metadata(filename):
-    regex = re.compile(r'#\s*pymod\:')
-    head = open(filename).readline()
-    if not regex.search(head):
-        return None
-    pymod_directive = split(regex.split(head, 1)[1], ',')
-    metadata = dict([split(x, '=', 1) for x in pymod_directive])
-    bool_options = ('enable_if', 'do_not_register')
-    for (key, val) in metadata.items():
-        try:
-            val = eval(val)
-        except:
-            if key in bool_options:
-                logging.error('Failed to evaluate meta data '
-                              'statement {0!r} in {1!r}'.format(val, filename))
-        if key in bool_options and not isinstance(val, bool):
-            logging.error('{0} statement in {1!r} must '
-                          'evaluate to a bool'.format(key, filename))
-        metadata[key] = val
-    return metadata
 
-
-def create_module_from_file(modulepath, path, is_explicit_default):
+def from_file(modulepath, path, is_explicit_default):
     if not os.path.isfile(path):
         logging.warning('{0} does not exist'.format(path), minverbosity=2)
         return None
@@ -48,7 +30,7 @@ def create_module_from_file(modulepath, path, is_explicit_default):
         # Don't backup files
         return None
     if f.endswith('.py'):
-        m_type = M_PY
+        m_type = python
     else:
         # If it is not python, it must be TCL
         tcl_header = '#%Module'
@@ -59,18 +41,18 @@ def create_module_from_file(modulepath, path, is_explicit_default):
         else:
             if not tcl_module:
                 return None
-        m_type = M_TCL
+        m_type = tcl
 
-    root = path if m_type == M_TCL else os.path.splitext(path)[0]
+    root = path if m_type == tcl else os.path.splitext(path)[0]
     fullname = root.replace(modulepath, '').lstrip(os.path.sep)
     try:
         name, version = fullname.split(os.path.sep)
     except ValueError:
         name, version = fullname, None
 
-    meta = None if m_type != M_PY else read_metadata(path)
+    meta = None if m_type != python else read_metadata(path)
 
-    if m_type == M_TCL and 'gcc' in path:
+    if m_type == tcl and 'gcc' in path:
         logging.debug(name)
         logging.debug(modulepath)
         logging.debug(path, '\n')
@@ -135,7 +117,7 @@ class Module(object):
 
     @property
     def is_loaded(self):
-        loaded_modules = split(environ.get('LOADEDMODULES'), os.pathsep)
+        loaded_modules = misc.split(environ.get(pymod.names.loaded_modules), os.pathsep)
         return self.fullname in loaded_modules
 
     @property
@@ -154,7 +136,6 @@ class Module(object):
             return False
         return self.metadata.get('do_not_register', False)
 
-    @trace
     def asdict(self, *args):
         d = dict(name=self.name, fullname=self.fullname, version=self.version,
                  type=self.type, filename=self.filename, modulepath=self.modulepath,
@@ -168,7 +149,7 @@ class Module(object):
     def data(self, mode, env):
         if self._data is not None:
             return self._data
-        if self.type == M_TCL:
+        if self.type == tcl:
             if not has_tclsh:
                 raise TCLModulesNotFoundError
             try:
@@ -180,7 +161,6 @@ class Module(object):
 
     def deactivate(self):
         self.is_default = False
-        self.is_loaded = False
 
     def reset_state(self):
         self.options = ModuleOptionParser()
@@ -283,7 +263,7 @@ class Module(object):
         return '\n'.join(s)
 
     def set_whatis(self, *args, **kwargs):
-        if self.type == M_TCL:
+        if self.type == tcl:
             assert len(args) == 1
             kwargs['short_description'] = args[0]
         else:
