@@ -53,6 +53,10 @@ class TestModuleArgumentParser:
         p = ModuleArgumentParser()
         with pytest.raises(ValueError):
             p.add_argument('bar')
+    def test_arg_parser_bad_action(self):
+        p = ModuleArgumentParser()
+        with pytest.raises(ValueError):
+            p.add_argument('+x', action='count')
     def test_unit(self):
         p = ModuleArgumentParser()
         opt = '{0}b'.format(p.prefix_chars)
