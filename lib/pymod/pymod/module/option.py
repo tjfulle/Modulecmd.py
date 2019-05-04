@@ -1,4 +1,5 @@
 import re
+import argparse
 from copy import deepcopy as copy
 
 from contrib.ordereddict_backport import OrderedDict
@@ -145,3 +146,22 @@ class ModuleOptionParser(object):
             line = '  {0:<{1}}{2}'.format(s, n, helpstr)
             x.append(line)
         return '\n'.join(x)
+
+
+
+class ModuleArgumentParser(argparse.ArgumentParser):
+    def __init__(self):
+        superinit = super(ModuleArgumentParser, self).__init__
+        superinit(prefix_chars='+', add_help=False)
+
+    def parse_args(self, argv=None):
+        superparser = super(ModuleArgumentParser, self).parse_args
+        return superparser(argv or [])
+
+    def add_argument(self, *args, **kwargs):
+        chars = self.prefix_chars
+        for arg in args:
+            if arg[0] not in chars:
+                raise ValueError('Positional module arguments not supported')
+        superadd = super(ModuleArgumentParser, self).add_argument
+        superadd(*args, **kwargs)
