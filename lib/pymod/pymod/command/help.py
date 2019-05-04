@@ -20,14 +20,14 @@ def setup_parser(subparser):
 
     help_spec_group = subparser.add_mutually_exclusive_group()
     help_spec_group.add_argument(
-        '--man', action='store_true',
-        help='print man page')
+        '--guide', action='store_const', dest='guide', const='modulefile',
+        default=None, help='print guide')
 
 
 def help(parser, args):
-    if args.man:
+    if args.guide:
         dirname = os.path.dirname(__file__)
-        filename = os.path.join(dirname, 'manpage.txt')
+        filename = os.path.join(dirname, 'guides', args.guide + '.txt')
         pager(colorize(open(filename, 'r').read()))
         return 0
 

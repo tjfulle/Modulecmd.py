@@ -9,9 +9,8 @@ import shlex
 import subprocess
 from six import string_types, text_type
 
-import llnl.util.tty as tty
+import contrib.util.logging as logging
 
-import spack.error
 
 __all__ = ['Executable', 'which', 'ProcessError']
 
@@ -143,7 +142,7 @@ class Executable(object):
 
         quoted_args = [arg for arg in args if re.search(r'^"|^\'|"$|\'$', arg)]
         if quoted_args:
-            tty.warn(
+            logging.warn(
                 "Quotes in command arguments can confuse scripts like"
                 " configure.",
                 "The following arguments may cause problems when executed:",
@@ -156,7 +155,7 @@ class Executable(object):
         cmd_line = "'%s'" % "' '".join(
             map(lambda arg: arg.replace("'", "'\"'\"'"), cmd))
 
-        tty.debug(cmd_line)
+        logging.debug(cmd_line)
 
         try:
             proc = subprocess.Popen(
@@ -253,10 +252,11 @@ def which(*args, **kwargs):
                 return Executable(exe)
 
     if required:
-        tty.die("spack requires '%s'. Make sure it is in your path." % args[0])
+        logging.die("spack requires '%s'. Make sure it is in your path." % args[0])
 
     return None
 
 
-class ProcessError(spack.error.SpackError):
+class ProcessError(Exception):
     """ProcessErrors are raised when Executables exit with an error code."""
+    pass

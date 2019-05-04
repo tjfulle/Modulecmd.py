@@ -1,6 +1,7 @@
 import os
 from argparse import Namespace
 
+import pymod.names
 from contrib.util.lang import Singleton
 from contrib.util.misc import str2dict, dict2str, boolean, split, join, pop
 from contrib.ordereddict_backport import OrderedDict
@@ -67,6 +68,7 @@ class Environ(OrderedDict):
         count += 1
         if allow_dups or value not in current_path.value:
             current_path.value.append(value)
+        current_path.meta[value] = (count, priority)
         self.set_path(current_path)
 
     def prepend_path(self, key, value, sep=os.pathsep):
@@ -81,6 +83,7 @@ class Environ(OrderedDict):
         if not allow_dups:
             pop(current_path.value, value)
         current_path.value.insert(0, value)
+        current_path.meta[value] = (count, priority)
         self.set_path(current_path)
 
     def remove_path(self, key, value, sep=os.pathsep):
@@ -99,6 +102,11 @@ class Environ(OrderedDict):
 
 environ = Singleton(Environ)
 
+def reset():
+    global environ
+    environ = Environ()
+
+
 def get(key, default=None):
     return environ.get(key, default)
 
@@ -115,7 +123,7 @@ def set_alias(key, value):
     return environ.set_alias(key, value)
 
 def unset_alias(key):
-    return environ.unsetalias(key)
+    return environ.unset_alias(key)
 
 def set_shell_function(key, value):
     return environ.set_shell_function(key, value)
@@ -131,27 +139,3 @@ def prepend_path(key, value, sep=os.pathsep):
 
 def remove_path(key, value, sep=os.pathsep):
     return environ.remove_path(key, value, sep)
-
-
-def test_1():
-    k = 'Key'
-    mk = '__PYMOD_{}_'.format(k)
-    env = Environment()
-
-    env[k] = 'bar:baz'
-    env.append_path('load', k, 'foo')
-    env.append_path('load', k, 'bar')
-    env.append_path('load', k, 'baz')
-    assert env[k] == 'bar:baz:foo'
-
-
-def test_2():
-    k = 'Key'
-    mk = '__PYMOD_{}_'.format(k)
-    env = Environment()
-
-    env[k] = 'bar:baz'
-    env.prepend_path('load', k, 'foo')
-    env.prepend_path('load', k, 'bar')
-    env.prepend_path('load', k, 'baz')
-    assert env[k] == 'baz:bar:foo'

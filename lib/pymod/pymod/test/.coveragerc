@@ -1,0 +1,8 @@
+[run]
+omit =
+  test/*.py
+  lib/pymod/tcl2py.py
+  */shell/*.py
+  */user_env.py
+
+#branch = true
