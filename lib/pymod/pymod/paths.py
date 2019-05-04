@@ -42,5 +42,5 @@ mock_modulepath_path = os.path.join(var_path, "modulepath.mock")
 #: User configuration location
 user_config_path = os.getenv('PYMOD_DOT_DIR', os.path.expanduser('~/.pymod.d'))
 
-etc_path        = os.path.join(prefix, "etc")
+etc_path        = os.path.join(prefix, "etc", "pymod")
 system_etc_path = '/etc'

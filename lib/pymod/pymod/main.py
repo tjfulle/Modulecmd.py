@@ -16,8 +16,11 @@ from contextlib import contextmanager
 
 
 import pymod.paths
+import pymod.config
 import pymod.modulepath
+import pymod.environ
 import pymod.command
+import pymod.shell
 
 import contrib.util.logging as logging
 import contrib.util.logging.color as color
@@ -292,8 +295,13 @@ def make_argument_parser(**kwargs):
     parser = PymodArgumentParser(
         formatter_class=PymodHelpFormatter, add_help=False,
         description=(
-            "Environment modules provide a convenient way to "
-            "dynamically change the users’ environment through modulefiles."),
+            'pymod - Environment modules framework implemented in Python\n\n'
+            'Environment modules, or just modules, are files containing commands that,\n'
+            'when processed by the module Framework, modify the current shell\'s\n'
+            'environment.  Modules allow users to dynamically modify their environment.\n'
+            'This, python, implementation of an environment module framework is inspired\n'
+            'by existing frameworks written in C/TCL and Lua and seeks parity with the\n'
+            'original TCL environment modules.'),
         **kwargs)
 
     # stat names in groups of 7, for nice wrapping.
@@ -307,6 +315,11 @@ def make_argument_parser(**kwargs):
         '-H', '--all-help',
         dest='help', action='store_const', const='long', default=None,
         help="show help for all commands (same as pymod help --all)")
+    parser.add_argument(
+        '--shell',
+        dest='shell', action='store_const',
+        const=pymod.config.get('default_shell'), default=None,
+        help=" this help message and exit")
     parser.add_argument(
         '--time', action='store_true', default=False,
         help='time execution of command')
@@ -347,11 +360,14 @@ def setup_main_options(args):
     # errors raised by pymod.config.
     if args.debug:
         pymod.error.debug = True
-        pymod.config.set('config:debug', True, scope='command_line')
+        pymod.config.set('debug', True, scope='command_line')
 
     if args.mock:
         p = pymod.modulepath.ModulePath(pymod.paths.mock_modulepath)
         pymod.modulepath.set_path(p)
+
+    if args.shell != pymod.config.get('default_shell'):
+        pymod.shell.set_shell(args.shell)
 
     # when to use color (takes always, auto, or never)
     color.set_color_when(args.color)
@@ -462,7 +478,7 @@ def main(argv=None):
             return _invoke_command(command, parser, args, unknown)
 
     except Exception as e:
-        if pymod.config.get('config:debug'):
+        if pymod.config.get('debug'):
             raise
         logging.die(str(e))
 

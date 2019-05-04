@@ -4,7 +4,10 @@ config:
   debug: false
 
   # Verbosity > 2 gives a lot of output
-  verbosity: 1
+  verbose: false
+
+  # Default shell
+  default_shell: bash
 
   # Emit all warnings
   warn_all: true

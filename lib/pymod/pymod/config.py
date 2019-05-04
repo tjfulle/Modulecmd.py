@@ -13,7 +13,7 @@ def load_yaml(filename, section=None):
 
 
 class Configuration(object):
-    _scopes = ['defaults', 'user', 'environment', 'command_line']
+    scope_names = ['defaults', 'user', 'environment', 'command_line']
     def __init__(self):
         self.scopes = {}
 
@@ -29,17 +29,17 @@ class Configuration(object):
             if scope is not None:
                 return self.scopes[scope]
             cfg = {}
-            for scope in self._scopes[::-1]:
-                if scope in self.scopes:
-                    cfg.update(self.scopes[scope])
+            for scope_name in self.scope_names[::-1]:
+                if scope_name in self.scopes:
+                    cfg.update(self.scopes[scope_name])
             return cfg
 
         if scope is not None:
             value = self.scopes[scope].get(key, default)
         else:
-            for scope in self._scopes[::-1]:
-                if scope in self.scopes:
-                    value = self.scopes[scope].get(key)
+            for scope_name in self.scope_names[::-1]:
+                if scope_name in self.scopes:
+                    value = self.scopes[scope_name].get(key)
                     if value is not None:
                         break
             else:
@@ -50,9 +50,9 @@ class Configuration(object):
         if scope is not None:
             self.scopes[scope][key] = value
         else:
-            for scope in self._scopes[::-1]:
-                if scope in self.scopes:
-                    self.scopes[scope][key] = value
+            for scope_name in self.scope_names[::-1]:
+                if scope_name in self.scopes:
+                    self.scopes[scope_name][key] = value
 
 def _config():
     """Singleton Configuration instance.
@@ -90,8 +90,10 @@ def _config():
         if env:
             cfg.push_scope('environment', env)
 
+    return cfg
 
-config = Singleton(Configuration())
+
+config = Singleton(_config)
 
 
 def get(key, default=None, scope=None):
