@@ -10,39 +10,41 @@ class Version:
 
     """
     def __init__(self, version_string=None):
+        self.tuple = tuple()
         self.string = version_string
-        self.major = self.minor = self.patch = self.micro = None
-        if self.string is not None:
+        if self.string is None:
+            self.major = self.minor = self.patch = self.micro = None
+        else:
             try:
-                version_string, self.micro = self.string.split('-')
-            except:
-                pass
-            attrs = ('major', 'minor', 'patch', 'micro')
-            for (i, part) in enumerate(version_string.split('.')):
+                version_string, micro = self.string.split('-')
+            except ValueError:
+                micro = None
+            version_tuple = []
+            for part in version_string.split('.'):
                 if not part.split():
                     continue
-                setattr(self, attrs[i], try_int(part))
+                version_tuple.append(try_int(part))
+            if micro is not None:
+                version_tuple.append(try_int(micro))
+            self.tuple = tuple(version_tuple)
+            for (i, attr) in enumerate(('major', 'minor', 'patch', 'micro')):
+                try:
+                    value = self.tuple[i]
+                except IndexError:
+                    value = None
+                setattr(self, attr, value)
+
+    def __repr__(self):
+        return self.string
 
     def __gt__(self, other):
-        if self.string is None:
-            return False
-        if other.string is None:
-            return True
-        if self.major > other.major:
-            return True
-        if self.minor > other.minor:
-            return True
-        if self.patch > other.patch:
-            return True
-        if self.micro > other.micro:
-            return True
-        return False
+        return self.tuple > other.tuple
 
     def __lt__(self, other):
         return not self > other
 
     def __eq__(self, other):
-        return self.string == other.string
+        return self.tuple == other.tuple
 
 
 def try_int(item):
