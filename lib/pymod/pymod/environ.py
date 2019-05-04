@@ -25,7 +25,7 @@ class Environ(OrderedDict):
     def get_path(self, key, sep=os.pathsep):
         p = Namespace()
         p.key = key
-        p.meta_key = '__PYMOD_{}_'.format(key)
+        p.meta_key = 'LMMETA_{}'.format(key)
         p.sep = sep
         p.value = split(self.get(key), sep=sep)
         p.meta = str2dict(self.get(p.meta_key))
