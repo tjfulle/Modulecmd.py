@@ -3,16 +3,78 @@ import sys
 import socket
 import subprocess
 
+import pymod.mc
 import pymod.environ
 from contrib.util.logging.color import colorize
 import contrib.util.logging as logging
 import contrib.util.misc as misc
 from contrib.util.executable import Executable
 from contrib.six import exec_
+from pymod.error import FamilyLoadedError
 
 
 # ----------------------------- MODULE EXECUTION FUNCTIONS
-def execmodule(module, mode, argv=None):
+def assert_known_mode(mode):
+    assert mode in ('load', 'unload', 'whatis', '*load*')
+
+
+def execmodule(module, mode, do_not_register=False):
+    """Execute the module in a sandbox"""
+    assert_known_mode(mode)
+    try:
+        out = execmodule_impl(module, mode, do_not_register=do_not_register)
+
+        if mode == 'load':
+            pymod.mc.set_refcount(module.fullname, 1)
+        elif mode in ('unload',):
+            pymod.mc.pop_refcount(module.fullname)
+
+        return out
+
+    except FamilyLoadedError as e:
+        # Module of same family already loaded, unload it first
+
+        # This comes after first trying to load the module because the
+        # family is set within the module, so the module must first be
+        # loaded to determine the family. If when the family is being set
+        # it is discovered that a module from the same family is loaded,
+        # the FamilyLoadedError is raised.
+
+        # This should only happen in load mode
+        assert mode == 'load'
+        other = pymod.modulepath.get(e.args[0])
+        args = [other.family, other.fullname, module.fullname]
+        self.m_state_changed.setdefault('FamilyChange', []).append(args)
+        assert other.is_loaded
+        self.swap2(other, module)
+
+
+def execmodule_impl(module, mode, do_not_register=False):
+    """Execute filename in sandbox"""
+
+    if module.type not in (pymod.module.python, pymod.module.tcl):
+        logging.error('Module {0!r} has unknown module type: '
+                      '{1!r}'.format(module.fullname, module.type))
+
+    if mode in ('unload',):
+        opts = pymod.environ.get_loaded_module_opts('opts', module=module)
+    else:
+        opts = pymod.environ.get_moduleopts(module)
+
+    try:
+        self.execmodule_in_sandbox(module, mode, argv=opts)
+    except FamilyLoadedError as e:
+        raise e
+    else:
+        if mode == 'load':
+            pymod.mc.on_module_load(module, do_not_register=do_not_register)
+        elif mode in ('unload',):
+            pymod.mc.on_module_unload(module)
+
+    return None
+
+
+def execmodule_in_sandbox(module, mode, argv=None):
     """Execute python module in sandbox"""
 
     argv = argv or []
