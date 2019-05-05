@@ -11,12 +11,11 @@ class Version:
     """
     def __init__(self, version_string=None):
         self.tuple = tuple()
-        self.string = version_string
-        if self.string is None:
+        if version_string is None:
             self.major = self.minor = self.patch = self.micro = None
         else:
             try:
-                version_string, micro = self.string.split('-')
+                version_string, micro = version_string.split('-')
             except ValueError:
                 micro = None
             version_tuple = []
@@ -33,8 +32,12 @@ class Version:
                 except IndexError:
                     value = None
                 setattr(self, attr, value)
+        self.string = version_string or ''
 
     def __repr__(self):
+        return self.string
+
+    def __str__(self):
         return self.string
 
     def __gt__(self, other):
