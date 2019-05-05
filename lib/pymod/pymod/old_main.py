@@ -124,14 +124,6 @@ help_page = """\
 {sp}swap <name_a> <name_b>
 {dp}Unload module {U}name_a{u} and load {U}name_b{u} in its place
 
-{sp}test
-{dp}Run module tests (requires pytest module)
-
-{sp}use <path> [path...]
-{sp}use -D <path> [path...]
-{sp}unuse <path> [path...]
-{dp}Add (use) or remove (unuse) directory[s] to/from MODULEPATH
-
 {dp}With the {U}-D{u} option, {I}use{i} behaves exactly as {I}unuse{i}.
 
 {sp}whatis

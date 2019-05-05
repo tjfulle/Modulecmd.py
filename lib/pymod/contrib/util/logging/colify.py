@@ -108,7 +108,7 @@ def colify(elts, **options):
     using ``str()``.
 
     Keyword Arguments:
-        output (stream): A file object to write to. Default is ``sys.stdout``
+        output (stream): A file object to write to. Default is ``sys.stderr``
         indent (int):    Optionally indent all columns by some number of spaces
         padding (int):   Spaces between columns. Default is 2
         width (int):     Width of the output. Default is 80 if tty not detected
@@ -124,7 +124,7 @@ def colify(elts, **options):
     """
     # Get keyword arguments or set defaults
     cols         = options.pop("cols", 0)
-    output       = options.pop("output", sys.stdout)
+    output       = options.pop("output", sys.stderr)
     indent       = options.pop("indent", 0)
     padding      = options.pop("padding", 2)
     tty          = options.pop('tty', None)

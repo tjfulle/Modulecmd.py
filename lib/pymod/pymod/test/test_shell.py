@@ -26,7 +26,7 @@ class TestBashShell:
         assert s == "alias ALIAS='ALIAS_VAL';"
         s = self.shell.format_alias('ALIAS', None)
         assert s == 'unalias ALIAS 2> /dev/null || true;'
-    def test_dump(self):
+    def test_format_commands(self):
         environ = Environ()
         environ.update(
             {'VAR_0': 'VAL_0', 'VAR_None': None})
@@ -34,7 +34,7 @@ class TestBashShell:
             {'VAR_0': 'VAL_0', 'VAR_None': None})
         environ.shell_functions.update(
             {'VAR_0': 'VAL_0', 'VAR_None': None})
-        s = self.shell.dump(environ)
+        s = self.shell.format_commands(environ)
         s_expected = """VAR_0="VAL_0";\n""" \
                      """export VAR_0;\n""" \
                      """unset VAR_None;\n""" \
@@ -70,7 +70,7 @@ class TestCshShell:
         assert s == "alias ALIAS 'ALIAS_VAL \!:1 \!:3 \!:5';"
         s = self.shell.format_alias('ALIAS', 'ALIAS_VAL $*')
         assert s == "alias ALIAS 'ALIAS_VAL \!*';"
-    def test_dump(self):
+    def test_format_commands(self):
         environ = Environ()
         environ.update(
             {'VAR_0': 'VAL_0', 'VAR_None': None})
@@ -78,7 +78,7 @@ class TestCshShell:
             {'VAR_0': 'VAL_0', 'VAR_None': None})
         environ.shell_functions.update(
             {'VAR_0': 'VAL_0', 'VAR_None': None})
-        s = self.shell.dump(environ)
+        s = self.shell.format_commands(environ)
         s_expected = """setenv VAR_0 "VAL_0";\n""" \
                      """unsetenv VAR_None;\n""" \
                      """alias VAR_0 'VAL_0';\n""" \

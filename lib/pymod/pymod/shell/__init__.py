@@ -55,9 +55,16 @@ def source_command(filename):
     return shell.source_command(filename)
 
 
-def dump(environ):
-    return shell.dump(environ)
+def format_commands(environ=None):
+    environ = environ or pymod.environ
+    return shell.format_commands(environ)
+
+
+def dump(environ=None):
+    environ = environ or pymod.environ
+    shell.dump(environ)
 
 
 def filter(environ):
+    environ = environ or pymod.environ
     return shell.filter(environ)
