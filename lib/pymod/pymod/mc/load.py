@@ -1,8 +1,9 @@
 import pymod.modulepath
+import pymod.mc
+
+from pymod.mc.execmodule import execmodule
 from pymod.error import ModuleNotFoundError
 import contrib.util.logging as logging
-from pymod.mc.execmodule import execmodule
-from pymod.mc.swap import swap_impl
 
 
 def load(modulename, options, do_not_register=False, insert_at=None,
@@ -33,9 +34,6 @@ def load(modulename, options, do_not_register=False, insert_at=None,
             logging.warn(msg.format(module.fullname, 'module reload'))
         return 0
 
-    print(module)
-    raise NotImplementedError('mc.load is not yet implemented')
-
     if insert_at is None:
         return load_impl(module, do_not_register=do_not_register)
 
@@ -45,6 +43,10 @@ def load(modulename, options, do_not_register=False, insert_at=None,
 def load_inserted(module, insert_at):
     """Load the `module` at `insert_at` by unloading all modules beyond
     `insert_at`, loading `module`, then reloading the unloaded modules"""
+
+    raise NotImplementedError('trying to load {0} but mc.load_inserted is '
+                              'not yet implemented'.format(module))
+
     my_opts = {}
     loaded = self.get_loaded_modules()
     to_unload_and_reload = loaded[(insert_at)-1:]
@@ -86,17 +88,19 @@ def load_impl(module, do_not_register=False):
 
     # Before loading this module, look for module of same name and unload
     # it if necessary
-    loaded = pymod.loaded_modules()
-    for (i, other) in enumerate(loaded):
+
+    # See if a module of the same name is already loaded. If so, swap that
+    # module with the requested module
+    for (i, other) in enumerate(pymod.mc.loaded_modules()):
         if other.name == module.name:
-            assert other.is_loaded
-            swap_impl(other, module)
-            key = 'VersionChanged'
-            to_swap = [other.fullname, module.fullname]
-            self.m_state_changed.setdefault(key, []).append(to_swap)
+            pymod.mc.swap_impl(other, module)
+            pymod.mc.register_changed_version(other, module)
             return module
 
     # Now load it
     execmodule(module, 'load', do_not_register=do_not_register)
+
+    raise NotImplementedError('trying to load {0} but mc.load_impl is '
+                              'not yet implemented'.format(module))
 
     return module

@@ -11,3 +11,17 @@ class ModuleNotFoundError(Exception):
                 msg += '\n\nDid you mean one of these?'
                 msg += '\n\t{0}'.format('\t'.join(candidates))
         super(ModuleNotFoundError, self).__init__(msg)
+
+
+class FamilyLoadedError(Exception):
+    pass
+
+
+class InconsistentModuleStateError(Exception):
+    def __init__(self, module):
+        m = 'An inconsistent state occurred when trying to load module ' \
+            '{0!r} that resulted in it not being found on MODULEPATH. '  \
+            'This is probably due to a module modifying MODULEPATH and ' \
+            'causing automatic changes in loaded/unloaded modules'
+        msg = m.format(module.fullname)
+        super(InconsistentModuleStateError, self).__init__(msg)

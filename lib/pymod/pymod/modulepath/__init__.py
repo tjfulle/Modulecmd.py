@@ -21,8 +21,8 @@ class Modulepath:
         self._grouped_by_modulepath = None
         self.set_path(directories)
 
-    def __contains__(self, path):
-        return path in self.path
+    def __contains__(self, dirname):
+        return dirname in self.path
 
     def get(self, key):
         """Get a module from the available modules.
@@ -38,7 +38,7 @@ class Modulepath:
 
     def getby_filename(self, filename):
         for module in self.modules:
-            if module.filename == path:
+            if module.filename == filename:
                 return module
         return None
 
@@ -197,7 +197,8 @@ class Modulepath:
         colorized = colorized.replace('(D,L)', DL)
         return colorized
 
-    def format_available(self, terse=False, regex=None, fulloutput=False, pathonly=False):
+    def format_available(self, terse=False, regex=None,
+                         fulloutput=False, pathonly=False):
         if pathonly:
             return '\n'.join('{0}) {1}'.format(i,_[0]) for i,_ in enumerate(self, start=1))
 
@@ -260,38 +261,46 @@ class Modulepath:
         return sorted(list(the_candidates))
 
 
-def _path():
+def _modulepath():
     path = misc.split(os.getenv(pymod.names.modulepath), os.pathsep)
     return Modulepath(path)
 
 
-path = Singleton(_path)
+mpath = Singleton(_modulepath)
 
 
 def set_path(other_path):
-    global path
-    path = other_path
+    global mpath
+    mpath = other_path
 
 
-def group_by_modulepath():
-    return path.group_by_modulepath()
+def group_by_modulepath(sort=False):
+    return mpath.group_by_modulepath(sort=False)
 
 
 def get(key):
-    return path.get(key)
+    return mpath.get(key)
 
 
 def append_path(dirname):
-    return path.append_path(dirname)
+    return mpath.append_path(dirname)
 
 
 def remove_path(dirname):
-    return path.remove_path(dirname)
+    return mpath.remove_path(dirname)
 
 
 def prepend_path(dirname):
-    return path.prepend_path(dirname)
+    return mpath.prepend_path(dirname)
 
 
 def format_available(**kwargs):
-    return path.format_available(**kwargs)
+    return mpath.format_available(**kwargs)
+
+
+def candidates(name):
+    return mpath.candidates(name)
+
+
+def contains(path):
+    return path in mpath
