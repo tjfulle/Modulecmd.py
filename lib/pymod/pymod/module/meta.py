@@ -21,7 +21,7 @@ class MetaData:
             return
         pymod_directive = misc.split(regex.split(head, 1)[1], ',')
         kwds = dict([misc.split(x, '=', 1) for x in pymod_directive])
-        for (key, default) in vars(self):
+        for (key, default) in vars(self).items():
             expr = kwds.pop(key, None)
             if expr is None:
                 value = default
