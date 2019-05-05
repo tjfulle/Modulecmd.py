@@ -48,11 +48,10 @@ class Configuration(object):
 
     def set(self, key, value, scope=None):
         if scope is not None:
-            self.scopes[scope][key] = value
+            self.scopes.setdefault(scope, {}).update({key: value})
         else:
             for scope_name in self.scope_names[::-1]:
-                if scope_name in self.scopes:
-                    self.scopes[scope_name][key] = value
+                self.scopes.setdefault(scope_name, {}).update({key: value})
 
 def _config():
     """Singleton Configuration instance.

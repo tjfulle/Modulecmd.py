@@ -83,6 +83,16 @@ class Module(object):
     def parser_options(self):
         return self.parser.parsed_argv()
 
+    def format_info(self):
+        if self.is_default and self.is_loaded:
+            return self.fullname + ' (D,L)'
+        elif self.is_default:
+            return self.fullname + ' (D)'
+        elif self.is_loaded:
+            return self.fullname + ' (L)'
+        return self.fullname
+
+
     @property
     def whatis(self):
         if 'explicit' in self._whatis:

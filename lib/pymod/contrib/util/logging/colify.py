@@ -152,7 +152,7 @@ def colify(elts, **options):
             pass
 
     # Use only one column if not a tty.
-    if not tty:
+    if not console_cols and not tty:
         if tty is False or not output.isatty():
             cols = 1
 

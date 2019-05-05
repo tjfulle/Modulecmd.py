@@ -7,22 +7,19 @@ import pymod.module
 from contrib.util.itertools import groupby
 from contrib.util.lang import Singleton
 import contrib.util.logging as logging
+import contrib.util.misc as misc
 from contrib.util.logging.color import colorize
+from contrib.util.logging.colify import colified
 from contrib.functools_backport import cmp_to_key
-
-#from .config import cfg
-#from .trace import trace
-#from .module2 import create_module_from_file, create_module_from_kwds
-#from .utils import strip_quotes, get_console_dims, wrap2, grep_pat_in_string
 
 
 class Modulepath:
-    def __init__(self, path):
+    def __init__(self, directories):
         self.path = []
         self.modules = []
         self.db = {}
         self._grouped_by_modulepath = None
-        self.set_path(path)
+        self.set_path(directories)
 
     def __contains__(self, path):
         return path in self.path
@@ -81,6 +78,7 @@ class Modulepath:
                 'Modulepath: {0!r} is not a directory'.format(dirname))
         if dirname in self.path:
             self.path.pop(self.path.index(dirname))
+            modules_in_dir = [m for m in self.modules if m.modulepath == dirname]
         else:
             modules_in_dir = find_modules(dirname)
             if not modules_in_dir:
@@ -100,7 +98,7 @@ class Modulepath:
             for module in modules:
                 if module.fullname in fullnames:
                     bumped.append(module)
-        return bumped
+        return modules_in_dir, bumped
 
     def remove_path(self, dirname):
         if dirname not in self.path:
@@ -115,25 +113,34 @@ class Modulepath:
         self.modules = [m for m in self.modules if m is not None]
         self.path.pop(self.path.index(dirname))
         self._path_modified()
-        return removed
 
-    def set_path(self, path):
+        # Determine which modules may have moved up in priority due to removed
+        # of directory from path
+        bumped = []
+        fullnames = [m.fullname for m in removed]
+        for (_, modules) in self.group_by_modulepath():
+            for module in modules:
+                if module.fullname in fullnames:
+                    bumped.append(module)
+        return removed, bumped
+
+    def set_path(self, directories):
         self.path = []
         self.modules = []
-        if not path:
+        if not directories:
             return
-        for dirname in path:
-            if not os.path.isdir(dirname):
+        for directory in directories:
+            if not os.path.isdir(directory):
                 logging.verbose(
-                    'Modulepath: nonexistent directory {0!r}'.format(dirname))
+                    'Modulepath: nonexistent directory {0!r}'.format(directory))
                 continue
-            modules_in_dir = find_modules(dirname)
+            modules_in_dir = find_modules(directory)
             if not modules_in_dir:
                 logging.verbose(
-                    'Modulepath: no modules found in {0}'.format(dirname))
+                    'Modulepath: no modules found in {0}'.format(directory))
                 continue
             self.modules.extend(modules_in_dir)
-            self.path.append(dirname)
+            self.path.append(directory)
         self._path_modified()
 
     def assign_defaults(self):
@@ -163,11 +170,16 @@ class Modulepath:
                 modules[0].is_default = True
             self.db['by_name'][modules[0].name] = modules[0]
 
-    def group_by_modulepath(self):
+    def group_by_modulepath(self, sort=False):
         if self._grouped_by_modulepath is None:
-            grouped = groupby(self.modules, lambda x: x.modulepath)
-            self._grouped_by_modulepath = sorted(
-                grouped, key=lambda x: self.path.index(x[0]))
+            grouped = dict(groupby(self.modules, lambda x: x.modulepath))
+            self._grouped_by_modulepath = []
+            for dirname in self.path:
+                if sort:
+                    modules = sorted(grouped.pop(dirname), key=lambda m: m.fullname)
+                else:
+                    modules = grouped.pop(dirname)
+                self._grouped_by_modulepath.append((dirname, modules))
         return self._grouped_by_modulepath
 
     def filter_modules_by_regex(self, modules, regex):
@@ -179,19 +191,19 @@ class Modulepath:
         """Colorize item for output to console"""
         D = '(' + colorize('@g{D}') + ')'
         L = '(' + colorize('@m{L}') + ')'
-        DL = '(' + colorize('@g{D}') + ',' + colorize('@{L}') + ')'
+        DL = '(' + colorize('@g{D}') + ',' + colorize('@m{L}') + ')'
         colorized = string.replace('(D)', D)
         colorized = colorized.replace('(L)', L)
         colorized = colorized.replace('(D,L)', DL)
         return colorized
 
-    def describe(self, terse=False, regex=None, fulloutput=False, pathonly=False):
+    def format_available(self, terse=False, regex=None, fulloutput=False, pathonly=False):
         if pathonly:
             return '\n'.join('{0}) {1}'.format(i,_[0]) for i,_ in enumerate(self, start=1))
 
         description = []
         if not terse:
-            _, width = get_console_dims()
+            _, width = logging.terminal_size()
             for (directory, modules) in self.group_by_modulepath():
                 modules = [m for m in modules if m.is_enabled]
                 modules = self.filter_modules_by_regex(modules, regex)
@@ -204,7 +216,7 @@ class Modulepath:
                         continue
                     s = colorize('@r{(None)}'.center(width))
                 else:
-                    s = wrap2([m.describe(is_default) for m in modules], width)
+                    s = colified([m.format_info() for m in modules], width=width)
                     s = self.colorize(s)
                 directory = directory.replace(os.path.expanduser('~/'), '~/')
                 description.append((' ' + directory + ' ').center(width, '-'))
@@ -222,7 +234,7 @@ class Modulepath:
 
         description = '\n'.join(description)
         if regex is not None:
-            description = grep_pat_in_string(description, regex)
+            description = misc.grep_pat_in_string(description, regex)
 
         return description
 
@@ -279,3 +291,7 @@ def remove_path(dirname):
 
 def prepend_path(dirname):
     return path.prepend_path(dirname)
+
+
+def format_available(**kwargs):
+    return path.format_available(**kwargs)
