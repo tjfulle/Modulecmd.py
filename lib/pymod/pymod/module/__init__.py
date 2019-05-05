@@ -37,7 +37,7 @@ class Module(object):
         self.family = None
         self.short_description = None
         self.configure_options = None
-        self._whatis ={}
+        self._whatis = {}
         self._helpstr = None
         self.metadata = meta
         self.is_default = False
@@ -101,12 +101,14 @@ class Module(object):
         if 'explicit' in self._whatis:
             return '\n'.join(self._whatis['explicit'])
 
-        s = ['Name: {0}'.format(self.name),
-             'Version: {0}'.format(self.version),
-             'Type: {0}'.format(self.type),
-             'Family: {0}'.format(self.family),
-             'Full Name: {0}'.format(self.fullname),
-             'Filename: {0}'.format(self.filename), ]
+        s = ['Name: {0}'.format(self.name)]
+        if self.version.string:
+            s.append('Version: {0}'.format(self.version))
+        s.extend([
+            'Type: {0}'.format(self.type),
+            'Family: {0}'.format(self.family),
+            'Full Name: {0}'.format(self.fullname),
+            'Filename: {0}'.format(self.filename), ])
 
         if self.short_description is not None:
             key = 'Description'

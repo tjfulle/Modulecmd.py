@@ -43,6 +43,8 @@ def load(modulename, options, do_not_register=False, insert_at=None,
 
 
 def load_inserted(module, insert_at):
+    """Load the `module` at `insert_at` by unloading all modules beyond
+    `insert_at`, loading `module`, then reloading the unloaded modules"""
     my_opts = {}
     loaded = self.get_loaded_modules()
     to_unload_and_reload = loaded[(insert_at)-1:]

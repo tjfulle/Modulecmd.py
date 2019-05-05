@@ -31,7 +31,9 @@ stat_names = pstats.Stats.sort_arg_dict_default
 
 #: top-level aliases for pymod commands
 aliases = {
-    'av': 'avail'
+    'av': 'avail',
+    'add': 'load',
+    'ls': 'list',
 }
 
 #: help levels in order of detail (i.e., number of commands shown)

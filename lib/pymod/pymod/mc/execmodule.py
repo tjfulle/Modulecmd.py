@@ -1,3 +1,4 @@
+import os
 import sys
 import socket
 import subprocess
@@ -7,18 +8,31 @@ from contrib.util.logging.color import colorize
 import contrib.util.logging as logging
 import contrib.util.misc as misc
 from contrib.util.executable import Executable
+from contrib.six import exec_
 
 
 # ----------------------------- MODULE EXECUTION FUNCTIONS
-def execmodule(module, mode, argv):
+def execmodule(module, mode, argv=None):
     """Execute python module in sandbox"""
 
+    argv = argv or []
     module.reset_state()
+
+    # Execute the environment
+    ns = module_exec_sandbox(module, mode)
+    code = compile(module.read(mode), module.filename, 'exec')
+    exec_(code, ns, {})
+
+
+
+def module_exec_sandbox(module, mode):
     reported_by = ' (reported by {0!r})'.format(module.filename)
     ns = {
+        'os': os,
+        'sys': os,
  #       'user': user.user_env,
         'getenv': pymod.environ.get,
-        'env': pymod.environ.copy(),
+        'env': pymod.environ,
         'is_darwin': 'darwin' in sys.platform,
         'get_hostname': socket.gethostname,
         'mode': lambda: mode,
@@ -62,16 +76,12 @@ def execmodule(module, mode, argv):
         #
         'whatis': whatis(mode, module),
         'help': help(mode, module),
-        'which': which,
-        'check_output': check_output,
+#        'which': which,
+#        'check_output': check_output,
         #
         'source': source(mode),
     }
-
-    # Execute the environment
-    s = module.read(mode)
-    code = compile(s, module.filename, 'exec')
-    execfun(code, ns, {})
+    return ns
 
 
 # ------------------- FUNCTIONS PASSED TO MODULE FILES ------------------ #
@@ -95,7 +105,7 @@ def execute(mode_):
     return _execute
 
 
-def whatis(module):
+def whatis(mode, module):
     def _whatis(*args, **kwargs):
         module.set_whatis(*args, **kwargs)
     return _whatis
@@ -136,7 +146,7 @@ def swap(mode):
 
 def load_first(mode):
     """Function to pass to modules to load other modules"""
-    def mf_load_first(*modulenames):
+    def _load_first(*modulenames):
         if mode == LOAD_PARTIAL:
             return
         cb_load(mode, load_first_of=modulenames)
@@ -161,9 +171,9 @@ def setenv(mode):
     """Set value of environment variable `name`"""
     def _setenv(name, value):
         if mode in ('load',):
-            pymod.environ.setenv(name, value)
+            pymod.environ.set(name, value)
         elif mode in ('unload',):
-            pymod.environ.unsetenv(name)
+            pymod.environ.unset(name)
     return _setenv
 
 
@@ -171,7 +181,7 @@ def unsetenv(mode):
     """Set value of environment variable `name`"""
     def _unsetenv(name):
         if mode in ('load',):
-            pymod.environ.unsetenv(name)
+            pymod.environ.unset(name)
     return _unsetenv
 
 
@@ -222,7 +232,7 @@ def set_shell_function(mode):
 
 def unset_shell_function(mode):
     """Set value of environment variable `name`"""
-    def mf_unset_shell_function(name):
+    def _unset_shell_function(name):
         if mode in ('load', '*load*'):
             pymod.environ.unset_shell_function(name)
     return _unset_shell_function
