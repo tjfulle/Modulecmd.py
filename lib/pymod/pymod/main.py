@@ -359,7 +359,7 @@ def setup_main_options(args):
     # debug must be set first so that it can even affect behvaior of
     # errors raised by pymod.config.
     if args.debug:
-        pymod.error.debug = True
+        # pymod.error.debug = True
         pymod.config.set('debug', True, scope='command_line')
 
     if args.mock:

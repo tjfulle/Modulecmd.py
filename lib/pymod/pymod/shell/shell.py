@@ -17,6 +17,9 @@ class Shell(object):
         raise NotImplementedError
 
     def dump(self, environ):
+        sys.stdout.write(self.format_commands(environ))
+
+    def format_commands(self, environ):
         string = []
         for (envar, defn) in environ.items():
             string.append(self.format_environment_variable(envar, defn))
