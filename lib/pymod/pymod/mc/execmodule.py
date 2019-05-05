@@ -27,7 +27,7 @@ def execmodule(module, mode, argv):
         #
         'parse_args': lambda: module.parse_args(argv),
         #
-        'log_info': lambda s: logging.info(s, reported_by=module.filename)
+        'log_info': lambda s: logging.info(s, reported_by=module.filename),
         'log_warn': lambda s: logging.warn(s, reported_by=module.filename),
         'log_error': lambda s: logging.error(s, reported_by=module.filename),
         'execute': execute(mode),

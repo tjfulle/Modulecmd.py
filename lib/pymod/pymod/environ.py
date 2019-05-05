@@ -23,6 +23,16 @@ class Environ(OrderedDict):
         return boolean(self.get(key))
 
     def get_path(self, key, sep=os.pathsep):
+        """Get the path given by `key`
+
+        When paths are saved, the path value is saved and also some meta data.
+        Currently, the saved meta data are the reference count and priority,
+        though priority is not yet used.
+
+        The meta data are saved in a dictionary in the environment variable
+        `loaded_module_meta(key)`
+
+        """
         p = Namespace()
         p.key = key
         p.meta_key = pymod.names.loaded_module_meta(key)
