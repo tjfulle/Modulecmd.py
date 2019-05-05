@@ -71,7 +71,7 @@ class Environ(OrderedDict):
         if key == pymod.names.modulepath:
             raise NotImplemented
         allow_dups = self.get_bool('PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES')
-        current_path = self.get_path_obj(key, sep=sep)
+        current_path = self.get_path(key, sep=sep)
         count, priority = current_path.meta.pop(value, (0, -1))
         if count == 0 and value in current_path.value:
             count = current_path.value.count(value)
@@ -85,7 +85,7 @@ class Environ(OrderedDict):
         if key == pymod.names.modulepath:
             raise NotImplemented
         allow_dups = self.get_bool('PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES')
-        current_path = self.get_path_obj(key, sep=sep)
+        current_path = self.get_path(key, sep=sep)
         count, priority = current_path.meta.pop(value, (0, -1))
         if count == 0 and value in current_path.value:
             count = current_path.value.count(value)
@@ -98,7 +98,7 @@ class Environ(OrderedDict):
 
     def remove_path(self, key, value, sep=os.pathsep):
         allow_dups = self.get_bool('PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES')
-        current_path = self.get_path_obj(key, sep=sep)
+        current_path = self.get_path(key, sep=sep)
         count, priority = current_path.meta.pop(value, (0, -1))
         if count == 0 and value in current_path.value:
             count = current_path.value.count(value)
