@@ -5,14 +5,15 @@ from textwrap import fill
 
 import pymod.config
 import pymod.names
-from pymod.module.meta import read_metadata
+from pymod.module.meta import MetaData
 from pymod.module.tcl2py import tcl2py
+from pymod.module.version import Version
 
 import contrib.util.misc as misc
 import pymod.environ as environ
 import contrib.util.logging as logging
 from contrib.util.executable import which
-from pymod.module.option import ModuleOptionParser
+from pymod.module.argument_parser import ModuleArgumentParser
 
 
 has_tclsh = which('tclsh') is not None
@@ -21,90 +22,25 @@ tcl = 'TCL'
 
 
 
-def from_file(modulepath, path, is_explicit_default):
-    if not os.path.isfile(path):
-        logging.warning('{0} does not exist'.format(path), minverbosity=2)
-        return None
-    dirname, f = os.path.split(path)
-    if f.endswith('~'):
-        # Don't backup files
-        return None
-    if f.endswith('.py'):
-        m_type = python
-    else:
-        # If it is not python, it must be TCL
-        tcl_header = '#%Module'
-        try:
-            tcl_module = open(path).readline().startswith(tcl_header)
-        except IOError:
-            return None
-        else:
-            if not tcl_module:
-                return None
-        m_type = tcl
-
-    root = path if m_type == tcl else os.path.splitext(path)[0]
-    fullname = root.replace(modulepath, '').lstrip(os.path.sep)
-    try:
-        name, version = fullname.split(os.path.sep)
-    except ValueError:
-        name, version = fullname, None
-
-    meta = None if m_type != python else read_metadata(path)
-
-    if m_type == tcl and 'gcc' in path:
-        logging.debug(name)
-        logging.debug(modulepath)
-        logging.debug(path, '\n')
-
-    return Module(name, fullname, version, m_type, path, modulepath,
-                  is_explicit_default, meta=meta)
-
-
-def create_module_from_kwds(**kwds):
-    name = kwds['name']
-    version = kwds['version']
-    m_type = kwds['type']
-
-    fullname = kwds.get('fullname')
-    if fullname is None:
-        if version is None:
-            fullname = name
-        else:
-            fullname = os.path.join(name, version)
-
-    is_explicit_default = kwds.get('is_explicit_default')
-    if is_explicit_default is None:
-        is_explicit_default = bool(kwds.get('is_default'))
-
-    return Module(name, fullname, version, m_type,
-                  kwds['filename'], kwds['modulepath'], is_explicit_default,
-                  meta=kwds.get('metadata'), data=kwds.get('data'))
-
-
 # --------------------------------------------------------------------------- #
 # --------------------------- MODULE CLASS ---------------------------------- #
 # --------------------------------------------------------------------------- #
 class Module(object):
-    def __init__(self, name, fullname, version, type, path, modulepath,
-                 is_explicit_default, meta=None, data=None):
+    def __init__(self, name, fullname, version, type, path, modulepath, meta):
         self.name = name
         self.fullname = fullname
-        self.version = version
+        self.version = Version(version)
         self.type = type
         self.filename = path
         self.modulepath = modulepath
-        self.is_explicit_default = is_explicit_default
-        self.is_default = None
-        self.options = ModuleOptionParser()
+        self.parser = ModuleArgumentParser()
         self.family = None
         self.short_description = None
         self.configure_options = None
         self._whatis ={}
         self._helpstr = None
         self.metadata = meta
-        self.version_tuple = self.get_version_tuple()
-        self._data = data
+        self.is_default = False
 
     def __str__(self):
         return 'Module(name={0})'.format(self.fullname)
@@ -112,19 +48,15 @@ class Module(object):
     def __repr__(self):
         return 'Module(name={0})'.format(self.fullname)
 
-    def reset_default_status(self):
-        self.is_default = None
-
     @property
     def is_loaded(self):
-        loaded_modules = misc.split(environ.get(pymod.names.loaded_modules), os.pathsep)
+        loaded_modules = misc.split(
+            environ.get(pymod.names.loaded_modules), os.pathsep)
         return self.fullname in loaded_modules
 
     @property
     def is_enabled(self):
-        if not self.metadata:
-            return True
-        return self.metadata.get('enable_if', True)
+        return self.metadata.is_enabled
 
     @property
     def is_hidden(self):
@@ -132,102 +64,24 @@ class Module(object):
 
     @property
     def do_not_register(self):
-        if not self.metadata:
-            return False
-        return self.metadata.get('do_not_register', False)
+        return self.metadata.do_not_register
 
-    def asdict(self, *args):
-        d = dict(name=self.name, fullname=self.fullname, version=self.version,
-                 type=self.type, filename=self.filename, modulepath=self.modulepath,
-                 is_explicit_default=self.is_explicit_default,
-                 metadata=self.metadata)
-        if args:
-            mode, env = args
-            d['data'] = self.data(mode, env)
-        return d
-
-    def data(self, mode, env):
-        if self._data is not None:
-            return self._data
+    def read(self, mode):
         if self.type == tcl:
             if not has_tclsh:
-                raise TCLModulesNotFoundError
+                raise TCLSHNotFoundError
             try:
-                return tcl2py(self, mode, env)
+                return tcl2py(self, mode)
             except Exception as e:
                 logging.error(e.args[0])
                 return ''
         return open(self.filename, 'r').read()
 
-    def deactivate(self):
-        self.is_default = False
-
     def reset_state(self):
-        self.options = ModuleOptionParser()
+        self.parser = ModuleArgumentParser()
 
-    def add_option(self, option, action='store_true', help=None):
-        return self.options.add_option(option, action=action, help=help)
-
-    def add_mutually_exclusive_option(self, o1, o2, action='store_true',
-                                      help=None):
-        return self.options.add_mutually_exclusive_option(
-            o1, o2, action=action, help=help)
-
-    def parse_opts(self, argv):
-        ns = self.options.parse_opts(argv)
-        return ns
-
-    def get_set_options(self):
-        return self.options.get_set_options()
-
-    @staticmethod
-    def _split_version_string(v):
-        def Int(i):
-            try: return int(i)
-            except: return i
-        ver_tup = [Int(x) for x in re.split(r'[-.]', v) if x.split()]
-        return ver_tup
-
-    def version_is_greater(self, other):
-        if self.version is None:
-            return False
-        if other.version is None:
-            return True
-        try:
-            my_ver_tup = self._split_version_string(self.version)
-            other_ver_tup = self._split_version_string(other.version)
-            m = min(len(my_ver_tup), len(other_ver_tup))
-            return my_ver_tup[:m] > other_ver_tup[:m]
-        except TypeError:
-            return self.version > other.version
-
-    def get_version_tuple(self):
-        v = self.version
-        if v is None:
-            return None
-        def _int(i):
-            try: return int(i)
-            except: return i
-        v2 = []
-        for x in v.split('.'):
-            if re.search('[-_]', x):
-                x = re.split('[-_]', x)
-                v2.extend(x)
-            else:
-                v2.append(x)
-        return tuple([_int(x) for x in v2])
-
-    def describe2(self):
-        if self.is_default and self.is_loaded:
-            return self.fullname + ' (D,L)'
-        elif self.is_default:
-            return self.fullname + ' (D)'
-        elif self.is_loaded:
-            return self.fullname + ' (L)'
-        return self.fullname
-
-    def describe(self):
-        return self.describe2()
+    def parser_options(self):
+        return self.parser.parsed_argv()
 
     @property
     def whatis(self):
@@ -244,7 +98,7 @@ class Module(object):
         if self.short_description is not None:
             key = 'Description'
             N = len(key) + 2
-            ss = textfill(self.short_description, indent=N)
+            ss = misc.textfill(self.short_description, indent=N)
             s.append('{0}: {1}'.format(key, ss))
 
         if self.configure_options is not None:
@@ -254,11 +108,12 @@ class Module(object):
 
         for (key, item) in self._whatis.items():
             N = len(key) + 2
-            ss = textfill(item, indent=N)
+            ss = misc.textfill(item, indent=N)
             s.append('{0}: {1}'.format(key, ss))
 
-        if self.options.registered_options:
-            s.append(self.options.description())
+        parser_help = self.parser.help_string()
+        if parser_help:
+            s.append(parser_help)
 
         return '\n'.join(s)
 
@@ -288,10 +143,52 @@ class Module(object):
         self._helpstr = helpstr
 
 
-class TCLModulesNotFoundError(Exception):
+def from_file(modulepath, filepath):
+    if not os.path.isfile(filepath):
+        logging.verbose('{0} does not exist'.format(filepath))
+        return None
+    if filepath.endswith(('~',)) or filepath.startswith(('.#',)):
+        # Don't read backup files
+        return None
+
+    if filepath.endswith('.py'):
+        m_type = python
+    elif is_tcl_module(filepath):
+        m_type = tcl
+    else:
+        return None
+
+    root = filepath if m_type == tcl else os.path.splitext(filepath)[0]
+    fullname = root.replace(modulepath, '').lstrip(os.path.sep)
+    try:
+        name, version = fullname.split(os.path.sep)
+    except ValueError:
+        name, version = fullname, None
+
+    meta = MetaData()
+    if m_type == python:
+        meta.read(filepath)
+
+    if m_type == tcl and 'gcc' in filepath:
+        logging.debug(name)
+        logging.debug(modulepath)
+        logging.debug(filepath, '\n')
+
+    return Module(name, fullname, version, m_type, filepath, modulepath, meta)
+
+
+def is_tcl_module(filename):
+    tcl_header = '#%Module'
+    try:
+        return open(filename).readline().startswith(tcl_header)
+    except IOError:
+        return False
+
+
+class TCLSHNotFoundError(Exception):
     def __init__(self):
-        msg = 'TCL modules not installed'
+        msg = 'tclsh not found on path'
         if pymod.config.get('debug'):
             logging.error(msg)
         else:
-            super(TCLModulesNotFoundError, self).__init__(msg)
+            super(TCLSHNotFoundError, self).__init__(msg)

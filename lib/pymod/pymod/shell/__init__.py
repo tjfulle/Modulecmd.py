@@ -27,16 +27,17 @@ def _shell(shell_name=None):
         The instantiated shell whose type's name matches shell_name
 
     """
+    global name
     if shell_name is None:
         shell_name = pymod.config.get('default_shell')
     for shelltype in __shells__:
         if shell_name == shelltype.name:
+            name = shell_name
             return shelltype()
     raise Exception('Unknown shell ' + shell_name)
 
 
 shell = Singleton(_shell)
-name = shell.name
 
 
 def set_shell(shell_name):
@@ -44,7 +45,10 @@ def set_shell(shell_name):
     global shell, name
     if shell_name != shell.name:
         shell = _shell(shell_name)
-        name = shell.name
+
+
+def name():
+    return shell.name
 
 
 def source_command(filename):

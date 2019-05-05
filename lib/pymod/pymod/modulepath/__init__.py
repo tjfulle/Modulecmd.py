@@ -1,8 +1,11 @@
 import os
 import re
-import sys
-import json
 
+from pymod.modulepath.discover import find_modules
+import pymod.module
+
+from contrib.util.itertools import groupby
+from contrib.util.lang import Singleton
 import contrib.util.logging as logging
 from contrib.util.logging.color import colorize
 from contrib.functools_backport import cmp_to_key
@@ -13,325 +16,159 @@ from contrib.functools_backport import cmp_to_key
 #from .utils import strip_quotes, get_console_dims, wrap2, grep_pat_in_string
 
 
-
-def compare_module_versions(a, b):
-    if a.version is None and b.version is not None:
-        return -1
-    if a.version is None and b.version is None:
-        return 0
-    if a.version is not None and b.version is None:
-        return 1
-    try:
-        a.version_tuple < b.version_tuple
-        av, bv = a.version_tuple, b.version_tuple
-    except TypeError:
-        av, bv = a.version, b.version
-    if av < bv:
-        return -1
-    elif av == bv:
-        return 0
-    return 1
-
-
 class Modulepath:
-    def __init__(self, directories):
+    def __init__(self, path):
         self.path = []
-        for directory in directories:
-            if not os.access(directory, os.R_OK):
-                continue
-            if not os.path.isdir(directory):
-                logging.warn('Modulepath: nonexistent directory '
-                             '{0!r}'.format(directory), minverbosity=2)
-            else:
-                self.path.append(directory)
-        self.modules = None
-        self.grouped_by_name = None
-        self._cache = self.read_cache()
-        self.discover_modules_on_path()
-
-    def __iter__(self):
-        for directory in self.path:
-            yield (directory, self.modules[directory])
+        self.modules = []
+        self.db = {}
+        self._grouped_by_modulepath = None
+        self.set_path(path)
 
     def __contains__(self, path):
         return path in self.path
 
-    def reset(self, directories=None):
-        self.modules = None
-        self.grouped_by_name = None
-        if directories is not None:
-            for directory in directories:
-                if not os.access(directory, os.R_OK):
-                    continue
-                if not os.path.isdir(directory):
-                    logging.warn('Modulepath: nonexistent directory '
-                                 '{0!r}'.format(directory))
-                else:
-                    self.path.append(directory)
-        self.discover_modules_on_path()
+    def get(self, key):
+        """Get a module from the available modules.
 
-    def get_module_by_name(self, name):
-        modules = self.grouped_by_name.get(name)
-        if modules is not None:
-            return modules[0]
-        candidates = {}
-        for (directory, modules) in self:
-            for module in modules:
-                if module.fullname == name:
-                    return module
-                if os.path.sep in name:
-                    # a more qualified path?
-                    root = os.path.join(module.modulepath, module.fullname)
-                    if root.endswith(name):
-                        # store just the length of the intersection of root and key
-                        key = len(root.replace(name, ''))
-                        if key not in candidates:
-                            candidates[key] = module
-        if not cfg.strict_modulename_matching and candidates:
-            key = min(list(candidates.keys()))
-            return candidates[key]
+        """
+        if os.path.isfile(key):
+            return self.getby_filename(key)
+        parts = key.split(os.path.sep)
+        if len(parts) == 1:
+            return self.getby_name(key)
+        if len(parts) == 2:
+            return self.getby_fullname(key)
+
+    def getby_filename(self, filename):
+        for module in self.modules:
+            if module.filename == path:
+                return module
         return None
 
-    def get_module_by_filename(self, filename):
-        for (directory, modules) in self:
+    def getby_name(self, name):
+        return self.db['by_name'].get(name)
+
+    def getby_fullname(self, fullname):
+        for (_, modules) in self.group_by_modulepath():
             for module in modules:
-                if module.filename == filename:
+                if module.fullname == fullname:
                     return module
         return None
 
-    def sort_and_assign_defaults(self):
+    def _path_modified(self):
+        self._grouped_by_modulepath = None
+        self.assign_defaults()
+
+    def append_path(self, dirname):
+        if not os.path.isdir(dirname):
+            logging.warn(
+                'Modulepath: {0!r} is not a directory'.format(dirname))
+        if dirname in self.path:
+            return
+        modules_in_dir = find_modules(dirname)
+        if not modules_in_dir:
+            logging.warn(
+                'Modulepath: no modules found in {0}'.format(dirname))
+            return
+        self.modules.extend(modules_in_dir)
+        self.path.append(dirname)
+        self._path_modified()
+        return modules_in_dir
+
+    def prepend_path(self, dirname):
+        if not os.path.isdir(dirname):
+            logging.warn(
+                'Modulepath: {0!r} is not a directory'.format(dirname))
+        if dirname in self.path:
+            self.path.pop(self.path.index(dirname))
+        else:
+            modules_in_dir = find_modules(dirname)
+            if not modules_in_dir:
+                logging.warn(
+                    'Modulepath: no modules found in {0}'.format(dirname))
+                return
+            self.modules.extend(modules_in_dir)
+        self.path.insert(0, dirname)
+        self._path_modified()
+
+        # Determine which modules changed in priority due to insertion of new
+        # directory in to path
+        bumped = []
+        grouped_by_modulepath = self.group_by_modulepath()
+        fullnames = [m.fullname for m in grouped_by_modulepath[0][1]]
+        for (_, modules) in grouped_by_modulepath[1:]:
+            for module in modules:
+                if module.fullname in fullnames:
+                    bumped.append(module)
+        return bumped
+
+    def remove_path(self, dirname):
+        if dirname not in self.path:
+            logging.warn(
+                'Modulepath: {0!r} is not in modulepath'.format(dirname))
+            return
+        removed = []
+        for (i, module) in enumerate(self.modules):
+            if module.modulepath == dirname:
+                removed.append(module)
+                self.modules[i] = None
+        self.modules = [m for m in self.modules if m is not None]
+        self.path.pop(self.path.index(dirname))
+        self._path_modified()
+        return removed
+
+    def set_path(self, path):
+        self.path = []
+        self.modules = []
+        if not path:
+            return
+        for dirname in path:
+            if not os.path.isdir(dirname):
+                logging.verbose(
+                    'Modulepath: nonexistent directory {0!r}'.format(dirname))
+                continue
+            modules_in_dir = find_modules(dirname)
+            if not modules_in_dir:
+                logging.verbose(
+                    'Modulepath: no modules found in {0}'.format(dirname))
+                continue
+            self.modules.extend(modules_in_dir)
+            self.path.append(dirname)
+        self._path_modified()
+
+    def assign_defaults(self):
         """Assign defaults to modules.  Given a module with multiple versions,
         the default is the module with the highest version across all modules,
         unless explicitly made the default.  A module is explicitly made the
         default by creating a symlink to it (in the same directory) named
         'default'"""
-        for (name, modules) in self.grouped_by_name.items():
-
-            for module in modules:
-                module.reset_default_status()
-
-            if len(modules) == 1:
-                continue
-
-            modules = sorted(modules, key=cmp_to_key(compare_module_versions))
-            version_groups = [[modules[0]]]
-            for module in modules[1:]:
-                if compare_module_versions(module, version_groups[-1][-1]) == 1:
-                    version_groups.append([module])
-                else:
-                    version_groups[-1].append(module)
-            modules = [x for y in reversed(version_groups) for x in y]
-            span = list(set([x.modulepath for x in modules]))
-
-            default = modules[0]
+        def compare_module_versions(a, b):
+            if a.is_explicit_default:
+                return 1
+            elif b.is_explicit_default:
+                return -1
+            elif a.version > b.version:
+                return 1
+            elif b.version > a.version:
+                return -1
+            return 0
+        self.db['by_name'] = {}
+        for (_, modules) in groupby(self.modules, lambda x: x.name):
             for module in modules:
                 module.is_default = False
+            if len(modules) > 1:
+                modules = sorted(modules,
+                                 key=cmp_to_key(compare_module_versions),
+                                 reverse=True)
+                modules[0].is_default = True
+            self.db['by_name'][modules[0].name] = modules[0]
 
-            for (i, module) in enumerate(modules):
-                if module.is_explicit_default:
-                    break
-            else:
-                i = 0
-            default = modules.pop(i)
-            modules.insert(0, default)
-            modules[0].is_default = True
-            self.grouped_by_name[name] = modules
-
-        return None
-
-    def discover_modules_on_path(self):
-        self.modules = {}
-        self.grouped_by_name = {}
-        for directory in self.path:
-            modules_in_directory = self.discover_modules_in_directory(directory)
-            if modules_in_directory is None:
-                logging.warn('Modulepath: no modules found in '
-                             '{0}'.format(directory), minverbosity=2)
-                continue
-            self.modules[directory] = modules_in_directory
-            for module in modules_in_directory:
-                self.grouped_by_name.setdefault(module.name, []).append(module)
-        self.sort_and_assign_defaults()
-        return None
-
-    def find_linked_default(self, dirname, files):
-        name = 'default'
-        try:
-            files.remove(name)
-        except ValueError:
-            return None
-
-        path = os.path.join(dirname, name)
-        if not os.path.islink(path):
-            logging.warn('Modulepath: expected file named default '
-                         'in {0} to be a link to a modulefile'.format(dirname),
-                            minverbosity=2)
-            return None
-
-        source = os.path.realpath(path)
-        if os.path.dirname(source) != dirname:
-            logging.warn('Modulepath: expected file named default in {0} to be '
-                         'a link to a modulefile in the same directory'.format(dirname))
-            return None
-
-        return source
-
-    def find_versioned_default(self, dirname, files):
-        # Support for TCL modules .version scheme
-        name = '.version'
-        try:
-            files.remove(name)
-        except ValueError:
-            return None
-
-        default = None
-        path = os.path.join(dirname, name)
-        try:
-            lines = open(path).readlines()
-            regex = """(?i)^\s*set\s+ModulesVersion"""
-            for line in lines:
-                if " ".join(line.split()).startswith('set ModulesVersion'):
-                    tmp = line.split("#", 1)[0].split()[-1]
-                    version = strip_quotes(tmp)
-                    default = os.path.join(dirname, version)
-                    break
-            if default is None:
-                logging.warn('Could not determine .version default '
-                             'in {0}'.format(dirname))
-            elif not os.path.exists(default):
-                logging.warn('{0!r}: versioned default does not '
-                             'exist'.format(default))
-            else:
-                return default
-        except:
-            logging.warn('Could not read {0}'.format(path))
-
-        return None
-
-    def discover_modules_in_directory(self, directory):
-        if not os.access(directory, os.R_OK):
-            return None
-        if directory == '/':
-            raise Exception('Searching root file system!')
-        if not os.path.isdir(directory):
-            return None
-
-        d_cache = self._cache.get(directory)
-        modules = []
-        for (dirname, _, files) in os.walk(directory):
-
-            if d_cache:
-                for filename in [f for f in files]:
-                    path = os.path.join(dirname, filename)
-                    try:
-                        m_cache = d_cache[path]
-                    except KeyError:
-                        pass
-                    else:
-                        if os.stat(path).st_mtime <= m_cache['st_mtime']:
-                            modules.append(create_module_from_kwds(**m_cache['kwds']))
-                            files.remove(filename)
-
-            if not files:
-                continue
-
-            # Determine if there is an explicit default
-            linked_default = self.find_linked_default(dirname, files)
-            versioned_default = self.find_versioned_default(dirname, files)
-            if linked_default and versioned_default:
-                logging.warn('A linked and versioned default exist for {0}, '
-                             'choosing the linked'.format(os.path.basename(dirname)))
-                default = linked_default
-            else:
-                default = linked_default or versioned_default
-
-            # Look for modules
-            for filename in files:
-                path = os.path.join(dirname, filename)
-                is_explicit_default = default == path
-                module = create_module_from_file(directory, path, is_explicit_default)
-                if module is not None:
-                    modules.append(module)
-        return sorted(modules, key=lambda x: x.fullname)
-
-    def append(self, directory):
-        if directory in self.path:
-            return None
-        if os.path.realpath(directory) in self.path:
-            return None
-        modules_in_directory = self.discover_modules_in_directory(directory)
-        if modules_in_directory is None:
-            logging.warn('Modulepath: no modules found in '
-                         '{0}'.format(directory))
-            return None
-        self.path.append(directory)
-        self.modules[directory] = modules_in_directory
-
-        # Add the new modules to their groups and reassign defaults
-        for module in modules_in_directory:
-            self.grouped_by_name.setdefault(module.name, []).append(module)
-        self.sort_and_assign_defaults()
-        return None
-
-    def remove(self, directory):
-        # Remove the directory from path and associated modules
-        if directory in self.path:
-            self.path.remove(directory)
-            removed = self.modules.pop(directory)
-        elif os.path.realpath(directory) in self.path:
-            self.path.remove(os.path.realpath(directory))
-            removed = self.modules.pop(os.path.realpath(directory))
-        else:
-            return None
-
-        # Regroup modules and reassign defaults
-        self.group_modules_by_name()
-        self.sort_and_assign_defaults()
-        return removed
-
-    def prepend(self, directory):
-        if directory in self.path:
-            return None
-        if os.path.realpath(directory) in self.path:
-            return None
-        modules_in_directory = self.discover_modules_in_directory(directory)
-        if modules_in_directory is None:
-            logging.warn('Modulepath: no modules found in {0}'.format(directory))
-            return None
-        self.path.insert(0, directory)
-        fullnames = [m.fullname for m in modules_in_directory]
-        self.modules[directory] = modules_in_directory
-
-        # Find modules that were bumped.  Only bump modules that have the same
-        # name/version
-        bumped = []
-        for other in self.path[1:]:
-            for module in self.modules[other]:
-                if module.fullname in fullnames:
-                    bumped.append(module)
-
-        # Regroup modules and reassign defaults
-        self.group_modules_by_name()
-        self.sort_and_assign_defaults()
-        return bumped
-
-    def group_modules_by_name(self):
-        self.grouped_by_name = {}
-        for (directory, modules) in self:
-            for module in modules:
-                self.grouped_by_name.setdefault(module.name, []).append(module)
-
-    def pretty_print(self):
-        for d in self.path:
-            print(d)
-            for m in self.modules[d]:
-                print('\t{0}'.format(m))
-
-    def join(self):
-        return os.pathsep.join(self.path)
-
-    def available(self):
-        return [(d, modules) for (d, modules) in self]
+    def group_by_modulepath(self):
+        if self._grouped_by_modulepath is None:
+            grouped = groupby(self.modules, lambda x: x.modulepath)
+            self._grouped_by_modulepath = sorted(
+                grouped, key=lambda x: self.path.index(x[0]))
+        return self._grouped_by_modulepath
 
     def filter_modules_by_regex(self, modules, regex):
         if regex:
@@ -355,7 +192,7 @@ class Modulepath:
         description = []
         if not terse:
             _, width = get_console_dims()
-            for (directory, modules) in self:
+            for (directory, modules) in self.group_by_modulepath():
                 modules = [m for m in modules if m.is_enabled]
                 modules = self.filter_modules_by_regex(modules, regex)
                 if not os.path.isdir(directory):
@@ -367,13 +204,13 @@ class Modulepath:
                         continue
                     s = colorize('@r{(None)}'.center(width))
                 else:
-                    s = wrap2([m.describe() for m in modules], width)
+                    s = wrap2([m.describe(is_default) for m in modules], width)
                     s = self.colorize(s)
                 directory = directory.replace(os.path.expanduser('~/'), '~/')
                 description.append((' ' + directory + ' ').center(width, '-'))
                 description.append(s + '\n')
         else:
-            for (directory, modules) in self:
+            for (directory, modules) in self.group_by_modulepath():
                 if not os.path.isdir(directory):
                     continue
                 modules = self.filter_modules_by_regex(modules, regex)
@@ -390,7 +227,7 @@ class Modulepath:
         return description
 
     def apply(self, fun):
-        for (directory, modules) in self:
+        for (_, modules) in self.group_by_modulepath():
             for module in modules:
                 fun(module)
 
@@ -398,7 +235,7 @@ class Modulepath:
         # Return a list of modules that might by given by key
         the_candidates = set()
         regex = re.compile(key)
-        for (directory, modules) in self:
+        for (_, modules) in self.group_by_modulepath():
             if not modules:
                 continue
             for module in modules:
@@ -410,23 +247,35 @@ class Modulepath:
                     the_candidates.add(module.fullname)
         return sorted(list(the_candidates))
 
-    def cache(self, env):
-        cache = {}
-        for (directory, modules) in self:
-            d_cache = {}
-            for module in modules:
-                t = os.stat(module.filename).st_mtime
-                d_cache[module.filename] = {'st_mtime': int(t),
-                                            'kwds': module.asdict('load', env)}
-            cache[directory] = d_cache
-        filename = os.path.join(cfg.dot_dir, 'modulepath.json')
-        with open(filename, 'w') as fh:
-            json.dump(cache, fh, indent=2)
 
-    def read_cache(self):
-        filename = os.path.join(cfg.dot_dir, 'modulepath.json')
-        if os.path.isfile(filename):
-            with open(filename, 'r') as fh:
-                return json.load(fh)
-        else:
-            return {}
+def _path():
+    path = misc.split(os.getenv(pymod.names.modulepath), os.pathsep)
+    return Modulepath(path)
+
+
+path = Singleton(_path)
+
+
+def set_path(other_path):
+    global path
+    path = other_path
+
+
+def group_by_modulepath():
+    return path.group_by_modulepath()
+
+
+def get(key):
+    return path.get(key)
+
+
+def append_path(dirname):
+    return path.append_path(dirname)
+
+
+def remove_path(dirname):
+    return path.remove_path(dirname)
+
+
+def prepend_path(dirname):
+    return path.prepend_path(dirname)
