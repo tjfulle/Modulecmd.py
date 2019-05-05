@@ -9,6 +9,7 @@ from contrib.util.filesystem import working_dir
 from contrib.util.logging.colify import colify
 
 import pymod.paths
+import pymod.modulepath
 
 description = "run pymod's unit tests"
 section = "developer"
@@ -69,6 +70,10 @@ def test(parser, args, unknown_args):
         sys.argv[0] = 'pymod test'
         pytest.main(['-h'])
         return
+
+    path = os.path.join(pymod.paths.mock_modulepath_path, 'core', '1')
+    modulepath = pymod.modulepath.Modulepath([path])
+    pymod.modulepath.set_path(modulepath)
 
     pytest_root = pymod.paths.test_path
 

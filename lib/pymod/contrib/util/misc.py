@@ -86,3 +86,18 @@ def pop(list, item, from_back=False):
         else:
             i = list.index(item)
         list.pop(i)
+
+
+def strip_quotes(item):
+    """Strip beginning/ending quotations"""
+    item = item.strip()
+    if item[0] == '"' and item[-1] == '"':
+        # strip quotations
+        item = item[1:-1]
+    if item[0] == "'" and item[-1] == "'":
+        # strip single quotations
+        item = item[1:-1]
+    # SEMs uses <NAME> as an identifier, but < gets escaped, so remove
+    # the escape character
+    item = re.sub(r'[\\]+', '', item)
+    return item

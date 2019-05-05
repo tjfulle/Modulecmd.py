@@ -1,7 +1,7 @@
 import os
 import pytest
 from pymod.module.version import Version
-from pymod.module.option import ModuleOptionParser, ModuleArgumentParser
+from pymod.module.argument_parser import ModuleArgumentParser
 
 
 class TestModuleVersion:
@@ -49,6 +49,9 @@ class TestModuleVersion:
         assert v == Version('2.1.3-c')
 
 class TestModuleArgumentParser:
+    def test_prefix_chars(self):
+        p = ModuleArgumentParser()
+        assert p.prefix_chars == '+'
     def test_arg_parser_no_positional(self):
         p = ModuleArgumentParser()
         with pytest.raises(ValueError):
@@ -59,9 +62,22 @@ class TestModuleArgumentParser:
             p.add_argument('+x', action='count')
     def test_unit(self):
         p = ModuleArgumentParser()
-        opt = '{0}b'.format(p.prefix_chars)
-        p.add_argument(opt, action='store_true')
+        p.add_argument('+b', action='store_true')
         ns = p.parse_args()
         assert not ns.b
-        ns = p.parse_args([opt])
+        ns = p.parse_args(['+b'])
         assert ns.b
+    def test_parsed(self):
+        p = ModuleArgumentParser()
+        p.add_argument('++x')
+        p.add_argument('+a', action='store_true')
+        p.add_argument('+b', action='store_false')
+        argv = ['++x=baz', '+b', '+a']
+        ns = p.parse_args(argv)
+        assert p.parsed_argv == argv
+    def test_help_str(self):
+        p = ModuleArgumentParser()
+        p.add_argument('++x', help='Store an x')
+        p.add_argument('+a', action='store_true', help='Set an a')
+        help_str = 'Module options:\n  ++x X  Store an x\n  +a     Set an a'
+        assert help_str == p.help_string().strip()

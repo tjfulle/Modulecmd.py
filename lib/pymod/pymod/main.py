@@ -363,7 +363,8 @@ def setup_main_options(args):
         pymod.config.set('debug', True, scope='command_line')
 
     if args.mock:
-        p = pymod.modulepath.ModulePath(pymod.paths.mock_modulepath)
+        path = os.path.join(pymod.paths.mock_modulepath, 'core')
+        p = pymod.modulepath.ModulePath([path])
         pymod.modulepath.set_path(p)
 
     if args.shell != pymod.config.get('default_shell'):
