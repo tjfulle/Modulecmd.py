@@ -134,6 +134,9 @@ def info(message, *args, **kwargs):
     wrap = kwargs.get('wrap', False)
     break_long_words = kwargs.get('break_long_words', False)
     st_countback = kwargs.get('countback', 3)
+    reported_by = kwargs.get('reported_by')
+    if reported_by is not None:
+        message += ' (reported by {0})'.format(reported_by)
 
     st_text = ""
     if _stacktrace:

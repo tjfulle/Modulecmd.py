@@ -6,12 +6,20 @@ class ModuleArgumentParser(ArgumentParser):
     def __init__(self):
         superinit = super(ModuleArgumentParser, self).__init__
         superinit(prefix_chars='+', add_help=False, usage=SUPPRESS)
+        self._argv = None
         self._parsed_argv = None
 
     def parse_args(self, argv=None):
         superparser = super(ModuleArgumentParser, self).parse_args
-        self._parsed_argv = list(argv or [])
-        return superparser(self._parsed_argv)
+        if argv is not None:
+            self.set_argv(argv)
+        argv = self._argv or []
+        ns = superparser(argv)
+        self._parsed_argv = list(argv)
+        return ns
+
+    def set_argv(self, argv):
+        self._argv = list(argv)
 
     def add_argument(self, *args, **kwargs):
         chars = self.prefix_chars

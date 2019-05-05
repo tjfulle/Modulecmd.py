@@ -83,6 +83,9 @@ class Module(object):
     def parser_options(self):
         return self.parser.parsed_argv()
 
+    def set_argv(self, argv):
+        self.parser.set_argv(argv)
+
     def format_info(self):
         if self.is_default and self.is_loaded:
             return self.fullname + ' (D,L)'
@@ -145,11 +148,10 @@ class Module(object):
     def helpstr(self):
         if self._helpstr is None:
             return '{0!r}: no help string provided'.format(
-                encode_str(self.fullname))
+                misc.encode_str(self.fullname))
         return fill(self._helpstr)
 
-    @helpstr.setter
-    def helpstr(self, helpstr):
+    def set_helpstr(self, helpstr):
         self._helpstr = helpstr
 
 

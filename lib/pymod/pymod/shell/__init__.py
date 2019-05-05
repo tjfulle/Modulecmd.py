@@ -56,15 +56,18 @@ def source_command(filename):
 
 
 def format_commands(environ=None):
-    environ = environ or pymod.environ
+    if environ is None:
+        environ = pymod.environ.environ
     return shell.format_commands(environ)
 
 
 def dump(environ=None):
-    environ = environ or pymod.environ
+    if environ is None:
+        environ = pymod.environ.environ
     shell.dump(environ)
 
 
 def filter(environ):
-    environ = environ or pymod.environ
+    if environ is None:
+        environ = pymod.environ.environ
     return shell.filter(environ)
