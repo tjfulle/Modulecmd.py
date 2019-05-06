@@ -1,9 +1,9 @@
 import sys
 
+import pymod.modes
 import pymod.modulepath
 from pymod.mc.execmodule import execmodule_in_sandbox
 from pymod.error import ModuleNotFoundError
-from contrib.util.logging import terminal_size
 
 
 def whatis(modulename):
@@ -11,10 +11,6 @@ def whatis(modulename):
     module = pymod.modulepath.get(modulename)
     if module is None:
         raise ModuleNotFoundError(modulename, mp=pymod.modulepath)
-    execmodule_in_sandbox(module, 'whatis')
-    _, width = terminal_size()
-    x = " " + module.name + " "
-    s = '{0}'.format(x.center(width, '=')) + '\n'
-    s += module.format_whatis() + '\n'
-    s += '=' * width
+    execmodule_in_sandbox(module, pymod.modes.whatis)
+    s = module.format_whatis()
     sys.stderr.write(s + '\n')

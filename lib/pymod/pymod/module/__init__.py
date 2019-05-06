@@ -2,6 +2,7 @@ import os
 import re
 import sys
 from textwrap import fill
+from six import StringIO
 
 import pymod.config
 import pymod.names
@@ -12,6 +13,7 @@ from pymod.module.version import Version
 import contrib.util.misc as misc
 import pymod.environ as environ
 import contrib.util.logging as logging
+from contrib.util.logging import terminal_size
 from contrib.util.executable import which
 from pymod.module.argument_parser import ModuleArgumentParser
 
@@ -106,36 +108,44 @@ class Module(object):
         if 'explicit' in self._whatis:
             return '\n'.join(self._whatis['explicit'])
 
-        s = ['Name: {0}'.format(self.name)]
+        sio = StringIO()
+        sio.write('Name: {0}\n'.format(self.name))
         if self.version.string:
-            s.append('Version: {0}'.format(self.version))
-        s.extend([
-            'Type: {0}'.format(self.type),
-            'Family: {0}'.format(self.family),
-            'Full Name: {0}'.format(self.fullname),
-            'Filename: {0}'.format(self.filename), ])
+            sio.write('Version: {0}\n'.format(self.version))
+        sio.write(
+            'Type: {0}\n'
+            'Family: {1}\n'
+            'Full Name: {2}\n'
+            'Filename: {3}\n'
+            .format(self.type, self.family, self.fullname, self.filename))
 
         if self.short_description is not None:
             key = 'Description'
             N = len(key) + 2
             ss = misc.textfill(self.short_description, indent=N)
-            s.append('{0}: {1}'.format(key, ss))
+            sio.write('{0}: {1}\n'.format(key, ss))
 
         if self.configure_options is not None:
             key = 'Configure Options'
             ss = '\n    '.join(self.configure_options.split())
-            s.append('{0}:\n    {1}'.format(key, ss))
+            sio.write('{0}:\n    {1}\n'.format(key, ss))
 
         for (key, item) in self._whatis.items():
             N = len(key) + 2
             ss = misc.textfill(item, indent=N)
-            s.append('{0}: {1}'.format(key, ss))
+            sio.write('{0}: {1}\n'.format(key, ss))
 
         parser_help = self.parser.help_string()
         if parser_help:
-            s.append(parser_help)
+            sio.write(parser_help + '\n')
 
-        return '\n'.join(s)
+        _, width = terminal_size()
+        x = " " + self.name + " "
+        s = '{0}'.format(x.center(width, '=')) + '\n'
+        s += sio.getvalue()
+        s += '=' * width
+
+        return s
 
     def set_whatis(self, *args, **kwargs):
         if self.type == tcl:
