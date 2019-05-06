@@ -18,6 +18,10 @@ def format_output():
     return mpath.format_output()
 
 
+def path():
+    return list(mpath.path)
+
+
 def set_path(other_path):
     global mpath
     mpath = other_path

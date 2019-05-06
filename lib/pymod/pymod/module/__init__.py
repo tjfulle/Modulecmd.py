@@ -199,7 +199,7 @@ def is_tcl_module(filename):
     tcl_header = '#%Module'
     try:
         return open(filename).readline().startswith(tcl_header)
-    except IOError:
+    except (IOError, UnicodeDecodeError):
         return False
 
 

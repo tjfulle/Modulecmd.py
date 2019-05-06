@@ -34,6 +34,7 @@ aliases = {
     'av': 'avail',
     'add': 'load',
     'ls': 'list',
+    'rm': 'unload',
 }
 
 #: help levels in order of detail (i.e., number of commands shown)
@@ -47,7 +48,7 @@ intro_by_level = {
 
 #: control top-level pymod options shown in basic vs. advanced help
 options_by_level = {
-    'short': ['h', 'V', 'color'],
+    'short': ['h', 'V', 'color', 'dryrun'],
     'long': 'all'
 }
 
@@ -68,6 +69,8 @@ section_descriptions = {
 #: preferential command order for some sections (e.g., build pipeline is
 #: in execution order, not alphabetical)
 section_order = {
+    'module': ['avail', 'list', 'load', 'unload', 'swap', 'purge', 'refresh',
+               'use', 'unuse', 'show', 'cat', 'more', 'whatis', 'path', 'edit'],
     'basic': ['list', 'info', 'find'],
     'build': ['fetch', 'stage', 'patch', 'configure', 'build', 'restage',
               'install', 'uninstall', 'clean'],
@@ -493,7 +496,7 @@ def main(argv=None):
 
     except KeyboardInterrupt:
         sys.stderr.write('\n')
-        pymod.loggig.die("Keyboard interrupt.")
+        logging.die("Keyboard interrupt.")
 
     except SystemExit as e:
         return e.code
