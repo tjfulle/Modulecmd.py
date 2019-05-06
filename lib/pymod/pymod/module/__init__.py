@@ -141,11 +141,11 @@ class Module(object):
 
         _, width = terminal_size()
         x = " " + self.name + " "
-        s = '{0}'.format(x.center(width, '=')) + '\n'
-        s += sio.getvalue()
-        s += '=' * width
+        whatis = '{0}'.format(x.center(width, '=')) + '\n'
+        whatis += sio.getvalue()
+        whatis += '=' * width
 
-        return s
+        return whatis
 
     def set_whatis(self, *args, **kwargs):
         if self.type == tcl:
