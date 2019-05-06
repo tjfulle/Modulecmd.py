@@ -29,6 +29,7 @@ def setup_parser(subparser):
 def load(parser, args):
     argv = parse_module_options(args.args)
     for (name, opts) in argv:
-        pymod.mc.load(name, opts, args.do_not_register, args.insert_at)
-    pymod.shell.dump()
+        pymod.mc.load(name, opts=opts, do_not_register=args.do_not_register,
+                      insert_at=args.insert_at)
+    pymod.mc.dump()
     return 0

@@ -1,6 +1,7 @@
 import os
 
 import pymod.module
+import pymod.environ
 import contrib.util.logging as logging
 from contrib.util.misc import strip_quotes
 
@@ -22,6 +23,11 @@ def find_modules(directory):
     for (dirname, _, files) in os.walk(directory):
         modules_in_dir = _find_modules(directory, dirname, files)
         modules.extend(modules_in_dir)
+
+    module_opts = pymod.environ.get_dict(pymod.names.loaded_module_opts)
+    for module in modules:
+        module.opts = module_opts.get(module.fullname)
+
     return modules
 
 

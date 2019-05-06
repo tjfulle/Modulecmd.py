@@ -4,8 +4,8 @@ from .csh import Csh
 from .python import Python
 from .shell import Shell
 
-from contrib.util.lang import Singleton
 import pymod.config
+from contrib.util.lang import Singleton
 
 
 __shells__ = (Shell, Bash, Csh, Python)
@@ -55,19 +55,9 @@ def source_command(filename):
     return shell.source_command(filename)
 
 
-def format_commands(environ=None):
-    if environ is None:
-        environ = pymod.environ.environ
-    return shell.format_commands(environ)
-
-
-def dump(environ=None):
-    if environ is None:
-        environ = pymod.environ.environ
-    shell.dump(environ)
+def format_output(environ, aliases=None, shell_functions=None):
+    return shell.format_output(environ, aliases, shell_functions)
 
 
 def filter(environ):
-    if environ is None:
-        environ = pymod.environ.environ
     return shell.filter(environ)

@@ -14,6 +14,10 @@ def _modulepath():
 mpath = Singleton(_modulepath)
 
 
+def format_output():
+    return mpath.format_output()
+
+
 def set_path(other_path):
     global mpath
     mpath = other_path

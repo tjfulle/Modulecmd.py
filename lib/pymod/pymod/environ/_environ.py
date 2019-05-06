@@ -2,6 +2,7 @@ import os
 from argparse import Namespace
 
 import pymod.names
+import pymod.shell
 from contrib.util.misc import str2dict, dict2str, boolean, split, join, pop
 from contrib.ordereddict_backport import OrderedDict
 
@@ -10,6 +11,10 @@ class Environ(OrderedDict):
     def __init__(self):
         self.aliases = {}
         self.shell_functions = {}
+
+    def format_output(self):
+        return pymod.shell.format_output(
+            self, self.aliases, self.shell_functions)
 
     def get(self, key, default=None):
         if key in self:
@@ -40,11 +45,28 @@ class Environ(OrderedDict):
         p.meta = str2dict(self.get(p.meta_key))
         return p
 
+    def set_path(self, path):
+        if not path.value:
+            self[path.key] = None
+            self[path.meta_key] = None
+        else:
+            self[path.key] = join(path.value, path.sep)
+            self[path.meta_key] = dict2str(path.meta)
+        if path.key.endswith('LD_LIBRARY_PATH'):
+            # sometimes python doesn't pick up ld_library_path :(
+            self['__ld_library_path__'] = self[path.key]
+
     def set(self, key, value):
         self[key] = value
+        if key.endswith('LD_LIBRARY_PATH'):
+            # sometimes python doesn't pick up ld_library_path :(
+            self['__ld_library_path__'] = self[key]
 
     def unset(self, key):
         self[key] = None
+        if key.endswith('LD_LIBRARY_PATH'):
+            # sometimes python doesn't pick up ld_library_path :(
+            self['__ld_library_path__'] = self[key]
 
     def set_alias(self, key, value):
         self.aliases[key] = value
@@ -57,14 +79,6 @@ class Environ(OrderedDict):
 
     def unset_shell_function(self, key):
         self.shell_functions[key] = None
-
-    def set_path(self, path):
-        if not path.value:
-            self[path.key] = None
-            self[path.meta_key] = None
-        else:
-            self[path.key] = join(path.value, path.sep)
-            self[path.meta_key] = dict2str(path.meta)
 
     def append_path(self, key, value, sep=os.pathsep):
         if key == pymod.names.modulepath:

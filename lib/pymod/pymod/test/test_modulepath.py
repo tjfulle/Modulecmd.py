@@ -107,7 +107,7 @@ class TestModulepath:
         assert module.fullname == 'pkg-c/4.0.0'
         assert module.filename == os.path.join(d2, module.fullname + '.py')
 
-        removed, _ = pymod.modulepath.remove_path(d2)
+        removed, _, _ = pymod.modulepath.remove_path(d2)
         assert len(removed) == 2
         removed_full_names = [m.fullname for m in removed]
         assert 'pkg-c/1.0.0' in removed_full_names
@@ -141,7 +141,7 @@ class TestModulepath:
         assert module.fullname == 'pkg-c/4.0.0'
         assert module.filename == os.path.join(d2, module.fullname + '.py')
 
-        removed, _ = pymod.modulepath.remove_path(d2)
+        removed, _, _ = pymod.modulepath.remove_path(d2)
         assert len(removed) == 2
         removed_full_names = [m.fullname for m in removed]
         assert 'pkg-c/1.0.0' in removed_full_names

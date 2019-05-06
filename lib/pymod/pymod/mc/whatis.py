@@ -15,6 +15,6 @@ def whatis(modulename):
     _, width = terminal_size()
     x = " " + module.name + " "
     s = '{0}'.format(x.center(width, '=')) + '\n'
-    s += module.whatis + '\n'
+    s += module.format_whatis() + '\n'
     s += '=' * width
     sys.stderr.write(s + '\n')

@@ -1,31 +1,34 @@
+import pymod.mc
+import pymod.modes
+import pymod.modulepath
 import contrib.util.logging as logging
 from pymod.error import ModuleNotFoundError
 
 
 def swap(module_a_name, module_b_name):
     """Swap modules a and b"""
-    module_a = self.modulepath.get_module_by_name(module_a_name)
-    module_b = self.modulepath.get_module_by_name(module_b_name)
+    module_a = pymod.modulepath.get(module_a_name)
+    module_b = pymod.modulepath.get(module_b_name)
     if module_a is None:
-        raise ModuleNotFoundError(module_a_name, self.modulepath)
+        raise ModuleNotFoundError(module_a_name, pymod.modulepath)
     if module_b is None:
-        raise ModuleNotFoundError(module_b_name, self.modulepath)
+        raise ModuleNotFoundError(module_b_name, pymod.modulepath)
     if not module_a.is_loaded:
-        logging.warn('{0} is not loaded, swap not performed!'.format(
-            module_a.fullname))
+        logging.warn('{0} is not loaded, swap not performed!'
+                     .format(module_a.fullname))
         return
     if module_b.is_loaded:
         logging.warn('{0} is already loaded!'.format(module_b.fullname))
-        return
+        return module_b
     assert module_a.is_loaded
     swap_impl(module_a, module_b)
 
-    self.m_state_changed.setdefault('Swapped', []).append(
-        [module_a.fullname, module_b.fullname])
-    return None
+    pymod.mc.swapped_explicitly(module_a, module_b)
+
+    return module_b
 
 
-def swap_impl(module_a, module_b, options_b=None, maintain_state=0):
+def swap_impl(module_a, module_b, maintain_state=False):
     """The general strategy of swapping is to unload all modules in reverse
     order back to the module to be swapped.  That module is then unloaded
     and its replacement loaded.  Afterward, modules that were previously
@@ -48,7 +51,7 @@ def swap_impl(module_a, module_b, options_b=None, maintain_state=0):
     assert module_a.is_loaded
 
     # Before swapping, unload modules and later reload
-    loaded = self.get_loaded_modules()
+    loaded = pymod.mc.get_loaded_modules()
     for (i, other) in enumerate(loaded):
         if other.name == module_a.name:
             # All modules coming after this one will be unloaded and
@@ -56,46 +59,41 @@ def swap_impl(module_a, module_b, options_b=None, maintain_state=0):
             to_unload_and_reload = loaded[i:]
             break
     else:
-        raise Exception('Should have found module_a to swap')
+        raise NoModulesToSwapError
 
     # Unload any that need to be unloaded first
-    my_opts = {}
     for other in to_unload_and_reload[::-1]:
-        my_opts[other.fullname] = self.environ.get_loaded_modules('opts', module=other)
-        self.execmodule(UNLOAD, other)
+        pymod.mc.execmodule(other, pymod.modes.unload)
     assert other.name == module_a.name
 
     # Now load it
-    if options_b:
-        self.set_moduleopts(module_b, options_b)
-    self.execmodule(LOAD, module_b)
+    pymod.mc.execmodule(module_b, pymod.modes.load)
 
     # Reload any that need to be unloaded first
     for other in to_unload_and_reload[1:]:
         if maintain_state:
-            this_module = self.modulepath.get_module_by_filename(other.filename)
+            this_module = pymod.modulepath.get(other.filename)
         else:
-            this_module = self.modulepath.get_module_by_name(other.fullname)
+            this_module = pymod.modulepath.get(other.fullname)
         if this_module is None:
-            m_tmp = self.modulepath.get_module_by_name(other.name)
+            m_tmp = pymod.modulepath.get(other.name)
             if m_tmp is not None:
                 this_module = m_tmp
             else:
                 # The only way this_module is None is if a swap of modules
                 # caused a change to MODULEPATH making this module
                 # unavailable.
-                on_mp_changed = self.m_state_changed.setdefault('MP', {})
-                on_mp_changed.setdefault('U', []).append(other)
+                pymod.mc.unloaded_on_mp_change(other)
                 continue
 
         if this_module.filename != other.filename:
-            on_mp_changed = self.m_state_changed.setdefault('MP', {})
-            on_mp_changed.setdefault('Up', []).append((other, this_module))
+            pymod.mc.swapped_on_mp_change(other, this_module)
 
-        # Check for module options to set.  If they were not explicitly set
-        # on the command line, set them from the previously loaded version
-        if not self.moduleopts.get(this_module.fullname):
-            self.moduleopts[this_module.fullname] = my_opts[other.fullname]
-        self.execmodule(LOAD, this_module)
+        # Now load the thing
+        pymod.mc.execmodule(this_module, pymod.modes.load)
 
     return module_b
+
+
+class NoModulesToSwapError(Exception):
+    pass

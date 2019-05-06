@@ -40,6 +40,7 @@ def display_module_help(name):
     s += '=' * width
     stream.write(s + '\n')
 
+
 def help(parser, args):
     import pymod.command
     if args.guide:
