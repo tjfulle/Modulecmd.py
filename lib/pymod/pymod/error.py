@@ -19,9 +19,9 @@ class FamilyLoadedError(Exception):
 
 class InconsistentModuleStateError(Exception):
     def __init__(self, module):
-        m = 'An inconsistent state occurred when trying to load module ' \
-            '{0!r} that resulted in it not being found on MODULEPATH. '  \
-            'This is probably due to a module modifying MODULEPATH and ' \
+        m = 'An inconsistent state occurred when trying to load module\n' \
+            '{0!r} that resulted in it not being found on MODULEPATH.\n'  \
+            'This is probably due to a module modifying MODULEPATH and\n' \
             'causing automatic changes in loaded/unloaded modules'
         msg = m.format(module.fullname)
         super(InconsistentModuleStateError, self).__init__(msg)

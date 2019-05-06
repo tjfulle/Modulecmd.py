@@ -332,6 +332,9 @@ def make_argument_parser(**kwargs):
         '--debug', action='store_true', default=False,
         help='run additional debug checks')
     parser.add_argument(
+        '--dryrun', action='store_true', default=False,
+        help='print commands to console, but do not execute them')
+    parser.add_argument(
         '--pdb', action='store_true', default=False,
         help='run execution through pdb debugger')
     parser.add_argument(
@@ -363,6 +366,9 @@ def setup_main_options(args):
     if args.debug:
         # pymod.error.debug = True
         pymod.config.set('debug', True, scope='command_line')
+
+    if args.dryrun:
+        pymod.config.set('dryrun', True, scope='command_line')
 
     if args.mock:
         path = os.path.join(pymod.paths.mock_modulepath, 'core')

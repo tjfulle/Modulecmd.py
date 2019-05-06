@@ -10,16 +10,9 @@ class ModuleArgumentParser(ArgumentParser):
         self._parsed_argv = None
 
     def parse_args(self, argv=None):
+        argv = argv or []
         superparser = super(ModuleArgumentParser, self).parse_args
-        if argv is not None:
-            self.set_argv(argv)
-        argv = self._argv or []
-        ns = superparser(argv)
-        self._parsed_argv = list(argv)
-        return ns
-
-    def set_argv(self, argv):
-        self._argv = list(argv)
+        return superparser(argv)
 
     def add_argument(self, *args, **kwargs):
         chars = self.prefix_chars
@@ -37,9 +30,6 @@ class ModuleArgumentParser(ArgumentParser):
         if not self._actions:
             return ''
         help_string = self.format_help()
-        description = help_string.replace('optional arguments', 'Module options')
+        description = help_string.replace(
+            'optional arguments', 'Module options')
         return description
-
-    @property
-    def parsed_argv(self):
-        return self._parsed_argv

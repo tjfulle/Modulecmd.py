@@ -1,5 +1,4 @@
-import pymod.shell
-import pymod.modulepath
+import pymod.mc
 
 
 description = 'Remove (unuse) directory[s] from MODULEPATH'
@@ -11,11 +10,9 @@ def setup_parser(subparser):
     """Parser is only constructed so that this prints a nice help
        message with -h. """
     subparser.add_argument(
-        'path', nargs='+',
-        help='Path[s] to use.')
+        'path', help='Path[s] to unuse.')
 
 
 def unuse(parser, args):
-    for path in args.path:
-        pymod.modulepath.remove_path(path)
-    pymod.shell.dump()
+    pymod.mc.unuse(path)
+    pymod.mc.dump()

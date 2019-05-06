@@ -1,6 +1,7 @@
 import os
 import re
 import base64
+import subprocess
 
 from contrib.util.logging.color import colorize
 
@@ -46,6 +47,8 @@ def encode_str(string):
 
 
 def dict2str(dikt):
+    if not isinstance(dikt, (dict,)):
+        raise ValueError('Expected dict')
     return encode64(str(dikt))
 
 
@@ -101,3 +104,32 @@ def strip_quotes(item):
     # the escape character
     item = re.sub(r'[\\]+', '', item)
     return item
+
+
+def check_output(command):
+    """Implementation of subprocess's check_output"""
+    import subprocess
+    fh = open(os.devnull, 'a')
+    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=fh)
+    out, err = p.communicate()
+    returncode = p.poll()
+    return decode_str(out)
+
+
+def which(executable, PATH=None, default=None):
+    """Find path to the executable"""
+    if is_executable(executable):
+        return executable
+    PATH = PATH or os.getenv('PATH')
+    for d in split(PATH, os.pathsep):
+        if not os.path.isdir(d):
+            continue
+        f = os.path.join(d, executable)
+        if is_executable(f):
+            return f
+    return default
+
+
+def is_executable(path):
+    """Is the path executable?"""
+    return os.path.isfile(path) and os.access(path, os.X_OK)

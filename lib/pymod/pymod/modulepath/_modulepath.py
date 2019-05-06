@@ -1,6 +1,7 @@
 import os
 import re
 
+import pymod.shell
 import pymod.module
 from pymod.modulepath.discover import find_modules
 
@@ -20,6 +21,11 @@ class Modulepath:
         self._grouped_by_modulepath = None
         self.set_path(directories)
 
+    def format_output(self):
+        key = pymod.names.modulepath
+        value = misc.join(self.path, os.pathsep)
+        return pymod.shell.format_output({key: value})
+
     def __contains__(self, dirname):
         return dirname in self.path
 
@@ -27,6 +33,8 @@ class Modulepath:
         """Get a module from the available modules.
 
         """
+        if os.path.isdir(key) and key in self.path:
+            return self.getby_dirname(key)
         if os.path.isfile(key):
             return self.getby_filename(key)
         parts = key.split(os.path.sep)
@@ -34,12 +42,10 @@ class Modulepath:
             return self.getby_name(key)
         if len(parts) == 2:
             return self.getby_fullname(key)
-
-    def getby_filename(self, filename):
-        for module in self.modules:
-            if module.filename == filename:
-                return module
         return None
+
+    def getby_dirname(self, dirname):
+        return [m for m in self.modules if m.modulepath == dirname]
 
     def getby_name(self, name):
         return self.db['by_name'].get(name)
@@ -48,6 +54,13 @@ class Modulepath:
         for (_, modules) in self.group_by_modulepath():
             for module in modules:
                 if module.fullname == fullname:
+                    return module
+        return None
+
+    def getby_filename(self, filename):
+        for (_, modules) in self.group_by_modulepath():
+            for module in modules:
+                if module.filename == filename:
                     return module
         return None
 
@@ -75,15 +88,17 @@ class Modulepath:
         if not os.path.isdir(dirname):
             logging.warn(
                 'Modulepath: {0!r} is not a directory'.format(dirname))
+            return [], []
         if dirname in self.path:
             self.path.pop(self.path.index(dirname))
-            modules_in_dir = [m for m in self.modules if m.modulepath == dirname]
+            modules_in_dir = [m for m in self.modules
+                              if m.modulepath == dirname]
         else:
             modules_in_dir = find_modules(dirname)
             if not modules_in_dir:
                 logging.warn(
                     'Modulepath: no modules found in {0}'.format(dirname))
-                return
+                return [], []
             self.modules.extend(modules_in_dir)
         self.path.insert(0, dirname)
         self._path_modified()
@@ -104,24 +119,27 @@ class Modulepath:
             logging.warn(
                 'Modulepath: {0!r} is not in modulepath'.format(dirname))
             return
-        removed = []
-        for (i, module) in enumerate(self.modules):
-            if module.modulepath == dirname:
-                removed.append(module)
-                self.modules[i] = None
-        self.modules = [m for m in self.modules if m is not None]
+
+        modules_in_dir = self.getby_dirname(dirname)
+        orphaned = [m for m in modules_in_dir if m.is_loaded]
+        self.modules = [m for m in self.modules if m not in modules_in_dir]
         self.path.pop(self.path.index(dirname))
         self._path_modified()
 
-        # Determine which modules may have moved up in priority due to removed
+        # Determine which modules may have moved up in priority due to removal
         # of directory from path
         bumped = []
-        fullnames = [m.fullname for m in removed]
-        for (_, modules) in self.group_by_modulepath():
-            for module in modules:
-                if module.fullname in fullnames:
-                    bumped.append(module)
-        return removed, bumped
+        for orphan in orphaned:
+            other = self.getby_fullname(orphan.fullname)
+            if other is not None:
+                bumped.append(other)
+                continue
+            other = self.getby_name(orphan.name)
+            if other is not None:
+                bumped.append(other)
+                continue
+            bumped.append(None)
+        return modules_in_dir, orphaned, bumped
 
     def set_path(self, directories):
         self.path = []

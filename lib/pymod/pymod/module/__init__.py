@@ -41,6 +41,7 @@ class Module(object):
         self._helpstr = None
         self.metadata = meta
         self.is_default = False
+        self._opts = None
 
     def __str__(self):
         return 'Module(name={0})'.format(self.fullname)
@@ -77,14 +78,20 @@ class Module(object):
                 return ''
         return open(self.filename, 'r').read()
 
+    def parse_args(self):
+        return self.parser.parse_args(self.opts)
+
     def reset_state(self):
         self.parser = ModuleArgumentParser()
 
-    def parser_options(self):
-        return self.parser.parsed_argv()
+    @property
+    def opts(self):
+        return self._opts
 
-    def set_argv(self, argv):
-        self.parser.set_argv(argv)
+    @opts.setter
+    def opts(self, opts):
+        if opts is not None:
+            self._opts = list(opts)
 
     def format_info(self):
         if self.is_default and self.is_loaded:
@@ -95,9 +102,7 @@ class Module(object):
             return self.fullname + ' (L)'
         return self.fullname
 
-
-    @property
-    def whatis(self):
+    def format_whatis(self):
         if 'explicit' in self._whatis:
             return '\n'.join(self._whatis['explicit'])
 

@@ -1,5 +1,5 @@
 import sys
-
+from six import StringIO
 
 # --------------------------------------------------------------------------- #
 # --  B  A  S  E    S  H  E  L  L-------------------------------------------- #
@@ -19,18 +19,21 @@ class Shell(object):
     def source_command(self, filename):  # pragma: no cover
         raise NotImplementedError
 
-    def dump(self, environ):
-        sys.stdout.write(self.format_commands(environ))
+    def format_output(self, environ, aliases=None, shell_functions=None):
+        sio = StringIO()
 
-    def format_commands(self, environ):
-        string = []
         for (envar, defn) in environ.items():
-            string.append(self.format_environment_variable(envar, defn))
-        for (alias, defn) in environ.aliases.items():
-            string.append(self.format_alias(alias, defn))
-        for (fun, defn) in environ.shell_functions.items():
-            string.append(self.format_shell_function(fun, defn))
-        return '\n'.join(string)
+            sio.write(self.format_environment_variable(envar, defn)+'\n')
+
+        if aliases is not None:
+            for (alias, defn) in environ.aliases.items():
+                sio.write(self.format_alias(alias, defn)+'\n')
+
+        if shell_functions is not None:
+            for (fun, defn) in environ.shell_functions.items():
+                sio.write(self.format_shell_function(fun, defn)+'\n')
+
+        return sio.getvalue()
 
     def filter(self, environ):
         pass
