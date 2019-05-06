@@ -1,7 +1,8 @@
 import os
 import sys
 import pymod.names
-from contrib.util.misc import split
+from contrib.util.misc import split, grep_pat_in_string
+from contrib.util.logging import terminal_size
 from contrib.util.logging.colify import colified
 
 description = 'Display loaded modules'
@@ -36,7 +37,8 @@ def list(parser, args):
     else:
         output = '\nCurrently loaded modules\n'
         loaded = ['{}) {}'.format(i+1, m) for i, m in enumerate(loaded)]
-        output += colified(loaded, indent=4)
+        _, width = terminal_size()
+        output += colified(loaded, indent=4, width=max(100, width))
     if args.regex:
-        raise NotImplementedError('regex parsing not implmented')
+        output = grep_pat_in_string(output, args.regex)
     sys.stderr.write(output)
