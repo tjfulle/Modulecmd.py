@@ -3,8 +3,11 @@ import pymod.mc
 import pymod.modulepath
 
 
-def use(dirname, append=False):
+def use(dirname, append=False, delete=False):
     """Add dirname to MODULEPATH"""
+    if delete:
+        pymod.mc.unuse(dirname)
+        return
     if dirname.startswith('~'):
         dirname = os.path.expanduser(dirname)
     if append:

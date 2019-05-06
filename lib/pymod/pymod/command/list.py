@@ -25,7 +25,7 @@ def setup_parser(subparser):
 
 
 def list(parser, args):
-    loaded = split(os.getenv(pymod.names.loaded_modules), os.pathsep)
+    loaded = pymod.environ.get_path(pymod.names.loaded_modules)
     if not loaded:
         output = 'No loaded modules'
     elif args.terse:

@@ -3,9 +3,7 @@ import sys
 from contrib.util.logging.pager import pager
 from pymod.command.common import get_entity_text
 
-description = (
-    'Print contents of `name` to the console output.  `name` can be the name of a\n'
-    'module or collection.')
+description = 'Print contents of a module or collection to the console output.'
 level = 'short'
 section = 'module'
 

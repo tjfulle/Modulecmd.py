@@ -19,7 +19,7 @@ class Configuration(object):
 
     def push_scope(self, scope_name, data):
         """Add a scope to the Configuration."""
-        self.scopes[scope_name] = dict(data)
+        self.scopes.setdefault(scope_name, {}).update(dict(data))
 
     def remove_scope(self, scope_name):
         return self.scopes.pop(scope_name)
@@ -75,7 +75,9 @@ def _config():
 
     test_in_progress = getattr(sys, '_pytest_in_progress_', False)
     if not test_in_progress:
-        user_config_file = os.path.join(pymod.paths.user_config_path, f)
+        user_config_file = os.getenv(
+            pymod.names.config_file_envar,
+            os.path.join(pymod.paths.user_config_path, f))
         if os.path.exists(user_config_file):
             user = load_yaml(user_config_file, 'config')
             cfg.push_scope('user', user)

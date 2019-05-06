@@ -4,9 +4,9 @@ from contrib.util.logging.pager import pager
 from pymod.command.common import get_entity_text
 
 description = (
-    'print `name` to the console output on page at a time.  Allows movement\n'
-    'through files similar to shell\'s `less` program.  `name` can be the name\n'
-    'of a module, collection, or configuration file')
+    'Print contents of a module or collection to the console output one\n'
+    'page at a time.  Allows movement through files similar to shell\'s `less`\n'
+    'program.')
 level = 'short'
 section = 'module'
 
