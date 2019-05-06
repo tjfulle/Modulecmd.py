@@ -146,8 +146,7 @@ class Module(object):
             else:
                 self._whatis[' '.join(key.split('_')).title()] = item
 
-    @property
-    def helpstr(self):
+    def format_help(self):
         if self._helpstr is None:
             return '{0!r}: no help string provided'.format(
                 misc.encode_str(self.fullname))

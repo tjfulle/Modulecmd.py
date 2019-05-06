@@ -21,7 +21,7 @@ import pymod.paths
 python_list = list
 
 # Patterns to ignore in the commands directory when looking for commands.
-ignore_files = r'^\.|^__init__.py$|^#'
+ignore_files = r'^\.|^__init__.py$|^#|flycheck_'
 
 SETUP_PARSER = "setup_parser"
 DESCRIPTION = "description"
