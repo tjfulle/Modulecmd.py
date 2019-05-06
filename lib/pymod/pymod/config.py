@@ -2,6 +2,7 @@ import os
 import sys
 import contrib.ruamel.yaml as yaml
 import pymod.paths
+import pymod.names
 from contrib.util.lang import Singleton
 
 
