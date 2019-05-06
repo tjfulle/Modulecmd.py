@@ -107,8 +107,8 @@ def index_commands():
         for p in required_command_properties:
             prop = getattr(cmd_module, p, None)
             if not prop:
-                pymod.util.io.die('Command doesn\'t define a property {0!r}: {1}'
-                                  .format(p, command))
+                logging.die('Command doesn\'t define a property {0!r}: {1}'
+                            .format(p, command))
 
         # add commands to lists for their level and higher levels
         for level in reversed(levels):
