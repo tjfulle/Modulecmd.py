@@ -43,7 +43,7 @@ class Environ(OrderedDict):
 
         """
         p = Namespace()
-        p.key = key
+        p.key = self.fix_ld_library_path(key)
         p.meta_key = pymod.names.loaded_module_meta(key)
         p.sep = sep
         p.value = split(self.get(key), sep=sep)
@@ -57,21 +57,28 @@ class Environ(OrderedDict):
         else:
             self[path.key] = join(path.value, path.sep)
             self[path.meta_key] = dict2str(path.meta)
-        if path.key.endswith('LD_LIBRARY_PATH'):
+        self.save_ld_library_path(path.key)
+
+    @staticmethod
+    def fix_ld_library_path(key):
+        if key.endswith(pymod.names.ld_library_path):
+            key = pymod.names.ld_library_path
+        return key
+
+    def save_ld_library_path(self, key):
+        if key.endswith(pymod.names.ld_library_path):
             # sometimes python doesn't pick up ld_library_path :(
-            self['__ld_library_path__'] = self[path.key]
+            self['__{}__'.format(key)] = self[key]
 
     def set(self, key, value):
+        key = self.fix_ld_library_path(key)
         self[key] = value
-        if key.endswith('LD_LIBRARY_PATH'):
-            # sometimes python doesn't pick up ld_library_path :(
-            self['__ld_library_path__'] = self[key]
+        self.save_ld_library_path(key)
 
     def unset(self, key):
+        key = self.fix_ld_library_path(key)
         self[key] = None
-        if key.endswith('LD_LIBRARY_PATH'):
-            # sometimes python doesn't pick up ld_library_path :(
-            self['__ld_library_path__'] = self[key]
+        self.save_ld_library_path(key)
 
     def set_alias(self, key, value):
         self.aliases[key] = value
@@ -87,8 +94,11 @@ class Environ(OrderedDict):
 
     def append_path(self, key, value, sep=os.pathsep):
         if key == pymod.names.modulepath:
-            raise NotImplemented
-        allow_dups = self.get_bool('PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES')
+            raise ValueError(
+                'Do not set MODULEPATH directly in Environ object.  '
+                'Set it in the Modulepath instead')
+        key = self.fix_ld_library_path(key)
+        allow_dups = self.get_bool(pymod.names.allow_dup_entries)
         current_path = self.get_path(key, sep=sep)
         count, priority = current_path.meta.pop(value, (0, -1))
         if count == 0 and value in current_path.value:
@@ -101,8 +111,11 @@ class Environ(OrderedDict):
 
     def prepend_path(self, key, value, sep=os.pathsep):
         if key == pymod.names.modulepath:
-            raise NotImplemented
-        allow_dups = self.get_bool('PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES')
+            raise ValueError(
+                'Do not set MODULEPATH directly in Environ object.  '
+                'Set it in the Modulepath instead')
+        key = self.fix_ld_library_path(key)
+        allow_dups = self.get_bool(pymod.names.allow_dup_entries)
         current_path = self.get_path(key, sep=sep)
         count, priority = current_path.meta.pop(value, (0, -1))
         if count == 0 and value in current_path.value:
@@ -115,7 +128,12 @@ class Environ(OrderedDict):
         self.set_path(current_path)
 
     def remove_path(self, key, value, sep=os.pathsep):
-        allow_dups = self.get_bool('PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES')
+        if key == pymod.names.modulepath:
+            raise ValueError(
+                'Do not set MODULEPATH directly in Environ object.  '
+                'Set it in the Modulepath instead')
+        key = self.fix_ld_library_path(key)
+        allow_dups = self.get_bool(pymod.names.allow_dup_entries)
         current_path = self.get_path(key, sep=sep)
         count, priority = current_path.meta.pop(value, (0, -1))
         if count == 0 and value in current_path.value:
