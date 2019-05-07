@@ -3,11 +3,15 @@ import sys
 import shutil
 import tempfile
 
-import pymod.paths
 sys._pytest_in_progress_ = True
+__D = os.path.dirname(os.path.realpath(__file__))
+pymod_pkg_dir = os.path.realpath(os.path.join(__D, '../lib'))
+assert os.path.isdir(pymod_pkg_dir)
+sys.path.insert(0, pymod_pkg_dir)
 
 
-pymod.config.set('tests_in_progress', True)
+import pymod
+pymod.config.cfg.tests_in_progress = True
 
 
 class TestBase(object):
