@@ -12,6 +12,11 @@ class Environ(OrderedDict):
         self.aliases = {}
         self.shell_functions = {}
 
+    def is_empty(self):
+        return (not len(self) and
+                not len(self.aliases) and
+                not len(self.shell_functions))
+
     def format_output(self):
         return pymod.shell.format_output(
             self, self.aliases, self.shell_functions)

@@ -69,28 +69,27 @@ def _config():
     """
     cfg = Configuration()
 
-    f = 'config.yaml'
+    f = pymod.names.config_filename
     default_config_file = os.path.join(pymod.paths.etc_path, f)
     defaults = load_yaml(default_config_file, 'config')
     cfg.push_scope('defaults', defaults)
 
-    test_in_progress = getattr(sys, '_pytest_in_progress_', False)
-    if not test_in_progress:
-        user_config_file = os.getenv(
-            pymod.names.config_file_envar,
-            os.path.join(pymod.paths.user_config_path, f))
-        if os.path.exists(user_config_file):
-            user = load_yaml(user_config_file, 'config')
-            cfg.push_scope('user', user)
+    user_config_file = os.getenv(
+        pymod.names.config_file_envar,
+        os.path.join(pymod.paths.user_config_path, f))
+    if os.path.exists(user_config_file):
+        user = load_yaml(user_config_file, 'config')
+        cfg.push_scope('user', user)
 
-        # Environment variable
-        env = {}
-        for key in defaults:
-            envar = 'PYMOD_{}'.format(key.upper())
-            if os.getenv(envar):
-                env[envar] = os.environ[envar]
-        if env:
-            cfg.push_scope('environment', env)
+    # Environment variable
+    env = {}
+    for key in defaults:
+        envar = 'PYMOD_{}'.format(key.upper())
+        if os.getenv(envar):
+            env[envar] = os.environ[envar]
+
+    if env:
+        cfg.push_scope('environment', env)
 
     return cfg
 

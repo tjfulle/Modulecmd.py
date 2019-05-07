@@ -1,6 +1,7 @@
 import pymod.mc
 import pymod.modes
 import pymod.modulepath
+import pymod.collection
 
 from pymod.mc.execmodule import execmodule
 from pymod.error import ModuleNotFoundError
@@ -17,8 +18,8 @@ def load(modulename, opts=None, do_not_register=False, insert_at=None,
     module = pymod.modulepath.get(modulename)
     if module is None:
         # is it a collection?
-        if pymod.collections.is_collection(modulename):
-            return pymod.collections.restore(modulename)
+        if pymod.collection.is_collection(modulename):
+            return pymod.collection.restore(modulename)
         else:
             raise ModuleNotFoundError(modulename, mp=pymod.modulepath)
 
