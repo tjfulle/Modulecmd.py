@@ -20,10 +20,13 @@ class Modulepath:
         self.path = []
         self.modules = []
         self.db = {}
+        self._modified = None
         self._grouped_by_modulepath = None
         self.set_path(directories)
 
     def format_output(self):
+        if not self._modified:
+            return ''
         key = pymod.names.modulepath
         value = join(self.path, os.pathsep)
         return pymod.shell.format_output({key: value})
@@ -71,6 +74,11 @@ class Modulepath:
     def _path_modified(self):
         self._grouped_by_modulepath = None
         self.assign_defaults()
+        if self._modified is None:
+            # First time through
+            self._modified = False
+        else:
+            self._modified = True
 
     def append_path(self, dirname):
         if not os.path.isdir(dirname):

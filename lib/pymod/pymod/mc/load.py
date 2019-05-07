@@ -9,7 +9,7 @@ import llnl.util.tty as tty
 
 
 def load(modulename, opts=None, do_not_register=False, insert_at=None,
-         increment_refcnt_if_loaded=False):
+         increment_refcnt_if_loaded=False, for_show=False):
     """Load the module given by `modulename`"""
 
     tty.verbose('Loading {}'.format(modulename))
@@ -27,7 +27,7 @@ def load(modulename, opts=None, do_not_register=False, insert_at=None,
     if opts:
         module.opts = opts
 
-    if module.is_loaded:
+    if not for_show and module.is_loaded:
         if increment_refcnt_if_loaded:
             pymod.mc.increment_refcount(module)
         else:
@@ -36,13 +36,13 @@ def load(modulename, opts=None, do_not_register=False, insert_at=None,
         return 0
 
     if insert_at is None:
-        return load_impl(module, do_not_register=do_not_register)
+        return load_impl(module, do_not_register=do_not_register, for_show=for_show)
 
     return load_inserted(module, insert_at,
                          do_not_register=do_not_register)
 
 
-def load_inserted(module, insert_at, do_not_register=False):
+def load_inserted(module, insert_at, do_not_register=False, for_show=False):
     """Load the `module` at `insert_at` by unloading all modules beyond
     `insert_at`, loading `module`, then reloading the unloaded modules"""
 
@@ -75,13 +75,12 @@ def load_inserted(module, insert_at, do_not_register=False):
         if this_module.filename != other.filename:
             pymod.mc.swapped_on_mp_change(other, this_module)
 
-        this_opts = this_module.opts or module_opts[this_module.fullname]
-        execmodule(this_module, pymod.modes.load,
-                   do_not_register=do_not_register)
+        mode = pymod.modes.show if for_show else pymod.modes.load
+        execmodule(this_module, mode, do_not_register=do_not_register)
 
     return return_module
 
-def load_impl(module, do_not_register=False):
+def load_impl(module, do_not_register=False, for_show=False):
     """Load the module given by `modulename`"""
 
     # Before loading this module, look for module of same name and unload
@@ -96,6 +95,7 @@ def load_impl(module, do_not_register=False):
             return module
 
     # Now load it
-    execmodule(module, pymod.modes.load, do_not_register=do_not_register)
+    mode = pymod.modes.show if for_show else pymod.modes.load
+    execmodule(module, mode, do_not_register=do_not_register)
 
     return module
