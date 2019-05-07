@@ -14,4 +14,5 @@ family_version = lambda key: 'MODULE_FAMILY_{}_VERSION'.format(key.upper())
 default_user_collection = 'default'
 default_sys_collection = 'system'
 
+config_filename = 'config.yaml'
 config_file_envar = 'PYMOD_CONFIG_FILE'

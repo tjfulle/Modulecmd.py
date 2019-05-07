@@ -71,10 +71,6 @@ def test(parser, args, unknown_args):
         pytest.main(['-h'])
         return
 
-    path = os.path.join(pymod.paths.mock_modulepath_path, 'core', '1')
-    modulepath = pymod.modulepath.Modulepath([path])
-    pymod.modulepath.set_path(modulepath)
-
     pytest_root = pymod.paths.test_path
 
     # pytest.ini lives in the root of the pymod repository.

@@ -4,6 +4,7 @@ import sys
 from textwrap import fill
 from six import StringIO
 
+import pymod.environ
 import pymod.config
 import pymod.names
 from pymod.module.meta import MetaData
@@ -11,7 +12,6 @@ from pymod.module.tcl2py import tcl2py
 from pymod.module.version import Version
 
 from contrib.util import split, textfill, encode_str
-import pymod.environ as environ
 import llnl.util.tty as tty
 from llnl.util.tty import terminal_size
 from spack.util.executable import which
@@ -54,7 +54,7 @@ class Module(object):
     @property
     def is_loaded(self):
         loaded_modules = split(
-            environ.get(pymod.names.loaded_modules), os.pathsep)
+            pymod.environ.get(pymod.names.loaded_modules), os.pathsep)
         return self.fullname in loaded_modules
 
     @property

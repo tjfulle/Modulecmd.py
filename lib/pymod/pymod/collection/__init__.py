@@ -15,6 +15,7 @@ def _collections():
 
 collections = Singleton(_collections)
 
+
 def save(name, loaded_modules, local=False):
     return collections.save(name, loaded_modules, local)
 
@@ -33,3 +34,7 @@ def format_available(terse=False, regex=None):
 
 def format_show(name):
     return collections.format_show(name)
+
+
+def is_collection(name):
+    return name in collections

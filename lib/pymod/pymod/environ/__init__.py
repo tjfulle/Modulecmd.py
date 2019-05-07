@@ -8,9 +8,13 @@ from llnl.util.lang import Singleton
 environ = Singleton(Environ)
 
 
-def reset():
+def set_env(env):
     global environ
-    environ = Environ()
+    environ = env
+
+
+def is_empty():
+    return environ.is_empty()
 
 
 def format_output():
