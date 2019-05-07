@@ -321,10 +321,9 @@ def make_argument_parser(**kwargs):
         dest='help', action='store_const', const='long', default=None,
         help="show help for all commands (same as pymod help --all)")
     parser.add_argument(
-        '--shell',
-        dest='shell', action='store_const',
-        const=pymod.config.get('default_shell'), default=None,
-        help=" this help message and exit")
+        '--shell', nargs='?',
+        default=pymod.config.get('default_shell'),
+        help="shell type to use, defaults to $SHELL")
     parser.add_argument(
         '--time', action='store_true', default=False,
         help='time execution of command')
