@@ -7,6 +7,20 @@ import pymod.names
 import pymod.environ
 import pymod.modulepath
 
+@pytest.fixture()
+def modules_path(tmpdir):
+    basic_py_module = """\
+family('XYZ')
+setenv('ENVAR_1', self.name)
+setenv('ENVAR_2', self.version.string)"""
+    a = tmpdir.mkdir('A')
+    a.join('1.0.py').write(basic_py_module)
+    a.join('2.0.py').write(basic_py_module)
+    b = tmpdir.mkdir('B')
+    b.join('1.0.py').write(basic_py_module)
+    b.join('2.0.py').write(basic_py_module)
+    return tmpdir.strpath
+
 
 @pytest.mark.unit
 def test_family_load_1(mock_module):
@@ -29,7 +43,7 @@ def test_family_unload_1(mock_module):
 
 
 @pytest.mark.sandbox
-def test_family_xyz(mock_modulepath, get_loaded_modules):
+def test_family_xyz(modules_path, mock_modulepath, get_loaded_modules):
 
     def standard_assertions(module):
         name_key = pymod.names.family_name('xyz')
@@ -47,7 +61,7 @@ def test_family_xyz(mock_modulepath, get_loaded_modules):
                 else:
                     assert id not in loaded_modules
 
-    mp = mock_modulepath('fam')
+    mp = mock_modulepath(modules_path)
 
     a1 = pymod.modulepath.get('A/1.0')
     assert a1 is not None
