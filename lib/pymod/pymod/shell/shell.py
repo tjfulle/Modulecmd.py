@@ -26,11 +26,11 @@ class Shell(object):
             sio.write(self.format_environment_variable(envar, defn)+'\n')
 
         if aliases is not None:
-            for (alias, defn) in environ.aliases.items():
+            for (alias, defn) in aliases.items():
                 sio.write(self.format_alias(alias, defn)+'\n')
 
         if shell_functions is not None:
-            for (fun, defn) in environ.shell_functions.items():
+            for (fun, defn) in shell_functions.items():
                 sio.write(self.format_shell_function(fun, defn)+'\n')
 
         return sio.getvalue()

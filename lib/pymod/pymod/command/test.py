@@ -7,6 +7,7 @@ from six import StringIO
 
 from llnl.util.filesystem import working_dir
 from llnl.util.tty.colify import colify
+from contrib.util.tty import redirect_stdout
 
 import pymod.paths
 import pymod.modulepath
@@ -74,16 +75,17 @@ def test(parser, args, unknown_args):
     pytest_root = pymod.paths.test_path
 
     # pytest.ini lives in the root of the pymod repository.
-    with working_dir(pytest_root):
-        # --list and --long-list print the test output better.
-        if args.list or args.long_list:
-            do_list(args, unknown_args)
-            return
+    with redirect_stdout():
+        with working_dir(pytest_root):
+            # --list and --long-list print the test output better.
+            if args.list or args.long_list:
+                do_list(args, unknown_args)
+                return
 
-        # Allow keyword search without -k if no options are specified
-        if (args.tests and not unknown_args and
-            not any(arg.startswith('-') for arg in args.tests)):
-            return pytest.main(['-k'] + args.tests)
+            # Allow keyword search without -k if no options are specified
+            if (args.tests and not unknown_args and
+                not any(arg.startswith('-') for arg in args.tests)):
+                return pytest.main(['-k'] + args.tests)
 
-        # Just run the pytest command
-        return pytest.main(unknown_args + args.tests)
+            # Just run the pytest command
+            return pytest.main(unknown_args + args.tests)
