@@ -1,7 +1,6 @@
 import argparse
 
 import pymod.mc
-import pymod.shell
 from pymod.command.common import parse_module_options
 
 description = 'Load modules into environment'

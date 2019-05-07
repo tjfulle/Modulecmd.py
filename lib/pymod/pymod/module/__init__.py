@@ -109,6 +109,10 @@ class Module(object):
             return '\n'.join(self._whatis['explicit'])
 
         sio = StringIO()
+        _, width = terminal_size()
+        head = '{0}'.format((" " + self.name + " ").center(width, '='))
+        sio.write(head + '\n')
+
         sio.write('Name: {0}\n'.format(self.name))
         if self.version.string:
             sio.write('Version: {0}\n'.format(self.version))
@@ -139,13 +143,9 @@ class Module(object):
         if parser_help:
             sio.write(parser_help + '\n')
 
-        _, width = terminal_size()
-        x = " " + self.name + " "
-        whatis = '{0}'.format(x.center(width, '=')) + '\n'
-        whatis += sio.getvalue()
-        whatis += '=' * width
+        sio.write('=' * width)
 
-        return whatis
+        return sio.getvalue()
 
     def set_whatis(self, *args, **kwargs):
         if self.type == tcl:
@@ -165,7 +165,15 @@ class Module(object):
         if self._helpstr is None:
             return '{0!r}: no help string provided'.format(
                 encode_str(self.fullname))
-        return fill(self._helpstr)
+
+        sio = StringIO()
+        _, width = terminal_size()
+        rule = '=' * width
+        head = '{0}'.format((" " + self.name + " ").center(width, '='))
+        sio.write(head + '\n')
+        sio.write(fill(self._helpstr))
+        sio.write(rule)
+        return sio.getvalue()
 
     def set_helpstr(self, helpstr):
         self._helpstr = helpstr
