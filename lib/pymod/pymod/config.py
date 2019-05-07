@@ -4,6 +4,7 @@ import ruamel.yaml as yaml
 import pymod.paths
 import pymod.names
 from llnl.util.lang import Singleton
+from spack.util.executable import which
 
 
 def load_yaml(filename, section=None):
@@ -12,6 +13,8 @@ def load_yaml(filename, section=None):
         return dict.get(section)
     return dict
 
+
+has_tclsh = which('tclsh') is not None
 
 class Configuration(object):
     scope_names = ['defaults', 'user', 'environment', 'command_line']

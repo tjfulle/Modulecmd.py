@@ -34,6 +34,8 @@ class Modulepath:
         """Get a module from the available modules.
 
         """
+        if isinstance(key, pymod.module.Module):
+            return key
         if os.path.isdir(key) and key in self.path:
             return self.getby_dirname(key)
         if os.path.isfile(key):

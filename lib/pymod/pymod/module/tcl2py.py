@@ -5,13 +5,14 @@ import pymod.paths
 import pymod.names
 import pymod.environ
 import llnl.util.tty as tty
+from spack.util.executable import Executable
 
 
 def tcl2py(module, mode):
     tcl2py_exe = os.path.join(pymod.paths.bin_path, 'tcl2py.tcl')
     tcl2py = Executable(tcl2py_exe)
 
-    env = dict([item for item in pymod.environ.items() if item[1] is not None])
+    env = pymod.environ.filtered()
 
     mode = {'show': 'display'}.get(mode, mode)
     args = []
@@ -21,7 +22,7 @@ def tcl2py(module, mode):
     args.extend(('-u', module.name))
     args.extend(('-s', 'bash'))
 
-    ldlibname = 'DYLD_LIBRARY_PATH' if IS_DARWIN else 'LD_LIBRARY_PATH'
+    ldlibname = pymod.names.ld_library_path
     ldlib = env.get(ldlibname)
     if ldlib:
         args.extend(('-L', ldlib))

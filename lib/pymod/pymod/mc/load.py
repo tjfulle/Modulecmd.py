@@ -24,7 +24,8 @@ def load(modulename, opts=None, do_not_register=False, insert_at=None,
             raise ModuleNotFoundError(modulename, mp=pymod.modulepath)
 
     # Set the command line options
-    module.opts = opts
+    if opts:
+        module.opts = opts
 
     if module.is_loaded:
         if increment_refcnt_if_loaded:

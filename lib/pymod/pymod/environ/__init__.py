@@ -81,3 +81,11 @@ def get_dict(key):
 def set_dict(key, dict):
     value = dict2str(dict)
     return environ.set(key, value)
+
+
+def filtered():
+    env = os.environ.copy()
+    pymod_env = dict([item for item in environ.items()
+                      if item[1] is not None])
+    env.update(pymod_env)
+    return env

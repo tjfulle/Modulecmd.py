@@ -18,7 +18,6 @@ from spack.util.executable import which
 from pymod.module.argument_parser import ModuleArgumentParser
 
 
-has_tclsh = which('tclsh') is not None
 python = 'PYTHON'
 tcl = 'TCL'
 
@@ -71,7 +70,7 @@ class Module(object):
 
     def read(self, mode):
         if self.type == tcl:
-            if not has_tclsh:
+            if not pymod.config.has_tclsh:
                 raise TCLSHNotFoundError
             try:
                 return tcl2py(self, mode)
