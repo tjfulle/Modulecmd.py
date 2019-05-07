@@ -1,12 +1,11 @@
 import os
 from argparse import Namespace
-from ordereddict_backport import OrderedDict
 
 import pymod.names
 import pymod.shell
 from contrib.util import str2dict, dict2str, boolean, split, join, pop
 
-class Environ(OrderedDict):
+class Environ(dict):
 
     def __init__(self):
         self.aliases = {}

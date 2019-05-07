@@ -1,11 +1,13 @@
 import os
 import sys
 import pymod.mc
+import pymod.command
 import pymod.modulepath
 from pymod.error import ModuleNotFoundError
 from contrib.util.tty.pager import pager
 from llnl.util.tty.color import colorize
 from llnl.util.tty import terminal_size
+from contrib.util.tty import redirect_stdout
 
 description = "get help on pymod and its commands"
 section = "help"
@@ -29,7 +31,7 @@ def setup_parser(subparser):
 
 
 def help(parser, args):
-    import pymod.command
+
     if args.guide:
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'guides', args.guide + '.txt')
@@ -39,8 +41,11 @@ def help(parser, args):
     if args.help_command:
         if args.help_command in pymod.command.all_commands():
             parser.add_command(args.help_command)
-            parser.parse_args([args.help_command, '-h'])
+            with redirect_stdout():
+                parser.parse_args([args.help_command, '-h'])
         else:
-            pymod.mc.help(args.help_command)
+            with redirect_stdout():
+                pymod.mc.help(args.help_command)
     else:
-        sys.stderr.write(parser.format_help(level=args.all))
+        with redirect_stdout():
+            sys.stderr.write(parser.format_help(level=args.all))

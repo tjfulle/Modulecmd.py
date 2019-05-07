@@ -18,7 +18,7 @@ command-line and writes the result to a file::
         'integers', metavar='int', nargs='+', type=int,
         help='an integer to be summed')
     parser.add_argument(
-        '--log', default=sys.stdout, type=argparse.FileType('w'),
+        '--log', default=sys.stderr, type=argparse.FileType('w'),
         help='the file where the sum should be written')
     args = parser.parse_args()
     args.log.write('%s' % sum(args.integers))
@@ -1158,7 +1158,7 @@ class FileType(object):
             if 'r' in self._mode:
                 return _sys.stdin
             elif 'w' in self._mode:
-                return _sys.stdout
+                return _sys.stderr
             else:
                 msg = _('argument "-" with mode %r' % self._mode)
                 raise ValueError(msg)
@@ -2349,12 +2349,12 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
     # =====================
     def print_usage(self, file=None):
         if file is None:
-            file = _sys.stdout
+            file = _sys.stderr
         self._print_message(self.format_usage(), file)
 
     def print_help(self, file=None):
         if file is None:
-            file = _sys.stdout
+            file = _sys.stderr
         self._print_message(self.format_help(), file)
 
     def print_version(self, file=None):

@@ -5,14 +5,13 @@ evaluating the bin/module script after the system path is set up.
 """
 from __future__ import print_function
 
-import sys
 import re
 import os
+import sys
 import inspect
 import pstats
 import argparse
 from six import StringIO
-from contextlib import contextmanager
 
 
 import pymod.paths
@@ -24,6 +23,7 @@ import pymod.shell
 
 import llnl.util.tty as tty
 import llnl.util.tty.color as color
+from contrib.util.tty import redirect_stdout
 
 
 #: names of profile statistics
@@ -141,6 +141,13 @@ class PymodHelpFormatter(argparse.RawTextHelpFormatter):
 
 
 class PymodArgumentParser(argparse.ArgumentParser):
+
+    def _print_message(self, message, file=None):
+        if message:
+            if file is None:
+                file = sys.stderr
+            file.write(message)
+
     def format_help_sections(self, level):
         """Format help on sections for a particular verbosity level.
 
@@ -264,7 +271,7 @@ class PymodArgumentParser(argparse.ArgumentParser):
         """Add one subcommand to this parser."""
         # lazily initialize any subparsers
         if not hasattr(self, 'subparsers'):
-            # remove the dummy "command" argument.
+            # remove the "shell" and the dummy "command" argument.
             if self._actions[-1].dest == 'command':
                 self._remove_action(self._actions[-1])
             self.subparsers = self.add_subparsers(metavar='COMMAND',
@@ -286,12 +293,12 @@ class PymodArgumentParser(argparse.ArgumentParser):
         return pymod.command.get_command(cmd_name)
 
     def format_help(self, level='short'):
-        if self.prog == 'pymod':
+        if self.prog in ('pymod', 'modulecmd.py'):
             # use format_help_sections for the main pymod parser, but not
             # for subparsers
             return self.format_help_sections(level)
         else:
-            # in subparsers, self.prog is, e.g., 'pymod load'
+            # in subparsers, self.prog is, e.g., 'modulecmd.py load'
             return super(PymodArgumentParser, self).format_help()
 
 
@@ -320,10 +327,6 @@ def make_argument_parser(**kwargs):
         '-H', '--all-help',
         dest='help', action='store_const', const='long', default=None,
         help="show help for all commands (same as pymod help --all)")
-    parser.add_argument(
-        '--shell', nargs='?',
-        default=pymod.config.get('default_shell'),
-        help="shell type to use, defaults to $SHELL")
     parser.add_argument(
         '--time', action='store_true', default=False,
         help='time execution of command')
@@ -411,14 +414,6 @@ def _invoke_command(command, parser, args, unknown_args):
     return 0 if return_val is None else return_val
 
 
-@contextmanager
-def redirect_stdout(stdout=sys.stderr):
-    old_stdout = sys.stdout
-    sys.stdout = stdout
-    yield
-    sys.stdout = old_stdout
-
-
 def main(argv=None):
     """This is the entry point for the pymod command.
 
@@ -429,6 +424,14 @@ def main(argv=None):
         parses from sys.argv.
     """
 
+    # Pull out the shell from argv
+    argv = argv or sys.argv[1:]
+    assert len(argv) >= 1
+    shell = argv.pop(0)
+    shells = ('bash', 'csh', 'python')
+    if shell not in shells:
+        raise ValueError('shell argument must by one of {0}'.format(shells))
+
     # Create a parser with a simple positional argument first.  We'll
     # lazily load the subcommand(s) we need later. This allows us to
     # avoid loading all the modules from pymod.command when we don't need
@@ -436,9 +439,10 @@ def main(argv=None):
     parser = make_argument_parser()
     parser.add_argument('command', nargs=argparse.REMAINDER)
     args, unknown = parser.parse_known_args(argv)
+    args.shell = shell
 
     # Just print help and exit if run with no arguments at all
-    no_args = (len(sys.argv) == 1) if argv is None else (len(argv) == 0)
+    no_args = len(argv) == 0
     if no_args:
         with redirect_stdout():
             parser.print_help()
@@ -450,7 +454,9 @@ def main(argv=None):
         sys.stderr.write(str(pymod.pymod_version) + '\n')
         return 0
     elif args.help:
-        sys.stderr.write(parser.format_help(level=args.help))
+        message = parser.format_help(level=args.help)
+        with redirect_stdout():
+            sys.stderr.write(message)
         return 0
     elif not args.command:
         with redirect_stdout():
@@ -474,7 +480,7 @@ def main(argv=None):
             tty.die("Unknown command: %s" % args.command[0])
 
         # Re-parse with the proper sub-parser added.
-        args, unknown = parser.parse_known_args()
+        args, unknown = parser.parse_known_args(argv)
 
         # many operations will fail without a working directory.
         set_working_dir()

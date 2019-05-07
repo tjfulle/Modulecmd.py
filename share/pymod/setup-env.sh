@@ -28,7 +28,7 @@ export MODULESHOME
 #  then the "eval" converts the text into changes in the current shell.
 module()
 {
-  eval $($PYMOD_CMD --shell=bash "$@")
+  eval $($PYMOD_CMD bash "$@")
 }
 
 PYMOD_VERSION="1.2"
@@ -43,7 +43,7 @@ unset export_module
 ########################################################################
 #  Make tab completions available to bash users.
 
-if [ ${BASH_VERSINFO:-0} -ge 3 ] && [ -r  "${PYMOD_DIR}"/init/pymod_bash_completions ] && [ -n "${PS1:-}" ]; then
+if [ ${BASH_VERSINFO:-0} -ge 3 ] && [ -r  "${PYMOD_DIR}"/share/pymod/bash_completions ] && [ -n "${PS1:-}" ]; then
  . "${PYMOD_DIR}"/share/pymod/bash_completions
 fi
 
