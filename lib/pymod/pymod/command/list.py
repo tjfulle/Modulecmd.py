@@ -1,9 +1,10 @@
 import os
 import sys
 import pymod.names
-from contrib.util.misc import split, grep_pat_in_string
-from contrib.util.logging import terminal_size
-from contrib.util.logging.colify import colified
+from contrib.util import split
+from contrib.util.tty import grep_pat_in_string
+from llnl.util.tty import terminal_size
+from llnl.util.tty.colify import colified
 
 description = 'Display loaded modules'
 level = 'short'

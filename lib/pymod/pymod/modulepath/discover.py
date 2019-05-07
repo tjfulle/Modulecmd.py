@@ -2,8 +2,8 @@ import os
 
 import pymod.module
 import pymod.environ
-import contrib.util.logging as logging
-from contrib.util.misc import strip_quotes
+import llnl.util.tty as tty
+from contrib.util import strip_quotes
 
 """Functions for finding modules on MODULEPATH"""
 
@@ -41,7 +41,7 @@ def _find_modules(rootdir, dirname, files):
     linked_default = _linked_default_file(dirname, files)
     versioned_default = _versioned_default_file(dirname, files)
     if linked_default and versioned_default:
-        logging.warn('A linked and versioned default exist for {0}, '
+        tty.warn('A linked and versioned default exist for {0}, '
                      'choosing the linked'.format(os.path.basename(dirname)))
         explicit_default = linked_default
     else:
@@ -67,14 +67,14 @@ def _linked_default_file(dirname, files):
 
     linked_default_file = os.path.join(dirname, linked_default_name)
     if not os.path.islink(linked_default_file):
-        logging.verbose(
+        tty.verbose(
             'Modulepath: expected file named `default` in {0} '
             'to be a link to a modulefile'.format(dirname))
         return None
 
     linked_default_source = os.path.realpath(linked_default_file)
     if os.path.dirname(linked_default_source) != dirname:
-        logging.warn(
+        tty.warn(
             'Modulepath: expected file named `default` in {0} to be '
             'a link to a modulefile in the same directory'.format(dirname))
         return None
@@ -92,13 +92,13 @@ def _versioned_default_file(dirname, files):
     version_file = os.path.join(dirname, version_file_name)
     version = read_tcl_default_version(version_file)
     if version is None:
-        logging.warn(
+        tty.warn(
             'Could not determine .version default in {0}'.format(dirname))
     else:
         default_file = os.path.join(dirname, version)
         if os.path.exists(default_file):
             return default_file
-        logging.warn(
+        tty.warn(
             '{0!r}: version default does not exist'.format(default_file))
 
 

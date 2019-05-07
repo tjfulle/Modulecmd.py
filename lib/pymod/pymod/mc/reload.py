@@ -1,6 +1,6 @@
 import pymod.mc
 import pymod.modulepath
-import contrib.util.logging as logging
+import llnl.util.tty as tty
 from pymod.error import ModuleNotFoundError
 
 
@@ -10,7 +10,7 @@ def reload(name):
     if module is None:
         raise ModuleNotFoundError(modulename, self.modulepath)
     if not module.is_loaded:
-        logging.warn('{0} is not loaded!'.format(module.fullname))
+        tty.warn('{0} is not loaded!'.format(module.fullname))
         return
     assert module.is_loaded
     pymod.mc.swap_impl(module, module, maintain_state=1)

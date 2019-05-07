@@ -4,7 +4,7 @@ import subprocess
 import pymod.paths
 import pymod.names
 import pymod.environ
-import contrib.util.logging as logging
+import llnl.util.tty as tty
 
 
 def tcl2py(module, mode):

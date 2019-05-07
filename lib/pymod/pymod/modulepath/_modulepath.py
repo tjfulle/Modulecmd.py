@@ -5,11 +5,12 @@ import pymod.shell
 import pymod.module
 from pymod.modulepath.discover import find_modules
 
-from contrib.util.itertools import groupby
-import contrib.util.logging as logging
-import contrib.util.misc as misc
-from contrib.util.logging.color import colorize
-from contrib.util.logging.colify import colified
+from contrib.util import groupby
+import llnl.util.tty as tty
+from contrib.util import join
+from contrib.util.tty import grep_pat_in_string
+from llnl.util.tty.color import colorize
+from llnl.util.tty.colify import colified
 from contrib.functools_backport import cmp_to_key
 
 
@@ -23,7 +24,7 @@ class Modulepath:
 
     def format_output(self):
         key = pymod.names.modulepath
-        value = misc.join(self.path, os.pathsep)
+        value = join(self.path, os.pathsep)
         return pymod.shell.format_output({key: value})
 
     def __contains__(self, dirname):
@@ -70,13 +71,13 @@ class Modulepath:
 
     def append_path(self, dirname):
         if not os.path.isdir(dirname):
-            logging.warn(
+            tty.warn(
                 'Modulepath: {0!r} is not a directory'.format(dirname))
         if dirname in self.path:
             return
         modules_in_dir = find_modules(dirname)
         if not modules_in_dir:
-            logging.warn(
+            tty.warn(
                 'Modulepath: no modules found in {0}'.format(dirname))
             return
         self.modules.extend(modules_in_dir)
@@ -86,7 +87,7 @@ class Modulepath:
 
     def prepend_path(self, dirname):
         if not os.path.isdir(dirname):
-            logging.warn(
+            tty.warn(
                 'Modulepath: {0!r} is not a directory'.format(dirname))
             return [], []
         if dirname in self.path:
@@ -96,7 +97,7 @@ class Modulepath:
         else:
             modules_in_dir = find_modules(dirname)
             if not modules_in_dir:
-                logging.warn(
+                tty.warn(
                     'Modulepath: no modules found in {0}'.format(dirname))
                 return [], []
             self.modules.extend(modules_in_dir)
@@ -116,7 +117,7 @@ class Modulepath:
 
     def remove_path(self, dirname):
         if dirname not in self.path:
-            logging.warn(
+            tty.warn(
                 'Modulepath: {0!r} is not in modulepath'.format(dirname))
             return
 
@@ -148,12 +149,12 @@ class Modulepath:
             return
         for directory in directories:
             if not os.path.isdir(directory):
-                logging.verbose(
+                tty.verbose(
                     'Modulepath: nonexistent directory {0!r}'.format(directory))
                 continue
             modules_in_dir = find_modules(directory)
             if not modules_in_dir:
-                logging.verbose(
+                tty.verbose(
                     'Modulepath: no modules found in {0}'.format(directory))
                 continue
             self.modules.extend(modules_in_dir)
@@ -221,7 +222,7 @@ class Modulepath:
 
         description = []
         if not terse:
-            _, width = logging.terminal_size()
+            _, width = tty.terminal_size()
             for (directory, modules) in self.group_by_modulepath():
                 modules = [m for m in modules if m.is_enabled]
                 modules = self.filter_modules_by_regex(modules, regex)
@@ -252,7 +253,7 @@ class Modulepath:
 
         description = '\n'.join(description)
         if regex is not None:
-            description = misc.grep_pat_in_string(description, regex)
+            description = grep_pat_in_string(description, regex)
 
         return description
 

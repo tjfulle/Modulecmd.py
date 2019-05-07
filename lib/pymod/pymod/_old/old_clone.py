@@ -18,7 +18,7 @@
         filename = cfg.clones_filename
         clones = self.read_clones(filename)
         if name not in clones:
-            logging.error('{0!r} is not a cloned environment'.format(name))
+            tty.die('{0!r} is not a cloned environment'.format(name))
         the_clone = dict(clones[name])
 
         # Purge current environment

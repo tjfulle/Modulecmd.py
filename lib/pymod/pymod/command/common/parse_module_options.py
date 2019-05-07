@@ -1,4 +1,4 @@
-import contrib.util.logging as logging
+import llnl.util.tty as tty
 
 
 def parse_module_options(args):
@@ -11,7 +11,7 @@ def parse_module_options(args):
     for item in args:
         if item.startswith('+'):
             if not argv:
-                logging.error('Options must be specified after module name')
+                tty.die('Options must be specified after module name')
             argv[-1][-1].append(item)
         else:
             argv.append((item, []))

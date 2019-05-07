@@ -28,7 +28,7 @@ pymod_script = os.path.join(bin_path, "pymod")
 
 # pymod directory hierarchy
 lib_path              = os.path.join(prefix, "lib", "pymod")
-contrib_path          = os.path.join(lib_path, "contrib")
+external_path         = os.path.join(lib_path, "contrib")
 module_path           = os.path.join(lib_path, "pymod")
 command_path          = os.path.join(module_path, "command")
 test_path             = os.path.join(module_path, "test")

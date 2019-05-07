@@ -19,18 +19,18 @@ pymod_lib_path = os.path.join(pymod_prefix, "lib", "pymod")
 sys.path.insert(0, pymod_lib_path)
 
 # Add external libs
-pymod_contrib_libs = os.path.join(pymod_lib_path, "contrib")
+pymod_external_libs = os.path.join(pymod_lib_path, "external")
 
 if sys.version_info[:2] == (2, 6):
-    sys.path.insert(0, os.path.join(pymod_contrib_libs, 'py26'))
+    sys.path.insert(0, os.path.join(pymod_external_libs, 'py26'))
 
-sys.path.insert(0, pymod_contrib_libs)
+sys.path.insert(0, pymod_external_libs)
 
 # Here we delete ruamel.yaml in case it has been already imported from site
 # (see #9206 for a broader description of the issue).
 #
 # Briefly: ruamel.yaml produces a .pth file when installed with pip that
-# makes the site installed package the preferred one, even tough sys.path
+# makes the site installed package the preferred one, even though sys.path
 # is modified to point to another version of ruamel.yaml.
 if 'ruamel.yaml' in sys.modules:
     del sys.modules['ruamel.yaml']

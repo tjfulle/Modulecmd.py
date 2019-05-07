@@ -1,9 +1,9 @@
 import os
 import pymod.paths
 import pymod.config
-from contrib.util.lang import Singleton
+from llnl.util.lang import Singleton
 from pymod.collection._collection import Collections
-import contrib.util.logging as logging
+import llnl.util.tty as tty
 
 
 def _collections():

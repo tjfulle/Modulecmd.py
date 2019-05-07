@@ -12,7 +12,7 @@ from .utils import *
 from . import user
 from .defaults import *
 from .color import colorize
-from .logging import logging, printc
+from .tty import tty, printc
 from .trace import trace, trace_function
 from .module2 import create_module_from_file, create_module_from_kwds, Module2
 from .optparse import ModuleOptionParser
@@ -34,7 +34,7 @@ class InconsistentModuleState(Exception):
             'causing automatic changes in loaded/unloaded modules'
         msg = m.format(module.fullname)
         if cfg.verbosity < 2:
-            logging.error(msg)
+            tty.die(msg)
         else:
             super(InconsistentModuleState, self).__init__(msg)
 
@@ -54,7 +54,7 @@ class ModuleNotFoundError(Exception):
                 msg += '\n\t{0}'.format('\t'.join(candidates))
         super(ModuleNotFoundError, self).__init__(msg)
         if cfg.verbosity < 2:
-            logging.error(msg)
+            tty.die(msg)
         else:
             super(ModuleNotFoundError, self).__init__(msg)
 
@@ -87,7 +87,7 @@ class MasterController(object):
 
         mp, extra = get_unique(split(self.environ[MP_KEY], os.pathsep))
         if extra:
-            logging.warning('Removing duplicate paths in MODULEPATH: '
+            tty.warning('Removing duplicate paths in MODULEPATH: '
                             '{0!r}'.format(','.join(extra)),
                             minverbosity=2)
         lm_files = self.environ.get_loaded_modules('filenames')
@@ -171,7 +171,7 @@ class MasterController(object):
         if module is None:
             raise ModuleNotFoundError(modulename, self.modulepath)
         if not module.is_loaded:
-            logging.warning('{0} is not loaded!'.format(module.fullname))
+            tty.warning('{0} is not loaded!'.format(module.fullname))
             return
         options = self.environ.get_loaded_modules('opts', module=module)
         assert module.is_loaded
@@ -202,7 +202,7 @@ class MasterController(object):
         if self.modulepath.get_module_by_name(modulename) is None:
             # and modulename is not a module!
             msg += ' (nor is it a module)'
-        logging.warning(msg)
+        tty.warning(msg)
         return None
 
     @trace
@@ -272,7 +272,7 @@ class MasterController(object):
         kwds[key] = value
         s = self.shell.dump(kwds.keys(), kwds)
         if self.dryrun:
-            logging.info(s)
+            tty.info(s)
             return 0
         stream.write(s)
 
@@ -382,7 +382,7 @@ class MasterController(object):
         """Execute filename in sandbox"""
 
         if module.type not in (M_PY, M_TCL):
-            logging.error('Module {0!r} has unknown module type: '
+            tty.die('Module {0!r} has unknown module type: '
                           '{1!r}'.format(module.fullname, module.type))
 
         if mode in (UNLOAD,):
@@ -432,10 +432,10 @@ class MasterController(object):
             lambda x, y, **k: module.add_mutually_exclusive_option(x, y, **k),
             'parse_opts': lambda: module.parse_opts(moduleopts),
             #
-            'log_message': self.wrap_mf_logging_info(mode, module.filename),
-            'log_info': self.wrap_mf_logging_info(mode, module.filename),
-            'log_warning': self.wrap_mf_logging_warning(mode, module.filename),
-            'log_error': self.wrap_mf_logging_error(mode, module.filename),
+            'log_message': self.wrap_mf_tty_info(mode, module.filename),
+            'log_info': self.wrap_mf_tty_info(mode, module.filename),
+            'log_warning': self.wrap_mf_tty_warning(mode, module.filename),
+            'log_error': self.wrap_mf_tty_error(mode, module.filename),
             'execute': self.wrap_mf_execute(mode),
             #
             'setenv': self.wrap_mf_setenv(mode),
@@ -483,7 +483,7 @@ class MasterController(object):
         #except Exception as e:
         #    msg = 'Failed to {0} {1} with the following error:\n{2}'.format(
         #        mode, module.fullname, e.args[0])
-        #    logging.error(msg)
+        #    tty.die(msg)
 
     @trace
     def cache_modules_on_modulepath(self):
@@ -713,35 +713,35 @@ class MasterController(object):
                                          stderr=subprocess.sys.stdout)
                     p.wait()
                 except:
-                    logging.warning('Command {0!r} failed'.format(command))
+                    tty.warning('Command {0!r} failed'.format(command))
             return
         return mf_execute
 
-    def wrap_mf_logging_info(self, mode, filename):
+    def wrap_mf_tty_info(self, mode, filename):
         @trace(name='log_message')
-        def mf_logging_info(message):
-            logging.info(message, filename)
-        return mf_logging_info
+        def mf_tty_info(message):
+            tty.info(message, filename)
+        return mf_tty_info
 
-    def wrap_mf_logging_warning(self, mode, filename):
+    def wrap_mf_tty_warning(self, mode, filename):
         @trace(name='log_warning')
-        def mf_logging_warning(message):
-            logging.warning(message, filename)
-        return mf_logging_warning
+        def mf_tty_warning(message):
+            tty.warning(message, filename)
+        return mf_tty_warning
 
-    def wrap_mf_logging_error(self, mode, filename):
+    def wrap_mf_tty_error(self, mode, filename):
         @trace(name='log_error')
-        def mf_logging_error(message, noraise=0):
+        def mf_tty_error(message, noraise=0):
             noraise = noraise or self.load_for_show
-            logging.error(message, filename, noraise=noraise)
-        return mf_logging_error
+            tty.die(message, filename, noraise=noraise)
+        return mf_tty_error
 
     # ---------------- FUNCTIONS THAT MODIFY THE ENVIRONMENT ---------------- #
     @InstructionLogger.log_instruction
     def setenv(self, name, value, **kwds):
         """Set value of environment variable `name`"""
         if name == 'MODULEPATH':
-            logging.error('MODULEPATH cannot be set by setenv')
+            tty.die('MODULEPATH cannot be set by setenv')
         if IS_DARWIN and name == 'LD_LIBRARY_PATH':
             name = 'DYLD_LIBRARY_PATH'
         self.environ[name] = value
@@ -756,7 +756,7 @@ class MasterController(object):
         if kwds.get('persist'):
             return
         if name == 'MODULEPATH':
-            logging.error('MODULEPATH cannot be unset by unsetenv')
+            tty.die('MODULEPATH cannot be unset by unsetenv')
         if IS_DARWIN and name == 'LD_LIBRARY_PATH':
             name = 'DYLD_LIBRARY_PATH'
         self.environ[name] = None
@@ -794,7 +794,7 @@ class MasterController(object):
         for modulename in modulenames:
             if modulename in loaded:
                 return
-        logging.error('One of the prerequisites {0!r} must '
+        tty.die('One of the prerequisites {0!r} must '
                       'first be loaded'.format(modulenames))
 
     @InstructionLogger.log_instruction
@@ -805,7 +805,7 @@ class MasterController(object):
         for modulename in modulenames:
             if modulename in loaded:
                 continue
-            logging.error('Prerequisite {0!r} must '
+            tty.die('Prerequisite {0!r} must '
                           'first be loaded'.format(modulename))
 
     @InstructionLogger.log_instruction
@@ -823,7 +823,7 @@ class MasterController(object):
                     msg += '{modulename!r}. Set environment variable '
                     msg += 'PYMOD_RESOLVE_CONFLICTS=1 to let pymod resolve '
                     msg += 'conflicts.'
-                    logging.error(msg.format(name=name, modulename=modulename))
+                    tty.die(msg.format(name=name, modulename=modulename))
 
     @trace
     def append_path(self, name, *values, **kwds):

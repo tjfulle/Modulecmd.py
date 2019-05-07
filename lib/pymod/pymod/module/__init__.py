@@ -10,11 +10,11 @@ from pymod.module.meta import MetaData
 from pymod.module.tcl2py import tcl2py
 from pymod.module.version import Version
 
-import contrib.util.misc as misc
+from contrib.util import split, textfill, encode_str
 import pymod.environ as environ
-import contrib.util.logging as logging
-from contrib.util.logging import terminal_size
-from contrib.util.executable import which
+import llnl.util.tty as tty
+from llnl.util.tty import terminal_size
+from spack.util.executable import which
 from pymod.module.argument_parser import ModuleArgumentParser
 
 
@@ -53,7 +53,7 @@ class Module(object):
 
     @property
     def is_loaded(self):
-        loaded_modules = misc.split(
+        loaded_modules = split(
             environ.get(pymod.names.loaded_modules), os.pathsep)
         return self.fullname in loaded_modules
 
@@ -76,7 +76,7 @@ class Module(object):
             try:
                 return tcl2py(self, mode)
             except Exception as e:
-                logging.error(e.args[0])
+                tty.die(e.args[0])
                 return ''
         return open(self.filename, 'r').read()
 
@@ -122,7 +122,7 @@ class Module(object):
         if self.short_description is not None:
             key = 'Description'
             N = len(key) + 2
-            ss = misc.textfill(self.short_description, indent=N)
+            ss = textfill(self.short_description, indent=N)
             sio.write('{0}: {1}\n'.format(key, ss))
 
         if self.configure_options is not None:
@@ -132,7 +132,7 @@ class Module(object):
 
         for (key, item) in self._whatis.items():
             N = len(key) + 2
-            ss = misc.textfill(item, indent=N)
+            ss = textfill(item, indent=N)
             sio.write('{0}: {1}\n'.format(key, ss))
 
         parser_help = self.parser.help_string()
@@ -164,7 +164,7 @@ class Module(object):
     def format_help(self):
         if self._helpstr is None:
             return '{0!r}: no help string provided'.format(
-                misc.encode_str(self.fullname))
+                encode_str(self.fullname))
         return fill(self._helpstr)
 
     def set_helpstr(self, helpstr):
@@ -173,7 +173,7 @@ class Module(object):
 
 def from_file(modulepath, filepath):
     if not os.path.isfile(filepath):
-        logging.verbose('{0} does not exist'.format(filepath))
+        tty.verbose('{0} does not exist'.format(filepath))
         return None
     if filepath.endswith(('~',)) or filepath.startswith(('.#',)):
         # Don't read backup files
@@ -198,9 +198,9 @@ def from_file(modulepath, filepath):
         meta.read(filepath)
 
     if m_type == tcl and 'gcc' in filepath:
-        logging.debug(name)
-        logging.debug(modulepath)
-        logging.debug(filepath, '\n')
+        tty.debug(name)
+        tty.debug(modulepath)
+        tty.debug(filepath, '\n')
 
     return Module(name, fullname, version, m_type, filepath, modulepath, meta)
 
@@ -217,6 +217,6 @@ class TCLSHNotFoundError(Exception):
     def __init__(self):
         msg = 'tclsh not found on path'
         if pymod.config.get('debug'):
-            logging.error(msg)
+            tty.die(msg)
         else:
             super(TCLSHNotFoundError, self).__init__(msg)

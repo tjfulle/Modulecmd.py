@@ -1,7 +1,7 @@
 import pymod.mc
 import pymod.modes
 import pymod.modulepath
-import contrib.util.logging as logging
+import llnl.util.tty as tty
 from pymod.error import ModuleNotFoundError
 
 
@@ -14,11 +14,11 @@ def swap(module_a_name, module_b_name):
     if module_b is None:
         raise ModuleNotFoundError(module_b_name, pymod.modulepath)
     if not module_a.is_loaded:
-        logging.warn('{0} is not loaded, swap not performed!'
+        tty.warn('{0} is not loaded, swap not performed!'
                      .format(module_a.fullname))
         return
     if module_b.is_loaded:
-        logging.warn('{0} is already loaded!'.format(module_b.fullname))
+        tty.warn('{0} is already loaded!'.format(module_b.fullname))
         return module_b
     assert module_a.is_loaded
     swap_impl(module_a, module_b)

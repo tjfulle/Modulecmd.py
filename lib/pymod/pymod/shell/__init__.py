@@ -5,7 +5,7 @@ from .python import Python
 from .shell import Shell
 
 import pymod.config
-from contrib.util.lang import Singleton
+from llnl.util.lang import Singleton
 
 
 __shells__ = (Shell, Bash, Csh, Python)

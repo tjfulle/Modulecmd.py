@@ -2,12 +2,13 @@ import os
 import sys
 import json
 from six import StringIO
-from contrib.ordereddict_backport import OrderedDict
+from ordereddict_backport import OrderedDict
 import pymod.names
 import pymod.environ
-import contrib.util.logging as logging
-from contrib.util.logging import terminal_size
-from contrib.util.logging.colify import colified
+import llnl.util.tty as tty
+from llnl.util.tty import terminal_size
+from llnl.util.tty.colify import colified
+from contrib.util.tty import grep_pat_in_string
 
 """Manages a collection of modules"""
 
@@ -90,7 +91,7 @@ class Collections:
             sio.write('\n'.join(c for c in names))
         string = sio.getvalue()
         if regex is not None:
-            string = misc.grep_pat_in_string(string, regex)
+            string = grep_pat_in_string(string, regex)
         return string
 
     def format_show(self, name):
@@ -100,7 +101,7 @@ class Collections:
         """
         collection = self.get(name)
         if collection is None:
-            logging.warning('{0!r} is not a collection'.format(name))
+            tty.warning('{0!r} is not a collection'.format(name))
             return
 
         sio = StringIO()

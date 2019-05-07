@@ -19,7 +19,7 @@ class Csh(Shell):
             # csh barfs on long env vars
             if len(val) > CSH_LIMIT:
                 if key == 'PATH':
-                    logging.warning('PATH exceeds {0} characters, truncating '
+                    tty.warning('PATH exceeds {0} characters, truncating '
                                     'and appending /usr/bin:/bin...')
                     newval = '/usr/bin' + os.pathsep + '/bin'
                     for item in val.split(os.pathsep):
@@ -30,7 +30,7 @@ class Csh(Shell):
                             break
                 else:
                     msg = '{0} exceeds {1} characters, truncating...'
-                    logging.warning(msg.format(key, CSH_LIMIT))
+                    tty.warning(msg.format(key, CSH_LIMIT))
                     val = val[:CSH_LIMIT]
         return 'setenv {0} "{1}";'.format(key, val)
 

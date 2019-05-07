@@ -1,8 +1,8 @@
 import re
 
 
-import contrib.util.misc as misc
-import contrib.util.logging as logging
+from contrib.util import split
+import llnl.util.tty as tty
 
 
 class MetaData:
@@ -19,8 +19,8 @@ class MetaData:
         head = open(filename).readline()
         if not regex.search(head):
             return
-        pymod_directive = misc.split(regex.split(head, 1)[1], ',')
-        kwds = dict([misc.split(x, '=', 1) for x in pymod_directive])
+        pymod_directive = split(regex.split(head, 1)[1], ',')
+        kwds = dict([split(x, '=', 1) for x in pymod_directive])
         for (key, default) in vars(self).items():
             expr = kwds.pop(key, None)
             if expr is None:
@@ -28,7 +28,7 @@ class MetaData:
             else:
                 value = eval_bool_expr(expr)
                 if value is None:
-                    logging.error('Failed to evaluate meta data '
+                    tty.die('Failed to evaluate meta data '
                                   'statement {0!r} in {1}'
                                   .format(expr, filename))
             setattr(self, key, value)
