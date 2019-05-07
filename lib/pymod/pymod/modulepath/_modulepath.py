@@ -218,18 +218,19 @@ class Modulepath:
         colorized = colorized.replace('(D,L)', DL)
         return colorized
 
-    def format_available(self, terse=False, regex=None,
-                         fulloutput=False, pathonly=False):
-        if pathonly:
-            return '\n'.join('{0}) {1}'.format(i,_[0]) for i,_ in enumerate(self, start=1))
+    @staticmethod
+    def sort_key(module):
+        return (module.name, module.version)
+
+    def format_available(self, terse=False, regex=None, fulloutput=False):
 
         sio = StringIO()
         if not terse:
             _, width = tty.terminal_size()
             head = lambda x: (' ' + x + ' ').center(width, '-')
             for (directory, modules) in self.group_by_modulepath():
-                modules = [m for m in modules if m.is_enabled]
-                modules = self.filter_modules_by_regex(modules, regex)
+                modules = sorted([m for m in modules if m.is_enabled])
+                modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
                 if not os.path.isdir(directory):
                     if not fulloutput:
                         continue
@@ -248,6 +249,7 @@ class Modulepath:
             for (directory, modules) in self.group_by_modulepath():
                 if not os.path.isdir(directory):
                     continue
+                modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
                 modules = self.filter_modules_by_regex(modules, regex)
                 if not modules:
                     continue

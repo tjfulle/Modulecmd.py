@@ -154,9 +154,10 @@ class Module(object):
             for arg in args:
                 self._whatis.setdefault('explicit', []).append(arg)
         for (key, item) in kwargs.items():
-            if key in ('name', 'version', 'short_description',
-                       'configure_options'):
+            if key in ('name', 'short_description', 'configure_options'):
                 setattr(self, key, item)
+            elif key == 'version':
+                self.version = Version(item)
             else:
                 self._whatis[' '.join(key.split('_')).title()] = item
 
@@ -174,7 +175,7 @@ class Module(object):
         sio.write(rule)
         return sio.getvalue()
 
-    def set_helpstr(self, helpstr):
+    def set_help_string(self, helpstr):
         self._helpstr = helpstr
 
 
