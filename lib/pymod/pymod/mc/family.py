@@ -1,6 +1,7 @@
 import os
 import pymod.names
 import pymod.modes
+import pymod.module
 import pymod.environ
 from pymod.error import FamilyLoadedError
 
@@ -8,7 +9,7 @@ def family(mode, module, family_name):
     """Assign a family"""
 
     name = module.name
-    version = module.version
+    version = module.version.string
     module.family = family_name
     def family_envar_keys():
         fam_key = pymod.names.family_name(family_name)
@@ -25,7 +26,7 @@ def family(mode, module, family_name):
             raise FamilyLoadedError(other)
 
         pymod.environ.set(fam_key, name)
-        ver = 'false' if not version.string else version.string
+        ver = 'false' if not version else version
         pymod.environ.set(ver_key, ver)
 
     elif mode in (pymod.modes.unload,):
