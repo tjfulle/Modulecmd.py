@@ -11,13 +11,11 @@ def format_output():
     return output
 
 
-def dump():
+def dump(stream=sys.stdout):
     """Dump the final results to the shell to be evaluated"""
     output = format_output()
-    if pymod.config.get('dryrun'):
-        sys.stderr.write(output)
-    else:
-        sys.stdout.write(output)
+    stream.write(output)
+
     output = pymod.mc._mc.format_changed_module_state()
     if output.split():
         sys.stderr.write(output)
