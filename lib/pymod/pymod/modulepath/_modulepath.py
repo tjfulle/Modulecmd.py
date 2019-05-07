@@ -1,5 +1,6 @@
 import os
 import re
+from six import StringIO
 
 import pymod.shell
 import pymod.module
@@ -222,9 +223,10 @@ class Modulepath:
         if pathonly:
             return '\n'.join('{0}) {1}'.format(i,_[0]) for i,_ in enumerate(self, start=1))
 
-        description = []
+        sio = StringIO()
         if not terse:
             _, width = tty.terminal_size()
+            head = lambda x: (' ' + x + ' ').center(width, '-')
             for (directory, modules) in self.group_by_modulepath():
                 modules = [m for m in modules if m.is_enabled]
                 modules = self.filter_modules_by_regex(modules, regex)
@@ -240,8 +242,8 @@ class Modulepath:
                     s = colified([m.format_info() for m in modules], width=width)
                     s = self.colorize(s)
                 directory = directory.replace(os.path.expanduser('~/'), '~/')
-                description.append((' ' + directory + ' ').center(width, '-'))
-                description.append(s + '\n')
+                sio.write(head(directory) + '\n')
+                sio.write(s + '\n')
         else:
             for (directory, modules) in self.group_by_modulepath():
                 if not os.path.isdir(directory):
@@ -249,11 +251,11 @@ class Modulepath:
                 modules = self.filter_modules_by_regex(modules, regex)
                 if not modules:
                     continue
-                description.append(directory + ':')
-                description.append('\n'.join(m.fullname for m in modules))
-            description.append('')
+                sio.write(directory + ':\n')
+                sio.write('\n'.join(m.fullname for m in modules))
+            sio.write('\n')
 
-        description = '\n'.join(description)
+        description = sio.getvalue()
         if regex is not None:
             description = grep_pat_in_string(description, regex)
 
