@@ -1,9 +1,9 @@
 import os
 import sys
-import contrib.ruamel.yaml as yaml
+import ruamel.yaml as yaml
 import pymod.paths
 import pymod.names
-from contrib.util.lang import Singleton
+from llnl.util.lang import Singleton
 
 
 def load_yaml(filename, section=None):

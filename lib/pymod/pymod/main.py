@@ -22,8 +22,8 @@ import pymod.environ
 import pymod.command
 import pymod.shell
 
-import contrib.util.logging as logging
-import contrib.util.logging.color as color
+import llnl.util.tty as tty
+import llnl.util.tty.color as color
 
 
 #: names of profile statistics
@@ -110,7 +110,7 @@ def index_commands():
         for p in required_command_properties:
             prop = getattr(cmd_module, p, None)
             if not prop:
-                logging.die('Command doesn\'t define a property {0!r}: {1}'
+                tty.die('Command doesn\'t define a property {0!r}: {1}'
                             .format(p, command))
 
         # add commands to lists for their level and higher levels
@@ -360,9 +360,9 @@ def make_argument_parser(**kwargs):
 def setup_main_options(args):
     """Configure pymod globals based on the basic options."""
     # Set up environment based on args.
-    logging.set_verbose(args.verbose)
-    logging.set_debug(args.debug)
-#    logging.set_trace(args.trace)
+    tty.set_verbose(args.verbose)
+    tty.set_debug(args.debug)
+#    tty.set_trace(args.trace)
 
     # debug must be set first so that it can even affect behvaior of
     # errors raised by pymod.config.
@@ -404,7 +404,7 @@ def _invoke_command(command, parser, args, unknown_args):
         return_val = command(parser, args, unknown_args)
     else:
         if unknown_args:
-            logging.die('unrecognized arguments: {}'
+            tty.die('unrecognized arguments: {}'
                         .format(' '.join(unknown_args)))
         return_val = command(parser, args)
 
@@ -472,7 +472,7 @@ def main(argv=None):
         except ImportError:
            # if pymod.config.get('config:debug'):
            #     raise
-            logging.die("Unknown command: %s" % args.command[0])
+            tty.die("Unknown command: %s" % args.command[0])
 
         # Re-parse with the proper sub-parser added.
         args, unknown = parser.parse_known_args()
@@ -492,11 +492,11 @@ def main(argv=None):
     except Exception as e:
         if pymod.config.get('debug'):
             raise
-        logging.die(str(e))
+        tty.die(str(e))
 
     except KeyboardInterrupt:
         sys.stderr.write('\n')
-        logging.die("Keyboard interrupt.")
+        tty.die("Keyboard interrupt.")
 
     except SystemExit as e:
         return e.code

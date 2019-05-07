@@ -14,7 +14,7 @@ from .trace import trace
 from .pager import pager
 from .shell import get_shell
 from .utils import split, total_module_time
-from .logging import write_to_console, logging
+from .tty import write_to_console, tty
 from .instruction_logger import InstructionLogger
 from .controller import MasterController
 from .optparse import ModuleOptionParser
@@ -793,7 +793,7 @@ def main(argv=None):
             else: aliases = {name: value}
             s = mc.shell.dump([], {}, alias_keys=[name], aliases=aliases)
             if mc.dryrun:
-                logging.info(s)
+                tty.info(s)
                 return 0
             sys.stdout.write(s)
 
@@ -829,10 +829,10 @@ def main(argv=None):
             if item.startswith(MODULE_OPTION_PREFIX):
                 if not argv:
                     msg = 'Options must be specified after module name'
-                    logging.error(msg)
+                    tty.die(msg)
                 if not ModuleOptionParser.is_valid_option_string(item):
                     msg = 'Invalid option {0!r} for module {1!r}'
-                    logging.error(msg.format(item, argv[-1]))
+                    tty.die(msg.format(item, argv[-1]))
                 argv[-1][-1].append(item)
             else:
                 argv.append((item, []))
@@ -849,9 +849,9 @@ def main(argv=None):
         if not not_found:
             return
         s = 'Failed to find the following module(s) on MODULEPATH: '
-        logging.info('\n' + colorize(s, 'magenta'))
+        tty.info('\n' + colorize(s, 'magenta'))
         for (i, x) in enumerate(not_found):
-            logging.info('  {0}) {1}'.format(i+1, x))
+            tty.info('  {0}) {1}'.format(i+1, x))
 
     elif args.subparser == CAT:
         pager(get_entity_text(mc, args.name), plain=True)

@@ -6,9 +6,6 @@ import pymod.error
 import pymod.environ
 import pymod.modulepath
 
-import contrib.util.misc as misc
-import contrib.util.logging as logging
-
 _swapped_explicitly = []
 _swapped_on_version_change = []
 _swapped_on_family_update = []

@@ -1,8 +1,8 @@
 import os
 
 import pymod.names
-from contrib.util.misc import split
-from contrib.util.lang import Singleton
+from contrib.util import split
+from llnl.util.lang import Singleton
 from pymod.modulepath._modulepath import Modulepath
 
 

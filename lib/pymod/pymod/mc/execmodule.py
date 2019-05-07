@@ -6,13 +6,13 @@ import subprocess
 import pymod.mc
 import pymod.modes
 import pymod.environ
-import contrib.util.logging as logging
-import contrib.util.misc as misc
+import llnl.util.tty as tty
+from contrib.util import which, check_output
 
 from pymod.mc.callback import callback
-from contrib.util.logging.color import colorize
-from contrib.util.executable import Executable
-from contrib.six import exec_
+from llnl.util.tty.color import colorize
+from spack.util.executable import Executable
+from six import exec_
 from pymod.error import FamilyLoadedError
 
 
@@ -52,7 +52,7 @@ def execmodule_impl(module, mode, do_not_register=False):
     """Execute filename in sandbox"""
 
     if module.type not in (pymod.module.python, pymod.module.tcl):
-        logging.error('Module {0!r} has unknown module type: '
+        tty.die('Module {0!r} has unknown module type: '
                       '{1!r}'.format(module.fullname, module.type))
 
     try:
@@ -97,9 +97,9 @@ def module_exec_sandbox(module, mode):
         'add_option': module.parser.add_argument,
         'parse_opts': module.parse_args,
         #
-        'log_info': lambda s: logging.info(s, reported_by=module.filename),
-        'log_warn': lambda s: logging.warn(s, reported_by=module.filename),
-        'log_error': lambda s: logging.error(s, reported_by=module.filename),
+        'log_info': lambda s: tty.info(s, reported_by=module.filename),
+        'log_warn': lambda s: tty.warn(s, reported_by=module.filename),
+        'log_error': lambda s: tty.die(s, reported_by=module.filename),
         'execute': callback('execute', mode),
         #
         'setenv': callback('setenv', mode),
@@ -132,8 +132,8 @@ def module_exec_sandbox(module, mode):
         #
         'whatis': callback('whatis', mode, module),
         'help': callback('help', mode, module),
-        'which': misc.which,
-        'check_output': misc.check_output,
+        'which': which,
+        'check_output': check_output,
         #
         'source': callback('source', mode),
     }

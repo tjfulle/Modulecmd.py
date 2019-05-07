@@ -2,9 +2,13 @@ import os
 import re
 import base64
 import subprocess
+from llnl.util.tty import terminal_size
 
-from contrib.util.logging.color import colorize
-
+__all__ = [
+    'split', 'join', 'join_args', 'decode_str', 'encode_str',
+    'dict2str', 'str2dict', 'encode64', 'decode64', 'boolean',
+    'pop', 'strip_quotes', 'check_output', 'which', 'is_executable',
+    'textfill',]
 
 def split(arg, sep=None, num=None):
     """Split arg on sep. Only non-empty characters are included in the returned
@@ -66,16 +70,6 @@ def decode64(item):
     return base64.urlsafe_b64decode(str(item)).decode()
 
 
-def grep_pat_in_string(string, pat, color='c'):
-    regex = re.compile(pat)
-    for line in string.split('\n'):
-        for item in line.split():
-            if regex.search(item):
-                repl = colorize('@%s{%s}' % (color, item))
-                string = re.sub(re.escape(item), repl, string)
-    return string
-
-
 def boolean(item):
     if item is None:
         return None
@@ -133,3 +127,13 @@ def which(executable, PATH=None, default=None):
 def is_executable(path):
     """Is the path executable?"""
     return os.path.isfile(path) and os.access(path, os.X_OK)
+
+
+def textfill(string, width=None, indent=None, **kwds):
+    if width is None:
+        _, width = terminal_size()
+    if indent is not None:
+        kwds['initial_indent'] = ' ' * indent
+        kwds['subsequent_indent'] = ' ' * indent
+    s = fill(string, width, **kwds)
+    return s.lstrip()

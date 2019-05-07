@@ -2,9 +2,9 @@ import os
 import sys
 import pymod.modulepath
 from pymod.error import ModuleNotFoundError
-from contrib.util.logging.pager import pager
-from contrib.util.logging.color import colorize
-from contrib.util.logging import terminal_size
+from contrib.util.tty.pager import pager
+from llnl.util.tty.color import colorize
+from llnl.util.tty import terminal_size
 from pymod.mc.execmodule import execmodule_in_sandbox
 
 description = "get help on pymod and its commands"

@@ -4,8 +4,10 @@ import sys
 import pymod.mc
 import pymod.modes
 import pymod.modulepath
-import contrib.util.logging as logging
+from contrib.util import split
 from pymod.error import ModuleNotFoundError
+
+import llnl.util.tty as tty
 
 """Module defines callback functions between modules and pymod"""
 
@@ -20,7 +22,7 @@ def callback(func_name, mode, module=None, when=True, memo={}):
     except KeyError:
         module_fun = getattr(sys.modules[__name__], func_name, None)
         if module_fun is None:
-            logging.warn('Callback function {} not defined'
+            tty.warn('Callback function {} not defined'
                          .format(func_name))
             module_fun = lambda *args, **kwargs: None
         memo[func_name] = module_fun
@@ -133,7 +135,7 @@ def source(mode, filename):
     sourced = pymod.environ.get_path(pymod.names.sourced_files)
     if mode == pymod.modes.load and filename not in sourced:
         if not os.path.isfile(filename):
-            logging.error('{0}: no such file to source'.format(filename))
+            tty.die('{0}: no such file to source'.format(filename))
         command = pymod.shell.source_command(filename)
         sourced.append(filename)
         pymod.environ.set_path(pymod.names.sourced_files, sourced)
@@ -247,7 +249,7 @@ def family(mode, module, family_name):
 def execute(mode_, command, mode=None):
     if mode is not None and mode != mode_:
         return
-    xc = misc.split(command, ' ', 1)
+    xc = split(command, ' ', 1)
     exe = Executable(xc[0])
     with open(os.devnull, 'a') as fh:
         kwargs = {
@@ -258,5 +260,5 @@ def execute(mode_, command, mode=None):
         try:
             exe(*xc[1:], **kwargs)
         except:
-            logging.warn('Command {0!r} failed'.format(command))
+            tty.warn('Command {0!r} failed'.format(command))
     return

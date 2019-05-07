@@ -10,8 +10,8 @@ import re
 import sys
 import argparse
 
-from contrib.util.lang import attr_setdefault
-import contrib.util.logging as logging
+from llnl.util.lang import attr_setdefault
+import llnl.util.tty as tty
 
 import pymod.config
 import pymod.paths
@@ -78,13 +78,13 @@ def get_module(cmd_name):
     module = __import__(module_name,
                         fromlist=[pname, SETUP_PARSER, DESCRIPTION],
                         level=0)
-    logging.debug('Imported {0} from built-in commands'.format(pname))
+    tty.debug('Imported {0} from built-in commands'.format(pname))
 
     attr_setdefault(module, SETUP_PARSER, lambda *args: None)  # null-op
     attr_setdefault(module, DESCRIPTION, "")
 
     if not hasattr(module, pname):
-        logging.die("Command module {0} ({1}) must define function {2!r}."
+        tty.die("Command module {0} ({1}) must define function {2!r}."
                     .format(module.__name__, module.__file__, pname))
 
     return module

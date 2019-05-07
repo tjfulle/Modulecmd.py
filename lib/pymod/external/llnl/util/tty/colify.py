@@ -12,8 +12,8 @@ import os
 import sys
 from six import StringIO, text_type
 
-from contrib.util.logging import terminal_size
-from contrib.util.logging.color import clen, cextra
+from llnl.util.tty import terminal_size
+from llnl.util.tty.color import clen, cextra
 
 
 class ColumnConfig:

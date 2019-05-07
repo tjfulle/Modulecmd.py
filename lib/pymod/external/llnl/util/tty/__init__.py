@@ -14,7 +14,7 @@ import traceback
 from six import StringIO
 from six.moves import input
 
-from contrib.util.logging.color import cprint, cwrite, cescape, clen
+from llnl.util.tty.color import cprint, cwrite, cescape, clen
 
 _debug = False
 _verbose = False
@@ -80,6 +80,33 @@ def error_enabled():
     return _error_enabled
 
 
+class SuppressOutput:
+    """Class for disabling output in a scope using 'with' keyword"""
+
+    def __init__(self,
+                 msg_enabled=True,
+                 warn_enabled=True,
+                 error_enabled=True):
+
+        self._msg_enabled_initial = _msg_enabled
+        self._warn_enabled_initial = _warn_enabled
+        self._error_enabled_initial = _error_enabled
+
+        self._msg_enabled = msg_enabled
+        self._warn_enabled = warn_enabled
+        self._error_enabled = error_enabled
+
+    def __enter__(self):
+        set_msg_enabled(self._msg_enabled)
+        set_warn_enabled(self._warn_enabled)
+        set_error_enabled(self._error_enabled)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        set_msg_enabled(self._msg_enabled_initial)
+        set_warn_enabled(self._warn_enabled_initial)
+        set_error_enabled(self._error_enabled_initial)
+
+
 def set_stacktrace(flag):
     global _stacktrace
     _stacktrace = flag
@@ -134,6 +161,7 @@ def info(message, *args, **kwargs):
     wrap = kwargs.get('wrap', False)
     break_long_words = kwargs.get('break_long_words', False)
     st_countback = kwargs.get('countback', 3)
+
     reported_by = kwargs.get('reported_by')
     if reported_by is not None:
         message += ' (reported by {0})'.format(reported_by)

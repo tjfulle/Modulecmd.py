@@ -2,7 +2,7 @@ import sys
 import pymod.config
 import pymod.environ
 import pymod.modulepath
-import contrib.util.logging as logging
+import llnl.util.tty as tty
 
 
 def format_output():

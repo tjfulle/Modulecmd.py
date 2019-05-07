@@ -4,14 +4,14 @@ import pymod.modulepath
 
 from pymod.mc.execmodule import execmodule
 from pymod.error import ModuleNotFoundError
-import contrib.util.logging as logging
+import llnl.util.tty as tty
 
 
 def load(modulename, opts=None, do_not_register=False, insert_at=None,
          increment_refcnt_if_loaded=False):
     """Load the module given by `modulename`"""
 
-    logging.verbose('Loading {}'.format(modulename))
+    tty.verbose('Loading {}'.format(modulename))
 
     # Execute the module
     module = pymod.modulepath.get(modulename)
@@ -30,7 +30,7 @@ def load(modulename, opts=None, do_not_register=False, insert_at=None,
             pymod.mc.increment_refcount(module)
         else:
             msg = '{0} is already loaded, use {1!r} to load again'
-            logging.warn(msg.format(module.fullname, 'module reload'))
+            tty.warn(msg.format(module.fullname, 'module reload'))
         return 0
 
     if insert_at is None:

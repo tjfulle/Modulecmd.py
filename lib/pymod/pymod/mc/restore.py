@@ -2,7 +2,7 @@ import pymod.mc
 import pymod.modes
 import pymod.names
 import pymod.collection
-import contrib.util.logging as logging
+import llnl.util.tty as tty
 
 
 def restore(name, warn_if_missing=True):
@@ -18,7 +18,7 @@ def restore(name, warn_if_missing=True):
                 msg = 'System default collection does not exist'
             else:
                 msg = 'Collection {0!r} does not exist'.format(name)
-            logging.warn(msg)
+            tty.warn(msg)
         return None
 
     # First unload all loaded modules
@@ -32,7 +32,7 @@ def restore(name, warn_if_missing=True):
         for (fullname, filename, opts) in modules:
             module = pymod.modulepath.get(filename)
             if module is None:
-                logging.error(
+                tty.die(
                     'Saved module {0!r} does not exist ({1})'
                     .format(m_dict['name'], m_dict['filename']))
             module.opts = opts

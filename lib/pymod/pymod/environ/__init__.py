@@ -1,8 +1,8 @@
 import os
 
-from contrib.util.misc import join, split, dict2str, str2dict
+from contrib.util import join, split, dict2str, str2dict
 from pymod.environ._environ import Environ
-from contrib.util.lang import Singleton
+from llnl.util.lang import Singleton
 
 
 environ = Singleton(Environ)

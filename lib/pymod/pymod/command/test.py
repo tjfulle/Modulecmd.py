@@ -5,8 +5,8 @@ import argparse
 import pytest
 from six import StringIO
 
-from contrib.util.filesystem import working_dir
-from contrib.util.logging.colify import colify
+from llnl.util.filesystem import working_dir
+from llnl.util.tty.colify import colify
 
 import pymod.paths
 import pymod.modulepath

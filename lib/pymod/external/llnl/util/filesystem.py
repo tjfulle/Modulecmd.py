@@ -20,9 +20,9 @@ import tempfile
 from contextlib import contextmanager
 
 import six
-from contrib.util import logging
-from contrib.util.lang import dedupe
-from contrib.util.executable import Executable
+from llnl.util import tty
+from llnl.util.lang import dedupe
+from spack.util.executable import Executable
 
 __all__ = [
     'FileFilter',
