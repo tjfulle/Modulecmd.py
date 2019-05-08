@@ -3,6 +3,7 @@ from six import StringIO
 
 import pymod.names
 import pymod.error
+import pymod.module
 import pymod.environ
 import pymod.modulepath
 
@@ -28,7 +29,20 @@ __all__ = [
     'unloaded_on_mp_change',
     'on_module_load',
     'on_module_unload',
+    'module_is_loaded',
 ]
+
+
+def module_is_loaded(key):
+    if isinstance(key, pymod.module.Module):
+        return key in get_loaded_modules()
+    elif os.path.isfile(key):
+        return key in loaded_module_files()
+    else:
+        for module in get_loaded_modules():
+            if module.name == key or module.fullname == key:
+                return True
+    return False
 
 
 def get_loaded_modules():

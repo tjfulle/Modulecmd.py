@@ -57,7 +57,7 @@ def swap(mode, m1, m2, **kwargs):
 
 def load_first(mode, *names):
     pymod.modes.assert_known_mode(mode)
-    if mode in (pymod.modes.unload, pymod.modes.load_partial):
+    if mode in (pymod.modes.load_partial,):
         return None
     for name in names:
         if name is None:
@@ -75,25 +75,28 @@ def load_first(mode, *names):
     if mode == pymod.modes.unload:
         # We are in unload mode and the module was requested to be loaded.
         # So, we reverse the action and unload it
-        return pymod.mc.unload_impl(module)
+        return pymod.mc.unload(module)
     elif mode == pymod.modes.load:
-        return pymod.mc.load_impl(module, increment_refcnt_if_loaded=True)
+        return pymod.mc.load(module, increment_refcnt_if_loaded=True)
 
 
-def load(mode, name, opts=None):
+def load(mode, *names, **kwds):
+    opts = kwds.get('opts', None)
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.load_partial:
         return None
     elif mode == pymod.modes.unload:
         # We are in unload mode and the module was requested to be loaded.
         # So, we reverse the action and unload it
-        return pymod.mc.unload(name)
+        for name in names:
+            pymod.mc.unload(name)
     else:
-        return pymod.mc.load(name, opts=opts,
-                             increment_refcnt_if_loaded=True)
+        for name in names:
+            pymod.mc.load(name, opts=opts,
+                          increment_refcnt_if_loaded=True)
 
 
-def unload(mode, name):
+def unload(mode, *names):
     pymod.modes.assert_known_mode(mode)
     if mode in (pymod.modes.unload, pymod.modes.load_partial):
         # We are in unload mode and the module was requested to be
@@ -101,16 +104,17 @@ def unload(mode, name):
         # skip
         return None
     else:
-        module = pymod.modulepath.get(name)
-        if module is None:
-            return None
-        refcnt = pymod.mc.get_refcount(module)
-        if refcnt > 1:
-            # Don't unload, just decrement the reference count
-            pymod.mc.decrement_refcount(module)
-            return
+        for name in names:
+            module = pymod.modulepath.get(name)
+            if module is None:
+                continue
+            refcnt = pymod.mc.get_refcount(module)
+            if refcnt > 1:
+                # Don't unload, just decrement the reference count
+                pymod.mc.decrement_refcount(module)
+                continue
 
-        pymod.mc.unload_impl(module)
+            pymod.mc.unload(module)
         return None
 
 
