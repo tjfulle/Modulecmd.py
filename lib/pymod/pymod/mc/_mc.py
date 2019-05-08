@@ -7,6 +7,9 @@ import pymod.module
 import pymod.environ
 import pymod.modulepath
 
+import llnl.util.tty as tty
+
+
 _swapped_explicitly = []
 _swapped_on_version_change = []
 _swapped_on_family_update = []
@@ -122,7 +125,7 @@ def decrement_refcount(module, count=None):
     set_lm_refcount(lm_refcount)
 
 
-def on_module_load(module, do_not_register=False):
+def on_module_load(module):
     """Register the `module` to the list of loaded modules"""
     # Update the environment
     if not pymod.modulepath.contains(module.modulepath):
@@ -130,12 +133,13 @@ def on_module_load(module, do_not_register=False):
     if (pymod.config.get('skip_add_devpack') and
         module.name.startswith('devpack')):
         return
-    if do_not_register or module.do_not_register:
-        return
     loaded_modules = get_loaded_modules()
     if module not in loaded_modules:
         loaded_modules.append(module)
         set_loaded_modules(loaded_modules)
+        increment_refcount(module)
+    elif pymod.config.get('debug'):
+        tty.die('on_module_load called for a module that is already loaded!')
 
 
 def on_module_unload(module):
@@ -147,6 +151,9 @@ def on_module_unload(module):
         i = loaded_modules.index(module)
         loaded_modules.pop(i)
         set_loaded_modules(loaded_modules)
+        decrement_refcount(module)
+    elif pymod.config.get('debug'):
+        tty.die('on_module_unload called for a module that is not loaded!')
 
 
 def swapped_explicitly(old, new):

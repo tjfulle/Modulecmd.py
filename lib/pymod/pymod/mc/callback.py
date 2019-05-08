@@ -35,76 +35,55 @@ def callback(func_name, mode, module=None, when=True, memo={}):
     return func
 
 
-def swap(mode, m1, m2, **kwargs):
+def swap(mode, name_a, name_b, **kwargs):
     pymod.modes.assert_known_mode(mode)
-    if mode in (pymod.modes.load_partial, pymod.modes.unload):
+    if mode != pymod.modes.unload:
         # We don't swap modules in unload mode
-        return
-    else:
-        pymod.mc.swap(m1, m2)
+        return pymod.mc.swap(name_a, name_b, caller='modulefile')
 
 
 def load_first(mode, *names):
     pymod.modes.assert_known_mode(mode)
-    if mode in (pymod.modes.load_partial,):
-        return None
     for name in names:
         if name is None:
             continue
-        module = pymod.modulepath.get(name)
-        if module is not None:
-            break
-    else:
-        if name is None:
-            # Passes modulename = None as last argument says to ignore
-            # if this module is not found
-            return None
-        raise ModuleNotFoundError(','.join(names))
+        try:
+            if mode == pymod.modes.unload:
+                # We are in unload mode and the module was requested to be
+                # loaded. So, we reverse the action and unload it
+                return pymod.mc.unload(name, caller='modulefile')
+            elif mode == pymod.modes.load:
+                return pymod.mc.load(name, caller='modulefile')
+        except ModuleNotFoundError:
+            continue
+    if name is None:
+        return
+    raise ModuleNotFoundError(','.join(names))
 
+
+def load(mode, name, **kwds):
+    opts = kwds.get('opts', None)
+    pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.unload:
         # We are in unload mode and the module was requested to be loaded.
         # So, we reverse the action and unload it
-        return pymod.mc.unload(module)
-    elif mode == pymod.modes.load:
-        return pymod.mc.load(module, increment_refcnt_if_loaded=True)
-
-
-def load(mode, *names, **kwds):
-    opts = kwds.get('opts', None)
-    pymod.modes.assert_known_mode(mode)
-    if mode == pymod.modes.load_partial:
-        return None
-    elif mode == pymod.modes.unload:
-        # We are in unload mode and the module was requested to be loaded.
-        # So, we reverse the action and unload it
-        for name in names:
-            pymod.mc.unload(name)
+        pymod.mc.unload(name, caller='modulefile')
     else:
-        for name in names:
-            pymod.mc.load(name, opts=opts,
-                          increment_refcnt_if_loaded=True)
+        pymod.mc.load(name, opts=opts, caller='modulefile')
 
 
-def unload(mode, *names):
+def unload(mode, name):
     pymod.modes.assert_known_mode(mode)
-    if mode in (pymod.modes.unload, pymod.modes.load_partial):
+    if mode == pymod.modes.unload:
         # We are in unload mode and the module was requested to be
         # unloaded. But, we don't know if it was previously loaded. So we
         # skip
-        return None
+        return
     else:
-        for name in names:
-            module = pymod.modulepath.get(name)
-            if module is None:
-                continue
-            refcnt = pymod.mc.get_refcount(module)
-            if refcnt > 1:
-                # Don't unload, just decrement the reference count
-                pymod.mc.decrement_refcount(module)
-                continue
-
-            pymod.mc.unload(module)
-        return None
+        try:
+            pymod.mc.unload(name, caller='modulefile')
+        except ModuleNotFoundError:
+            return None
 
 
 def is_loaded(mode, module):
@@ -152,45 +131,45 @@ def setenv(mode, name, value):
 
 def unsetenv(mode, name):
     """Set value of environment variable `name`"""
-    if mode in (pymod.modes.load,):
+    if mode != pymod.modes.unload:
         return pymod.environ.unset(name)
 
 def set_alias(mode, name, value):
-    if mode in (pymod.modes.load, pymod.modes.load_partial):
-        pymod.environ.set_alias(name, value)
-    elif mode in (pymod.modes.unload,):
+    if mode == pymod.modes.unload:
         pymod.environ.unset_alias(name)
+    else:
+        pymod.environ.set_alias(name, value)
 
 
 def unset_alias(mode, name):
-    if mode in (pymod.modes.load, pymod.modes.load_partial):
+    if mode != pymod.modes.unload:
         pymod.environ.unset_alias(name)
 
 
 def set_shell_function(mode, name, value):
-    if mode in (pymod.modes.load, pymod.modes.load_partial):
-        pymod.environ.set_shell_function(name, value)
-    elif mode in (pymod.modes.unload,):
+    if mode == pymod.modes.unload:
         pymod.environ.unset_shell_function(name)
+    else:
+        pymod.environ.set_shell_function(name, value)
 
 
 def unset_shell_function(mode, name):
-    if mode in (pymod.modes.load, pymod.modes.load_partial):
+    if mode != pymod.modes.unload:
         pymod.environ.unset_shell_function(name)
 
 
 def prereq_any(mode, *names):
-    if mode in (pymod.modes.load,):
+    if mode == pymod.modes.load:
         pymod.mc.prereq_any(*names)
 
 
 def prereq(mode, *names):
-    if mode in (pymod.modes.load,):
-        pymod.mc.prereq(*modulenames)
+    if mode == pymod.modes.load:
+        pymod.mc.prereq(*names)
 
 
 def conflict(mode, module, *names):
-    if mode in (pymod.modes.load,):
+    if mode == pymod.modes.load:
         pymod.mc.conflict(module.name, *names)
 
 

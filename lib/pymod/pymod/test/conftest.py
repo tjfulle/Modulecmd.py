@@ -59,16 +59,19 @@ def mock_modulepath(request):
     """Function scoped Modulepath object pointing to the mock directory"""
     real_modulepath = pymod.modulepath.mpath
     def _modulepath(subdir):
-        if os.path.isdir(subdir):
+        if isinstance(subdir, (tuple, list)):
             path = subdir
+        elif os.path.isdir(subdir):
+            path = [subdir]
         else:
             p1 = pymod.paths.mock_modulepath_path
             if os.path.isdir(os.path.join(p1, subdir)):
                 path = os.path.join(p1, subdir)
             else:
                 path = os.path.join(p1, 'core', subdir)
-        assert os.path.isdir(path)
-        modulepath = pymod.modulepath.Modulepath([path])
+            assert os.path.isdir(path)
+            path = [path]
+        modulepath = pymod.modulepath.Modulepath(path)
         pymod.modulepath.mpath = modulepath
         return pymod.modulepath.mpath
     def _reset():
@@ -127,8 +130,9 @@ def modulecmds():
     module file"""
     class Commands:
         @staticmethod
-        def setenv(x):
-            return "setenv('__{0}__', '__{0}__')\n".format(x)
+        def setenv(key, val=None):
+            val = val or key
+            return "setenv({0!r}, {1!r})\n".format(key, val)
         @staticmethod
         def load(x):
             return "load({0!r})\n".format(x)
@@ -140,10 +144,12 @@ def modulecmds():
         def unload(x):
             return "unload({0!r})\n".format(x)
         @staticmethod
-        def prepend_path(key, val):
+        def prepend_path(key, val=None):
+            val = val or key
             return "prepend_path({0!r}, {1!r})\n".format(key, val)
         @staticmethod
-        def append_path(key, val):
+        def append_path(key, val=None):
+            val = val or key
             return "append_path({0!r}, {1!r})\n".format(key, val)
         @staticmethod
         def remove_path(key):
@@ -154,4 +160,10 @@ def modulecmds():
         @staticmethod
         def unuse(path):
             return "unuse({0!r})\n".format(path)
+        @staticmethod
+        def swap(a, b):
+            return "swap({0!r}, {1!r})\n".format(a, b)
+        @staticmethod
+        def family(x):
+            return "family({0!r})\n".format(x)
     return Commands()

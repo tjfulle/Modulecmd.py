@@ -14,6 +14,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     one.join('b.py').write(m.setenv('b')+m.load('c'))
     one.join('c.py').write(m.setenv('c')+m.load('d'))
     one.join('d.py').write(m.setenv('d')+m.load('e'))
+    one.join('e.py').write(m.setenv('e'))
     two = tmpdir.mkdir('2')
     two.join('a.py').write(m.setenv('a'))
     two.join('b.py').write(m.setenv('b')+m.load_first('c','e','d'))
@@ -30,9 +31,9 @@ def test_load_1(modules_path, mock_modulepath):
     """Just load and then unload a"""
     mp = mock_modulepath(modules_path.one)
     pymod.mc.load('a')
-    assert pymod.environ.get('__a__') == '__a__'
+    assert pymod.environ.get('a') == 'a'
     pymod.mc.unload('a')
-    assert pymod.environ.get('__a__') is None
+    assert pymod.environ.get('a') is None
 
 
 def test_load_2(modules_path, mock_modulepath):
@@ -41,54 +42,51 @@ def test_load_2(modules_path, mock_modulepath):
     """
     mp = mock_modulepath(modules_path.one)
     pymod.mc.load('a')
-    assert pymod.environ.get('__a__') == '__a__'
+    assert pymod.environ.get('a') == 'a'
 
     pymod.mc.load('b')
     for x in 'bcde':
-        key = '__{}__'.format(x.upper())
-        val = '__{}__'.format(x)
-        assert pymod.environ.get(key) == val
+        assert pymod.environ.get(x) == x
         assert pymod.mc.module_is_loaded(x)
 
     # just unload e
-    pymod.mc.unload('e')
-    assert pymod.environ.get('__e__') is None
+    pymod.mc.unload('d')
+    assert pymod.environ.get('d') is None
+    assert pymod.environ.get('e') is None
 
     # unload b, c and d also unload
     pymod.mc.unload('b')
-    assert pymod.environ.get('__b__') is None
-    assert pymod.environ.get('__c__') is None
-    assert pymod.environ.get('__d__') is None
-    assert pymod.environ.get('__a__') == '__a__'
+    assert pymod.environ.get('b') is None
+    assert pymod.environ.get('c') is None
+    assert pymod.environ.get('d') is None
+    assert pymod.environ.get('a') == 'a'
 
     pymod.mc.unload('a')
-    assert pymod.environ.get('__a__') is None
+    assert pymod.environ.get('a') is None
 
 
 def test_load_3(modules_path, mock_modulepath):
     """Load a and b, b loads d. Then, unload b (d should also unload)"""
     mp = mock_modulepath(modules_path.two)
     pymod.mc.load('a')
-    assert pymod.environ.get('__a__') == '__a__'
+    assert pymod.environ.get('a') == 'a'
 
     pymod.mc.load('b')
     for x in 'ced':
-        key = '__{}__'.format(x.upper())
         if x in 'ce':
-            assert pymod.environ.get(key) is None
+            assert pymod.environ.get(x) is None
             assert not pymod.mc.module_is_loaded(x)
         else:
-            val = '__{}__'.format(x)
-            assert pymod.environ.get(key) == val
+            assert pymod.environ.get(x) == x
             assert pymod.mc.module_is_loaded(x)
 
     # unload b, e will also unload
     pymod.mc.unload('b')
-    assert pymod.environ.get('__b__') is None
-    assert pymod.environ.get('__c__') is None
-    assert pymod.environ.get('__d__') is None
-    assert pymod.environ.get('__e__') is None
-    assert pymod.environ.get('__a__') == '__a__'
+    assert pymod.environ.get('b') is None
+    assert pymod.environ.get('c') is None
+    assert pymod.environ.get('d') is None
+    assert pymod.environ.get('e') is None
+    assert pymod.environ.get('a') == 'a'
 
     pymod.mc.unload('a')
-    assert pymod.environ.get('__a__') is None
+    assert pymod.environ.get('a') is None

@@ -5,7 +5,7 @@ import llnl.util.tty as tty
 from pymod.error import ModuleNotFoundError
 
 
-def swap(module_a_name, module_b_name, maintain_state=False):
+def swap(module_a_name, module_b_name, maintain_state=False, caller='command_line'):
     """Swap modules a and b"""
     module_a = pymod.modulepath.get(module_a_name)
     module_b = pymod.modulepath.get(module_b_name)
@@ -20,14 +20,16 @@ def swap(module_a_name, module_b_name, maintain_state=False):
         return pymod.mc.load(module_b)
 
     assert module_a.is_loaded
-    swap_impl(module_a, module_b, maintain_state=maintain_state)
+
+    print(module_a, module_b)
+    swap_impl(module_a, module_b, maintain_state=maintain_state, caller=caller)
 
     pymod.mc.swapped_explicitly(module_a, module_b)
 
     return module_b
 
 
-def swap_impl(module_a, module_b, maintain_state=False):
+def swap_impl(module_a, module_b, maintain_state=False, caller='command_line'):
     """The general strategy of swapping is to unload all modules in reverse
     order back to the module to be swapped.  That module is then unloaded
     and its replacement loaded.  Afterward, modules that were previously
@@ -62,11 +64,11 @@ def swap_impl(module_a, module_b, maintain_state=False):
 
     # Unload any that need to be unloaded first
     for other in to_unload_and_reload[::-1]:
-        pymod.mc.execmodule(other, pymod.modes.unload)
+        pymod.mc.unload_impl(other, caller=caller)
     assert other.name == module_a.name
 
     # Now load it
-    pymod.mc.execmodule(module_b, pymod.modes.load)
+    pymod.mc.load(module_b, caller=caller)
 
     # Reload any that need to be unloaded first
     for other in to_unload_and_reload[1:]:
@@ -89,7 +91,7 @@ def swap_impl(module_a, module_b, maintain_state=False):
             pymod.mc.swapped_on_mp_change(other, this_module)
 
         # Now load the thing
-        pymod.mc.execmodule(this_module, pymod.modes.load)
+        pymod.mc.load(this_module, caller=caller)
 
     return module_b
 

@@ -17,19 +17,12 @@ from pymod.error import FamilyLoadedError
 
 
 # ----------------------------- MODULE EXECUTION FUNCTIONS
-def execmodule(module, mode, do_not_register=False):
+def execmodule(module, mode):
     """Execute the module in a sandbox"""
     pymod.modes.assert_known_mode(mode)
+
     try:
-        out = execmodule_impl(module, mode,
-                              do_not_register=do_not_register)
-
-        if mode == pymod.modes.load:
-            pymod.mc.set_refcount(module, 1)
-        elif mode in (pymod.modes.unload,):
-            pymod.mc.pop_refcount(module)
-
-        return out
+        return execmodule_impl(module, mode)
 
     except FamilyLoadedError as e:
         # Module of same family already loaded, unload it first
@@ -45,10 +38,10 @@ def execmodule(module, mode, do_not_register=False):
         other = pymod.modulepath.get(e.args[0])
         pymod.mc.swapped_on_family_update(other, module)
         assert other.is_loaded
-        pymod.mc.swap(other, module)
+        pymod.mc.swap_impl(other, module)
 
 
-def execmodule_impl(module, mode, do_not_register=False):
+def execmodule_impl(module, mode):
     """Execute filename in sandbox"""
 
     if module.type not in (pymod.module.python, pymod.module.tcl):
@@ -59,11 +52,6 @@ def execmodule_impl(module, mode, do_not_register=False):
         execmodule_in_sandbox(module, mode)
     except FamilyLoadedError as e:
         raise e
-    else:
-        if mode == pymod.modes.load:
-            pymod.mc.on_module_load(module, do_not_register=do_not_register)
-        elif mode in (pymod.modes.unload,):
-            pymod.mc.on_module_unload(module)
 
     return None
 
