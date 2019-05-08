@@ -1,4 +1,5 @@
 import os
+import re
 import pytest
 
 import pymod.names
@@ -111,3 +112,46 @@ def get_loaded_modules():
         value = pymod.environ.environ.get(pymod.names.loaded_modules, '')
         return [x for x in value.split(os.pathsep) if x.split()]
     return _get_loaded_modules
+
+
+@pytest.fixture()
+def namespace():
+    class Namespace:
+        pass
+    return Namespace
+
+
+@pytest.fixture()
+def modulecmds():
+    """Returns a class with members for writing common module commands in to a
+    module file"""
+    class Commands:
+        @staticmethod
+        def setenv(x):
+            return "setenv('__{0}__', '__{0}__')\n".format(x)
+        @staticmethod
+        def load(x):
+            return "load({0!r})\n".format(x)
+        @staticmethod
+        def load_first(*x):
+            x = ','.join('{0!r}'.format(_) for _ in x)
+            return "load_first({})\n".format(x)
+        @staticmethod
+        def unload(x):
+            return "unload({0!r})\n".format(x)
+        @staticmethod
+        def prepend_path(key, val):
+            return "prepend_path({0!r}, {1!r})\n".format(key, val)
+        @staticmethod
+        def append_path(key, val):
+            return "append_path({0!r}, {1!r})\n".format(key, val)
+        @staticmethod
+        def remove_path(key):
+            return "remove_path({0!r})\n".format(key)
+        @staticmethod
+        def use(path):
+            return "use({0!r})\n".format(path)
+        @staticmethod
+        def unuse(path):
+            return "unuse({0!r})\n".format(path)
+    return Commands()

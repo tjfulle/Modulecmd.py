@@ -40,19 +40,8 @@ def swap(mode, m1, m2, **kwargs):
     if mode in (pymod.modes.load_partial, pymod.modes.unload):
         # We don't swap modules in unload mode
         return
-    module_a = pymod.modulepath.get(m1)
-    module_b = pymod.modulepath.get(m2)
-    if module_a is None:
-        raise ModuleNotFoundError(m1)
-    if module_b is None:
-        raise ModuleNotFoundError(m2)
-    if module_b.is_loaded:
-        return
-    if not module_a.is_loaded:
-        pymod.mc.execmodule(module_b, pymod.modes.load)
-        return
-    assert module_a.is_loaded
-    pymod.mc.swap_impl(module_a, module_b)
+    else:
+        pymod.mc.swap(m1, m2)
 
 
 def load_first(mode, *names):

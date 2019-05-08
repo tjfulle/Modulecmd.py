@@ -45,7 +45,7 @@ def execmodule(module, mode, do_not_register=False):
         other = pymod.modulepath.get(e.args[0])
         pymod.mc.swapped_on_family_update(other, module)
         assert other.is_loaded
-        pymod.mc.swap_impl(other, module)
+        pymod.mc.swap(other, module)
 
 
 def execmodule_impl(module, mode, do_not_register=False):
