@@ -28,17 +28,18 @@ def test_swap_1(modules_path, mock_modulepath):
 
 def test_swap_2(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path)
-    pymod.mc.load('a')
+    a = pymod.mc.load('a')
     assert pymod.environ.get('MODULE_SWAP') == 'a'
-    pymod.mc.load('c')
+    c = pymod.mc.load('c')
     assert pymod.environ.get('MODULE_SWAP') == 'b'
 
     # Module b is loaded, nothing to do
-    pymod.mc.load('c')
+    pymod.mc.load('f')
     assert pymod.environ.get('MODULE_SWAP') == 'b'
+    pymod.mc.unload('f')
+    pymod.mc.unload('c')
 
     # Unload b and then load c.  a is not loaded, but b should still be
-    pymod.mc.unload('c')
     pymod.mc.unload('b')
     assert pymod.environ.get('MODULE_SWAP') is None
     pymod.mc.load('c')
@@ -52,5 +53,5 @@ def test_swap_3(modules_path, mock_modulepath):
         pymod.mc.load('d')
     with pytest.raises(pymod.error.ModuleNotFoundError):
         pymod.mc.load('e')
-    pymod.mc.load('f')
+    pymod.mc.load('c')
     assert pymod.environ.get('MODULE_SWAP') == 'b'

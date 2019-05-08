@@ -12,7 +12,7 @@ from pymod.mc.refresh import refresh
 from pymod.mc.reload import reload
 from pymod.mc.restore import restore
 from pymod.mc.save import save
-from pymod.mc.swap import swap, swap_impl
+from pymod.mc.swap import swap
 from pymod.mc.unload import unload
 from pymod.mc.unuse import unuse
 from pymod.mc.use import use

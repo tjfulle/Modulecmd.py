@@ -38,11 +38,12 @@ def load(modulename, opts=None, do_not_register=False, insert_at=None,
     if insert_at is None:
         return load_impl(module, do_not_register=do_not_register, for_show=for_show)
 
-    return load_inserted(module, insert_at,
-                         do_not_register=do_not_register)
+    return load_inserted_impl(module, insert_at,
+                              do_not_register=do_not_register)
 
 
-def load_inserted(module, insert_at, do_not_register=False, for_show=False):
+def load_inserted_impl(module, insert_at,
+                       do_not_register=False, for_show=False):
     """Load the `module` at `insert_at` by unloading all modules beyond
     `insert_at`, loading `module`, then reloading the unloaded modules"""
 
@@ -90,7 +91,7 @@ def load_impl(module, do_not_register=False, for_show=False):
     # module with the requested module
     for (i, other) in enumerate(pymod.mc.get_loaded_modules()):
         if other.name == module.name:
-            pymod.mc.swap_impl(other, module)
+            pymod.mc.swap(other, module)
             pymod.mc.swapped_on_version_change(other, module)
             return module
 

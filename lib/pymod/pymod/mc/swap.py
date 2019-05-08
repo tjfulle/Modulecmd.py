@@ -5,7 +5,7 @@ import llnl.util.tty as tty
 from pymod.error import ModuleNotFoundError
 
 
-def swap(module_a_name, module_b_name):
+def swap(module_a_name, module_b_name, maintain_state=False):
     """Swap modules a and b"""
     module_a = pymod.modulepath.get(module_a_name)
     module_b = pymod.modulepath.get(module_b_name)
@@ -13,15 +13,14 @@ def swap(module_a_name, module_b_name):
         raise ModuleNotFoundError(module_a_name, pymod.modulepath)
     if module_b is None:
         raise ModuleNotFoundError(module_b_name, pymod.modulepath)
-    if not module_a.is_loaded:
-        tty.warn('{0} is not loaded, swap not performed!'
-                     .format(module_a.fullname))
-        return
     if module_b.is_loaded:
         tty.warn('{0} is already loaded!'.format(module_b.fullname))
         return module_b
+    if not module_a.is_loaded:
+        return pymod.mc.load(module_b)
+
     assert module_a.is_loaded
-    swap_impl(module_a, module_b)
+    swap_impl(module_a, module_b, maintain_state=maintain_state)
 
     pymod.mc.swapped_explicitly(module_a, module_b)
 

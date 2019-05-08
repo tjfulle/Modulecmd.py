@@ -13,5 +13,5 @@ def reload(name):
         tty.warn('{0} is not loaded!'.format(module.fullname))
         return
     assert module.is_loaded
-    pymod.mc.swap_impl(module, module, maintain_state=1)
+    pymod.mc.swap(module, module, maintain_state=1)
     return module
