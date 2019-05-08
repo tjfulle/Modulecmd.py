@@ -237,7 +237,6 @@ class Modulepath:
             _, width = tty.terminal_size()
             head = lambda x: (' ' + x + ' ').center(width, '-')
             for (directory, modules) in self.group_by_modulepath():
-                modules = sorted([m for m in modules if m.is_enabled])
                 modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
                 if not os.path.isdir(directory):
                     if not fulloutput:
