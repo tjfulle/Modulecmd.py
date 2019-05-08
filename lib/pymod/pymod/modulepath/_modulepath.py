@@ -19,8 +19,8 @@ class Modulepath:
     def __init__(self, directories):
         self.path = []
         self.modules = []
-        self.db = {}
-        self._modified = None
+        self.db = {'by_name': {}}
+        self._modified = False
         self._grouped_by_modulepath = None
         self.set_path(directories)
 
@@ -74,11 +74,7 @@ class Modulepath:
     def _path_modified(self):
         self._grouped_by_modulepath = None
         self.assign_defaults()
-        if self._modified is None:
-            # First time through
-            self._modified = False
-        else:
-            self._modified = True
+        self._modified = True
 
     def append_path(self, dirname):
         if not os.path.isdir(dirname):
