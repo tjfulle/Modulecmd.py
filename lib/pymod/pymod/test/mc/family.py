@@ -65,32 +65,32 @@ def test_family_xyz(modules_path, mock_modulepath, get_loaded_modules):
 
     a1 = pymod.modulepath.get('A/1.0')
     assert a1 is not None
-    pymod.mc.execmodule(a1, pymod.modes.load)
+    pymod.mc.load(a1)
     standard_assertions(a1)
 
     a2 = pymod.modulepath.get('A/2.0')
     assert a2 is not None
-    pymod.mc.execmodule(a2, pymod.modes.load)
+    pymod.mc.load(a2)
     standard_assertions(a2)
 
-    old, new = pymod.mc._mc._swapped_on_family_update[0]
-    assert old.name == 'A'
-    assert new.name == 'A'
+    old, new = pymod.mc._mc._swapped_on_version_change[0]
+    assert old.fullname == 'A/1.0'
+    assert new.fullname == 'A/2.0'
 
     b1 = pymod.modulepath.get('B/1.0')
     assert b1 is not None
-    pymod.mc.execmodule(b1, pymod.modes.load)
+    pymod.mc.load(b1)
     standard_assertions(b1)
 
-    old, new = pymod.mc._mc._swapped_on_family_update[1]
-    assert old.name == 'A'
-    assert new.name == 'B'
+    old, new = pymod.mc._mc._swapped_on_family_update[0]
+    assert old.fullname == 'A/2.0'
+    assert new.fullname == 'B/1.0'
 
     b2 = pymod.modulepath.get('B/2.0')
     assert b2 is not None
-    pymod.mc.execmodule(b2, pymod.modes.load)
+    pymod.mc.load(b2)
     standard_assertions(b2)
 
-    old, new = pymod.mc._mc._swapped_on_family_update[2]
-    assert old.name == 'B'
-    assert new.name == 'B'
+    old, new = pymod.mc._mc._swapped_on_version_change[1]
+    assert old.fullname == 'B/1.0'
+    assert new.fullname == 'B/2.0'
