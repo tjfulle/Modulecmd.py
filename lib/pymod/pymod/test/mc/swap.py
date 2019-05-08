@@ -21,9 +21,10 @@ def modules_path(tmpdir):
 def test_swap_1(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path)
     pymod.mc.load('a')
-    pymod.environ.get('MODULE_SWAP') == 'a'
+    assert pymod.environ.get('MODULE_SWAP') == 'a'
     pymod.mc.swap('a', 'b')
-    pymod.environ.get('MODULE_SWAP') == 'b'
+    assert pymod.environ.get('MODULE_SWAP') == 'b'
+
 
 def test_swap_2(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path)
@@ -42,6 +43,7 @@ def test_swap_2(modules_path, mock_modulepath):
     assert pymod.environ.get('MODULE_SWAP') is None
     pymod.mc.load('c')
     assert pymod.environ.get('MODULE_SWAP') == 'b'
+
 
 def test_swap_3(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path)

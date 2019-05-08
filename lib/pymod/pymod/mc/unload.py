@@ -16,5 +16,5 @@ def unload(name, tolerant=False):
     if module is None:
         # and modulename is not a module!
         msg += ' (nor is it a module)'
-    tty.warning(msg)
+    tty.warn(msg)
     return None
