@@ -10,6 +10,7 @@ loaded_module_opts = '_LMOPTS_'
 
 sourced_files = 'PYMOD_SOURCED_FILES'
 allow_dup_entries = 'PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES'
+resolve_conflicts = 'PYMOD_RESOLVE_CONFLICTS'
 
 family_name = lambda key: 'MODULE_FAMILY_{}'.format(key.upper())
 family_version = lambda key: 'MODULE_FAMILY_{}_VERSION'.format(key.upper())
