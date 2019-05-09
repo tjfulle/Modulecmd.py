@@ -36,7 +36,7 @@ Consider the workflow of a developer working on two projects requiring compilers
 append_path('PATH', '/path/to/ucc-1.0')
 ```
 
-and 
+and
 
 `ucc-2.0.py`:
 
@@ -57,7 +57,8 @@ In the context of module files, the term module is different from the standard P
 Clone or download `Modulecmd.py`.  In your `.bashrc`, execute the following:
 
 ```
-eval `python -B -E ${MODULECMD_PY_DIR}/Contents/Modulecmd/modulecmd.py bash init`
+source ${MODULECMD_PY_DIR}/share/pymod/setup-env.sh
+module init -p=${MODULEPATH}
 ```
 
 where `${MODULECMD_PY_DIR}` is the path to the directory where `Modulecmd.py` is
@@ -89,7 +90,7 @@ The `Modulecmd.py` initialization defines the `module` shell function that execu
 
 `Modulecmd.py` module files are executed by the `Modulecmd.py` Framework.  `Modulecmd.py` executes module files in an environment providing the following commands:
 
-- `getenv(name)`: Get the value of environment variable given by `name`.  Returns `None` if `name` is not defined. 
+- `getenv(name)`: Get the value of environment variable given by `name`.  Returns `None` if `name` is not defined.
 - `get_hostname()`: Get the value of the host name of the sytem.
 - `mode()`: Return the active mode.  One of `"load"` or `"unload"`
 

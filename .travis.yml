@@ -10,9 +10,9 @@ python:
 install:
   - pip install pytest-cov
   - pip install codecov
-  - pip install pyyaml
 
-script: py.test --cov=./ --cov-config=./test/.coveragerc
+script:
+  - share/pymod/qa/run-tests
 
 after_success:
   - codecov --token=402daea0-aa6a-4dca-b448-5400fb883d38

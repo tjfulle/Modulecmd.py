@@ -1,21 +1,43 @@
 #!/usr/bin/env python
+
+from __future__ import print_function
+
 import os
 import sys
 
-__this_dir__ = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0, os.path.join(__this_dir__, '../lib'))
+if sys.version_info[:2] < (2, 6):
+    v_info = sys.version_info[:3]
+    sys.exit("Spack requires Python 2.6 or higher."
+             "This is Python %d.%d.%d." % v_info)
 
-import pymod
+# Find pymod's location and its prefix.
+pymod_file = os.path.realpath(os.path.expanduser(__file__))
+pymod_prefix = os.path.dirname(os.path.dirname(pymod_file))
 
-if __name__ == '__main__':
+# Allow pymod libs to be imported in our scripts
+pymod_lib_path = os.path.join(pymod_prefix, "lib", "pymod")
+sys.path.insert(0, pymod_lib_path)
 
-    if '--profile' in sys.argv:
-        sys.argv.remove('--profile')
-        try:
-            import cProfile as profile
-        except ImportError:
-            import profile
-        output_file = os.path.join(os.getcwd(), 'modulecmd.stats')
-        profile.run('pymod.main()', output_file)
-    else:
-        sys.exit(pymod.main())
+# Add external libs
+pymod_external_libs = os.path.join(pymod_lib_path, "external")
+
+if sys.version_info[:2] == (2, 6):
+    sys.path.insert(0, os.path.join(pymod_external_libs, 'py26'))
+
+sys.path.insert(0, pymod_external_libs)
+
+# Here we delete ruamel.yaml in case it has been already imported from site
+# (see #9206 for a broader description of the issue).
+#
+# Briefly: ruamel.yaml produces a .pth file when installed with pip that
+# makes the site installed package the preferred one, even though sys.path
+# is modified to point to another version of ruamel.yaml.
+if 'ruamel.yaml' in sys.modules:
+    del sys.modules['ruamel.yaml']
+
+if 'ruamel' in sys.modules:
+    del sys.modules['ruamel']
+
+# Once we've set up the system path, run the pymod main method
+import pymod.main  # noqa
+sys.exit(pymod.main.main())

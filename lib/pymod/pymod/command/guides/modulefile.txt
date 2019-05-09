@@ -1,0 +1,126 @@
+@*{MODULEFILES}
+
+pymod module files are python files that are executed by the pymod Framework.
+Modulefiles must have a .py file extension and must be on the MODULEPATH to be
+recognized.  pymod executes module files in an environment providing the
+following commands:
+
+@_{GENERAL PURPOSE}
+  @`{getenv(name)}
+    Get the value of environment variable given by name.  Returns None if name
+    is not defined.
+  @`{get_hostname()}
+    Get the value of the host name of the sytem.
+  @`{mode()}
+    Return the active mode.  One of "load" or "unload"
+  @`{self}
+    Reference to this modules object.
+  @`{HOME}
+    The path to HOME
+  @`{USER}
+    The name of USER
+  @`{IS_DARWIN}
+    Boolean.  True if the system is Darwin.  False otherwise.
+  @`{user_env}
+    Reference to a user defined Python module containing custom commands.
+  @`{args}
+    List of commands passed from command line to this module.
+
+@_{MESSAGE LOGGING}
+  @`{log_message(message)}
+    Log an informational message to the console.
+  @`{log_info(message)}
+    Log an informational message to the console.
+  @`{log_warning(message)}
+    Log a warning message to the console.
+  @`{log_error(message)}
+    Log an error message to the console and quit.
+
+@_{ENVIRONMENT MODIFICATION}
+  @`{setenv(variable, value)}
+    Set the environment variable variable to value.
+  @`{unsetenv(variable)}
+    Unset the environment variable variable.
+  @`{set_alias(name, value)}
+    Set the alias name to value.
+  @`{unset_alias(name)}
+    Unset the alias given by name.
+
+  @`{set_shell_function(name, value)}
+    Set the shell function name to value.
+  @`{unset_shell_function(name, value)}
+    Unset the shell function name
+
+  @`{prepend_path(pathname, value)}
+    Prepend value to path-like variable pathname.
+  @`{append_path(pathname, value)}
+    Append value to path-like variable pathname.
+  @`{remove_path(pathname, value)}
+    Remove value from path-like variable pathname.
+
+@_{INTERACTION WITH OTHER MODULES}
+  @`{prereq(name)}
+    Module name is a prerequisite of this module.
+    If name is not loaded, pymod will quit.
+  @`{prereq_any(*names)}
+    Any one of names is a prerequisite of this module.
+    If none of names is not loaded, pymod will quit.
+  @`{conflict(*names)}
+    Module name is a prerequisite of this module.
+    If name is not loaded, pymod will quit.
+  @`{load(name)}
+    Load the module name.
+  @`{load_first(*names)}
+    Load the first module in names.
+  @`{unload(name)}
+    Unload the module name.
+
+@_{MODULE OPTIONS}
+A module can support command line options.  Options are specified on the
+commandline as
+
+    @`{module load <modulename> [+option[=value] [+option...]]}
+
+The following modulefile functions register options
+
+  @`{add_option(name, action='store_true')}
+    Register a module option.  By default, options are boolean flags.  Pass
+    @`{action='store'} to register an option that takes a value.
+
+  @`{add_mutually_exclusive_option(name1, name2, action='store_true')}
+    Register a mutually exclusive option
+
+  @`{parse_opts}
+    Parse module options.  Only options added before calling @`{parse_opts} will
+    be parsed.
+
+@`{EXAMPLE}
+To specify two options for module 'spam', in modulefile spam.py do
+
+  add_option('+x', action='store')  # option with value
+  add_option('+b')  # boolean option
+  opts = parse_opts()
+
+  if (opts.b):
+      # Do something
+  if (opts.x == 'baz'):
+      # Do something
+
+On the commandline, the module spam can be loaded as
+
+  @`{module load spam +b +x=baz}
+
+@_{OTHER COMMANDS}
+  @`{family(name)}
+    Set the name of the module's family.
+  @`{execute(command)}
+    Execute command in the current shell.
+  @`{whatis(string)}
+    Store string as an informational message describing this module.
+
+@_{EXAMPLE}
+The following commands, when put in a module file on MODULEPATH, prepends the
+user's bin directory to the PATH and aliases the ls command.
+
+  prepend_path('PATH', '~/bin')
+  set_alias('ls', 'ls -lF')
