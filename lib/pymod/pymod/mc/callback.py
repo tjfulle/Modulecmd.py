@@ -8,13 +8,16 @@ from contrib.util import split
 from pymod.error import ModuleNotFoundError
 
 import llnl.util.tty as tty
+from spack.util.executable import Executable
 
 """Module defines callback functions between modules and pymod"""
 
 __all__ = ['callback']
 
 
-def callback(func_name, mode, module=None, when=True, memo={}):
+def callback(func_name, mode, module=None, when=None, memo={}):
+    if when is None:
+        when = mode != pymod.modes.load_partial
     if not when:
         return lambda *args, **kwargs: None
     try:
@@ -213,7 +216,7 @@ def family(mode, module, family_name):
 
 
 def execute(mode_, command, mode=None):
-    if mode is not None and mode != mode_:
+    if mode is not None and mode != pymod.modes.as_string(mode_):
         return
     xc = split(command, ' ', 1)
     exe = Executable(xc[0])

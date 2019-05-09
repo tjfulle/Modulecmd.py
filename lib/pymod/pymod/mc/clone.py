@@ -52,6 +52,10 @@ def restore_clone(name):
     path = pymod.modulepath.Modulepath(dirnames)
     pymod.modulepath.set_path(path)
 
+    # Make sure environment matches clone
+    for (key, val) in the_clone.items():
+        pymod.environ.set(key, val)
+
     # Load modules to make sure aliases/functions are restored
     module_files = the_clone[pymod.names.loaded_module_files].split(os.pathsep)
     module_opts = str2dict(the_clone[pymod.names.loaded_module_opts])
@@ -61,11 +65,7 @@ def restore_clone(name):
         if module is None:
             raise pymod.error.ModuleNotFoundError(filename, mp=pymod.modulepath)
         module.opts = module_opts.get(module.fullname)
-        pymod.mc.load_impl(module)
-
-    # Make sure environment matches clone
-    for (key, val) in the_clone.items():
-        pymod.environ.set(key, val)
+        pymod.mc.load_partial(module)
 
 
 class CloneDoesNotExistError(Exception):

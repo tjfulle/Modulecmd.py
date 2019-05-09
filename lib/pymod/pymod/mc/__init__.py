@@ -6,7 +6,7 @@ from pymod.mc.dump import dump
 from pymod.mc.execmodule import execmodule
 from pymod.mc.family import family
 from pymod.mc.help import help
-from pymod.mc.load import load, load_impl
+from pymod.mc.load import load, load_impl, load_partial
 from pymod.mc.prereq import prereq, prereq_any
 from pymod.mc.purge import purge
 from pymod.mc.refresh import refresh

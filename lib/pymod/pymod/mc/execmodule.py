@@ -23,7 +23,7 @@ def execmodule(module, mode):
     pymod.modes.assert_known_mode(mode)
 
     try:
-        return execmodule_impl(module, mode)
+        return execmodule_in_sandbox(module, mode)
 
     except FamilyLoadedError as e:
         # Module of same family already loaded, unload it first
@@ -42,21 +42,6 @@ def execmodule(module, mode):
         pymod.mc.swap_impl(other, module)
 
 
-def execmodule_impl(module, mode):
-    """Execute filename in sandbox"""
-
-    if module.type not in (pymod.module.python, pymod.module.tcl):
-        tty.die('Module {0!r} has unknown module type: '
-                      '{1!r}'.format(module.fullname, module.type))
-
-    try:
-        execmodule_in_sandbox(module, mode)
-    except FamilyLoadedError as e:
-        raise e
-
-    return None
-
-
 def execmodule_in_sandbox(module, mode):
     """Execute python module in sandbox"""
 
@@ -70,6 +55,7 @@ def execmodule_in_sandbox(module, mode):
 
 
 def module_exec_sandbox(module, mode):
+
     reported_by = ' (reported by {0!r})'.format(module.filename)
     ns = {
         'os': os,
@@ -98,11 +84,11 @@ def module_exec_sandbox(module, mode):
         'use': callback('use', mode),
         'unuse': callback('unuse', mode),
         #
-        'set_alias': callback('set_alias', mode),
-        'unset_alias': callback('unset_alias', mode),
+        'set_alias': callback('set_alias', mode, when=True),
+        'unset_alias': callback('unset_alias', mode, when=True),
         #
-        'set_shell_function': callback('set_shell_function', mode),
-        'unset_shell_function': callback('unset_shell_function', mode),
+        'set_shell_function': callback('set_shell_function', mode, when=True),
+        'unset_shell_function': callback('unset_shell_function', mode, when=True),
         #
         'prereq': callback('prereq', mode),
         'prereq_any': callback('prereq_any', mode),

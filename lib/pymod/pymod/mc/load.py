@@ -129,5 +129,25 @@ def load_inserted_impl(module, insert_at):
     return
 
 
+def load_partial(module):
+    """Implementation of load, but only load partially.
+
+    Parameters
+    ----------
+    module : Module
+        The module to load
+
+    Notes
+    -----
+    This function is used to do a partial load. A partial load is one in which
+    only some of the callback functions are actually executed. This function is
+    used, e.g., by restore_clone to load a module, but only execute set_alias
+    and set_shell_function.  In fact, that is the only current use case.
+
+    """
+    # Execute the module
+    execmodule(module, pymod.modes.load_partial)
+    return
+
 class ModuleLoadError(Exception):
     pass
