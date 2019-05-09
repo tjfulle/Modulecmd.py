@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-QA_DIR="$(dirname ${BASH_SOURCE[0]})"
+QA_DIR="$(dirname $0)"
 export PYMOD_ROOT=$(realpath "$QA_DIR/../../..")
 
 # Source the setup script
