@@ -4,6 +4,7 @@ import pymod.modes
 import pymod.module
 import pymod.environ
 from pymod.error import FamilyLoadedError
+import llnl.util.tty as tty
 
 def family(mode, module, family_name):
     """Assign a family"""
@@ -24,6 +25,7 @@ def family(mode, module, family_name):
     else:
         fam_key, ver_key = family_envar_keys()
         fam = pymod.environ.get(fam_key)
+        tty.debug(str(fam))
         if fam is not None:
             # Attempting to load module of same family
             ver = pymod.environ.get(ver_key)

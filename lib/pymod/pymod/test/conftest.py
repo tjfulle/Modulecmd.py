@@ -195,4 +195,7 @@ def modulecmds():
         def prereq_any(*x):
             x = ','.join('{0!r}'.format(_) for _ in x)
             return "prereq_any({})\n".format(x)
+        @staticmethod
+        def source(f):
+            return "source({0!r})\n".format(f)
     return Commands()

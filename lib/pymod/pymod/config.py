@@ -16,6 +16,7 @@ def load_yaml(filename, section=None):
 
 has_tclsh = which('tclsh') is not None
 
+
 class Configuration(object):
     scope_names = ['defaults', 'user', 'environment', 'command_line']
     def __init__(self):
@@ -23,7 +24,19 @@ class Configuration(object):
 
     def push_scope(self, scope_name, data):
         """Add a scope to the Configuration."""
+        if 'defaults' in self.scopes and scope_name != 'defaults':
+            self.check_config_types(data)
         self.scopes.setdefault(scope_name, {}).update(dict(data))
+
+    def check_config_types(self, data):
+        for (key, val) in data.items():
+            default = self.scopes['defaults'].get(key)
+            if default is None:
+                continue
+            if type(default) != type(val):
+                m = 'User config var {0!r} must be of type {1!r}, not {2!r}'
+                msg = m.format(key, type(default).__name__, type(val).__name__)
+                raise ValueError(msg)
 
     def remove_scope(self, scope_name):
         return self.scopes.pop(scope_name)

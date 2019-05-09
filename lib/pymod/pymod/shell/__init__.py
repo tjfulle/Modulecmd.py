@@ -51,8 +51,8 @@ def name():
     return shell.name
 
 
-def source_command(filename):
-    return shell.source_command(filename)
+def format_source_command(filename):
+    return shell.format_source_command(filename)
 
 
 def format_output(environ, aliases=None, shell_functions=None):

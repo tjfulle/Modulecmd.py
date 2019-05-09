@@ -39,8 +39,12 @@ def modules_path(tmpdir, namespace, modulecmds):
     tmpdir.join('l.py').write(m.set_shell_function('baz', 'bar $@'))
     tmpdir.join('m.py').write(m.unset_shell_function('baz'))
 
+    n_script = tmpdir.join('baz').write('echo BAZ')
+    tmpdir.join('n.py').write(m.source(tmpdir.join('baz').strpath))
+
     ns = namespace()
     ns.path = tmpdir.strpath
+    ns.n_script = tmpdir.join('baz').strpath
     return ns
 
 
@@ -120,3 +124,11 @@ def test_set_shell_function(modules_path, mock_modulepath):
     assert pymod.environ.environ.shell_functions['baz'] == 'bar $@'
     pymod.mc.unload('l')
     assert pymod.environ.environ.shell_functions['baz'] is None
+
+@pytest.mark.unit
+def test_source(modules_path, mock_modulepath, capsys):
+    mp = mock_modulepath(modules_path.path)
+    n = pymod.mc.load('n')
+    captured = capsys.readouterr()
+    command = r'source {};'.format(modules_path.n_script)
+    assert captured[0].strip() == command.strip()

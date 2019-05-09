@@ -7,21 +7,25 @@ from pymod.environ import Environ
 
 class TestCshShell:
     _shell = None
+
     @property
     def shell(self):
         if self._shell is None:
             self._shell = pymod.shell._shell('csh')
         return self._shell
+
     def test_format_environment_variable(self):
         s = self.shell.format_environment_variable('VAR', 'VAL')
         assert s == 'setenv VAR "VAL";'
         s = self.shell.format_environment_variable('VAR', None)
         assert s == 'unsetenv VAR;'
+
     def test_format_shell_function(self):
         s = self.shell.format_shell_function('FCN', 'FCN_VAL;')
         assert s == "alias FCN 'FCN_VAL';"
         s = self.shell.format_shell_function('FCN', None)
         assert s == 'unalias FCN 2> /dev/null || true;'
+
     def test_format_alias(self):
         s = self.shell.format_alias('ALIAS', 'ALIAS_VAL')
         assert s == "alias ALIAS 'ALIAS_VAL';"
@@ -31,6 +35,11 @@ class TestCshShell:
         assert s == "alias ALIAS 'ALIAS_VAL \!:1 \!:3 \!:5';"
         s = self.shell.format_alias('ALIAS', 'ALIAS_VAL $*')
         assert s == "alias ALIAS 'ALIAS_VAL \!*';"
+
+    def test_source_command(self):
+        s = self.shell.format_source_command('foo')
+        assert s.strip() == 'source foo'
+
     @pytest.mark.skipif(sys.version_info[0]==2, reason='dicts not ordered in 2.7')
     def test_format_output(self):
         environ = Environ()

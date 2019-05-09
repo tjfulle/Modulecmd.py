@@ -58,6 +58,16 @@ class Environ(dict):
             self[path.meta_key] = dict2str(path.meta)
         self.save_ld_library_path(path.key)
 
+    def filtered(self):
+        env = os.environ.copy()
+        pymod_env = dict([item for item in self.items()
+                          if item[1] is not None])
+        env.update(pymod_env)
+        return env
+
+    def copy(self):
+        return self.filtered()
+
     @staticmethod
     def fix_ld_library_path(key):
         if key.endswith(pymod.names.ld_library_path):

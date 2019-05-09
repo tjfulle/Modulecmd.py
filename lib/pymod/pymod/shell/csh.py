@@ -53,5 +53,5 @@ class Csh(Shell):
         val = re.sub(r'\$\*', r'\!*', val)
         return "alias {0} '{1}';".format(key, val)
 
-    def source_command(self, filename):
+    def format_source_command(self, filename):
         return 'source {0}'.format(filename)

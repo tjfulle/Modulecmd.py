@@ -21,7 +21,7 @@ def unuse(dirname):
         pymod.mc.execmodule(orphan, pymod.modes.unload)
 
     # Load modules bumped by removal of dirname from MODULEPATH
-    for (i, orphan) in orphaned:
+    for (i, orphan) in enumerate(orphaned):
         if bumped[i] is None:
             # No longer available!
             pymod.mc.unloaded_on_mp_change(orphan)

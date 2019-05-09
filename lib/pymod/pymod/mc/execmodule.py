@@ -4,6 +4,7 @@ import socket
 import subprocess
 
 import pymod.mc
+import pymod.user
 import pymod.modes
 import pymod.environ
 import llnl.util.tty as tty
@@ -73,7 +74,8 @@ def module_exec_sandbox(module, mode):
     ns = {
         'os': os,
         'sys': sys,
- #       'user': user.user_env,
+        'env': pymod.environ.copy(),
+        'user_env': pymod.user.env,
         'getenv': pymod.environ.get,
         'is_darwin': 'darwin' in sys.platform,
         'IS_DARWIN': 'darwin' in sys.platform,

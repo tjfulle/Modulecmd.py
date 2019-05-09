@@ -24,7 +24,7 @@ config:
   editor: "vi"
 
   # Modules to load after calling `module purge`
-  load_after_purge: null
+  load_after_purge: []
 
   # Only load modules that match module name exactly. Otherwise, you can
   # specify a more qualified module name. e.g., to load ucc/1.0 you can specify

@@ -13,6 +13,7 @@ from pymod.mc.reload import reload
 from pymod.mc.restore import restore
 from pymod.mc.save import save
 from pymod.mc.show import show
+from pymod.mc.source import source
 from pymod.mc.swap import swap, swap_impl
 from pymod.mc.unload import unload, unload_impl
 from pymod.mc.unuse import unuse

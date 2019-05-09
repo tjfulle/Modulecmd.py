@@ -5,7 +5,7 @@ import pymod.collection
 import llnl.util.tty as tty
 
 
-def restore(name, warn_if_missing=True):
+def restore(name):
     """Restore a collection of modules previously saved"""
 
     if name == 'system':
@@ -13,15 +13,15 @@ def restore(name, warn_if_missing=True):
 
     collection = pymod.collection.get(name)
     if collection is None:
-        if warn_if_missing:
-            if name == pymod.names.default_sys_collection:
-                msg = 'System default collection does not exist'
-            else:
-                msg = 'Collection {0!r} does not exist'.format(name)
-            tty.warn(msg)
+        if name == pymod.names.default_sys_collection:
+            msg = 'System default collection does not exist'
+        else:
+            msg = 'Collection {0!r} does not exist'.format(name)
+        tty.warn(msg)
         return None
 
     # First unload all loaded modules
+    pymod.mc.purge(load_after_purge=False)
     loaded_modules = pymod.mc.get_loaded_modules()
     for module in loaded_modules[::-1]:
         pymod.mc.execmodule(module, pymod.modes.unload)
@@ -32,9 +32,13 @@ def restore(name, warn_if_missing=True):
         for (fullname, filename, opts) in modules:
             module = pymod.modulepath.get(filename)
             if module is None:
-                tty.die(
-                    'Saved module {0!r} does not exist ({1})'
-                    .format(m_dict['name'], m_dict['filename']))
+                raise CollectionModuleNotFoundError(fullname, filename)
             module.opts = opts
-            pymod.mc.execmodule(module, pymod.modes.load)
+            pymod.mc.load_impl(module)
     return None
+
+
+class CollectionModuleNotFoundError(Exception):
+    def __init__(self, name, filename):
+        msg = 'Saved module {0!r} does not exist ({1})'.format(name, filename)
+        super(CollectionModuleNotFoundError, self).__init__(msg)

@@ -18,3 +18,4 @@ def setup_parser(subparser):
 
 def restore(parser, args):
     pymod.mc.restore(args.name)
+    pymod.mc.dump()

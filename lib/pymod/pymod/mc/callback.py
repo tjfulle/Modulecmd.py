@@ -104,14 +104,8 @@ def unuse(mode, dirname):
 
 def source(mode, filename):
     """Source a script"""
-    sourced = pymod.environ.get_path(pymod.names.sourced_files)
-    if mode == pymod.modes.load and filename not in sourced:
-        if not os.path.isfile(filename):
-            tty.die('{0}: no such file to source'.format(filename))
-        command = pymod.shell.source_command(filename)
-        sourced.append(filename)
-        pymod.environ.set_path(pymod.names.sourced_files, sourced)
-        sys.stdout.write(command + ';\n')
+    if mode == pymod.modes.load:
+        pymod.mc.source(filename)
 
 
 def whatis(mode, module, *args, **kwargs):

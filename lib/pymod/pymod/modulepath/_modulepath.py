@@ -78,14 +78,12 @@ class Modulepath:
 
     def append_path(self, dirname):
         if not os.path.isdir(dirname):
-            tty.warn(
-                'Modulepath: {0!r} is not a directory'.format(dirname))
+            tty.warn('Modulepath: {0!r} is not a directory'.format(dirname))
         if dirname in self.path:
             return
         modules_in_dir = find_modules(dirname)
         if not modules_in_dir:
-            tty.warn(
-                'Modulepath: no modules found in {0}'.format(dirname))
+            tty.warn('Modulepath: no modules found in {0}'.format(dirname))
             return
         self.modules.extend(modules_in_dir)
         self.path.append(dirname)
@@ -94,8 +92,7 @@ class Modulepath:
 
     def prepend_path(self, dirname):
         if not os.path.isdir(dirname):
-            tty.warn(
-                'Modulepath: {0!r} is not a directory'.format(dirname))
+            tty.warn('Modulepath: {0!r} is not a directory'.format(dirname))
             return [], []
         if dirname in self.path:
             self.path.pop(self.path.index(dirname))
@@ -104,8 +101,7 @@ class Modulepath:
         else:
             modules_in_dir = find_modules(dirname)
             if not modules_in_dir:
-                tty.warn(
-                    'Modulepath: no modules found in {0}'.format(dirname))
+                tty.warn('Modulepath: no modules found in {0}'.format(dirname))
                 return [], []
             self.modules.extend(modules_in_dir)
         self.path.insert(0, dirname)
@@ -123,20 +119,20 @@ class Modulepath:
         return modules_in_dir, bumped
 
     def remove_path(self, dirname):
-        if dirname not in self.path:
-            tty.warn(
-                'Modulepath: {0!r} is not in modulepath'.format(dirname))
-            return
+        modules_in_dir, orphaned, bumped = [], [], []
 
-        modules_in_dir = self.getby_dirname(dirname)
-        orphaned = [m for m in modules_in_dir if m.is_loaded]
+        if dirname not in self.path:
+            tty.warn('Modulepath: {0!r} is not in modulepath'.format(dirname))
+            return modules_in_dir, orphaned, bumped
+
+        modules_in_dir.extend(self.getby_dirname(dirname))
+        orphaned.extend([m for m in modules_in_dir if m.is_loaded])
         self.modules = [m for m in self.modules if m not in modules_in_dir]
         self.path.pop(self.path.index(dirname))
         self._path_modified()
 
         # Determine which modules may have moved up in priority due to removal
         # of directory from path
-        bumped = []
         for orphan in orphaned:
             other = self.getby_fullname(orphan.fullname)
             if other is not None:
@@ -147,6 +143,7 @@ class Modulepath:
                 bumped.append(other)
                 continue
             bumped.append(None)
+        tty.debug(str(orphaned))
         return modules_in_dir, orphaned, bumped
 
     def set_path(self, directories):

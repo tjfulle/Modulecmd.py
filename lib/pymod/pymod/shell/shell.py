@@ -16,7 +16,7 @@ class Shell(object):
     def format_alias(self, key, val=None):  # pragma: no cover
         raise NotImplementedError
 
-    def source_command(self, filename):  # pragma: no cover
+    def format_source_command(self, filename):  # pragma: no cover
         raise NotImplementedError
 
     def format_output(self, environ, aliases=None, shell_functions=None):

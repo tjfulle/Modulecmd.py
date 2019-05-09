@@ -84,8 +84,8 @@ def set_dict(key, dict):
 
 
 def filtered():
-    env = os.environ.copy()
-    pymod_env = dict([item for item in environ.items()
-                      if item[1] is not None])
-    env.update(pymod_env)
-    return env
+    return environ.filtered()
+
+
+def copy():
+    return environ.copy()
