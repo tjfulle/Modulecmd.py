@@ -144,16 +144,28 @@ def modulecmds():
         def unload(x):
             return "unload({0!r})\n".format(x)
         @staticmethod
-        def prepend_path(key, val=None):
+        def prepend_path(key, val=None, sep=os.pathsep):
             val = val or key
-            return "prepend_path({0!r}, {1!r})\n".format(key, val)
+            return "prepend_path({0!r},{1!r},sep={2!r})\n".format(key, val, sep)
         @staticmethod
-        def append_path(key, val=None):
+        def append_path(key, val=None, sep=os.pathsep):
             val = val or key
-            return "append_path({0!r}, {1!r})\n".format(key, val)
+            return "append_path({0!r},{1!r},{2!r})\n".format(key, val, sep)
         @staticmethod
         def remove_path(key):
             return "remove_path({0!r})\n".format(key)
+        @staticmethod
+        def set_alias(key, val):
+            return "set_alias({0!r},{1!r})\n".format(key, val)
+        @staticmethod
+        def unset_alias(key):
+            return "unset_alias({0!r})\n".format(key)
+        @staticmethod
+        def set_shell_function(key, val):
+            return "set_shell_function({0!r},{1!r})\n".format(key, val)
+        @staticmethod
+        def unset_shell_function(key):
+            return "unset_shell_function({0!r})\n".format(key)
         @staticmethod
         def use(path):
             return "use({0!r})\n".format(path)
@@ -166,4 +178,14 @@ def modulecmds():
         @staticmethod
         def family(x):
             return "family({0!r})\n".format(x)
+        @staticmethod
+        def conflict(x):
+            return "conflict({0!r})\n".format(x)
+        @staticmethod
+        def prereq(x):
+            return "prereq({0!r})\n".format(x)
+        @staticmethod
+        def prereq_any(*x):
+            x = ','.join('{0!r}'.format(_) for _ in x)
+            return "prereq_any({})\n".format(x)
     return Commands()

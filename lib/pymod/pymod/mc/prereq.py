@@ -1,20 +1,21 @@
 import pymod.mc
+from pymod.error import PrereqMissingError
 import llnl.util.tty as tty
 
 
-def prereq_any(mode, *names):
+def prereq_any(*prereqs):
     loaded_modules = pymod.mc.get_loaded_modules()
     lm_names = [x for m in loaded_modules for x in [m.name, m.fullname]]
-    for name in names:
+    for name in prereqs:
         if name in lm_names:
             return
-    tty.die('One of the prerequisites {0!r} must first be loaded'.format(names))
+    raise PrereqMissingError(*prereqs)
 
 
-def prereq(mode, *names):
+def prereq(*prereqs):
     loaded_modules = pymod.mc.get_loaded_modules()
     lm_names = [x for m in loaded_modules for x in [m.name, m.fullname]]
-    for name in names:
+    for name in prereqs:
         if name in lm_names:
             continue
-        tty.die('Prerequisite {0!r} must first be loaded'.format(name))
+        raise PrereqMissingError(name)

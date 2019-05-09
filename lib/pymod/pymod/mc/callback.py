@@ -168,9 +168,9 @@ def prereq(mode, *names):
         pymod.mc.prereq(*names)
 
 
-def conflict(mode, module, *names):
+def conflict(mode, module, *conflicting):
     if mode == pymod.modes.load:
-        pymod.mc.conflict(module.name, *names)
+        pymod.mc.conflict(module, *conflicting)
 
 
 def append_path(mode, name, *values, **kwds):
@@ -180,12 +180,12 @@ def append_path(mode, name, *values, **kwds):
             use(mode, value, append=True)
         return
     sep = kwds.get('sep', os.pathsep)
-    if mode in (pymod.modes.load,):
-        for value in values:
-            pymod.environ.append_path(name, value, sep)
-    elif mode in (pymod.modes.unload,):
+    if mode == pymod.modes.unload:
         for value in values:
             pymod.environ.remove_path(name, value, sep)
+    else:
+        for value in values:
+            pymod.environ.append_path(name, value, sep)
 
 
 def prepend_path(mode, name, *values, **kwds):
@@ -194,12 +194,12 @@ def prepend_path(mode, name, *values, **kwds):
             use(mode, value)
         return
     sep = kwds.get('sep', os.pathsep)
-    if mode in (pymod.modes.load,):
-        for value in values:
-            pymod.environ.prepend_path(name, value, sep)
-    elif mode in (pymod.modes.unload,):
+    if mode == pymod.modes.unload:
         for value in values:
             pymod.environ.remove_path(name, value, sep)
+    else:
+        for value in values:
+            pymod.environ.prepend_path(name, value, sep)
 
 
 def remove_path(mode, name, *values, **kwds):
@@ -208,7 +208,7 @@ def remove_path(mode, name, *values, **kwds):
             unuse(mode, value)
         return
     sep = kwds.get('sep', os.pathsep)
-    if mode in (pymod.modes.load,):
+    if mode == pymod.modes.load:
         for value in values:
             pymod.environ.remove_path(name, value, sep)
 
