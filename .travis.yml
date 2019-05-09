@@ -12,7 +12,7 @@ install:
   - pip install codecov
 
 script:
-  - share/pymod/qa/run-tests
+  - share/pymod/qa/run-tests.sh
 
 after_success:
   - codecov --token=402daea0-aa6a-4dca-b448-5400fb883d38
