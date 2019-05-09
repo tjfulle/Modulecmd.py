@@ -59,7 +59,7 @@ class Collections:
             collection = self.collections.get(name)
         return collection
 
-    def remove(self, collection):
+    def remove(self, name):
         self.collections.pop(name, None)
         self.write(self.collections, self.filename)
 

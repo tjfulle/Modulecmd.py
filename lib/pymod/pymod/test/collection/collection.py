@@ -38,6 +38,7 @@ def test_collection_default(modules_path, mock_modulepath):
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     pymod.mc.save(pymod.names.default_user_collection)
+    assert pymod.collection.contains(pymod.names.default_user_collection)
     x = pymod.collection.get(pymod.names.default_user_collection)
     assert len(x) == 1
     assert len(x[0]) == 2
@@ -59,6 +60,7 @@ def test_collection_named(modules_path, mock_modulepath):
     d = pymod.mc.load('d')
 
     pymod.mc.save('foo')
+    assert pymod.collection.contains('foo')
     x = pymod.collection.get('foo')
     assert len(x) == 2
 
@@ -76,3 +78,8 @@ def test_collection_named(modules_path, mock_modulepath):
 
     s = pymod.collection.format_available().split('\n')[1].strip()
     assert s == 'foo'
+
+    s = pymod.collection.format_show('foo')
+
+    pymod.collection.remove('foo')
+    assert not pymod.collection.contains('foo')
