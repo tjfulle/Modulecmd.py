@@ -1,9 +1,12 @@
 import os
+import sys
+import pytest
 
 import pymod.shell
 from pymod.environ import Environ
 
 
+pytest.mark.skipif(sys.version_info[0]==2, reason='string comparisons')
 class TestBashShell:
     _shell = None
     @property
