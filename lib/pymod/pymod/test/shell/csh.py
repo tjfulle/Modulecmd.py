@@ -5,7 +5,6 @@ import pytest
 import pymod.shell
 from pymod.environ import Environ
 
-pytest.mark.skipif(sys.version_info[0]==2, reason='string comparisons')
 class TestCshShell:
     _shell = None
     @property
@@ -32,6 +31,7 @@ class TestCshShell:
         assert s == "alias ALIAS 'ALIAS_VAL \!:1 \!:3 \!:5';"
         s = self.shell.format_alias('ALIAS', 'ALIAS_VAL $*')
         assert s == "alias ALIAS 'ALIAS_VAL \!*';"
+    @pytest.mark.skipif(sys.version_info[0]==2, reason='dicts not ordered in 2.7')
     def test_format_output(self):
         environ = Environ()
         environ.update(

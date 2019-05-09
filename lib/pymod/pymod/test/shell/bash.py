@@ -6,7 +6,6 @@ import pymod.shell
 from pymod.environ import Environ
 
 
-pytest.mark.skipif(sys.version_info[0]==2, reason='string comparisons')
 class TestBashShell:
     _shell = None
     @property
@@ -29,6 +28,7 @@ class TestBashShell:
         assert s == "alias ALIAS='ALIAS_VAL';"
         s = self.shell.format_alias('ALIAS', None)
         assert s == 'unalias ALIAS 2> /dev/null || true;'
+    @pytest.mark.skipif(sys.version_info[0]==2, reason='dicts not ordered in 2.7')
     def test_format_output(self):
         environ = Environ()
         environ.update(

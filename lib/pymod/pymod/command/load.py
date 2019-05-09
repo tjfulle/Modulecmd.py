@@ -12,10 +12,6 @@ def setup_parser(subparser):
     """Parser is only constructed so that this prints a nice help
        message with -h. """
     subparser.add_argument(
-        '-x', dest='do_not_register',
-        action='store_true', default=False,
-        help='Do not register module in LOADEDMODULES')
-    subparser.add_argument(
         '-i', '--insert-at', type=int, default=None,
         help='Load the module as the `i`th module.')
     subparser.add_argument(
@@ -28,7 +24,6 @@ def setup_parser(subparser):
 def load(parser, args):
     argv = parse_module_options(args.args)
     for (name, opts) in argv:
-        pymod.mc.load(name, opts=opts, do_not_register=args.do_not_register,
-                      insert_at=args.insert_at)
+        pymod.mc.load(name, opts=opts, insert_at=args.insert_at)
     pymod.mc.dump()
     return 0
