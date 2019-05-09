@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+import pymod.modes
 import pymod.paths
 import pymod.names
 import pymod.environ
@@ -14,7 +15,9 @@ def tcl2py(module, mode):
 
     env = pymod.environ.filtered()
 
+    mode = pymod.modes.as_string(mode)
     mode = {'show': 'display'}.get(mode, mode)
+
     args = []
     args.extend(('-l', env.get(pymod.names.loaded_modules, '')))
     args.extend(('-f', module.fullname))
