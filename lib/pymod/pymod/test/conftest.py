@@ -150,10 +150,11 @@ def modulecmds():
         @staticmethod
         def append_path(key, val=None, sep=os.pathsep):
             val = val or key
-            return "append_path({0!r},{1!r},{2!r})\n".format(key, val, sep)
+            return "append_path({0!r},{1!r},sep={2!r})\n".format(key, val, sep)
         @staticmethod
-        def remove_path(key):
-            return "remove_path({0!r})\n".format(key)
+        def remove_path(key, val=None, sep=os.pathsep):
+            val = val or key
+            return "remove_path({0!r},{1!r},sep={2!r})\n".format(key, val, sep)
         @staticmethod
         def set_alias(key, val):
             return "set_alias({0!r},{1!r})\n".format(key, val)

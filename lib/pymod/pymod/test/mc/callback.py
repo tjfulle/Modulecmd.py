@@ -16,12 +16,16 @@ def modules_path(tmpdir, namespace, modulecmds):
     tmpdir.join('a.py').write(
         m.append_path('foo', 'bar', sep=':') +
         m.prepend_path('foo', 'baz', sep=':'))
-    tmpdir.join('b.py').write(m.remove_path('foo'))
+    tmpdir.join('b.py').write(
+        m.remove_path('foo', 'baz') +
+        m.remove_path('foo', 'bar'))
 
     tmpdir.join('c.py').write(
         m.append_path('spam', 'ham', sep=';') +
         m.prepend_path('spam', 'eggs', sep=';'))
-    tmpdir.join('d.py').write(m.remove_path('foo'))
+    tmpdir.join('d.py').write(
+        m.remove_path('spam', 'ham', sep=';')+
+        m.remove_path('spam', 'eggs', sep=';'))
 
     tmpdir.join('e.py').write(m.setenv('e'))
     tmpdir.join('f.py').write(m.conflict('e'))
@@ -40,22 +44,20 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.skipif(True, reason='not working')
 @pytest.mark.unit
 def test_path_ops(modules_path, mock_modulepath):
     """Just load and then unload a"""
     mp = mock_modulepath(modules_path.path)
+
+    c = pymod.mc.load('c')
+    assert pymod.environ.get('spam') == 'eggs;ham'
+    d = pymod.mc.load('d')
+    assert pymod.environ.get('spam') is None
+
     pymod.mc.load('a')
     assert pymod.environ.get('foo') == 'baz:bar'
     pymod.mc.load('b')
-    print(pymod.environ.environ)
-    print(str2dict(pymod.environ.get('_LMMETA_foo')))
     assert pymod.environ.get('foo') is None
-
-    pymod.mc.load('c')
-    assert pymod.environ.get('spam') == 'egs;ham'
-    pymod.mc.load('d')
-    assert pymod.environ.get('spam') is None
 
 
 @pytest.mark.unit
@@ -104,6 +106,7 @@ def test_set_alias(modules_path, mock_modulepath):
     assert pymod.environ.environ.aliases['foo'] == 'bar'
     pymod.mc.unload('j')
     assert pymod.environ.environ.aliases['foo'] is None
+
 
 @pytest.mark.unit
 def test_set_shell_function(modules_path, mock_modulepath):
