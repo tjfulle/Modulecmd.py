@@ -4,7 +4,7 @@
 
 `Modulecmd.py` is an environment module system inspired by TCL [Environment Modules](http://modules.sourceforge.net) and Lua [lmod](https://lmod.readthedocs.io/en/latest/) and written in Python.  `Modulecmd.py` is compatible with Python 2.7 and 3.5+ and does not require additional compilation.
 
-`Modulecmd.py` provides a Framework for processing module files written in Python.  Additionally, `Modulecmd.py` processes TCL modules by wrapping the TCL module command.  TCL compatibility requires that `tclsh` be found on the user's `PATH` (the TCL module command is provided by `Modulecmd.py`).  Likewise, `lmod` can process most TCL modules.
+`Modulecmd.py` provides a framework for processing module files written in Python.  Additionally, `Modulecmd.py` processes TCL modules by wrapping the TCL module command.  TCL compatibility requires that `tclsh` be found on the user's `PATH` (the TCL module command is provided by `Modulecmd.py`).  Likewise, `lmod` can process most TCL modules.
 
 ## Why another module system?
 
@@ -12,7 +12,7 @@ TCL modules and the associated TCL module command are ubiquitous on most HPC sys
 
 # What Are Environment Modules?
 
-Environment modules, or just modules, are files containing commands that, when processed by the module Framework, modify the current shell's environment.  Modules allow users to dynamically modify their environment.  For example, a module file (call it `foo.py`) containing the following command, sets the environment variable `FOO` to the value `BAR`
+Environment modules, or just modules, are files containing commands that, when processed by the module framework, modify the current shell's environment.  Modules allow users to dynamically modify their environment.  For example, a module file (call it `foo.py`) containing the following command, sets the environment variable `FOO` to the value `BAR`
 
 ```python
 setenv('FOO', 'BAR')
@@ -46,7 +46,7 @@ append_path('PATH', '/path/to/ucc-2.0')
 
 When the developer works on the project requiring `ucc-1.0`, the appropriate module is be loaded, putting the the compiler in the environment's `PATH`.  `ucc-2.0` can later be accessed by unloading module `ucc-1.0` and loading `ucc-2.0`.
 
-This example is meant to merely demonstrate a simplistic usage of `Modulecmd.py` modules.  This document describes the `Modulecmd.py` module Framework in more detail.
+This example is meant to merely demonstrate a simplistic usage of `Modulecmd.py` modules.  This document describes the `Modulecmd.py` module framework in more detail.
 
 ## A Note on Terminology
 
@@ -88,7 +88,7 @@ The `Modulecmd.py` initialization defines the `module` shell function that execu
 
 # Modulecmd.py Module Files
 
-`Modulecmd.py` module files are executed by the `Modulecmd.py` Framework.  `Modulecmd.py` executes module files in an environment providing the following commands:
+`Modulecmd.py` module files are executed by the `Modulecmd.py` framework.  `Modulecmd.py` executes module files in an environment providing the following commands:
 
 - `getenv(name)`: Get the value of environment variable given by `name`.  Returns `None` if `name` is not defined.
 - `get_hostname()`: Get the value of the host name of the sytem.
