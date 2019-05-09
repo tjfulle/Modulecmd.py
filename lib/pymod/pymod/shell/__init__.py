@@ -59,5 +59,9 @@ def format_output(environ, aliases=None, shell_functions=None):
     return shell.format_output(environ, aliases, shell_functions)
 
 
-def filter(environ):
-    return shell.filter(environ)
+def filter_env(environ):
+    return shell.filter_env(environ)
+
+
+def filter_key(key):
+    return shell.filter_key(key)

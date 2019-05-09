@@ -87,8 +87,8 @@ def mock_config():
     """Removes user defined changes from config"""
     real_configuration = pymod.config.config
     cfg = pymod.config.Configuration()
-    f = pymod.names.config_filename
-    default_config_file = os.path.join(pymod.paths.etc_path, f)
+    basename = pymod.names.config_file_basename
+    default_config_file = os.path.join(pymod.paths.etc_path, basename)
     defaults = pymod.config.load_yaml(default_config_file, 'config')
     cfg.push_scope('defaults', defaults)
 

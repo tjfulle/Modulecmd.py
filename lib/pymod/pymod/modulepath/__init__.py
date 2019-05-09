@@ -14,8 +14,8 @@ def _modulepath():
 mpath = Singleton(_modulepath)
 
 
-def format_output():
-    return mpath.format_output()
+def export_env():
+    return mpath.export_env()
 
 
 def path():

@@ -3,6 +3,7 @@ from argparse import Namespace
 
 import pymod.names
 import pymod.shell
+import pymod.modulepath
 from contrib.util import str2dict, dict2str, boolean, split, join, pop
 
 class Environ(dict):
@@ -17,8 +18,10 @@ class Environ(dict):
                 not len(self.shell_functions))
 
     def format_output(self):
+        env = self.copy()
+        env.update(pymod.modulepath.export_env())
         return pymod.shell.format_output(
-            self, self.aliases, self.shell_functions)
+            env, self.aliases, self.shell_functions)
 
     def get(self, key, default=None):
         if key in self:
@@ -58,15 +61,25 @@ class Environ(dict):
             self[path.meta_key] = dict2str(path.meta)
         self.save_ld_library_path(path.key)
 
-    def filtered(self):
-        env = os.environ.copy()
-        pymod_env = dict([item for item in self.items()
-                          if item[1] is not None])
-        env.update(pymod_env)
-        return env
+    def filtered(self, include_os=True):
+        env = dict() if not include_os else dict(os.environ)
+        env.update(dict([item for item in self.items() if item[1] is not None]))
+        pymod_env = dict()
+        for (key, val) in env.items():
+            if pymod.shell.filter_key(key):
+                continue
+            pymod_env[key] = val
+        return pymod_env
 
-    def copy(self):
-        return self.filtered()
+    def copy(self, include_os=True):
+        env = dict() if not include_os else dict(os.environ)
+        env.update(self)
+        pymod_env = dict()
+        for (key, val) in env.items():
+            if pymod.shell.filter_key(key):
+                continue
+            pymod_env[key] = val
+        return pymod_env
 
     @staticmethod
     def fix_ld_library_path(key):

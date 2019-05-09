@@ -5,6 +5,7 @@ throughout Modulecmd.py and should bring in a minimal number of external
 dependencies.
 """
 import os
+import sys
 
 
 def ancestor(dir, n=1):
@@ -39,8 +40,15 @@ share_path            = os.path.join(prefix, "share", "pymod")
 # Paths to built-in Spack repositories.
 mock_modulepath_path = os.path.join(var_path, "modulepath.mock")
 
-#: User configuration location
-user_config_path = os.getenv('PYMOD_DOT_DIR', os.path.expanduser('~/.pymod.d'))
-
 etc_path        = os.path.join(prefix, "etc", "pymod")
 system_etc_path = '/etc'
+
+
+#: User configuration location
+user_config_path          = os.getenv('PYMOD_CONFIG_DIR', os.path.expanduser('~/.pymod.d'))
+user_config_platform_path = os.getenv('PYMOD_CONFIG_PLATFORM_DIR',
+                                      os.path.join(user_config_path, sys.platform.lower()))
+
+
+del os
+del sys

@@ -31,16 +31,16 @@ class Bash(Shell):
         val = val.rstrip(';')
         return "alias {0}='{1}';".format(key, val)
 
-    def filter(self, environ):
-        env = {}
-        skip = []
+    def filter_env(self, environ):
+        env = dict()
         for (key, val) in environ.items():
-            if key.startswith('BASH_FUNC'):
-                continue
-            if key in skip:
+            if self.filter_key(key):
                 continue
             env[key] = val
         return env
 
     def format_source_command(self, filename):
         return 'source {0}'.format(filename)
+
+    def filter_key(self, key):
+        return key.startswith(('BASH_FUNC',))

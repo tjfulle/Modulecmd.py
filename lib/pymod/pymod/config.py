@@ -25,12 +25,16 @@ class Configuration(object):
     def push_scope(self, scope_name, data):
         """Add a scope to the Configuration."""
         if 'defaults' in self.scopes and scope_name != 'defaults':
-            self.check_config_types(data)
+            self.verify_config(data)
         self.scopes.setdefault(scope_name, {}).update(dict(data))
 
-    def check_config_types(self, data):
+    def verify_config(self, data):
         for (key, val) in data.items():
-            default = self.scopes['defaults'].get(key)
+            try:
+                default = self.scopes['defaults'][key]
+            except KeyError:
+                msg = 'Unknown user config var {0!r}'.format(key)
+                raise ValueError(msg)
             if default is None:
                 continue
             if type(default) != type(val):
@@ -85,22 +89,31 @@ def _config():
     """
     cfg = Configuration()
 
-    f = pymod.names.config_filename
-    default_config_file = os.path.join(pymod.paths.etc_path, f)
+    config_basename = pymod.names.config_file_basename
+    default_config_file = os.path.join(pymod.paths.etc_path, config_basename)
     defaults = load_yaml(default_config_file, 'config')
     cfg.push_scope('defaults', defaults)
 
-    user_config_file = os.getenv(
-        pymod.names.config_file_envar,
-        os.path.join(pymod.paths.user_config_path, f))
-    if os.path.exists(user_config_file):
+    user_config_file = os.getenv(pymod.names.config_file_envar)
+    if user_config_file is not None:
         user = load_yaml(user_config_file, 'config')
         cfg.push_scope('user', user)
+    else:
+        for dirname in (pymod.paths.user_config_path,
+                        pymod.paths.user_config_platform_path):
+            user_config_file = os.path.join(dirname, config_basename)
+            if os.path.exists(user_config_file):
+                user = load_yaml(user_config_file, 'config')
+                cfg.push_scope('user', user)
 
     # Environment variable
     env = {}
     for key in defaults:
         envar = 'PYMOD_{}'.format(key.upper())
+        if envar in ('PYMOD_CONFIG_DIR',
+                     'PYMOD_PLATFORM_CONFIG_DIR',
+                     'PYMOD_CONFIG_FILE'):
+            continue
         if os.getenv(envar):
             env[envar] = os.environ[envar]
 

@@ -1,13 +1,11 @@
 import sys
 import pymod.config
 import pymod.environ
-import pymod.modulepath
 
 
 def format_output():
     """Format the final output for the shell to be evaluated"""
-    output = pymod.modulepath.format_output()
-    output += pymod.environ.format_output()
+    output = pymod.environ.format_output()
     return output
 
 

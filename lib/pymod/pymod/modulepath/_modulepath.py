@@ -2,7 +2,6 @@ import os
 import re
 from six import StringIO
 
-import pymod.shell
 import pymod.module
 from pymod.modulepath.discover import find_modules
 
@@ -24,12 +23,13 @@ class Modulepath:
         self._grouped_by_modulepath = None
         self.set_path(directories)
 
-    def format_output(self):
-        if not self._modified:
-            return ''
-        key = pymod.names.modulepath
-        value = join(self.path, os.pathsep)
-        return pymod.shell.format_output({key: value})
+    def export_env(self):
+        env = dict()
+        if self._modified:
+            key = pymod.names.modulepath
+            value = join(self.path, os.pathsep)
+            env.update({key: value})
+        return env
 
     def __contains__(self, dirname):
         return dirname in self.path

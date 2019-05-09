@@ -38,10 +38,5 @@ config:
   # modules.  Useful for smart MODULEPATH updating and switching.
   skip_add_devpack: false
 
-  # Files to store collections and clones.  Paths relative to dot_dir.
-  collections_filename: "collections.json"
-  clones_filename: "clones.json"
-  user_env_filename: "user.py"
-
   # Wether to colorize output, or not.  One of auto, always, never
   color: auto

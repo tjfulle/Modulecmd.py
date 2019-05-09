@@ -1,6 +1,7 @@
 import os
-import pymod.paths
 import pymod.config
+import pymod.names
+import pymod.paths
 from llnl.util.lang import load_module_from_file, Singleton
 
 
@@ -19,18 +20,16 @@ class UserEnv:
 
 
 def _user_env():
-    name = pymod.config.get('user_env_filename')
-    op = os.path
-    if op.exists(name) and op.realpath(name) != op.realpath(__file__):
-        filename = name
-    elif op.exists(op.join(pymod.paths.user_config_path, name)):
-        filename = op.join(pymod.paths.user_config_path, name)
-    elif op.exists(op.join(pymod.paths.user_config_path, 'user.py')):
-        filename = op.join(pymod.paths.user_config_path, 'user.py')
+    basename = pymod.names.user_env_file_basename
+    for dirname in (pymod.paths.user_config_platform_path,
+                    pymod.paths.user_config_path):
+        if os.path.exists(os.path.join(dirname, basename)):
+            filename = os.path.join(dirname, basename)
+            break
     else:
         filename = None
     if filename is not None:
-        assert op.isfile(op.realpath(filename))
+        assert os.path.isfile(os.path.realpath(filename))
     return UserEnv(filename)
 
 

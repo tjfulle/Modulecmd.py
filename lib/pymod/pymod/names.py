@@ -18,9 +18,14 @@ family_version = lambda key: 'MODULE_FAMILY_{}_VERSION'.format(key.upper())
 default_user_collection = 'default'
 default_sys_collection = 'system'
 
-config_filename = 'config.yaml'
+config_file_basename = 'config.yaml'
 config_file_envar = 'PYMOD_CONFIG_FILE'
 
 ld_library_path = ('DYLD_LIBRARY_PATH' if sys.platform == 'darwin'
                    else 'LD_LIBRARY_PATH')
 ld_preload = 'LD_PRELOAD'
+
+# Files to store collections and clones.  Paths relative to dot_dir.
+collections_file_basename = 'collections.json'
+clones_file_basename      = 'clones.json'
+user_env_file_basename    = 'user.py'

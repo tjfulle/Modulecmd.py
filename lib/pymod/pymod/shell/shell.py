@@ -35,5 +35,8 @@ class Shell(object):
 
         return sio.getvalue()
 
-    def filter(self, environ):
-        pass
+    def filter_env(self, environ):
+        return dict(environ)
+
+    def filter_key(self, key):
+        return False

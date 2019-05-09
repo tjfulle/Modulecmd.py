@@ -7,9 +7,12 @@ import llnl.util.tty as tty
 
 
 def _collections():
-    filename = os.path.join(
-        pymod.paths.user_config_path,
-        pymod.config.get('collections_filename'))
+    basename = pymod.names.collections_file_basename
+    for dirname in (pymod.paths.user_config_platform_path,
+                    pymod.paths.user_config_path):
+        filename = os.path.join(dirname, basename)
+        if os.path.exists(filename):
+            break
     return Collections(filename)
 
 
