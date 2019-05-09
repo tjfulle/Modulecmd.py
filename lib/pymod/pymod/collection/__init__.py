@@ -38,3 +38,7 @@ def format_show(name):
 
 def is_collection(name):
     return name in collections
+
+
+def contains(name):
+    return is_collection(name)

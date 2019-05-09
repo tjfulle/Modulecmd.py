@@ -1,6 +1,8 @@
 import os
 import re
+import py
 import pytest
+import tempfile
 
 import pymod.names
 import pymod.paths
@@ -89,6 +91,10 @@ def mock_config():
     default_config_file = os.path.join(pymod.paths.etc_path, f)
     defaults = pymod.config.load_yaml(default_config_file, 'config')
     cfg.push_scope('defaults', defaults)
+
+    dirname = py.path.local(tempfile.mkdtemp())
+    pymod.paths.user_config_path = dirname.strpath
+
     pymod.config.config = cfg
 
     yield pymod.config.config
