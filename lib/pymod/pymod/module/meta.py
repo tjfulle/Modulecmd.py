@@ -1,8 +1,7 @@
+import os
 import re
-
-
+import sys
 from contrib.util import split
-import llnl.util.tty as tty
 
 
 class MetaData:
@@ -11,7 +10,7 @@ class MetaData:
         self.is_enabled = True
         self.do_not_register = False
 
-    def read(self, filename):
+    def parse(self, filename):
         """Reads meta data for module in ``filename``
         # pymod: [enable_if=<bool expr> [,do_not_register=<bool expr>]]
         """
@@ -20,17 +19,21 @@ class MetaData:
         if not regex.search(head):
             return
         pymod_directive = split(regex.split(head, 1)[1], ',')
+        print(pymod_directive)
         kwds = dict([split(x, '=', 1) for x in pymod_directive])
         for (key, default) in vars(self).items():
+            print(key, default)
             expr = kwds.pop(key, None)
+            print(expr)
             if expr is None:
                 value = default
             else:
                 value = eval_bool_expr(expr)
                 if value is None:
-                    tty.die('Failed to evaluate meta data '
-                                  'statement {0!r} in {1}'
-                                  .format(expr, filename))
+                    raise ValueError(
+                        'Failed to evaluate meta data '
+                        'statement {0!r} in {1}'
+                        .format(expr, filename))
             setattr(self, key, value)
 
         for (key, value) in kwds.items():

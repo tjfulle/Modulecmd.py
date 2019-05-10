@@ -203,7 +203,7 @@ def from_file(modulepath, filepath):
 
     meta = MetaData()
     if m_type == python:
-        meta.read(filepath)
+        meta.parse(filepath)
 
     if m_type == tcl and 'gcc' in filepath:
         tty.debug(name)
