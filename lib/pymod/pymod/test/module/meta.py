@@ -1,6 +1,7 @@
 import os
 import pytest
-from pymod.module.meta import MetaData
+from pymod.module.meta import (
+    MetaData, MetaDataValueError, MetaDataUnknownFieldsError)
 
 
 def test_module_meta_1(tmpdir):
@@ -32,7 +33,15 @@ def test_module_meta_3(tmpdir):
 
 def test_module_meta_4(tmpdir):
     meta = MetaData()
-    with pytest.raises(ValueError):
+    with pytest.raises(MetaDataValueError):
         tmpdir.join('f.py').write('# pymod: is_enabled= bad, do_not_register=bool(sys.platform)')
+        f = os.path.join(tmpdir.strpath, 'f.py')
+        meta.parse(f)
+
+
+def test_module_meta_5(tmpdir):
+    meta = MetaData()
+    with pytest.raises(MetaDataUnknownFieldsError):
+        tmpdir.join('f.py').write('# pymod: a = True')
         f = os.path.join(tmpdir.strpath, 'f.py')
         meta.parse(f)

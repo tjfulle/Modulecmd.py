@@ -22,22 +22,17 @@ class MetaData:
         print(pymod_directive)
         kwds = dict([split(x, '=', 1) for x in pymod_directive])
         for (key, default) in vars(self).items():
-            print(key, default)
             expr = kwds.pop(key, None)
-            print(expr)
             if expr is None:
                 value = default
             else:
                 value = eval_bool_expr(expr)
                 if value is None:
-                    raise ValueError(
-                        'Failed to evaluate meta data '
-                        'statement {0!r} in {1}'
-                        .format(expr, filename))
+                    raise MetaDataValueError(expr, filename)
             setattr(self, key, value)
 
-        for (key, value) in kwds.items():
-            setattr(self, key, value)
+        if len(kwds):
+            raise MetaDataUnknownFieldsError(list(kwds.keys()), filename)
 
 
 def eval_bool_expr(expr):
@@ -45,3 +40,17 @@ def eval_bool_expr(expr):
         return bool(eval(expr))
     except:
         return None
+
+
+class MetaDataValueError(Exception):
+    def __init__(self, expr, filename):
+        superini = super(MetaDataValueError, self).__init__
+        superini('Failed to evaluate meta data statement {0!r} '
+                 'in {1}' .format(expr, filename))
+
+
+class MetaDataUnknownFieldsError(Exception):
+    def __init__(self, fields, filename):
+        superini = super(MetaDataUnknownFieldsError, self).__init__
+        superini('Unknown MetaData fields {0!r} in module file '
+                 '{1}'.format(', '.join(fields), filename))
