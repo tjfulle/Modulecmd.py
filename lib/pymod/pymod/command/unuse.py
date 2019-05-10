@@ -14,5 +14,5 @@ def setup_parser(subparser):
 
 
 def unuse(parser, args):
-    pymod.mc.unuse(path)
+    pymod.mc.unuse(args.path)
     pymod.mc.dump()

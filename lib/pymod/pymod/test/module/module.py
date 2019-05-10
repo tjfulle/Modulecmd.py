@@ -67,7 +67,7 @@ class TestModuleArgumentParser:
         assert not ns.b
         ns = p.parse_args(['+b'])
         assert ns.b
-    def test_help_str(self):
+    def test_module_help_str(self):
         p = ModuleArgumentParser()
         p.add_argument('++x', help='Store an x')
         p.add_argument('+a', action='store_true', help='Set an a')
