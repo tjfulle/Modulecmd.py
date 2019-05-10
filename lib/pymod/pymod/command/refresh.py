@@ -1,7 +1,6 @@
 import pymod.mc
 
-
-description = 'Remove and reload all loaded modules'
+description = 'Unload and reload all loaded modules'
 level = 'short'
 section = 'module'
 
@@ -15,3 +14,4 @@ def setup_parser(subparser):
 def refresh(parser, args):
     pymod.mc.refresh()
     pymod.mc.dump()
+    return 0

@@ -1,7 +1,4 @@
-import argparse
-
 import pymod.mc
-from pymod.command.common import parse_module_options
 
 description = 'Reload a loaded module'
 level = 'short'

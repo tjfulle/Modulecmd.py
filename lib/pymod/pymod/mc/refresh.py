@@ -1,11 +1,13 @@
 import pymod.mc
-import pymod.modes
+import llnl.util.tty as tty
 
 
 def refresh():
-    """Purge all modules from environment"""
+    """Unload all modules from environment and reload them"""
     loaded_modules = pymod.mc.get_loaded_modules()
     for module in loaded_modules[::-1]:
-        pymod.mc.execmodule(module, pymod.modes.unload)
+        tty.verbose('Unloading {}'.format(module))
+        pymod.mc.unload_impl(module)
     for module in loaded_modules:
-        pymod.mc.execmodule(module, pymod.modes.load)
+        tty.verbose('Loading {}'.format(module))
+        pymod.mc.load_impl(module)

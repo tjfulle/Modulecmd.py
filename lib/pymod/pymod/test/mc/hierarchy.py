@@ -88,7 +88,6 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-
 def test_hierarchy_1(modules_path, mock_modulepath):
     """Loop through the module hierarchy to make sure it is laid out
     correctly"""
