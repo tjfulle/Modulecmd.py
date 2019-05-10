@@ -7,7 +7,7 @@ import sys
 
 if sys.version_info[:2] < (2, 6):
     v_info = sys.version_info[:3]
-    sys.exit("Spack requires Python 2.6 or higher."
+    sys.exit("Modulecmd.py requires Python 2.6 or higher."
              "This is Python %d.%d.%d." % v_info)
 
 # Find pymod's location and its prefix.
@@ -26,9 +26,6 @@ if sys.version_info[:2] == (2, 6):
 
 sys.path.insert(0, pymod_external_libs)
 
-# Here we delete ruamel.yaml in case it has been already imported from site
-# (see #9206 for a broader description of the issue).
-#
 # Briefly: ruamel.yaml produces a .pth file when installed with pip that
 # makes the site installed package the preferred one, even though sys.path
 # is modified to point to another version of ruamel.yaml.
