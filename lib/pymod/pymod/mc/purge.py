@@ -8,7 +8,6 @@ def purge(load_after_purge=True):
     loaded_modules = pymod.mc.get_loaded_modules()
     for module in loaded_modules[::-1]:
         if module.is_loaded:
-            print('here i am a.0', module)
             pymod.mc.unload_impl(module)
 
     if load_after_purge:

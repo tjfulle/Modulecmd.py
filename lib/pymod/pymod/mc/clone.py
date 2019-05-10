@@ -35,6 +35,7 @@ def clone(name):
     clones = read(filename)
     clones[name] = pymod.environ.filtered()
     with open(filename, 'w') as fh:
+        print(clones[name])
         json.dump(clones, fh, indent=2)
     return 0
 

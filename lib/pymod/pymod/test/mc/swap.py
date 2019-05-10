@@ -42,9 +42,7 @@ def test_swap_2(modules_path, mock_modulepath):
     assert not a.is_loaded
 
     # Module b is loaded, nothing to do
-    print(pymod.mc.get_loaded_modules())
     pymod.mc.load('f')
-    return
     assert pymod.environ.get('module_swap') == 'b'
     pymod.mc.unload('f')
     pymod.mc.unload('c')

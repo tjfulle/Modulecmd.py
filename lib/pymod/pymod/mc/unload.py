@@ -24,7 +24,6 @@ def unload_impl(module, caller='command_line'):
     module : Module
         The module to unload
     """
-    print('here i am b.0', module)
     if not module.is_loaded:
         if caller == 'command_line':
             raise ValueError('Unexepecedly unloaded module {}'.format(module))

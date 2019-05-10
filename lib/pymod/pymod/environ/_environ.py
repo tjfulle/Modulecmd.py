@@ -19,7 +19,6 @@ class Environ(dict):
 
     def format_output(self):
         env = self.copy()
-        env.update(pymod.modulepath.export_env())
         return pymod.shell.format_output(
             env, self.aliases, self.shell_functions)
 
@@ -64,6 +63,7 @@ class Environ(dict):
     def filtered(self, include_os=True):
         env = dict() if not include_os else dict(os.environ)
         env.update(dict([item for item in self.items() if item[1] is not None]))
+        env.update(pymod.modulepath.export_env())
         pymod_env = dict()
         for (key, val) in env.items():
             if pymod.shell.filter_key(key):
@@ -74,6 +74,7 @@ class Environ(dict):
     def copy(self, include_os=True):
         env = dict() if not include_os else dict(os.environ)
         env.update(self)
+        env.update(pymod.modulepath.export_env())
         pymod_env = dict()
         for (key, val) in env.items():
             if pymod.shell.filter_key(key):
