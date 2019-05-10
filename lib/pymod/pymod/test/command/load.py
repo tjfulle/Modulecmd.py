@@ -3,6 +3,7 @@ import pytest
 
 import pymod.mc
 import pymod.environ
+from pymod.main import PymodCommand
 
 
 @pytest.fixture()
@@ -28,49 +29,58 @@ def modules_path(tmpdir, namespace, modulecmds):
 @pytest.mark.unit
 def test_load_1(modules_path, mock_modulepath):
     """Just load and then unload a"""
+    load = PymodCommand('load')
+    unload = PymodCommand('unload')
     mp = mock_modulepath(modules_path.one)
-    pymod.mc.load('a')
+    load('a')
     assert pymod.environ.get('a') == 'a'
-    pymod.mc.unload('a')
+    unload('a')
     assert pymod.environ.get('a') is None
 
 
+@pytest.mark.unit
 def test_load_2(modules_path, mock_modulepath):
     """Load a and b, b loads c, d, e. Then, unload b (c, d, e should also
     unload)
     """
+    load = PymodCommand('load')
+    unload = PymodCommand('unload')
     mp = mock_modulepath(modules_path.one)
-    pymod.mc.load('a')
+    load('a')
     assert pymod.environ.get('a') == 'a'
 
-    pymod.mc.load('b')
+    load('b')
     for x in 'bcde':
         assert pymod.environ.get(x) == x
         assert pymod.mc.module_is_loaded(x)
 
     # just unload e
-    pymod.mc.unload('d')
+    unload('d')
     assert pymod.environ.get('d') is None
     assert pymod.environ.get('e') is None
 
     # unload b, c and d also unload
-    pymod.mc.unload('b')
+    unload('b')
     assert pymod.environ.get('b') is None
     assert pymod.environ.get('c') is None
     assert pymod.environ.get('d') is None
     assert pymod.environ.get('a') == 'a'
 
-    pymod.mc.unload('a')
+    unload('a')
     assert pymod.environ.get('a') is None
 
 
+@pytest.mark.unit
 def test_load_3(modules_path, mock_modulepath):
     """Load a and b, b loads d. Then, unload b (d should also unload)"""
+    load = PymodCommand('load')
+    unload = PymodCommand('unload')
     mp = mock_modulepath(modules_path.two)
-    pymod.mc.load('a')
+
+    load('a')
     assert pymod.environ.get('a') == 'a'
 
-    pymod.mc.load('b')
+    load('b')
     for x in 'ced':
         if x in 'ce':
             assert pymod.environ.get(x) is None
@@ -80,12 +90,12 @@ def test_load_3(modules_path, mock_modulepath):
             assert pymod.mc.module_is_loaded(x)
 
     # unload b, e will also unload
-    pymod.mc.unload('b')
+    unload('b')
     assert pymod.environ.get('b') is None
     assert pymod.environ.get('c') is None
     assert pymod.environ.get('d') is None
     assert pymod.environ.get('e') is None
     assert pymod.environ.get('a') == 'a'
 
-    pymod.mc.unload('a')
+    unload('a')
     assert pymod.environ.get('a') is None

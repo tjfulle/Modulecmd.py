@@ -3,6 +3,7 @@
 [run]
 source = lib
 omit =
+     lib/pymod/pymod/main.py
      lib/pymod/pymod/test/*
      lib/pymod/external/*
      lib/pymod/contrib/*
