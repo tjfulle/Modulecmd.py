@@ -44,49 +44,6 @@ mpi/
 
 """
 
-def test_hierarchy_1(modules_path, mock_modulepath):
-    """Loop through the module hierarchy to make sure it is laid out
-    correctly"""
-    core_path = modules_path.core
-    mp = mock_modulepath(modules_path.core)
-
-    is_module = lambda x: pymod.modulepath.get(x) is not None
-
-    for compiler_ver in compiler_versions:
-        compiler_module_name = os.path.sep.join((compiler_vendor, compiler_ver))
-        compiler = pymod.mc.load(compiler_module_name)
-        assert compiler is not None
-
-        compiler_unlocks_dir = os.path.normpath(
-            os.path.join(core_path, '..', 'compiler',
-                         compiler_vendor, compiler_ver))
-
-        assert os.path.isdir(compiler_unlocks_dir)
-        assert pymod.modulepath.contains(compiler_unlocks_dir)
-
-        a = pymod.modulepath.get('a')
-        assert a is not None
-        assert a.version.string == '1.0'
-        assert a.filename == os.path.join(
-            compiler_unlocks_dir, a.name, a.version.string + '.py')
-
-        for mpi_ver in mpi_versions:
-            mpi_module_name = os.path.sep.join((mpi_vendor, mpi_ver))
-            mpi = pymod.mc.load(mpi_module_name)
-            assert mpi is not None
-
-            mpi_unlocks_dir = os.path.normpath(
-                os.path.join(core_path, '..', 'mpi',
-                             compiler_vendor, compiler_ver,
-                             mpi_vendor, mpi_ver))
-
-            assert os.path.isdir(mpi_unlocks_dir)
-            assert pymod.modulepath.contains(mpi_unlocks_dir)
-
-            pymod.mc.load('b')
-
-    return
-
 
 @pytest.fixture()
 def modules_path(tmpdir, namespace, modulecmds):
@@ -131,7 +88,52 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
+
 def test_hierarchy_1(modules_path, mock_modulepath):
+    """Loop through the module hierarchy to make sure it is laid out
+    correctly"""
+    core_path = modules_path.core
+    mp = mock_modulepath(modules_path.core)
+
+    is_module = lambda x: pymod.modulepath.get(x) is not None
+
+    for compiler_ver in compiler_versions:
+        compiler_module_name = os.path.sep.join((compiler_vendor, compiler_ver))
+        compiler = pymod.mc.load(compiler_module_name)
+        assert compiler is not None
+
+        compiler_unlocks_dir = os.path.normpath(
+            os.path.join(core_path, '..', 'compiler',
+                         compiler_vendor, compiler_ver))
+
+        assert os.path.isdir(compiler_unlocks_dir)
+        assert pymod.modulepath.contains(compiler_unlocks_dir)
+
+        a = pymod.modulepath.get('a')
+        assert a is not None
+        assert a.version.string == '1.0'
+        assert a.filename == os.path.join(
+            compiler_unlocks_dir, a.name, a.version.string + '.py')
+
+        for mpi_ver in mpi_versions:
+            mpi_module_name = os.path.sep.join((mpi_vendor, mpi_ver))
+            mpi = pymod.mc.load(mpi_module_name)
+            assert mpi is not None
+
+            mpi_unlocks_dir = os.path.normpath(
+                os.path.join(core_path, '..', 'mpi',
+                             compiler_vendor, compiler_ver,
+                             mpi_vendor, mpi_ver))
+
+            assert os.path.isdir(mpi_unlocks_dir)
+            assert pymod.modulepath.contains(mpi_unlocks_dir)
+
+            pymod.mc.load('b')
+
+    return
+
+
+def test_hierarchy_2(modules_path, mock_modulepath):
     """Tests the basic functionality of module hierarchy.
 
     Steps:
