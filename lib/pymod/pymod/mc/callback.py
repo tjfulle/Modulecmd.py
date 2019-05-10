@@ -15,27 +15,15 @@ from spack.util.executable import Executable
 __all__ = ['callback']
 
 
-def callback(func_name, mode, module=None, when=None, memo={}):
+def callback(func, mode, when=None, **kwds):
     if when is None:
         when = mode != pymod.modes.load_partial
     if not when:
-        return lambda *args, **kwargs: None
-    try:
-        module_fun = memo[func_name]
-    except KeyError:
-        module_fun = getattr(sys.modules[__name__], func_name, None)
-        if module_fun is None:
-            tty.warn('Callback function {} not defined'
-                         .format(func_name))
-            module_fun = lambda *args, **kwargs: None
-        memo[func_name] = module_fun
-    if module is not None:
-        def func(*args, **kwargs):
-            return module_fun(mode, module, *args, **kwargs)
-    else:
-        def func(*args, **kwargs):
-            return module_fun(mode, *args, **kwargs)
-    return func
+        func = lambda *args, **kwargs: None
+    def wrapper(*args, **kwargs):
+        kwargs.update(kwds)
+        return func(mode, *args, **kwargs)
+    return wrapper
 
 
 def swap(mode, name_a, name_b, **kwargs):
@@ -89,7 +77,8 @@ def unload(mode, name):
             return None
 
 
-def is_loaded(mode, module):
+def is_loaded(mode, **kwargs):
+    module = kwargs.pop('module')
     return module.is_loaded
 
 
@@ -111,11 +100,13 @@ def source(mode, filename):
         pymod.mc.source(filename)
 
 
-def whatis(mode, module, *args, **kwargs):
+def whatis(mode, *args, **kwargs):
+    module = kwargs.pop('module')
     return module.set_whatis(*args, **kwargs)
 
 
-def help(mode, module, help_string):
+def help(mode, help_string, **kwargs):
+    module = kwargs.pop('module')
     module.set_help_string(help_string)
 
 
@@ -165,8 +156,9 @@ def prereq(mode, *names):
         pymod.mc.prereq(*names)
 
 
-def conflict(mode, module, *conflicting):
+def conflict(mode, *conflicting, **kwargs):
     if mode == pymod.modes.load:
+        module = kwargs.pop('module')
         pymod.mc.conflict(module, *conflicting)
 
 
@@ -210,8 +202,9 @@ def remove_path(mode, name, *values, **kwds):
             pymod.environ.remove_path(name, value, sep)
 
 
-def family(mode, module, family_name):
+def family(mode, family_name, **kwargs):
     """Assign a family"""
+    module = kwargs.pop('module')
     pymod.mc.family(mode, module, family_name)
 
 
