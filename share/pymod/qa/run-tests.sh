@@ -15,4 +15,4 @@ extra_args=""
 if [[ -n "$@" ]]; then
     extra_args="-k $@"
 fi
-coverage run bin/pymod bash test --verbose "$extra_args"
+coverage run bin/modulecmd.py bash test --verbose "$extra_args"
