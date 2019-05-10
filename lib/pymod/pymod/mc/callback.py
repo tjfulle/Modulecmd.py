@@ -211,16 +211,4 @@ def family(mode, family_name, **kwargs):
 def execute(mode_, command, mode=None):
     if mode is not None and mode != pymod.modes.as_string(mode_):
         return
-    xc = split(command, ' ', 1)
-    exe = Executable(xc[0])
-    with open(os.devnull, 'a') as fh:
-        kwargs = {
-            'env': pymod.environ.filter(),
-            'output': fh,
-            'error': subprocess.sys.stdout,
-        }
-        try:
-            exe(*xc[1:], **kwargs)
-        except:
-            tty.warn('Command {0!r} failed'.format(command))
-    return
+    pymod.mc.execute(command)

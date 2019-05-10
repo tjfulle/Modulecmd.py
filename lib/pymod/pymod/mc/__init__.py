@@ -4,6 +4,7 @@ from pymod.mc.conflict import conflict
 from pymod.mc.clone import clone, restore_clone
 from pymod.mc.dump import dump
 from pymod.mc.execmodule import execmodule
+from pymod.mc.execute import execute
 from pymod.mc.family import family
 from pymod.mc.help import help
 from pymod.mc.load import load, load_impl, load_partial
