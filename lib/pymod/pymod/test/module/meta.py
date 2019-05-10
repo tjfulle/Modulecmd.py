@@ -30,7 +30,7 @@ def test_module_meta_3(tmpdir):
     assert meta.do_not_register is True
 
 
-def test_module_meta_3(tmpdir):
+def test_module_meta_4(tmpdir):
     meta = MetaData()
     with pytest.raises(ValueError):
         tmpdir.join('f.py').write('# pymod: is_enabled= bad, do_not_register=bool(sys.platform)')
