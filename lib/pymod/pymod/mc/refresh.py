@@ -7,7 +7,9 @@ def refresh():
     loaded_modules = pymod.mc.get_loaded_modules()
     for module in loaded_modules[::-1]:
         tty.verbose('Unloading {}'.format(module))
-        pymod.mc.unload_impl(module)
+        if module.is_loaded:
+            pymod.mc.unload_impl(module)
     for module in loaded_modules:
         tty.verbose('Loading {}'.format(module))
-        pymod.mc.load_impl(module)
+        if not module.is_loaded:
+            pymod.mc.load_impl(module)

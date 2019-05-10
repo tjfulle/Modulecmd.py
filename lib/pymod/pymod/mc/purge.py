@@ -7,7 +7,9 @@ def purge(load_after_purge=True):
     """Purge all modules from environment"""
     loaded_modules = pymod.mc.get_loaded_modules()
     for module in loaded_modules[::-1]:
-        pymod.mc.unload_impl(module)
+        if module.is_loaded:
+            print('here i am a.0', module)
+            pymod.mc.unload_impl(module)
 
     if load_after_purge:
         load_after_purge = pymod.config.get('load_after_purge')
