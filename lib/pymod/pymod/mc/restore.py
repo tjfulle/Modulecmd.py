@@ -24,7 +24,7 @@ def restore(name):
     pymod.mc.purge(load_after_purge=False)
     loaded_modules = pymod.mc.get_loaded_modules()
     for module in loaded_modules[::-1]:
-        pymod.mc.execmodule(module, pymod.modes.unload)
+        pymod.mc.unload_impl(module)
 
     # Now load the collection, one module at a time
     for (directory, modules) in collection:
