@@ -46,3 +46,4 @@ def test_clone(modules_path, mock_modulepath):
     assert modules == 'abc'
     assert pymod.environ.environ['foo'] == 'baz'
     assert pymod.environ.environ['spam'] == 'ham:bar'
+    pymod.mc.remove_clone('the-clone')

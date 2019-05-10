@@ -14,6 +14,11 @@ def read(filename):
     return dict()
 
 
+def write(clones, filename):
+    with open(filename, 'w') as fh:
+        json.dump(clones, fh, indent=2)
+
+
 def _clone_file():
     basename = pymod.names.clones_file_basename
     for dirname in (pymod.paths.user_config_platform_path,
@@ -34,10 +39,15 @@ def clone(name):
     filename = _clone_file()
     clones = read(filename)
     clones[name] = pymod.environ.filtered()
-    with open(filename, 'w') as fh:
-        print(clones[name])
-        json.dump(clones, fh, indent=2)
+    write(clones, filename)
     return 0
+
+
+def remove_clone(name):
+    filename = _clone_file()
+    clones = read(filename)
+    clones.pop(name, None)
+    write(clones, filename)
 
 
 def restore_clone(name):

@@ -1,4 +1,5 @@
 import os
+import sys
 import pymod.config
 import pymod.names
 import pymod.paths
@@ -10,8 +11,13 @@ class UserEnv:
         # Load user module, if found
         if filename is None:
             self._module = None
+            self._modulename = None
         else:
-            self._module = load_module_from_file('pymod._user', filename)
+            modulename = 'pymod._user.{}'.format(
+                os.path.splitext(os.path.basename(filename))[0])
+            self._module = load_module_from_file(modulename, filename)
+            assert self._module is not None
+            self._modulename = modulename
 
     def __getattr__(self, attr):
         if self._module is None:
@@ -31,6 +37,19 @@ def _user_env():
     if filename is not None:
         assert os.path.isfile(os.path.realpath(filename))
     return UserEnv(filename)
+
+
+def set_user_env(user_env):
+    global env
+    assert isinstance(user_env, UserEnv)
+    env = user_env
+
+
+def reset():
+    global env
+    if env._modulename in sys.modules:
+        del sys.modules[env._modulename]
+    env = _user_env()
 
 
 env = Singleton(_user_env)
