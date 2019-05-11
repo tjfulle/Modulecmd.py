@@ -55,3 +55,9 @@ class TestBashShell:
                      """VAR_0() { VAL_0; };\n""" \
                      """unset -f VAR_None 2> /dev/null || true;\n"""
         assert s.strip() == s_expected.strip()
+
+    def test_shell_bash_filter_env(self):
+        env = {'foo': 'bar', 'BASH_FUNC%%': 'baz'}
+        d = self.shell.filter_env(env)
+        assert d['foo'] == 'bar'
+        assert 'BASH_FUNC%%' not in d
