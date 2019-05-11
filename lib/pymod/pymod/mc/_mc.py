@@ -100,7 +100,7 @@ def pop_refcount(module):
     set_lm_refcount(lm_refcount)
 
 
-def set_refcount(module, count):
+def set_refcount(module, count):  # pragma: no cover
     name = module.fullname
     lm_refcount = get_lm_refcount()
     lm_refcount[name] = count

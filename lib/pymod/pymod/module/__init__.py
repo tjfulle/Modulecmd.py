@@ -205,10 +205,11 @@ def from_file(modulepath, filepath):
     if m_type == python:
         meta.parse(filepath)
 
-    if m_type == tcl and 'gcc' in filepath:
-        tty.debug(name)
-        tty.debug(modulepath)
-        tty.debug(filepath, '\n')
+    if pymod.config.get('debug'):  # pragma: no cover
+        if m_type == tcl and 'gcc' in filepath:
+            tty.debug(name)
+            tty.debug(modulepath)
+            tty.debug(filepath, '\n')
 
     return Module(name, fullname, version, m_type, filepath, modulepath, meta)
 
@@ -217,11 +218,11 @@ def is_tcl_module(filename):
     tcl_header = '#%Module'
     try:
         return open(filename).readline().startswith(tcl_header)
-    except (IOError, UnicodeDecodeError):
+    except (IOError, UnicodeDecodeError):  # pragma: no cover
         return False
 
 
-class TCLSHNotFoundError(Exception):
+class TCLSHNotFoundError(Exception):  # pragma: no cover
     def __init__(self):
         msg = 'tclsh not found on path'
         if pymod.config.get('debug'):

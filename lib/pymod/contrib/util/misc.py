@@ -1,6 +1,7 @@
 import os
 import re
 import base64
+import textwrap
 import subprocess
 from llnl.util.tty import terminal_size
 
@@ -135,5 +136,5 @@ def textfill(string, width=None, indent=None, **kwds):
     if indent is not None:
         kwds['initial_indent'] = ' ' * indent
         kwds['subsequent_indent'] = ' ' * indent
-    s = fill(string, width, **kwds)
+    s = textwrap.fill(string, width, **kwds)
     return s.lstrip()
