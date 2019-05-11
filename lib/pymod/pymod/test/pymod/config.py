@@ -40,7 +40,7 @@ def test_config_user(mock_test_config):
     assert cfg.get('baz', scope='user') == 'spam'
     cfg.set('baz', 'spam')
     assert isinstance(cfg.get(), dict)
-    cfg.get()
+    cfg.get(None)
     cfg.get(scope='user')
 
 
