@@ -25,7 +25,7 @@ def init(parser, args):
     for dirname in modulepath:
         pymod.mc.use(dirname, append=True)
 
-    if pymod.collection.is_collection(pymod.names.default_user_collection):
+    if pymod.collection.is_collection(pymod.names.default_user_collection): # pragma: no cover
         pymod.mc.restore(pymod.names.default_user_collection)
 
     pymod.mc.dump()
