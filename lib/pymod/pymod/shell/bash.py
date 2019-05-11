@@ -31,14 +31,6 @@ class Bash(Shell):
         val = val.rstrip(';')
         return "alias {0}='{1}';".format(key, val)
 
-    def filter_env(self, environ):
-        env = dict()
-        for (key, val) in environ.items():
-            if self.filter_key(key):
-                continue
-            env[key] = val
-        return env
-
     def format_source_command(self, filename):
         return 'source {0}'.format(filename)
 

@@ -36,7 +36,13 @@ class Shell(object):
         return sio.getvalue()
 
     def filter_env(self, environ):
-        return dict(environ)
+        env = dict()
+        for (key, val) in environ.items():
+            if self.filter_key(key):
+                continue
+            env[key] = val
+        return env
+
 
     def filter_key(self, key):
         return False
