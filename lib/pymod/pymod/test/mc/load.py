@@ -89,3 +89,11 @@ def test_mc_load_3(modules_path, mock_modulepath):
 
     pymod.mc.unload('a')
     assert pymod.environ.get('a') is None
+
+
+def test_mc_load_inserted(modules_path, mock_modulepath):
+    mp = mock_modulepath(modules_path.two)
+    pymod.mc.load('e')
+    pymod.mc.load('a', insert_at=1)
+    assert ''.join(pymod.mc._mc.loaded_module_names) == 'ae'
+    
