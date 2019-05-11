@@ -41,7 +41,7 @@ def test_config_user(mock_test_config):
     cfg.set('baz', 'spam')
     assert isinstance(cfg.get(None), dict)
     cfg.get(None)
-    cfg.get(scope='user')
+    cfg.get(None, scope='user')
 
 
 def test_config_user_unknown_var(mock_test_config):
