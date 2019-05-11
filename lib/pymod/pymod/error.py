@@ -44,3 +44,15 @@ class PrereqMissingError(Exception):
         else:
             msg = 'Prerequisite {0!r} must first be loaded'
         super(PrereqMissingError, self).__init__(msg.format(names))
+
+
+class CollectionNotFoundError(Exception):
+    def __init__(self, name):
+        msg = 'Collection {0!r} does not exist'.format(name)
+        super(CollectionNotFoundError, self).__init__(msg)
+
+
+class CollectionModuleNotFoundError(Exception):
+    def __init__(self, name, filename):
+        msg = 'Saved module {0!r} does not exist ({1})'.format(name, filename)
+        super(CollectionModuleNotFoundError, self).__init__(msg)

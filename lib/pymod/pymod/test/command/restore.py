@@ -6,6 +6,7 @@ import pymod.paths
 import pymod.environ
 import pymod.collection
 from pymod.main import PymodCommand
+from pymod.error import CollectionNotFoundError
 
 
 @pytest.fixture(scope='function', autouse=True)
@@ -56,8 +57,11 @@ def test_mc_restore_goo(modules_path, mock_modulepath):
     assert c.is_loaded
     assert d.is_loaded
 
+    cat = PymodCommand('cat')
+    cat('foo')
+
 
 @pytest.mark.unit
 def test_mc_restore_bad(modules_path, mock_modulepath):
-    x = pymod.mc.restore('fake')
-    assert x is None
+    with pytest.raises(CollectionNotFoundError):
+        pymod.mc.restore('fake')
