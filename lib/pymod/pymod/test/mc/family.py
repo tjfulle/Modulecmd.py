@@ -23,7 +23,7 @@ setenv('ENVAR_2', self.version.string)"""
 
 
 @pytest.mark.unit
-def test_family_load_1(mock_module):
+def test_mc_family_load_1(mock_module):
     family = 'compiler'
     module = mock_module('ucc', '1.2', 'ucc/1.2.py')
     pymod.mc.family(pymod.modes.load, module, 'compiler')
@@ -33,7 +33,7 @@ def test_family_load_1(mock_module):
 
 @pytest.mark.mf
 @pytest.mark.unit
-def test_family_unload_1(mock_module):
+def test_mc_family_unload_1(mock_module):
     module = mock_module('ucc', '2.0', 'ucc/2.0.py')
     pymod.environ.set('MODULE_FAMILY_COMPILER', 'ucc')
     pymod.environ.set('MODULE_FAMILY_UCC_VERSION', '2.0')
@@ -43,7 +43,7 @@ def test_family_unload_1(mock_module):
 
 
 @pytest.mark.sandbox
-def test_family_xyz(modules_path, mock_modulepath, get_loaded_modules):
+def test_mc_family_xyz(modules_path, mock_modulepath, get_loaded_modules):
 
     def standard_assertions(module):
         name_key = pymod.names.family_name('xyz')

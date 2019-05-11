@@ -26,7 +26,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-def test_avail(modules_path, mock_modulepath):
+def test_command_avail(modules_path, mock_modulepath):
     avail = PymodCommand('avail')
     mp = mock_modulepath([modules_path.one, modules_path.two])
     avail()

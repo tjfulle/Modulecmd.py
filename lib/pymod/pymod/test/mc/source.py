@@ -12,7 +12,7 @@ def script(tmpdir):
 
 
 @pytest.mark.unit
-def test_source_command(script, capsys):
+def test_mc_source_command(script, capsys):
     pymod.mc.source(script)
     captured = capsys.readouterr()
     command = r'source {};'.format(script)

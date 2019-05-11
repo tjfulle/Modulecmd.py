@@ -37,7 +37,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_use_prepend(modules_path, mock_modulepath):
+def test_mc_use_prepend(modules_path, mock_modulepath):
     """Just load and then unload a"""
     is_module = lambda x: pymod.modulepath.get(x) is not None
     mp = mock_modulepath(modules_path.one)
@@ -74,7 +74,7 @@ def test_use_prepend(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_use_append(modules_path, mock_modulepath):
+def test_mc_use_append(modules_path, mock_modulepath):
     """Just load and then unload a"""
     is_module = lambda x: pymod.modulepath.get(x) is not None
     mp = mock_modulepath(modules_path.one)

@@ -20,7 +20,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_purge(modules_path, mock_modulepath):
+def test_mc_purge(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('a')

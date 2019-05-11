@@ -19,7 +19,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_refresh(modules_path, mock_modulepath):
+def test_command_refresh(modules_path, mock_modulepath):
     load = PymodCommand('load')
     refresh = PymodCommand('refresh')
     mp = mock_modulepath(modules_path.one)

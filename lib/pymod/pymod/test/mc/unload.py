@@ -19,7 +19,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_unload_1(modules_path, mock_modulepath):
+def test_mc_unload_1(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     assert pymod.environ.get('a') == 'a'
@@ -30,7 +30,7 @@ def test_unload_1(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_unload_2(modules_path, mock_modulepath):
+def test_mc_unload_2(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     assert pymod.environ.get('a') == 'a'
@@ -42,7 +42,7 @@ def test_unload_2(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_unload_3(modules_path, mock_modulepath):
+def test_mc_unload_3(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     a1 = pymod.mc.load('a1')

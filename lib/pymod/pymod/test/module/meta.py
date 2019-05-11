@@ -6,7 +6,7 @@ from pymod.module.meta import (
 
 def test_module_meta_1(tmpdir):
     meta = MetaData()
-    tmpdir.join('f.py').write('# pymod: is_enabled=False, do_not_register=True')
+    tmpdir.join('f.py').write('# pymod: enable_if=False, do_not_register=True')
     f = os.path.join(tmpdir.strpath, 'f.py')
     meta.parse(f)
     assert meta.is_enabled is False
@@ -15,7 +15,7 @@ def test_module_meta_1(tmpdir):
 
 def test_module_meta_2(tmpdir):
     meta = MetaData()
-    tmpdir.join('f.py').write('# pymod: is_enabled= not False, do_not_register=not None')
+    tmpdir.join('f.py').write('# pymod: enable_if= not False, do_not_register=not None')
     f = os.path.join(tmpdir.strpath, 'f.py')
     meta.parse(f)
     assert meta.is_enabled is True
@@ -24,7 +24,7 @@ def test_module_meta_2(tmpdir):
 
 def test_module_meta_3(tmpdir):
     meta = MetaData()
-    tmpdir.join('f.py').write('# pymod: is_enabled= os.path.isdir(os.getcwd()), do_not_register=bool(sys.platform)')
+    tmpdir.join('f.py').write('# pymod: enable_if= os.path.isdir(os.getcwd()), do_not_register=bool(sys.platform)')
     f = os.path.join(tmpdir.strpath, 'f.py')
     meta.parse(f)
     assert meta.is_enabled is True
@@ -34,7 +34,7 @@ def test_module_meta_3(tmpdir):
 def test_module_meta_4(tmpdir):
     meta = MetaData()
     with pytest.raises(MetaDataValueError):
-        tmpdir.join('f.py').write('# pymod: is_enabled= bad, do_not_register=bool(sys.platform)')
+        tmpdir.join('f.py').write('# pymod: enable_if= bad, do_not_register=bool(sys.platform)')
         f = os.path.join(tmpdir.strpath, 'f.py')
         meta.parse(f)
 

@@ -16,7 +16,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-def test_cat(modules_path, mock_modulepath):
+def test_command_cat(modules_path, mock_modulepath):
     cat = PymodCommand('cat')
     mp = mock_modulepath(modules_path.one)
     cat('a')

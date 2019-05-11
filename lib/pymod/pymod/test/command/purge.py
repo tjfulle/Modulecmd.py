@@ -26,7 +26,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-def test_purge(modules_path, mock_modulepath):
+def test_command_purge(modules_path, mock_modulepath):
     """Load a and b, b loads c, d, e. Then, unload b (c, d, e should also
     unload)
     """

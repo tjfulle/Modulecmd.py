@@ -19,7 +19,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_reload_1(modules_path, mock_modulepath):
+def test_mc_reload_1(modules_path, mock_modulepath):
     """Just load and then unload a"""
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
@@ -31,7 +31,7 @@ def test_reload_1(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_reload_2(modules_path, mock_modulepath):
+def test_mc_reload_2(modules_path, mock_modulepath):
     """Just load and then unload a"""
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')

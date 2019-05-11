@@ -20,7 +20,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_reload_1(modules_path, mock_modulepath):
+def test_command_reload_1(modules_path, mock_modulepath):
     load = PymodCommand('load')
     reload = PymodCommand('reload')
     mp = mock_modulepath(modules_path.path)
@@ -34,7 +34,7 @@ def test_reload_1(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_reload_2(modules_path, mock_modulepath):
+def test_command_reload_2(modules_path, mock_modulepath):
     load = PymodCommand('load')
     reload = PymodCommand('reload')
     mp = mock_modulepath(modules_path.path)

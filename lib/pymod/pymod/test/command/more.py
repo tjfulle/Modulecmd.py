@@ -16,7 +16,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-def test_more(modules_path, mock_modulepath):
+def test_command_more(modules_path, mock_modulepath):
     more = PymodCommand('more')
     mp = mock_modulepath(modules_path.one)
     more('a')

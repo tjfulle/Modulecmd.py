@@ -14,19 +14,19 @@ class TestCshShell:
             self._shell = pymod.shell._shell('csh')
         return self._shell
 
-    def test_format_environment_variable(self):
+    def test_shell_csh_format_environment_variable(self):
         s = self.shell.format_environment_variable('VAR', 'VAL')
         assert s == 'setenv VAR "VAL";'
         s = self.shell.format_environment_variable('VAR', None)
         assert s == 'unsetenv VAR;'
 
-    def test_format_shell_function(self):
+    def test_shell_csh_format_shell_function(self):
         s = self.shell.format_shell_function('FCN', 'FCN_VAL;')
         assert s == "alias FCN 'FCN_VAL';"
         s = self.shell.format_shell_function('FCN', None)
         assert s == 'unalias FCN 2> /dev/null || true;'
 
-    def test_format_alias(self):
+    def test_shell_csh_format_alias(self):
         s = self.shell.format_alias('ALIAS', 'ALIAS_VAL')
         assert s == "alias ALIAS 'ALIAS_VAL';"
         s = self.shell.format_alias('ALIAS', None)
@@ -36,12 +36,12 @@ class TestCshShell:
         s = self.shell.format_alias('ALIAS', 'ALIAS_VAL $*')
         assert s == "alias ALIAS 'ALIAS_VAL \!*';"
 
-    def test_source_command(self):
+    def test_shell_csh_source_command(self):
         s = self.shell.format_source_command('foo')
         assert s.strip() == 'source foo'
 
     @pytest.mark.skipif(sys.version_info[0]==2, reason='dicts not ordered in 2.7')
-    def test_format_output(self):
+    def test_shell_csh_format_output(self):
         environ = Environ()
         environ.update(
             {'VAR_0': 'VAL_0', 'VAR_None': None})

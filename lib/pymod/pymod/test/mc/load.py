@@ -26,7 +26,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_load_1(modules_path, mock_modulepath):
+def test_mc_load_1(modules_path, mock_modulepath):
     """Just load and then unload a"""
     mp = mock_modulepath(modules_path.one)
     pymod.mc.load('a')
@@ -35,7 +35,7 @@ def test_load_1(modules_path, mock_modulepath):
     assert pymod.environ.get('a') is None
 
 
-def test_load_2(modules_path, mock_modulepath):
+def test_mc_load_2(modules_path, mock_modulepath):
     """Load a and b, b loads c, d, e. Then, unload b (c, d, e should also
     unload)
     """
@@ -64,7 +64,7 @@ def test_load_2(modules_path, mock_modulepath):
     assert pymod.environ.get('a') is None
 
 
-def test_load_3(modules_path, mock_modulepath):
+def test_mc_load_3(modules_path, mock_modulepath):
     """Load a and b, b loads d. Then, unload b (d should also unload)"""
     mp = mock_modulepath(modules_path.two)
     pymod.mc.load('a')

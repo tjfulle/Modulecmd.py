@@ -2,7 +2,7 @@ import pytest
 import pymod.environ
 
 
-def test_set_get_unset():
+def test_environ_set_get_unset():
     assert pymod.environ.is_empty()
     pymod.environ.set('KEY', 'ONE')
     assert pymod.environ.get('KEY') == 'ONE'
@@ -12,7 +12,7 @@ def test_set_get_unset():
     assert pymod.environ.get('KEY', 1) is None
 
 
-def test_set_alias():
+def test_environ_set_alias():
     assert pymod.environ.is_empty()
     pymod.environ.set_alias('A1', 'ls')
     assert len(pymod.environ.environ.aliases) == 1
@@ -22,7 +22,7 @@ def test_set_alias():
     assert pymod.environ.environ.aliases['A1'] is None
 
 
-def test_set_shell_function():
+def test_environ_set_shell_function():
     assert pymod.environ.is_empty()
     pymod.environ.set_shell_function('F1', 'doit "$@"')
     assert len(pymod.environ.environ.shell_functions) == 1
@@ -32,7 +32,7 @@ def test_set_shell_function():
     assert pymod.environ.environ.shell_functions['F1'] is None
 
 
-def test_append_path():
+def test_environ_append_path():
     assert pymod.environ.is_empty()
     name = 'PATHNAME'
     pymod.environ.environ[name] = 'bar:baz'
@@ -42,7 +42,7 @@ def test_append_path():
     assert pymod.environ.environ[name] == 'bar:baz:foo'
 
 
-def test_prepend_path():
+def test_environ_prepend_path():
     assert pymod.environ.is_empty()
     name = 'PATHNAME'
     pymod.environ.environ[name] = 'bar:baz'
@@ -52,7 +52,7 @@ def test_prepend_path():
     assert pymod.environ.environ[name] == 'baz:bar:foo'
 
 
-def test_remove_path():
+def test_environ_remove_path():
     assert pymod.environ.is_empty()
     name = 'PATHNAME'
     pymod.environ.environ[name] = 'bar:baz'

@@ -7,8 +7,12 @@ from contrib.util import split
 class MetaData:
     def __init__(self):
         """Store meta data for module"""
-        self.is_enabled = True
+        self.enable_if = True
         self.do_not_register = False
+
+    @property
+    def is_enabled(self):
+        return self.enable_if
 
     def parse(self, filename):
         """Reads meta data for module in ``filename``
@@ -19,7 +23,6 @@ class MetaData:
         if not regex.search(head):
             return
         pymod_directive = split(regex.split(head, 1)[1], ',')
-        print(pymod_directive)
         kwds = dict([split(x, '=', 1) for x in pymod_directive])
         for (key, default) in vars(self).items():
             expr = kwds.pop(key, None)

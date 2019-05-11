@@ -49,7 +49,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_path_ops(modules_path, mock_modulepath):
+def test_mc_path_ops(modules_path, mock_modulepath):
     """Just load and then unload a"""
     mp = mock_modulepath(modules_path.path)
 
@@ -65,7 +65,7 @@ def test_path_ops(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_conflict(modules_path, mock_modulepath):
+def test_mc_conflict(modules_path, mock_modulepath):
     """Just load and then unload a"""
     mp = mock_modulepath(modules_path.path)
     e = pymod.mc.load('e')
@@ -74,7 +74,7 @@ def test_conflict(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_prereq(modules_path, mock_modulepath):
+def test_mc_prereq(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     g = pymod.mc.load('g')
     # no problem, prereq g is loaded
@@ -99,7 +99,7 @@ def test_prereq(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_set_alias(modules_path, mock_modulepath):
+def test_mc_set_alias(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     j = pymod.mc.load('j')
     assert pymod.environ.environ.aliases['foo'] == 'bar'
@@ -113,7 +113,7 @@ def test_set_alias(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_set_shell_function(modules_path, mock_modulepath):
+def test_mc_set_shell_function(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     l = pymod.mc.load('l')
     assert pymod.environ.environ.shell_functions['baz'] == 'bar $@'
@@ -126,7 +126,7 @@ def test_set_shell_function(modules_path, mock_modulepath):
     assert pymod.environ.environ.shell_functions['baz'] is None
 
 @pytest.mark.unit
-def test_source(modules_path, mock_modulepath, capsys):
+def test_mc_source(modules_path, mock_modulepath, capsys):
     mp = mock_modulepath(modules_path.path)
     n = pymod.mc.load('n')
     captured = capsys.readouterr()

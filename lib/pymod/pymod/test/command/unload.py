@@ -20,7 +20,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_unload_1(modules_path, mock_modulepath):
+def test_command_unload_1(modules_path, mock_modulepath):
     load = PymodCommand('load')
     unload = PymodCommand('unload')
     mp = mock_modulepath(modules_path.path)
@@ -34,7 +34,7 @@ def test_unload_1(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_unload_2(modules_path, mock_modulepath):
+def test_command_unload_2(modules_path, mock_modulepath):
     load = PymodCommand('load')
     unload = PymodCommand('unload')
     mp = mock_modulepath(modules_path.path)
@@ -50,7 +50,7 @@ def test_unload_2(modules_path, mock_modulepath):
 
 
 @pytest.mark.unit
-def test_unload_3(modules_path, mock_modulepath):
+def test_command_unload_3(modules_path, mock_modulepath):
     load = PymodCommand('load')
     unload = PymodCommand('unload')
     mp = mock_modulepath(modules_path.path)

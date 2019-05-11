@@ -26,7 +26,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-def test_list(modules_path, mock_modulepath):
+def test_command_list(modules_path, mock_modulepath):
     load = PymodCommand('load')
     list = PymodCommand('list')
     mp = mock_modulepath([modules_path.one, modules_path.two])

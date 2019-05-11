@@ -43,6 +43,15 @@ def pymod_environ():
     pymod.environ.environ = real_environ
 
 
+@pytest.fixture(scope='function', autouse=True)
+def pymod_swapped_state_reset():
+    pymod.mc._mc._swapped_explicitly = []
+    pymod.mc._mc._swapped_on_version_change = []
+    pymod.mc._mc._swapped_on_family_update = []
+    pymod.mc._mc._swapped_on_mp_change = []
+    pymod.mc._mc._unloaded_on_mp_change = []
+
+
 @pytest.fixture(scope='session', autouse=True)
 def _mock_modulepath():
     """Session scoped Modulepath object pointing to the mock directory"""
@@ -199,4 +208,10 @@ def modulecmds():
         @staticmethod
         def source(f):
             return "source({0!r})\n".format(f)
+        @staticmethod
+        def help(x):
+            return "help({0!r})\n".format(x)
+        @staticmethod
+        def whatis(x):
+            return "whatis({0!r})\n".format(x)
     return Commands()

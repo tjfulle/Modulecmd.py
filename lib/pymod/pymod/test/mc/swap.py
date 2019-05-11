@@ -21,7 +21,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_swap_1(modules_path, mock_modulepath):
+def test_mc_swap_1(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     pymod.mc.load('a')
     assert pymod.environ.get('module_swap') == 'a'
@@ -29,7 +29,7 @@ def test_swap_1(modules_path, mock_modulepath):
     assert pymod.environ.get('module_swap') == 'b'
 
 
-def test_swap_2(modules_path, mock_modulepath):
+def test_mc_swap_2(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     assert a.is_loaded
@@ -54,7 +54,7 @@ def test_swap_2(modules_path, mock_modulepath):
     assert pymod.environ.get('module_swap') == 'b'
 
 
-def test_swap_3(modules_path, mock_modulepath):
+def test_mc_swap_3(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     pymod.mc.load('a')
     with pytest.raises(pymod.error.ModuleNotFoundError):

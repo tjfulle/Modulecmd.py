@@ -48,7 +48,7 @@ def modules_path(tmpdir):
 
     return tmpdir
 
-def test_available_1(modules_path, mock_modulepath):
+def test_modulepath_available_1(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.join('1').strpath)
     grouped = pymod.modulepath.group_by_modulepath()
     assert len(grouped) == 1
@@ -85,7 +85,7 @@ def test_available_1(modules_path, mock_modulepath):
         assert m.type == pymod.module.python
 
 
-def test_get(modules_path, mock_modulepath):
+def test_modulepath_get(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.join('1').strpath)
     dirname = pymod.modulepath.mpath.path[0]
 
@@ -119,7 +119,7 @@ def test_get(modules_path, mock_modulepath):
     assert module.type == pymod.module.python
     assert module.filename == os.path.join(dirname, module.fullname + '.py')
 
-def test_append_path(modules_path, mock_modulepath):
+def test_modulepath_append_path(modules_path, mock_modulepath):
 
     mp = mock_modulepath(modules_path.join('1').strpath)
     d1 = pymod.modulepath.mpath.path[0]
@@ -153,7 +153,7 @@ def test_append_path(modules_path, mock_modulepath):
     assert module.fullname == 'ucc/2.0.0'
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
-def test_prepend_path(modules_path, mock_modulepath):
+def test_modulepath_prepend_path(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.join('1').strpath)
     d1 = pymod.modulepath.mpath.path[0]
 
