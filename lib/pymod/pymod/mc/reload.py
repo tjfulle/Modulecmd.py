@@ -8,7 +8,7 @@ def reload(name):
     """Reload the module given by `modulename`"""
     module = pymod.modulepath.get(name)
     if module is None:
-        raise ModuleNotFoundError(modulename, self.modulepath)
+        raise ModuleNotFoundError(name, pymod.modulepath)
     if not module.is_loaded:
         tty.warn('{0} is not loaded!'.format(module.fullname))
         return

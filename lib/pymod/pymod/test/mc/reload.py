@@ -3,6 +3,7 @@ import pytest
 
 import pymod.mc
 import pymod.environ
+from pymod.error import ModuleNotFoundError
 
 
 @pytest.fixture()
@@ -45,3 +46,13 @@ def test_mc_reload_2(modules_path, mock_modulepath):
     # Reference count should not change
     assert pymod.mc.get_refcount(a) == 1
     assert pymod.mc.get_refcount(b) == 1
+
+
+@pytest.mark.unit
+def test_mc_reload_3(modules_path, mock_modulepath):
+    """Just load and then unload a"""
+    mp = mock_modulepath(modules_path.path)
+    x = pymod.mc.reload('a')
+    assert x is None
+    with pytest.raises(ModuleNotFoundError):
+        pymod.mc.reload('fake')
