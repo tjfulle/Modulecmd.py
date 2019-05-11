@@ -18,11 +18,3 @@ class Python(Shell):
 
     def format_alias(self, key, val=None):  # pragma: no cover
         return None
-
-    def dump(self, envar_keys, envars,
-             alias_keys=None, aliases=None,
-             fcn_keys=None, fcns=None):
-        string = []
-        for key in envar_keys:
-            string.append(self.format_environment_variable(key, envars[key]))
-        return '\n'.join(string)
