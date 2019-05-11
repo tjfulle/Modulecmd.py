@@ -95,5 +95,5 @@ def test_mc_load_inserted(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.one)
     pymod.mc.load('e')
     pymod.mc.load('a', insert_at=1)
-    assert ''.join(pymod.mc._mc.loaded_module_names) == 'ae'
+    assert ''.join(pymod.mc._mc.loaded_module_names()) == 'ae'
     
