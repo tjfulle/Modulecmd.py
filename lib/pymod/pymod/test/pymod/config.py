@@ -36,6 +36,12 @@ def test_config_user(mock_test_config):
     cfg = mock_test_config
     d = dict(cfg.scopes['defaults'])
     cfg.push_scope('user', d)
+    cfg.set(‘baz’, ‘spam’, scope=‘user’)
+    assert cfg.get(‘baz’, scope=‘user’) == ‘spam’
+    cfg.set(‘baz’, ‘spam’)
+    assert isinstance(cfg.get(), dict)
+    cfg.get()
+    cfg.get(scope=‘user’)
 
 
 def test_config_user_unknown_var(mock_test_config):
