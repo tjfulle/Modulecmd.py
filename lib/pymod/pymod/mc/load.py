@@ -91,7 +91,7 @@ def load_impl(module):
                 module == pymod.mc._mc._swapped_on_family_update[-1][1]):
             raise ModuleLoadError('Expected 0 ref_count')
     else:
-        pymod.mc.on_module_load(module)
+        pymod.mc.register_module(module)
 
     return
 

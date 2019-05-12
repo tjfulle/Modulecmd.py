@@ -30,8 +30,8 @@ __all__ = [
     'swapped_on_family_update',
     'swapped_on_mp_change',
     'unloaded_on_mp_change',
-    'on_module_load',
-    'on_module_unload',
+    'register_module',
+    'unregister_module',
     'module_is_loaded',
 ]
 
@@ -125,7 +125,7 @@ def decrement_refcount(module, count=None):
     set_lm_refcount(lm_refcount)
 
 
-def on_module_load(module):
+def register_module(module):
     """Register the `module` to the list of loaded modules"""
     # Update the environment
     if not pymod.modulepath.contains(module.modulepath):
@@ -139,13 +139,17 @@ def on_module_load(module):
         set_loaded_modules(loaded_modules)
         increment_refcount(module)
     elif pymod.config.get('debug'):
-        tty.die('on_module_load called for a module that is already loaded!')
+        tty.die('register_module called for a module that is already loaded!')
 
 
-def on_module_unload(module):
+def unregister_module(module):
     """Unregister the `module` to the list of loaded modules"""
-    # Update the environment
-    # Make sure this module is removed
+    # Don't use `get_loaded_modules` because the module we are unregistering
+    # may no longer be available. `get_loaded_modules` makes some assumptions
+    # that can be violated in certain situations. Like, for example, # when
+    # "unusing" a # directory on # the MODULEPATH which has loaded modules.
+    # Those modules are # automaically unloaded since they are no longer
+    # available.
     lm_files = loaded_module_files()
     if module.filename in lm_files:
         i = lm_files.index(module.filename)
@@ -154,7 +158,7 @@ def on_module_unload(module):
         set_loaded_modules(loaded_modules)
         decrement_refcount(module)
     elif pymod.config.get('debug'):
-        tty.die('on_module_unload called for a module that is not loaded!')
+        tty.die('unregister_module called for a module that is not loaded!')
 
 
 def swapped_explicitly(old, new):

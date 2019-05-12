@@ -32,6 +32,6 @@ def unload_impl(module, caller='command_line'):
 
     if refcount == 1 or caller == 'command_line':
         pymod.mc.execmodule(module, pymod.modes.unload)
-        pymod.mc.on_module_unload(module)
+        pymod.mc.unregister_module(module)
     else:
         pymod.mc.decrement_refcount(module)

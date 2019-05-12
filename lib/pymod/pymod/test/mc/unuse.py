@@ -109,3 +109,9 @@ def test_mc_unuse_2(modules_path, mock_modulepath):
     old, new = pymod.mc._mc._swapped_on_mp_change[0]
     assert old == a2
     assert new == a3
+
+
+def test_mc_unuse_fake(modules_path, mock_modulepath):
+    mp = mock_modulepath(modules_path.one)
+    # Nothing to do for nonexistent directory
+    pymod.mc.unuse('fake')

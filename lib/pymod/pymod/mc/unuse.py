@@ -6,9 +6,7 @@ import pymod.modulepath
 def unuse(dirname):
     """Remove dirname from MODULEPATH"""
 
-    if dirname.startswith('~'):
-        dirname = os.path.expanduser(dirname)
-
+    dirname = os.path.expanduser(dirname)
     if not pymod.modulepath.contains(dirname):
         # Nothing to do!
         return
