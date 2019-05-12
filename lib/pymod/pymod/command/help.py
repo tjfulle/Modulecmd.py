@@ -39,7 +39,7 @@ def help(parser, args):
         return 0
 
     if args.help_command:
-        if args.help_command in pymod.command.all_commands():
+        if args.help_command in pymod.command.all_commands():  # pragma: no cover
             parser.add_command(args.help_command)
             with redirect_stdout():
                 parser.parse_args([args.help_command, '-h'])

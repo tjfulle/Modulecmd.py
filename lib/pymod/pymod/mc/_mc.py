@@ -138,7 +138,7 @@ def register_module(module):
         loaded_modules.append(module)
         set_loaded_modules(loaded_modules)
         increment_refcount(module)
-    elif pymod.config.get('debug'):
+    elif pymod.config.get('debug'):  # pragma: no cover
         tty.die('register_module called for a module that is already loaded!')
 
 
@@ -157,7 +157,7 @@ def unregister_module(module):
         loaded_modules = [pymod.modulepath.get(f) for f in lm_files]
         set_loaded_modules(loaded_modules)
         decrement_refcount(module)
-    elif pymod.config.get('debug'):
+    elif pymod.config.get('debug'):  # pragma: no cover
         tty.die('unregister_module called for a module that is not loaded!')
 
 

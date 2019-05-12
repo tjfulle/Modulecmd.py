@@ -25,7 +25,6 @@ def family(mode, module, family_name):
     else:
         fam_key, ver_key = family_envar_keys()
         fam = pymod.environ.get(fam_key)
-        tty.debug(str(fam))
         if fam is not None:
             # Attempting to load module of same family
             ver = pymod.environ.get(ver_key)

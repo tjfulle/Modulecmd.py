@@ -50,18 +50,23 @@ def execmodule_in_sandbox(module, mode):
     # Execute the environment
     ns = module_exec_sandbox(module, mode)
     code = compile(module.read(mode), module.filename, 'exec')
-    exec_(code, ns, {})
+    try:
+        exec_(code, ns, {})
+    except StopLoadingModuleError:
+        pass
 
 
 
 def module_exec_sandbox(module, mode):
-
+    def stop():
+        raise StopLoadingModuleError
     cb = pymod.mc.callback
     callback = pymod.mc.callback.callback
     reported_by = ' (reported by {0!r})'.format(module.filename)
     ns = {
         'os': os,
         'sys': sys,
+        'stop': stop,
         'env': pymod.environ.copy(),
         'user_env': pymod.user.env,
         'getenv': pymod.environ.get,
@@ -116,3 +121,7 @@ def module_exec_sandbox(module, mode):
         'source': callback(cb.source, mode),
     }
     return ns
+
+
+class StopLoadingModuleError(Exception):
+    pass

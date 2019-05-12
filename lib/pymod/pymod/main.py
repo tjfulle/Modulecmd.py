@@ -198,7 +198,6 @@ class PymodArgumentParser(argparse.ArgumentParser):
 
         # select only the options for the particular level we're showing.
         show_options = options_by_level[level]
-        print(self._optionals)
         if show_options != 'all':
             opts = dict((opt.option_strings[0].strip('-'), opt)
                         for opt in self._optionals._group_actions)

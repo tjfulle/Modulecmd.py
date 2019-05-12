@@ -150,6 +150,9 @@ def modulecmds():
             val = val or key
             return "setenv({0!r}, {1!r})\n".format(key, val)
         @staticmethod
+        def unsetenv(key):
+            return "unsetenv({0!r})\n".format(key)
+        @staticmethod
         def load(x):
             return "load({0!r})\n".format(x)
         @staticmethod
@@ -214,4 +217,7 @@ def modulecmds():
         @staticmethod
         def whatis(x):
             return "whatis({0!r})\n".format(x)
+        @staticmethod
+        def isloaded(x):
+            return "is_loaded({0!r})\n".format(x)
     return Commands()

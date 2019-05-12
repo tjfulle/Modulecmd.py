@@ -179,7 +179,15 @@ class Modulepath:
                 return 1
             elif b.version > a.version:
                 return -1
-            return 0
+            ai = self.path.index(a.modulepath)
+            bi = self.path.index(b.modulepath)
+            if ai < bi:
+                return 1
+            elif bi < ai:
+                return -1
+            raise ValueError(  # pragma: no cover
+                "This is a state of module version comparison that should "
+                "never be reached.  Please inform the Modulecmd.py developers")
         self.db['by_name'] = {}
         for (_, modules) in groupby(self.modules, lambda x: x.name):
             for module in modules:

@@ -21,7 +21,6 @@ def swap(module_a_name, module_b_name, maintain_state=False, caller='command_lin
 
     assert module_a.is_loaded
 
-    print(module_a, module_b)
     swap_impl(module_a, module_b, maintain_state=maintain_state, caller=caller)
 
     pymod.mc.swapped_explicitly(module_a, module_b)

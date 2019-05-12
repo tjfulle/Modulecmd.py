@@ -148,7 +148,8 @@ class Module(object):
 
     def set_whatis(self, *args, **kwargs):
         if self.type == tcl:
-            assert len(args) == 1
+            if len(args) != 1:
+                raise ValueError('unknown whatis args length for tcl module')
             kwargs['short_description'] = args[0]
         else:
             for arg in args:
