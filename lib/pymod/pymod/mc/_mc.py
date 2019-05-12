@@ -146,10 +146,11 @@ def on_module_unload(module):
     """Unregister the `module` to the list of loaded modules"""
     # Update the environment
     # Make sure this module is removed
-    loaded_modules = get_loaded_modules()
-    if module in loaded_modules:
-        i = loaded_modules.index(module)
-        loaded_modules.pop(i)
+    lm_files = loaded_module_files()
+    if module.filename in lm_files:
+        i = lm_files.index(module.filename)
+        lm_files.pop(i)
+        loaded_modules = [pymod.modulepath.get(f) for f in lm_files]
         set_loaded_modules(loaded_modules)
         decrement_refcount(module)
     elif pymod.config.get('debug'):

@@ -5,20 +5,24 @@ import pymod.modulepath
 
 def use(dirname, append=False, delete=False):
     """Add dirname to MODULEPATH"""
+    dirname = os.path.expanduser(dirname)
     if delete:
         pymod.mc.unuse(dirname)
         return
-    if dirname.startswith('~'):
-        dirname = os.path.expanduser(dirname)
-    if append:
+    elif append:
         pymod.modulepath.append_path(dirname)
     else:
-        _, bumped = pymod.modulepath.prepend_path(dirname)
-        for m1 in bumped:
+        _, lost_precedence = pymod.modulepath.prepend_path(dirname)
+        for m1 in lost_precedence:
             if not m1.is_loaded:
                 continue
-            m2 = pymod.modulepath.get(m1.name)
+            for attr in ('fullname', 'name'):
+                m2 = pymod.modulepath.get(getattr(m1, attr))
+                if m2 is not None:
+                    break
+            else:
+                continue
             if m1.filename != m2.filename:
-                assert m1.is_loaded
-                pymod.mc.swap(m1, m2)
+                # Filenames not same -> m2 has higher precedence, swap
+                pymod.mc.swap_impl(m1, m2)
                 pymod.mc.swapped_on_mp_change(m1, m2)

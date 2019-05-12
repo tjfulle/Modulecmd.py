@@ -36,9 +36,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
 def test_mc_use_prepend(modules_path, mock_modulepath):
-    """Just load and then unload a"""
     is_module = lambda x: pymod.modulepath.get(x) is not None
     mp = mock_modulepath(modules_path.one)
 
@@ -73,9 +71,7 @@ def test_mc_use_prepend(modules_path, mock_modulepath):
     assert a.modulepath == modules_path.four
 
 
-@pytest.mark.unit
 def test_mc_use_append(modules_path, mock_modulepath):
-    """Just load and then unload a"""
     is_module = lambda x: pymod.modulepath.get(x) is not None
     mp = mock_modulepath(modules_path.one)
 
@@ -108,3 +104,19 @@ def test_mc_use_append(modules_path, mock_modulepath):
     a = pymod.modulepath.get('a')
     assert a.version.string == '4.0'
     assert a.modulepath == modules_path.four
+
+
+def test_mc_use_prepend_bumped(modules_path, mock_modulepath):
+    is_module = lambda x: pymod.modulepath.get(x) is not None
+    mp = mock_modulepath(modules_path.one)
+
+    a1 = pymod.mc.load('a/1.0')
+
+    # Using 2 will automatically unload 1/a/1.0 and load 2/a/1.0
+    pymod.mc.use(modules_path.two)
+    a2 = pymod.modulepath.get('a/1.0')
+    assert a1.version == a2.version
+    assert a1.filename != a2.filename
+    old, new = pymod.mc._mc._swapped_on_mp_change[0]
+    assert old == a1
+    assert new == a2

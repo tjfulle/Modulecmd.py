@@ -109,21 +109,21 @@ class Modulepath:
 
         # Determine which modules changed in priority due to insertion of new
         # directory in to path
-        bumped = []
+        lost_precedence = []
         grouped_by_modulepath = self.group_by_modulepath()
         fullnames = [m.fullname for m in grouped_by_modulepath[0][1]]
         for (_, modules) in grouped_by_modulepath[1:]:
             for module in modules:
                 if module.fullname in fullnames:
-                    bumped.append(module)
-        return modules_in_dir, bumped
+                    lost_precedence.append(module)
+        return modules_in_dir, lost_precedence
 
     def remove_path(self, dirname):
-        modules_in_dir, orphaned, bumped = [], [], []
+        modules_in_dir, orphaned, gained_precedence = [], [], []
 
         if dirname not in self.path:
             tty.warn('Modulepath: {0!r} is not in modulepath'.format(dirname))
-            return modules_in_dir, orphaned, bumped
+            return modules_in_dir, orphaned, gained_precedence
 
         modules_in_dir.extend(self.getby_dirname(dirname))
         orphaned.extend([m for m in modules_in_dir if m.is_loaded])
@@ -136,15 +136,14 @@ class Modulepath:
         for orphan in orphaned:
             other = self.getby_fullname(orphan.fullname)
             if other is not None:
-                bumped.append(other)
+                gained_precedence.append(other)
                 continue
             other = self.getby_name(orphan.name)
             if other is not None:
-                bumped.append(other)
+                gained_precedence.append(other)
                 continue
-            bumped.append(None)
-        tty.debug(str(orphaned))
-        return modules_in_dir, orphaned, bumped
+            gained_precedence.append(None)
+        return modules_in_dir, orphaned, gained_precedence
 
     def set_path(self, directories):
         self.path = []
@@ -262,11 +261,6 @@ class Modulepath:
             description = grep_pat_in_string(description, regex)
 
         return description
-
-    def apply(self, fun):
-        for (_, modules) in self.group_by_modulepath():
-            for module in modules:
-                fun(module)
 
     def candidates(self, key):
         # Return a list of modules that might by given by key
