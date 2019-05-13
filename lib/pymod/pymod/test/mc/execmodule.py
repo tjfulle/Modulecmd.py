@@ -149,27 +149,23 @@ def test_mc_execmodule_modulepath_ops(tmpdir, mock_modulepath):
     one.join('a.py').write('')
     two = tmpdir.mkdir('2')
     two.join('a.py').write('')
-    mp = mock_modulepath(one.strpath)
+    core = tmpdir.mkdir('core')
+    x = core.mkdir('x')
+    f1 = x.join('1.py').write('append_path({0!r}, {1!r})'.format(
+        pymod.names.modulepath, one.strpath))
+    f2 = x.join('2.py').write('prepend_path({0!r}, {1!r})'.format(
+        pymod.names.modulepath, two.strpath))
+    mp = mock_modulepath(core.strpath)
+
+    x = pymod.mc.load('x/1')
     a = pymod.modulepath.get('a')
     assert a.filename == os.path.join(one.strpath, 'a.py')
-    pymod.mc.callback.append_path(
-        pymod.modes.load,
-        pymod.names.modulepath,
-        two.strpath)
-    a = pymod.modulepath.get('a')
-    assert a.filename == os.path.join(one.strpath, 'a.py')
-    pymod.mc.callback.remove_path(
-        pymod.modes.load,
-        pymod.names.modulepath,
-        two.strpath)
-    a = pymod.modulepath.get('a')
-    assert a.filename == os.path.join(one.strpath, 'a.py')
-    pymod.mc.callback.prepend_path(
-        pymod.modes.load,
-        pymod.names.modulepath,
-        two.strpath)
+    assert x.unlocks(one.strpath)
+
+    x = pymod.mc.load('x/2')
     a = pymod.modulepath.get('a')
     assert a.filename == os.path.join(two.strpath, 'a.py')
+    assert x.unlocks(two.strpath)
 
 
 def test_mc_execmodule_stop(tmpdir, mock_modulepath):

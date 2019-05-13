@@ -30,4 +30,4 @@ def test_command_unuse(modules_path, mock_modulepath):
     mp = mock_modulepath([modules_path.one, modules_path.two])
     unuse(modules_path.two)
     unuse(modules_path.one)
-    assert len(pymod.modulepath.mpath.path) == 0
+    assert pymod.modulepath.size() == 0

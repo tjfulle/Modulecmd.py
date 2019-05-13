@@ -43,7 +43,7 @@ def test_collection_default(modules_path, mock_modulepath):
     assert len(x) == 1
     assert len(x[0]) == 2
     assert len(x[0][1]) == 2
-    assert x[0][0] == pymod.modulepath.mpath.path[0]
+    assert x[0][0] == pymod.modulepath._path.path[0].path
     assert x[0][1][0][0] == 'a'
     assert x[0][1][1][0] == 'b'
     s = pymod.collection.format_available().split('\n')[1].strip()
@@ -66,13 +66,13 @@ def test_collection_named(modules_path, mock_modulepath):
 
     assert len(x[0]) == 2
     assert len(x[0][1]) == 2
-    assert x[0][0] == pymod.modulepath.mpath.path[0]
+    assert x[0][0] == pymod.modulepath._path.path[0].path
     assert x[0][1][0][0] == 'a'
     assert x[0][1][1][0] == 'b'
 
     assert len(x[1]) == 2
     assert len(x[1][1]) == 2
-    assert x[1][0] == pymod.modulepath.mpath.path[1]
+    assert x[1][0] == pymod.modulepath._path.path[1].path
     assert x[1][1][0][0] == 'c'
     assert x[1][1][1][0] == 'd'
 
@@ -88,7 +88,7 @@ def test_collection_named(modules_path, mock_modulepath):
 
     pymod.mc.purge()
     # remove a module
-    f = os.path.join(pymod.modulepath.mpath.path[0], 'a.py')
+    f = os.path.join(pymod.modulepath._path.path[0].path, 'a.py')
     os.remove(f)
     with pytest.raises(pymod.error.CollectionModuleNotFoundError):
         pymod.mc.restore('foo')

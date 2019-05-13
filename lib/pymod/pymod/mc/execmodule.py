@@ -81,42 +81,42 @@ def module_exec_sandbox(module, mode):
         'log_info': lambda s: tty.info(s, reported_by=module.filename),
         'log_warn': lambda s: tty.warn(s, reported_by=module.filename),
         'log_error': lambda s: tty.die(s, reported_by=module.filename),
-        'execute': callback(cb.execute, mode),
+        'execute': callback(cb.execute, mode, module),
         #
-        'setenv': callback(cb.setenv, mode),
-        'unsetenv': callback(cb.unsetenv, mode),
+        'setenv': callback(cb.setenv, mode, module),
+        'unsetenv': callback(cb.unsetenv, mode, module),
         #
-        'use': callback(cb.use, mode),
-        'unuse': callback(cb.unuse, mode),
+        'use': callback(cb.use, mode, module),
+        'unuse': callback(cb.unuse, mode, module),
         #
-        'set_alias': callback(cb.set_alias, mode, when='alsways'),
-        'unset_alias': callback(cb.unset_alias, mode, when='always'),
+        'set_alias': callback(cb.set_alias, mode, module, when='alsways'),
+        'unset_alias': callback(cb.unset_alias, mode, module, when='always'),
         #
-        'set_shell_function': callback(cb.set_shell_function, mode, when='always'),
-        'unset_shell_function': callback(cb.unset_shell_function, mode, when='always'),
+        'set_shell_function': callback(cb.set_shell_function, mode, module, when='always'),
+        'unset_shell_function': callback(cb.unset_shell_function, mode, module, when='always'),
         #
-        'prereq': callback(cb.prereq, mode),
-        'prereq_any': callback(cb.prereq_any, mode),
-        'conflict': callback(cb.conflict, mode, module=module),
+        'prereq': callback(cb.prereq, mode, module),
+        'prereq_any': callback(cb.prereq_any, mode, module),
+        'conflict': callback(cb.conflict, mode, module),
         #
-        'load': callback(cb.load, mode),
-        'swap': callback(cb.swap, mode),
-        'load_first': callback(cb.load_first, mode),
-        'unload': callback(cb.unload, mode),
-        'is_loaded': callback(cb.is_loaded, mode),
+        'load': callback(cb.load, mode, module),
+        'swap': callback(cb.swap, mode, module),
+        'load_first': callback(cb.load_first, mode, module),
+        'unload': callback(cb.unload, mode, module),
+        'is_loaded': callback(cb.is_loaded, mode, module),
         #
-        'family': callback(cb.family, mode, module=module),
+        'family': callback(cb.family, mode, module),
         #
-        'prepend_path': callback(cb.prepend_path, mode),
-        'append_path': callback(cb.append_path, mode),
-        'remove_path': callback(cb.remove_path, mode),
+        'prepend_path': callback(cb.prepend_path, mode, module),
+        'append_path': callback(cb.append_path, mode, module),
+        'remove_path': callback(cb.remove_path, mode, module),
         #
-        'whatis': callback(cb.whatis, mode, module=module),
-        'help': callback(cb.help, mode, module=module),
+        'whatis': callback(cb.whatis, mode, module),
+        'help': callback(cb.help, mode, module),
         'which': which,
         'check_output': check_output,
         #
-        'source': callback(cb.source, mode),
+        'source': callback(cb.source, mode, module),
     }
     return ns
 

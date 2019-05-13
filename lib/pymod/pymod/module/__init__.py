@@ -43,6 +43,7 @@ class Module(object):
         self.metadata = meta
         self.is_default = False
         self._opts = None
+        self._unlocks = []
 
     def __str__(self):
         return 'Module(name={0})'.format(self.fullname)
@@ -67,6 +68,23 @@ class Module(object):
     @property
     def do_not_register(self):
         return self.metadata.do_not_register
+
+    def unlocks_dir(self, dirname):
+        if dirname not in self._unlocks:
+            self._unlocks.append(dirname)
+
+    def unlocks(self, dirname):
+        return dirname in self._unlocks
+
+    def unlocked_by(self, loaded_modules):
+        """Simple function which lets a module know about its dependents"""
+        unlocked_by = []
+        dirname = self.modulepath
+        for module in loaded_modules[::-1]:
+            if module.unlocks(dirname):
+                unlocked_by.append(module)
+                dirname = module.modulepath
+        return unlocked_by[::-1]
 
     def read(self, mode):
         if self.type == tcl:

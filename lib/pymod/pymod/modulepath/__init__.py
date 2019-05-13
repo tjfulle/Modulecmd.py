@@ -11,49 +11,49 @@ def _modulepath():
     return Modulepath(path)
 
 
-mpath = Singleton(_modulepath)
+_path = Singleton(_modulepath)
 
 
 def export_env():
-    return mpath.export_env()
+    return _path.export_env()
 
 
 def path():
-    return list(mpath.path)
+    return [p.path for p in _path.path]
 
 
 def set_path(other_path):
-    global mpath
-    mpath = other_path
-
-
-def group_by_modulepath(sort=False):
-    return mpath.group_by_modulepath(sort=False)
+    global _path
+    _path = other_path
 
 
 def get(key):
-    return mpath.get(key)
+    return _path.get(key)
 
 
 def append_path(dirname):
-    return mpath.append_path(dirname)
+    return _path.append_path(dirname)
 
 
 def remove_path(dirname):
-    return mpath.remove_path(dirname)
+    return _path.remove_path(dirname)
 
 
 def prepend_path(dirname):
-    return mpath.prepend_path(dirname)
+    return _path.prepend_path(dirname)
 
 
 def format_available(**kwargs):
-    return mpath.format_available(**kwargs)
+    return _path.format_available(**kwargs)
 
 
 def candidates(name):
-    return mpath.candidates(name)
+    return _path.candidates(name)
 
 
 def contains(path):
-    return path in mpath
+    return path in _path
+
+
+def size():
+    return len(_path)

@@ -55,20 +55,20 @@ def pymod_swapped_state_reset():
 @pytest.fixture(scope='session', autouse=True)
 def _mock_modulepath():
     """Session scoped Modulepath object pointing to the mock directory"""
-    real_modulepath = pymod.modulepath.mpath
+    real_modulepath = pymod.modulepath._path
     path = os.path.join(pymod.paths.mock_modulepath_path, 'core', '1')
     modulepath = pymod.modulepath.Modulepath([path])
-    pymod.modulepath.mpath = modulepath
+    pymod.modulepath._path = modulepath
 
-    yield pymod.modulepath.mpath
+    yield pymod.modulepath._path
 
-    pymod.modulepath.mpath = real_modulepath
+    pymod.modulepath._path = real_modulepath
 
 
 @pytest.fixture()
 def mock_modulepath(request):
     """Function scoped Modulepath object pointing to the mock directory"""
-    real_modulepath = pymod.modulepath.mpath
+    real_modulepath = pymod.modulepath._path
     def _modulepath(subdir):
         if isinstance(subdir, (tuple, list)):
             path = subdir
@@ -83,10 +83,10 @@ def mock_modulepath(request):
             assert os.path.isdir(path)
             path = [path]
         modulepath = pymod.modulepath.Modulepath(path)
-        pymod.modulepath.mpath = modulepath
-        return pymod.modulepath.mpath
+        pymod.modulepath._path = modulepath
+        return pymod.modulepath._path
     def _reset():
-        pymod.modulepath.mpath = real_modulepath
+        pymod.modulepath._path = real_modulepath
     request.addfinalizer(_reset)
     return _modulepath
 

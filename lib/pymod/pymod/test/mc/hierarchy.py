@@ -213,4 +213,8 @@ def test_mc_hierarchy_2(modules_path, mock_modulepath):
     assert b.filename == os.path.join(
         mpi_unlocks_dir, b.name, b.version.string + '.py')
 
+    unlocked_by = b.unlocked_by(pymod.mc.get_loaded_modules())
+    assert len(unlocked_by) == 2
+    assert unlocked_by[0] == pymod.modulepath.get('ucc/2.0')
+    assert unlocked_by[1] == pymod.modulepath.get('umpi/1.0')
     return

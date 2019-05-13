@@ -14,25 +14,78 @@ from llnl.util.tty.colify import colified
 from contrib.functools_backport import cmp_to_key
 
 
+class Path:
+    def __init__(self, dirname):
+        self.path = dirname
+        self.modules = find_modules(dirname)
+        if not self.modules:
+            tty.verbose('Path: no modules found in {0}'.format(dirname))
+
+    def __contains__(self, key):
+        if isinstance(key, pymod.module.Module):
+            return key in self.modules
+        if os.path.isfile(key):
+            return key in self.filenames
+        parts = key.split(os.path.sep)
+        if len(parts) == 1:
+            return key in self.names
+        if len(parts) == 2:
+            return key in self.fullnames
+
+    @property
+    def filenames(self):
+        return [m.filename for m in self.modules]
+
+    @property
+    def names(self):
+        return [m.name for m in self.modules]
+
+    @property
+    def fullnames(self):
+        return [m.fullname for m in self.modules]
+
+    def getby_name(self, name):
+        for module in self.modules:
+            if module.name == name:
+                return module
+        return None
+
+    def getby_fullname(self, fullname):
+        for module in self.modules:
+            if module.fullname == fullname:
+                return module
+        return None
+
+    def getby_filename(self, filename):
+        for module in self.modules:
+            if module.filename == filename:
+                return module
+        return None
+
+
 class Modulepath:
     def __init__(self, directories):
         self.path = []
-        self.modules = []
-        self.db = {'by_name': {}}
+        self.defaults = {}
         self._modified = False
-        self._grouped_by_modulepath = None
         self.set_path(directories)
 
     def export_env(self):
         env = dict()
         if self._modified:
             key = pymod.names.modulepath
-            value = join(self.path, os.pathsep)
+            value = join([p.path for p in self.path], os.pathsep)
             env.update({key: value})
         return env
 
     def __contains__(self, dirname):
-        return dirname in self.path
+        return dirname in [p.path for p in self.path]
+
+    def __iter__(self):
+        return iter(self.path)
+
+    def __len__(self):
+        return len(self.path)
 
     def get(self, key):
         """Get a module from the available modules.
@@ -40,7 +93,7 @@ class Modulepath:
         """
         if isinstance(key, pymod.module.Module):
             return key
-        if os.path.isdir(key) and key in self.path:
+        if os.path.isdir(key) and key in self:
             return self.getby_dirname(key)
         if os.path.isfile(key):
             return self.getby_filename(key)
@@ -51,84 +104,84 @@ class Modulepath:
             return self.getby_fullname(key)
         return None
 
+    def index(self, dirname):
+        for (i, path) in enumerate(self.path):
+            if path.path == dirname:
+                return i
+        raise ValueError('{0} not in Modulepath'.format(dirname))
+
     def getby_dirname(self, dirname):
-        return [m for m in self.modules if m.modulepath == dirname]
+        for path in self:
+            if path.path == dirname:
+                return path.modules
+        return []
 
     def getby_name(self, name):
-        return self.db['by_name'].get(name)
+        return self.defaults.get(name)
 
     def getby_fullname(self, fullname):
-        for (_, modules) in self.group_by_modulepath():
-            for module in modules:
-                if module.fullname == fullname:
-                    return module
+        for path in self.path:
+            module = path.getby_fullname(fullname)
+            if module is not None:
+                return module
         return None
 
     def getby_filename(self, filename):
-        for (_, modules) in self.group_by_modulepath():
-            for module in modules:
-                if module.filename == filename:
-                    return module
+        for path in self.path:
+            module = path.getby_filename(filename)
+            if module is not None:
+                return module
         return None
 
     def _path_modified(self):
-        self._grouped_by_modulepath = None
         self.assign_defaults()
         self._modified = True
 
     def append_path(self, dirname):
         if not os.path.isdir(dirname):  # pragma: no cover
             tty.warn('Modulepath: {0!r} is not a directory'.format(dirname))
-        if dirname in self.path:
+        if dirname in self:
             return
-        modules_in_dir = find_modules(dirname)
-        if not modules_in_dir:
-            tty.warn('Modulepath: no modules found in {0}'.format(dirname))
+        path = Path(dirname)
+        if not path.modules:
             return
-        self.modules.extend(modules_in_dir)
-        self.path.append(dirname)
+        self.path.append(path)
         self._path_modified()
-        return modules_in_dir
+        return path.modules
 
     def prepend_path(self, dirname):
         if not os.path.isdir(dirname):  # pragma: no cover
             tty.warn('Modulepath: {0!r} is not a directory'.format(dirname))
             return [], []
-        if dirname in self.path:
-            self.path.pop(self.path.index(dirname))
-            modules_in_dir = [m for m in self.modules
-                              if m.modulepath == dirname]
+        if dirname in self:
+            path = self.path.pop(self.index(dirname))
         else:
-            modules_in_dir = find_modules(dirname)
-            if not modules_in_dir:
-                tty.warn('Modulepath: no modules found in {0}'.format(dirname))
+            path = Path(dirname)
+            if not path.modules:
                 return [], []
-            self.modules.extend(modules_in_dir)
-        self.path.insert(0, dirname)
+        self.path.insert(0, path)
         self._path_modified()
 
         # Determine which modules changed in priority due to insertion of new
         # directory in to path
         lost_precedence = []
-        grouped_by_modulepath = self.group_by_modulepath()
-        fullnames = [m.fullname for m in grouped_by_modulepath[0][1]]
-        for (_, modules) in grouped_by_modulepath[1:]:
-            for module in modules:
+        fullnames = [m.fullname for m in self.path[0].modules]
+        for p in self.path[1:]:
+            for module in p.modules:
                 if module.fullname in fullnames:
                     lost_precedence.append(module)
-        return modules_in_dir, lost_precedence
+        return path.modules, lost_precedence
 
     def remove_path(self, dirname):
         modules_in_dir, orphaned, gained_precedence = [], [], []
 
-        if dirname not in self.path:
+        if dirname not in self:
             tty.warn('Modulepath: {0!r} is not in modulepath'.format(dirname))
             return modules_in_dir, orphaned, gained_precedence
 
         modules_in_dir.extend(self.getby_dirname(dirname))
         orphaned.extend([m for m in modules_in_dir if m.is_loaded])
-        self.modules = [m for m in self.modules if m not in modules_in_dir]
-        self.path.pop(self.path.index(dirname))
+        self.path.pop(self.index(dirname))
         self._path_modified()
 
         # Determine which modules may have moved up in priority due to removal
@@ -147,7 +200,6 @@ class Modulepath:
 
     def set_path(self, directories):
         self.path = []
-        self.modules = []
         if not directories:
             return
         for directory in directories:
@@ -155,13 +207,12 @@ class Modulepath:
                 tty.verbose(
                     'Modulepath: nonexistent directory {0!r}'.format(directory))
                 continue
-            modules_in_dir = find_modules(directory)
-            if not modules_in_dir:
+            path = Path(directory)
+            if not path.modules:
                 tty.verbose(
                     'Modulepath: no modules found in {0}'.format(directory))
                 continue
-            self.modules.extend(modules_in_dir)
-            self.path.append(directory)
+            self.path.append(path)
         self._path_modified()
 
     def assign_defaults(self):
@@ -179,8 +230,8 @@ class Modulepath:
                 return 1
             elif b.version > a.version:
                 return -1
-            ai = self.path.index(a.modulepath)
-            bi = self.path.index(b.modulepath)
+            ai = self.index(a.modulepath)
+            bi = self.index(b.modulepath)
             if ai < bi:
                 return 1
             elif bi < ai:
@@ -188,8 +239,11 @@ class Modulepath:
             raise ValueError(  # pragma: no cover
                 "This is a state of module version comparison that should "
                 "never be reached.  Please inform the Modulecmd.py developers")
-        self.db['by_name'] = {}
-        for (_, modules) in groupby(self.modules, lambda x: x.name):
+        self.defaults = {}
+        grouped = groupby(
+            [module for path in self.path for module in path.modules],
+            lambda x: x.name)
+        for (_, modules) in grouped:
             for module in modules:
                 module.is_default = False
             if len(modules) > 1:
@@ -197,19 +251,7 @@ class Modulepath:
                                  key=cmp_to_key(compare_module_versions),
                                  reverse=True)
                 modules[0].is_default = True
-            self.db['by_name'][modules[0].name] = modules[0]
-
-    def group_by_modulepath(self, sort=False):
-        if self._grouped_by_modulepath is None:
-            grouped = dict(groupby(self.modules, lambda x: x.modulepath))
-            self._grouped_by_modulepath = []
-            for dirname in self.path:
-                if sort:
-                    modules = sorted(grouped.pop(dirname), key=lambda m: m.fullname)
-                else:
-                    modules = grouped.pop(dirname)
-                self._grouped_by_modulepath.append((dirname, modules))
-        return self._grouped_by_modulepath
+            self.defaults[modules[0].name] = modules[0]
 
     def filter_modules_by_regex(self, modules, regex):
         if regex:
@@ -236,7 +278,9 @@ class Modulepath:
         if not terse:
             _, width = tty.terminal_size()
             head = lambda x: (' ' + x + ' ').center(width, '-')
-            for (directory, modules) in self.group_by_modulepath():
+            for path in self:
+                directory = path.path
+                modules = path.modules
                 modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
                 if not os.path.isdir(directory):  # pragma: no cover
                     if not fulloutput:
@@ -253,7 +297,9 @@ class Modulepath:
                 sio.write(head(directory) + '\n')
                 sio.write(s + '\n')
         else:
-            for (directory, modules) in self.group_by_modulepath():
+            for path in self:
+                directory = path.path
+                modules = path.modules
                 if not os.path.isdir(directory):  # pragma: no cover
                     continue
                 modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
@@ -274,7 +320,8 @@ class Modulepath:
         # Return a list of modules that might by given by key
         the_candidates = set()
         regex = re.compile(key)
-        for (_, modules) in self.group_by_modulepath():
+        for path in self:
+            modules = path.modules
             if not modules:
                 continue
             for module in modules:
