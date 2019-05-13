@@ -19,9 +19,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
 def test_mc_reload_1(modules_path, mock_modulepath):
-    """Just load and then unload a"""
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     assert pymod.environ.get('a') == 'a'
@@ -31,16 +29,16 @@ def test_mc_reload_1(modules_path, mock_modulepath):
     assert pymod.mc.get_refcount(a) == 1
 
 
-@pytest.mark.unit
 def test_mc_reload_2(modules_path, mock_modulepath):
-    """Just load and then unload a"""
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
-    assert pymod.environ.get('a') == 'a'
-    assert pymod.environ.get('b') == 'b'
-    assert pymod.environ.get('c') == 'c'
-    assert pymod.environ.get('d') == 'd'
+    assert a.is_loaded
+    assert b.is_loaded
+    c = pymod.modulepath.get('c')
+    d = pymod.modulepath.get('d')
+    assert c.is_loaded
+    assert d.is_loaded
     pymod.mc.reload('a')
     assert pymod.environ.get('a') == 'a'
     # Reference count should not change
@@ -48,9 +46,7 @@ def test_mc_reload_2(modules_path, mock_modulepath):
     assert pymod.mc.get_refcount(b) == 1
 
 
-@pytest.mark.unit
 def test_mc_reload_3(modules_path, mock_modulepath):
-    """Just load and then unload a"""
     mp = mock_modulepath(modules_path.path)
     x = pymod.mc.reload('a')
     assert x is None

@@ -77,7 +77,7 @@ class Modulepath:
         self._modified = True
 
     def append_path(self, dirname):
-        if not os.path.isdir(dirname):
+        if not os.path.isdir(dirname):  # pragma: no cover
             tty.warn('Modulepath: {0!r} is not a directory'.format(dirname))
         if dirname in self.path:
             return
@@ -91,7 +91,7 @@ class Modulepath:
         return modules_in_dir
 
     def prepend_path(self, dirname):
-        if not os.path.isdir(dirname):
+        if not os.path.isdir(dirname):  # pragma: no cover
             tty.warn('Modulepath: {0!r} is not a directory'.format(dirname))
             return [], []
         if dirname in self.path:
@@ -151,7 +151,7 @@ class Modulepath:
         if not directories:
             return
         for directory in directories:
-            if not os.path.isdir(directory):
+            if not os.path.isdir(directory):  # pragma: no cover
                 tty.verbose(
                     'Modulepath: nonexistent directory {0!r}'.format(directory))
                 continue
@@ -238,7 +238,7 @@ class Modulepath:
             head = lambda x: (' ' + x + ' ').center(width, '-')
             for (directory, modules) in self.group_by_modulepath():
                 modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
-                if not os.path.isdir(directory):
+                if not os.path.isdir(directory):  # pragma: no cover
                     if not fulloutput:
                         continue
                     s = colorize('@r{(Directory does not exist)}'.center(width))
@@ -254,7 +254,7 @@ class Modulepath:
                 sio.write(s + '\n')
         else:
             for (directory, modules) in self.group_by_modulepath():
-                if not os.path.isdir(directory):
+                if not os.path.isdir(directory):  # pragma: no cover
                     continue
                 modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
                 modules = self.filter_modules_by_regex(modules, regex)

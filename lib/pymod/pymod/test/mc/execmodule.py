@@ -11,7 +11,6 @@ from contrib.util import str2dict
 
 
 def test_mc_execmodule_path_ops(tmpdir, modulecmds, mock_modulepath):
-    """Just load and then unload a"""
     m = modulecmds
     tmpdir.join('a.py').write(
         m.append_path('foo', 'bar', sep=':') +

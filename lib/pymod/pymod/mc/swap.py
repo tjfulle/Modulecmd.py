@@ -5,7 +5,7 @@ import llnl.util.tty as tty
 from pymod.error import ModuleNotFoundError
 
 
-def swap(module_a_name, module_b_name, maintain_state=False, caller='command_line'):
+def swap(module_a_name, module_b_name, caller='command_line'):
     """Swap modules a and b"""
     module_a = pymod.modulepath.get(module_a_name)
     module_b = pymod.modulepath.get(module_b_name)
@@ -21,7 +21,7 @@ def swap(module_a_name, module_b_name, maintain_state=False, caller='command_lin
 
     assert module_a.is_loaded
 
-    swap_impl(module_a, module_b, maintain_state=maintain_state, caller=caller)
+    swap_impl(module_a, module_b, caller=caller)
 
     pymod.mc.swapped_explicitly(module_a, module_b)
 
@@ -58,8 +58,9 @@ def swap_impl(module_a, module_b, maintain_state=False, caller='command_line'):
             # reloaded
             to_unload_and_reload = loaded[i:]
             break
-    else:
+    else: # pragma: no cover
         raise NoModulesToSwapError
+    print(to_unload_and_reload)
 
     # Unload any that need to be unloaded first
     for other in to_unload_and_reload[::-1]:
@@ -67,7 +68,7 @@ def swap_impl(module_a, module_b, maintain_state=False, caller='command_line'):
     assert other.name == module_a.name
 
     # Now load it
-    pymod.mc.load(module_b, caller=caller)
+    pymod.mc.load_impl(module_b)
 
     # Reload any that need to be unloaded first
     for other in to_unload_and_reload[1:]:
@@ -90,7 +91,7 @@ def swap_impl(module_a, module_b, maintain_state=False, caller='command_line'):
             pymod.mc.swapped_on_mp_change(other, this_module)
 
         # Now load the thing
-        pymod.mc.load(this_module, caller=caller)
+        pymod.mc.load_impl(this_module)
 
     return module_b
 

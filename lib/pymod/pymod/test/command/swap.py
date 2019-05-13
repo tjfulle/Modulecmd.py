@@ -17,9 +17,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
 def test_command_swap(modules_path, mock_modulepath):
-    """Just load and then unload a"""
     load = PymodCommand('load')
     swap = PymodCommand('swap')
     mp = mock_modulepath(modules_path.one)

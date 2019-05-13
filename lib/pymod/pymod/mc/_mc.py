@@ -22,7 +22,6 @@ __all__ = [
     'set_loaded_modules',
     'get_refcount',
     'set_refcount',
-    'pop_refcount',
     'increment_refcount',
     'decrement_refcount',
     'swapped_explicitly',
@@ -156,7 +155,7 @@ def unregister_module(module):
         lm_files.pop(i)
         loaded_modules = [pymod.modulepath.get(f) for f in lm_files]
         set_loaded_modules(loaded_modules)
-        decrement_refcount(module)
+        pop_refcount(module)
     elif pymod.config.get('debug'):  # pragma: no cover
         tty.die('unregister_module called for a module that is not loaded!')
 

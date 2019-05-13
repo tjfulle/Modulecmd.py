@@ -3,7 +3,7 @@ import pymod.modes
 import pymod.modulepath
 
 from pymod.mc.execmodule import execmodule
-from pymod.error import ModuleNotFoundError
+from pymod.error import ModuleNotFoundError, ModuleLoadError
 import llnl.util.tty as tty
 
 
@@ -148,6 +148,3 @@ def load_partial(module):
     # Execute the module
     execmodule(module, pymod.modes.load_partial)
     return
-
-class ModuleLoadError(Exception):
-    pass

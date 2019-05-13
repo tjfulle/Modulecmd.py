@@ -2,7 +2,7 @@ import pymod.mc
 import pymod.modes
 import pymod.modulepath
 import llnl.util.tty as tty
-from pymod.error import ModuleNotFoundError
+from pymod.error import ModuleNotFoundError, ModuleNotLoadedError
 
 
 def unload(name, tolerant=False, caller='command_line'):
@@ -26,7 +26,7 @@ def unload_impl(module, caller='command_line'):
     """
     if not module.is_loaded:
         if caller == 'command_line':
-            raise ValueError('Unexepecedly unloaded module {}'.format(module))
+            raise ModuleNotLoadedError(module)
         return
     refcount = pymod.mc.get_refcount(module)
 
@@ -35,3 +35,5 @@ def unload_impl(module, caller='command_line'):
         pymod.mc.unregister_module(module)
     else:
         pymod.mc.decrement_refcount(module)
+
+    module.reset_state()

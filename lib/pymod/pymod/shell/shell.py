@@ -43,6 +43,5 @@ class Shell(object):
             env[key] = val
         return env
 
-
     def filter_key(self, key):
         return False

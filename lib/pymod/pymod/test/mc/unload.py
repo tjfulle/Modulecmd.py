@@ -18,7 +18,6 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
 def test_mc_unload_1(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
@@ -29,7 +28,6 @@ def test_mc_unload_1(modules_path, mock_modulepath):
     assert not a.is_loaded
 
 
-@pytest.mark.unit
 def test_mc_unload_2(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
@@ -41,7 +39,6 @@ def test_mc_unload_2(modules_path, mock_modulepath):
     assert b.is_loaded
 
 
-@pytest.mark.unit
 def test_mc_unload_3(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
@@ -58,3 +55,11 @@ def test_mc_unload_3(modules_path, mock_modulepath):
     assert a.is_loaded
     pymod.mc.unload('a')
     assert not a.is_loaded
+
+
+def test_mc_unload_bad(modules_path, mock_modulepath):
+    mp = mock_modulepath(modules_path.path)
+    a = pymod.modulepath.get('a')
+    assert not a.is_loaded
+    with pytest.raises(pymod.error.ModuleNotLoadedError):
+        pymod.mc.unload_impl(a)

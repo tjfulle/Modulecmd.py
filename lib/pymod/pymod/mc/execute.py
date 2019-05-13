@@ -17,6 +17,6 @@ def execute(command):
         }
         try:
             exe(*xc[1:], **kwargs)
-        except:
+        except:  # pragma: no cover
             tty.warn('Command {0!r} failed'.format(command))
     return

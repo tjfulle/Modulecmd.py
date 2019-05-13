@@ -16,9 +16,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     return tmpdir.strpath
 
 
-@pytest.mark.unit
 def test_mc_show(modules_path, mock_modulepath):
-    """Just load and then unload a"""
     mp = mock_modulepath(modules_path)
     show = PymodCommand('show')
     show('a')

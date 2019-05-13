@@ -1,6 +1,7 @@
 import os
 import pytest
 import pymod.paths
+import pymod.module
 import pymod.modulepath
 from contrib.util.itertools import groupby
 
@@ -46,7 +47,44 @@ def modules_path(tmpdir):
     ucc.join('1.0.0.py').write(basic_py_module)
     ucc.join('4.0.0.py').write(basic_py_module)
 
+    # 2 defaults
+    X = one.mkdir('X')
+    X.join('2.0.0.py').write(basic_py_module)
+    X.join('3.0.0').write(basic_tcl_module.format('X', '3.0.0'))
+    X.join('.version').write('set ModulesVersion "3.0.0"')
+    default = X.join('default')
+    default.mksymlinkto(X.join('2.0.0.py'))
+
+    # bad default
+    Y = one.mkdir('Y')
+    Y.join('3.0.0').write(basic_tcl_module.format('Y', '3.0.0'))
+    Y.join('4.0.0').write(basic_tcl_module.format('Y', '4.0.0'))
+    Y.join('.version').write('set ModulesVersion "5.0.0"')
+
     return tmpdir
+
+
+def test_modulepath_discover_root(mock_modulepath):
+    with pytest.raises(ValueError):
+        modules = pymod.modulepath.discover.find_modules('/')
+    with pytest.raises(ValueError):
+        mock_modulepath('/')
+    assert pymod.modulepath.discover.find_modules('fake') is None
+
+
+def test_modulepath_two_defaults(modules_path, mock_modulepath):
+    mp = mock_modulepath(modules_path.join('1').strpath)
+    x = pymod.modulepath.get('X')
+    assert x.version.string == '2.0.0'
+    assert x.type == pymod.module.python
+
+
+def test_modulepath_bad_default(modules_path, mock_modulepath):
+    mp = mock_modulepath(modules_path.join('1').strpath)
+    y = pymod.modulepath.get('Y')
+    assert y.version.string == '4.0.0'
+    assert y.type == pymod.module.tcl
+
 
 def test_modulepath_available_1(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.join('1').strpath)
@@ -119,6 +157,9 @@ def test_modulepath_get(modules_path, mock_modulepath):
     assert module.type == pymod.module.python
     assert module.filename == os.path.join(dirname, module.fullname + '.py')
 
+    modules = pymod.modulepath.get(pymod.modulepath.mpath.path[0])
+
+
 def test_modulepath_append_path(modules_path, mock_modulepath):
 
     mp = mock_modulepath(modules_path.join('1').strpath)
@@ -152,6 +193,7 @@ def test_modulepath_append_path(modules_path, mock_modulepath):
     module = pymod.modulepath.get('ucc')
     assert module.fullname == 'ucc/2.0.0'
     assert module.filename == os.path.join(d1, module.fullname + '.py')
+
 
 def test_modulepath_prepend_path(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.join('1').strpath)

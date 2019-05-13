@@ -56,3 +56,14 @@ class CollectionModuleNotFoundError(Exception):
     def __init__(self, name, filename):
         msg = 'Saved module {0!r} does not exist ({1})'.format(name, filename)
         super(CollectionModuleNotFoundError, self).__init__(msg)
+
+
+class ModuleNotLoadedError(Exception):
+    def __init__(self, module):
+        superini = super(ModuleNotLoadedError, self).__init__
+        msg = 'Unexepecedly unloaded module {}'.format(module)
+        superini(msg)
+
+
+class ModuleLoadError(Exception):
+    pass

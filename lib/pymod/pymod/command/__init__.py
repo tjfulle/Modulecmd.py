@@ -83,9 +83,9 @@ def get_module(cmd_name):
     attr_setdefault(module, SETUP_PARSER, lambda *args: None)  # null-op
     attr_setdefault(module, DESCRIPTION, "")
 
-    if not hasattr(module, pname):
+    if not hasattr(module, pname):  # pragma: no cover
         tty.die("Command module {0} ({1}) must define function {2!r}."
-                    .format(module.__name__, module.__file__, pname))
+                .format(module.__name__, module.__file__, pname))
 
     return module
 

@@ -29,11 +29,12 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
 def test_mc_load_1(modules_path, mock_modulepath):
     """Just load and then unload a"""
     mp = mock_modulepath(modules_path.one)
-    pymod.mc.load('a')
+    a = pymod.mc.load('a')
+    assert pymod.mc.get_refcount(a) == 1
+    assert pymod.mc.get_refcount().get(a.fullname) == 1
     assert pymod.environ.get('a') == 'a'
     pymod.mc.unload('a')
     assert pymod.environ.get('a') is None
@@ -51,6 +52,9 @@ def test_mc_load_2(modules_path, mock_modulepath):
     for x in 'bcde':
         assert pymod.environ.get(x) == x
         assert pymod.mc.module_is_loaded(x)
+        m = pymod.modulepath.get(x)
+        assert pymod.mc.module_is_loaded(m)
+        assert pymod.mc.module_is_loaded(m.filename)
 
     # just unload e
     pymod.mc.unload('d')

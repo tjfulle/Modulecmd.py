@@ -45,16 +45,14 @@ def execmodule(module, mode):
 def execmodule_in_sandbox(module, mode):
     """Execute python module in sandbox"""
 
-    module.reset_state()
-
     # Execute the environment
+    module.prepare()
     ns = module_exec_sandbox(module, mode)
     code = compile(module.read(mode), module.filename, 'exec')
     try:
         exec_(code, ns, {})
     except StopLoadingModuleError:
         pass
-
 
 
 def module_exec_sandbox(module, mode):

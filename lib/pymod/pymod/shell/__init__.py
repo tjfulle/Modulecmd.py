@@ -13,7 +13,7 @@ __shells__ = (Shell, Bash, Csh, Python)
 default_shell = os.path.basename(os.getenv('SHELL', 'bash'))
 
 
-def _shell(shell_name=None):
+def get_shell(shell_name=None):
     """Shell factory method
 
     Parameters
@@ -34,34 +34,31 @@ def _shell(shell_name=None):
         if shell_name == shelltype.name:
             name = shell_name
             return shelltype()
-    raise Exception('Unknown shell ' + shell_name)
+    raise ValueError('Unknown shell ' + shell_name)
 
 
-shell = Singleton(_shell)
+_shell = Singleton(get_shell)
+name = None
 
 
 def set_shell(shell_name):
     """Set the shell singleton to a specific value. """
-    global shell, name
-    if shell_name != shell.name:
-        shell = _shell(shell_name)
-
-
-def name():
-    return shell.name
+    global _shell, name
+    if shell_name != _shell.name:
+        _shell = get_shell(shell_name)
 
 
 def format_source_command(filename):
-    return shell.format_source_command(filename)
+    return _shell.format_source_command(filename)
 
 
 def format_output(environ, aliases=None, shell_functions=None):
-    return shell.format_output(environ, aliases, shell_functions)
+    return _shell.format_output(environ, aliases, shell_functions)
 
 
 def filter_env(environ):
-    return shell.filter_env(environ)
+    return _shell.filter_env(environ)
 
 
 def filter_key(key):
-    return shell.filter_key(key)
+    return _shell.filter_key(key)

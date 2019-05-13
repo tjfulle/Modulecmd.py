@@ -10,9 +10,8 @@ def test_mc_execute(tmpdir):
     pymod.mc.execute(command)
     assert os.path.isfile(f)
 
-@pytest.mark.unit
+
 def test_mc_execute_2(tmpdir, mock_modulepath):
-    """Just load and then unload a"""
     f = os.path.join(tmpdir.strpath, 'foobar')
     tmpdir.join('a.py').write("execute('touch {0}', mode='load')".format(f))
     mp = mock_modulepath(tmpdir.strpath)

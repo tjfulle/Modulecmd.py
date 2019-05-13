@@ -28,7 +28,7 @@ class Collections:
         return OrderedDict()
 
     def write(self, obj, filename):
-        if pymod.config.get('dryrun'):
+        if pymod.config.get('dryrun'):  # pragma: no cover
             sys.stderr.write(json.dumps(obj))
         else:
             with open(filename, 'w') as fh:
@@ -41,7 +41,7 @@ class Collections:
             m_desc = [module.fullname, module.filename, module.opts]
             collection.setdefault(module.modulepath, []).append(m_desc)
         collection = list(collection.items())
-        if local:
+        if local:  # pragma: no cover
             self.write({'collection': collection},
                        filename=name+'.collection')
         else:
@@ -51,9 +51,9 @@ class Collections:
 
     def get(self, name):
         collection = None
-        if os.path.isfile(name):
+        if os.path.isfile(name): # pragma: no cover
             collection = self.read(name).get('collection')
-        elif os.path.isfile(name+'.collection'):
+        elif os.path.isfile(name+'.collection'): # pragma: no cover
             collection = self.read(name+'.collection').get('collection')
         else:
             collection = self.collections.get(name)
@@ -100,7 +100,7 @@ class Collections:
             module show <collection>
         """
         collection = self.get(name)
-        if collection is None:
+        if collection is None: # pragma: no cover
             tty.warning('{0!r} is not a collection'.format(name))
             return
 

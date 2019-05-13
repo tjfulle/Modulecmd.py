@@ -79,11 +79,14 @@ class Module(object):
                 return ''
         return open(self.filename, 'r').read()
 
+    def prepare(self):
+        self.parser = ModuleArgumentParser()
+
     def parse_args(self):
         return self.parser.parse_args(self.opts)
 
     def reset_state(self):
-        self.parser = ModuleArgumentParser()
+        self._opts = None
 
     @property
     def opts(self):

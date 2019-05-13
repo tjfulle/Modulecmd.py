@@ -19,9 +19,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
 def test_mc_clone(modules_path, mock_modulepath):
-    """Just load and then unload a"""
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')

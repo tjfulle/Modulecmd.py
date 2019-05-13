@@ -10,7 +10,7 @@ from contrib.util import strip_quotes
 
 def find_modules(directory):
 
-    if not os.access(directory, os.R_OK):
+    if not os.access(directory, os.R_OK):  # pragma: no cover
         return None
 
     if directory == '/':

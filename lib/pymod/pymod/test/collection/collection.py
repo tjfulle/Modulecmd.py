@@ -81,5 +81,20 @@ def test_collection_named(modules_path, mock_modulepath):
 
     s = pymod.collection.format_show('foo')
 
+    pymod.mc.purge()
+    pymod.mc.restore('foo')
+    for x in 'abcd':
+        assert pymod.modulepath.get(x) is not None
+
+    pymod.mc.purge()
+    # remove a module
+    f = os.path.join(pymod.modulepath.mpath.path[0], 'a.py')
+    os.remove(f)
+    with pytest.raises(pymod.error.CollectionModuleNotFoundError):
+        pymod.mc.restore('foo')
+
     pymod.collection.remove('foo')
     assert not pymod.collection.contains('foo')
+
+    with pytest.raises(pymod.error.CollectionNotFoundError):
+        pymod.mc.restore('foo')
