@@ -117,7 +117,8 @@ class Modulepath:
         return []
 
     def getby_name(self, name):
-        return self.defaults.get(name)
+        default = self.defaults.get(name)
+        return default
 
     def getby_fullname(self, fullname):
         for path in self.path:

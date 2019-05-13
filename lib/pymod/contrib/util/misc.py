@@ -9,7 +9,15 @@ __all__ = [
     'split', 'join', 'join_args', 'decode_str', 'encode_str',
     'dict2str', 'str2dict', 'encode64', 'decode64', 'boolean',
     'pop', 'strip_quotes', 'check_output', 'which', 'is_executable',
-    'textfill',]
+    'textfill', 'listdir']
+
+
+def listdir(dirname, key=None):
+    items = os.listdir(dirname)
+    if key is None:
+        return items
+    return [x for x in items if key(os.path.join(dirname, x))]
+
 
 def split(arg, sep=None, num=None):
     """Split arg on sep. Only non-empty characters are included in the returned

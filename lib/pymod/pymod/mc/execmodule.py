@@ -9,7 +9,7 @@ import pymod.modes
 import pymod.environ
 import pymod.mc.callback
 import llnl.util.tty as tty
-from contrib.util import which, check_output
+from contrib.util import which, check_output, listdir
 
 from llnl.util.tty.color import colorize
 from spack.util.executable import Executable
@@ -71,6 +71,7 @@ def module_exec_sandbox(module, mode):
         'is_darwin': 'darwin' in sys.platform,
         'IS_DARWIN': 'darwin' in sys.platform,
         'get_hostname': socket.gethostname,
+        'listdir': lambda dirname, key=None: listdir(dirname, key=key),
         'mode': lambda: mode,
         'self': module,
         'colorize': colorize,
