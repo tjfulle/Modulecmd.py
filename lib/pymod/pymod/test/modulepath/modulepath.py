@@ -247,3 +247,8 @@ def test_modulepath_prepend_path(modules_path, mock_modulepath):
     module = pymod.modulepath.get('ucc')
     assert module.fullname == 'ucc/2.0.0'
     assert module.filename == os.path.join(d1, module.fullname + '.py')
+
+    pymod.modulepath.prepend_path(d1)
+    module = pymod.modulepath.get('ucc/1.0.0')
+    assert module.fullname == 'ucc/1.0.0'
+    assert module.filename == os.path.join(d1, module.fullname + '.py')
