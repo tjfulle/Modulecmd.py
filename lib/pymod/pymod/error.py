@@ -17,7 +17,7 @@ class FamilyLoadedError(Exception):
     pass
 
 
-class InconsistentModuleStateError(Exception):
+class InconsistentModuleStateError(Exception):  # pragma: no cover
     def __init__(self, module):
         m = 'An inconsistent state occurred when trying to load module\n' \
             '{0!r} that resulted in it not being found on MODULEPATH.\n'  \
