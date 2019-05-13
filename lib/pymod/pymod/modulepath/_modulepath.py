@@ -21,34 +21,17 @@ class Path:
         if not self.modules:
             tty.verbose('Path: no modules found in {0}'.format(dirname))
 
-    def __contains__(self, key):
-        if isinstance(key, pymod.module.Module):
-            return key in self.modules
-        if os.path.isfile(key):
-            return key in self.filenames
-        parts = key.split(os.path.sep)
-        if len(parts) == 1:
-            return key in self.names
-        if len(parts) == 2:
-            return key in self.fullnames
-
-    @property
-    def filenames(self):
-        return [m.filename for m in self.modules]
-
-    @property
-    def names(self):
-        return [m.name for m in self.modules]
-
-    @property
-    def fullnames(self):
-        return [m.fullname for m in self.modules]
-
     def getby_name(self, name):
+        candidates = []
         for module in self.modules:
             if module.name == name:
-                return module
-        return None
+                if module.is_explicit_default:
+                    return module
+                else:
+                    candidates.append(module)
+        if not candidates:
+            return None
+        return candidates[0]
 
     def getby_fullname(self, fullname):
         for module in self.modules:

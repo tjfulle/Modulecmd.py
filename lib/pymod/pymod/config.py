@@ -67,7 +67,7 @@ class Configuration(object):
                 value = default
         return value
 
-    def set(self, key, value, scope=None):
+    def set(self, key, value, scope=None):  # pragma: no cover
         if scope is not None:
             self.scopes.setdefault(scope, {}).update({key: value})
         else:
@@ -131,11 +131,9 @@ def get(key, default=None, scope=None):
     return config.get(key, default, scope)
 
 
-def set(key, value, scope=None):
+def set(key, value, scope=None):  # pragma: no cover
     """Convenience function for getting single values in config files."""
     return config.set(key, value, scope)
-
-
 
 
 class ConfigError(Exception):

@@ -79,6 +79,19 @@ def test_modulepath_two_defaults(modules_path, mock_modulepath):
     assert x.type == pymod.module.python
 
 
+def test_modulepath_path_obj(modules_path, mock_modulepath):
+    dirname = modules_path.join('1').strpath
+    p = pymod.modulepath.Path(dirname)
+    m_default = p.getby_name('py')
+    assert m_default.version.string == '2.0.0'
+    m1 = p.getby_fullname('py/1.0.0')
+    assert m1.version.string == '1.0.0'
+    m3 = p.getby_filename(os.path.join(dirname, 'py/3.0.0.py'))
+    assert m3.version.string == '3.0.0'
+    m_fake = p.getby_name('fake')
+    assert m_fake is None
+
+
 def test_modulepath_bad_default(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.join('1').strpath)
     y = pymod.modulepath.get('Y')
