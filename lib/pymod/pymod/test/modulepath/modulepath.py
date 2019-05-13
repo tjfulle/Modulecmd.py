@@ -47,6 +47,9 @@ def modules_path(tmpdir):
     ucc.join('1.0.0.py').write(basic_py_module)
     ucc.join('4.0.0.py').write(basic_py_module)
 
+    xxx = two.mkdir('xxx')
+    xxx.join('1.0.0.py').write(basic_py_module)
+
     # 2 defaults
     X = one.mkdir('X')
     X.join('2.0.0.py').write(basic_py_module)
@@ -197,11 +200,16 @@ def test_modulepath_append_path(modules_path, mock_modulepath):
     assert module.fullname == 'ucc/4.0.0'
     assert module.filename == os.path.join(d2, module.fullname + '.py')
 
-    removed, _, _ = pymod.modulepath.remove_path(d2)
-    assert len(removed) == 2
+    xxx = pymod.mc.load('xxx')
+
+    removed, orphaned, _ = pymod.modulepath.remove_path(d2)
+    assert len(removed) == 3
+    assert len(orphaned) == 1
     removed_full_names = [m.fullname for m in removed]
     assert 'ucc/1.0.0' in removed_full_names
     assert 'ucc/4.0.0' in removed_full_names
+    assert 'xxx/1.0.0' in removed_full_names
+    assert orphaned[0] == xxx
 
     module = pymod.modulepath.get('ucc')
     assert module.fullname == 'ucc/2.0.0'
@@ -235,10 +243,11 @@ def test_modulepath_prepend_path(modules_path, mock_modulepath):
     assert module.filename == os.path.join(d2, module.fullname + '.py')
 
     removed, _, _ = pymod.modulepath.remove_path(d2)
-    assert len(removed) == 2
+    assert len(removed) == 3
     removed_full_names = [m.fullname for m in removed]
     assert 'ucc/1.0.0' in removed_full_names
     assert 'ucc/4.0.0' in removed_full_names
+    assert 'xxx/1.0.0' in removed_full_names
 
     module = pymod.modulepath.get('ucc/1.0.0')
     assert module.fullname == 'ucc/1.0.0'
