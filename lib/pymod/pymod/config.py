@@ -95,10 +95,10 @@ def _config():
     cfg.push_scope('defaults', defaults)
 
     user_config_file = os.getenv(pymod.names.config_file_envar)
-    if user_config_file is not None:
+    if user_config_file is not None:  # pragma: no cover
         user = load_yaml(user_config_file, 'config')
         cfg.push_scope('user', user)
-    else:
+    else:  # pragma: no cover
         for dirname in (pymod.paths.user_config_path,
                         pymod.paths.user_config_platform_path):
             user_config_file = os.path.join(dirname, config_basename)
@@ -108,7 +108,7 @@ def _config():
 
     # Environment variable
     env = {}
-    for key in defaults:
+    for key in defaults:  # pragma: no cover
         envar = 'PYMOD_{}'.format(key.upper())
         if envar in ('PYMOD_CONFIG_DIR',
                      'PYMOD_PLATFORM_CONFIG_DIR',
@@ -117,7 +117,7 @@ def _config():
         if os.getenv(envar):
             env[envar] = os.environ[envar]
 
-    if env:
+    if env:  # pragma: no cover
         cfg.push_scope('environment', env)
 
     return cfg
