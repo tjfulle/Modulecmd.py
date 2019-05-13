@@ -191,7 +191,7 @@ def format_changed_module_state():
             sio.write('  {0}) {1} => {2}\n'.format(i+1, a, b))
 
     # Report reloaded
-    if _swapped_on_family_update:
+    if _swapped_on_family_update:  # pragma: no cover
         sio.write('\nThe following modules in the same family have '
                   'been updated with a version change:\n')
         for (i, (m1, m2)) in enumerate(_swapped_on_family_update):
@@ -206,7 +206,7 @@ def format_changed_module_state():
             sio.write('  {0}) {1} => {2}\n'.format(i+1, a, b))
 
     # Report changes due to to change in modulepath
-    if _unloaded_on_mp_change:
+    if _unloaded_on_mp_change:  # pragma: no cover
         lm_files = loaded_module_files()
         unloaded = [m for m in _unloaded_on_mp_change
                     if m.filename not in lm_files]
