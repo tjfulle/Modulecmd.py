@@ -2,7 +2,7 @@ import pymod.mc
 
 description = 'Reload a loaded module'
 level = 'short'
-section = 'module'
+section = 'basic'
 
 
 def setup_parser(subparser):

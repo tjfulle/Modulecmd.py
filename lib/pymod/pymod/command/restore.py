@@ -4,7 +4,7 @@ import pymod.mc
 
 description = 'Restore saved modules or, optionally, a clone'
 level = 'short'
-section = 'module'
+section = 'collections'
 
 
 def setup_parser(subparser):

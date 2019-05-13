@@ -3,7 +3,7 @@ import pymod.mc
 
 description = 'Unload modules from environment'
 level = 'short'
-section = 'module'
+section = 'basic'
 
 
 def setup_parser(subparser):

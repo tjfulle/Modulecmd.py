@@ -6,7 +6,7 @@ description = (
     "Display module whatis string.  The whatis string is a short informational\n"
     "message a module can provide.  If not defined by the module, a default is \n"
     "displayed.")
-section = "module"
+section = "info"
 level = "short"
 
 

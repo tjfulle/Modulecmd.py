@@ -8,7 +8,7 @@ from llnl.util.tty.colify import colified
 
 description = 'Display loaded modules'
 level = 'short'
-section = 'module'
+section = 'info'
 
 
 def setup_parser(subparser):

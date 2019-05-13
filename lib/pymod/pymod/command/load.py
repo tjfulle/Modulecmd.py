@@ -5,7 +5,7 @@ from pymod.command.common import parse_module_options
 
 description = 'Load modules into environment'
 level = 'short'
-section = 'module'
+section = 'basic'
 
 
 def setup_parser(subparser):

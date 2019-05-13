@@ -5,7 +5,7 @@ from pymod.command.common import parse_module_options
 
 description = 'Show the commands that would be issued by module load'
 level = 'short'
-section = 'module'
+section = 'info'
 
 
 def setup_parser(subparser):

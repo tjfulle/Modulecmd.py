@@ -7,7 +7,7 @@ from contrib.util import split
 
 description = 'Initialize modules (should only be called by the startup script).'
 level = 'long'
-section = 'module'
+section = 'init'
 
 
 def setup_parser(subparser):

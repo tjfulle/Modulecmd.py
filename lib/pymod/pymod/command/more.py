@@ -8,7 +8,7 @@ description = (
     'page at a time.  Allows movement through files similar to shell\'s `less`\n'
     'program.')
 level = 'short'
-section = 'module'
+section = 'info'
 
 
 def setup_parser(subparser):

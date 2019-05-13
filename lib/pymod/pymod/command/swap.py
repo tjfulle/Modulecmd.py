@@ -3,7 +3,7 @@ import pymod.mc
 description = ('Swaps two modules, effectively unloading the first '
                'then loading the second')
 level = 'short'
-section = 'module'
+section = 'basic'
 
 
 def setup_parser(subparser):

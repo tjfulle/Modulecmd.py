@@ -4,7 +4,7 @@ import pymod.mc
 
 description = 'Clone current environment'
 level = 'short'
-section = 'module'
+section = 'collections'
 
 
 def setup_parser(subparser):

@@ -17,6 +17,6 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 def test_command_file(modules_path, mock_modulepath):
-    file = PymodCommand('file')
+    find = PymodCommand('find')
     mp = mock_modulepath(modules_path.one)
-    file('a')
+    find('a')

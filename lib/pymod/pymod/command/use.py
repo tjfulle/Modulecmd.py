@@ -5,7 +5,7 @@ import pymod.modulepath
 
 description = 'Add (use) directory[s] to MODULEPATH'
 level = 'short'
-section = 'module'
+section = 'modulepath'
 
 
 def setup_parser(subparser):

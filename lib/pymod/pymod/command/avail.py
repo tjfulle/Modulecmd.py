@@ -6,7 +6,7 @@ import pymod.collection
 
 description = 'Displays available modules'
 level = 'short'
-section = 'module'
+section = 'basic'
 
 
 def setup_parser(subparser):

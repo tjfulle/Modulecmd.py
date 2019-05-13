@@ -3,7 +3,7 @@ import pymod.mc
 
 description = 'Remove (unuse) directory[s] from MODULEPATH'
 level = 'short'
-section = 'module'
+section = 'modulepath'
 
 
 def setup_parser(subparser):

@@ -36,7 +36,7 @@ aliases = {
     'add': 'load',
     'ls': 'list',
     'rm': 'unload',
-    'which': 'file',
+    'which': 'find',
 }
 
 #: help levels in order of detail (i.e., number of commands shown)
@@ -56,27 +56,21 @@ options_by_level = {
 
 #: Longer text for each section, to show in help
 section_descriptions = {
-    'admin':       'administration',
-    'basic':       'query packages',
-    'build':       'build packages',
-    'config':      'configuration',
+    'info':        'informational',
+    'basic':       'modify environment',
     'developer':   'developer',
-    'environment': 'environment',
-    'extensions':  'extensions',
+    'modulepath':  'modulepath',
+    'collections': 'collections',
     'help':        'more help',
-    'packaging':   'create packages',
-    'system':      'system',
 }
 
 #: preferential command order for some sections (e.g., build pipeline is
 #: in execution order, not alphabetical)
 section_order = {
-    'module': ['avail', 'list', 'load', 'unload', 'swap', 'purge', 'refresh',
-               'use', 'unuse', 'show', 'cat', 'more', 'whatis', 'path', 'edit'],
-    'basic': ['list', 'info', 'find'],
-    'build': ['fetch', 'stage', 'patch', 'configure', 'build', 'restage',
-              'install', 'uninstall', 'clean'],
-    'packaging': ['create', 'edit']
+    'info': ['avail', 'list', 'whatis', 'show', 'cat', 'more', 'find'],
+    'basic': ['load', 'unload', 'reload', 'swap', 'purge', 'refresh'],
+    'modulepath': ['path', 'use', 'unuse'],
+    'collections': ['save', 'clone', 'restore'],
 }
 
 #: Properties that commands are required to set.

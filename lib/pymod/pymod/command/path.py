@@ -3,7 +3,7 @@ import pymod.modulepath
 
 description = 'Show MODULEPATH'
 level = 'short'
-section = 'module'
+section = 'modulepath'
 
 
 def setup_parser(subparser):
