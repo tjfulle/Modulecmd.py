@@ -40,3 +40,16 @@ def test_user_3(tmpdir, mock_config, mock_modulepath):
 
     os.remove(f)
     pymod.user.reset()
+
+
+def test_user_4(tmpdir, mock_modulepath):
+    one = tmpdir.mkdir('1')
+    one.join('a.py').write('x = user_env.x\nassert x == 10')
+    tmpdir.join('user.py').write('x = 10')
+    f = tmpdir.join('user.py').strpath
+    user_env = pymod.user.UserEnv(f)
+    pymod.user.set_user_env(user_env)
+    mock_modulepath(one.strpath)
+    a = pymod.mc.load('a')
+    os.remove(f)
+    pymod.user.reset()

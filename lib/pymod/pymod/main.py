@@ -36,6 +36,7 @@ aliases = {
     'add': 'load',
     'ls': 'list',
     'rm': 'unload',
+    'which': 'file',
 }
 
 #: help levels in order of detail (i.e., number of commands shown)
