@@ -6,7 +6,7 @@ import pymod.paths
 import pymod.environ
 import pymod.collection
 from pymod.main import PymodCommand
-from pymod.error import CollectionNotFoundError
+from pymod.error import CollectionNotFoundError, CloneDoesNotExistError
 
 
 @pytest.fixture(scope='function', autouse=True)
@@ -33,17 +33,17 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
-def test_mc_restore_goo(modules_path, mock_modulepath):
+def test_mc_command_save(modules_path, mock_modulepath):
 
     mp = mock_modulepath(modules_path.path)
+    save = PymodCommand('save')
     restore = PymodCommand('restore')
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     c = pymod.mc.load('c')
     d = pymod.mc.load('d')
 
-    pymod.mc.save('foo')
+    save('foo')
 
     pymod.mc.purge()
     assert not a.is_loaded
@@ -61,7 +61,36 @@ def test_mc_restore_goo(modules_path, mock_modulepath):
     cat('foo')
 
 
-@pytest.mark.unit
-def test_mc_restore_bad(modules_path, mock_modulepath):
+def test_mc_command_restore_bad(modules_path, mock_modulepath):
     with pytest.raises(CollectionNotFoundError):
         pymod.mc.restore('fake')
+
+
+def test_mc_command_clone(modules_path, mock_modulepath):
+
+    mp = mock_modulepath(modules_path.path)
+    clone = PymodCommand('clone')
+    restore = PymodCommand('restore')
+    a = pymod.mc.load('a')
+    b = pymod.mc.load('b')
+    c = pymod.mc.load('c')
+    d = pymod.mc.load('d')
+
+    clone('foo')
+
+    pymod.mc.purge()
+    assert not a.is_loaded
+    assert not b.is_loaded
+    assert not c.is_loaded
+    assert not d.is_loaded
+
+    restore('foo', '-c')
+    for x in 'abcd':
+        m = pymod.modulepath.get(x)
+        assert m.is_loaded
+
+
+def test_mc_command_restore_clone_bad(modules_path, mock_modulepath):
+    restore = PymodCommand('restore')
+    with pytest.raises(CloneDoesNotExistError):
+        restore('fake', '-c')

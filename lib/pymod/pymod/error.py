@@ -67,3 +67,9 @@ class ModuleNotLoadedError(Exception):
 
 class ModuleLoadError(Exception):
     pass
+
+
+class CloneDoesNotExistError(Exception):
+    def __init__(self, name):
+        msg = '{0!r} is not a cloned environment'.format(name)
+        super(CloneDoesNotExistError, self).__init__(msg)

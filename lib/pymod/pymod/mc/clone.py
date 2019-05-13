@@ -54,7 +54,7 @@ def restore_clone(name):
     filename = _clone_file()
     clones = read(filename)
     if name not in clones:
-        raise CloneDoesNotExistError(name)
+        raise pymod.error.CloneDoesNotExistError(name)
     the_clone = dict(clones[name])
 
     # Purge current environment
@@ -77,9 +77,3 @@ def restore_clone(name):
             raise pymod.error.ModuleNotFoundError(filename, mp=pymod.modulepath)
         module.opts = module_opts.get(module.fullname)
         pymod.mc.load_partial(module)
-
-
-class CloneDoesNotExistError(Exception):
-    def __init__(self, name):
-        msg = '{0!r} is not a cloned environment'.format(name)
-        super(CloneDoesNotExistError, self).__init__(msg)
