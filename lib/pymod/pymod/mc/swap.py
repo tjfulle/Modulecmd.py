@@ -60,7 +60,6 @@ def swap_impl(module_a, module_b, maintain_state=False, caller='command_line'):
             break
     else: # pragma: no cover
         raise NoModulesToSwapError
-    print(to_unload_and_reload)
 
     # Unload any that need to be unloaded first
     for other in to_unload_and_reload[::-1]:
