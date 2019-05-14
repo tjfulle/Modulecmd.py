@@ -13,7 +13,7 @@ class UserEnv:
             self._module = None
             self._modulename = None
         else:
-            modulename = 'pymod._{}'.format(
+            modulename = 'pymod._{0}'.format(
                 os.path.splitext(os.path.basename(filename))[0])
             self._module = load_module_from_file(modulename, filename)
             assert self._module is not None

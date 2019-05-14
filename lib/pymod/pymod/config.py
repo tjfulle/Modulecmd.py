@@ -109,7 +109,7 @@ def _config():
     # Environment variable
     env = {}
     for key in defaults:  # pragma: no cover
-        envar = 'PYMOD_{}'.format(key.upper())
+        envar = 'PYMOD_{0}'.format(key.upper())
         if envar in ('PYMOD_CONFIG_DIR',
                      'PYMOD_PLATFORM_CONFIG_DIR',
                      'PYMOD_CONFIG_FILE'):

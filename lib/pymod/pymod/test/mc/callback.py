@@ -107,7 +107,7 @@ def test_mc_callback_source(tmpdir, capsys):
     baz.write('echo BAZ')
     pymod.mc.callback.source(pymod.modes.load, None, baz.strpath)
     captured = capsys.readouterr()
-    command = r'source {};'.format(baz.strpath)
+    command = r'source {0};'.format(baz.strpath)
     assert captured[0].strip() == command.strip()
 
 

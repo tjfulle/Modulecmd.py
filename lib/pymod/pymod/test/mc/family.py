@@ -55,7 +55,7 @@ def test_mc_family_xyz(modules_path, mock_modulepath, get_loaded_modules):
         loaded_modules = get_loaded_modules()
         for key in ('A', 'B'):
             for ver in ('1.0', '2.0'):
-                id = '{}/{}'.format(key, ver)
+                id = '{0}/{1}'.format(key, ver)
                 if id == module.fullname:
                     assert id in loaded_modules
                 else:

@@ -4,7 +4,7 @@ modulepath = 'MODULEPATH'
 
 loaded_modules = 'LOADEDMODULES'
 loaded_module_files = '_LMFILES_'
-loaded_module_meta = lambda key: '_LMMETA_{}'.format(key)
+loaded_module_meta = lambda key: '_LMMETA_{0}'.format(key)
 loaded_module_refcount = '_LMREFCNT_'
 loaded_module_opts = '_LMOPTS_'
 
@@ -12,8 +12,8 @@ sourced_files = 'PYMOD_SOURCED_FILES'
 allow_dup_entries = 'PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES'
 resolve_conflicts = 'PYMOD_RESOLVE_CONFLICTS'
 
-family_name = lambda key: 'MODULE_FAMILY_{}'.format(key.upper())
-family_version = lambda key: 'MODULE_FAMILY_{}_VERSION'.format(key.upper())
+family_name = lambda key: 'MODULE_FAMILY_{0}'.format(key.upper())
+family_version = lambda key: 'MODULE_FAMILY_{0}_VERSION'.format(key.upper())
 
 default_user_collection = 'default'
 default_sys_collection = 'system'

@@ -158,7 +158,7 @@ def modulecmds():
         @staticmethod
         def load_first(*x):
             x = ','.join('{0!r}'.format(_) for _ in x)
-            return "load_first({})\n".format(x)
+            return "load_first({0})\n".format(x)
         @staticmethod
         def unload(x):
             return "unload({0!r})\n".format(x)
@@ -207,7 +207,7 @@ def modulecmds():
         @staticmethod
         def prereq_any(*x):
             x = ','.join('{0!r}'.format(_) for _ in x)
-            return "prereq_any({})\n".format(x)
+            return "prereq_any({0})\n".format(x)
         @staticmethod
         def source(f):
             return "source({0!r})\n".format(f)

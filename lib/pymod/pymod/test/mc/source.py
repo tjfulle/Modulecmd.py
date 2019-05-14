@@ -15,5 +15,5 @@ def script(tmpdir):
 def test_mc_source_command(script, capsys):
     pymod.mc.source(script)
     captured = capsys.readouterr()
-    command = r'source {};'.format(script)
+    command = r'source {0};'.format(script)
     assert captured[0].strip() == command.strip()

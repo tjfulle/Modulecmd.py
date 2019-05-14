@@ -61,7 +61,7 @@ class CollectionModuleNotFoundError(Exception):
 class ModuleNotLoadedError(Exception):
     def __init__(self, module):
         superini = super(ModuleNotLoadedError, self).__init__
-        msg = 'Unexepecedly unloaded module {}'.format(module)
+        msg = 'Unexepecedly unloaded module {0}'.format(module)
         superini(msg)
 
 

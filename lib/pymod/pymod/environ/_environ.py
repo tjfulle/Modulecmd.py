@@ -91,7 +91,7 @@ class Environ(dict):
     def save_ld_library_path(self, key):
         if key.endswith(pymod.names.ld_library_path):
             # sometimes python doesn't pick up ld_library_path :(
-            self['__{}__'.format(key)] = self[key]
+            self['__{0}__'.format(key)] = self[key]
 
     def set(self, key, value):
         key = self.fix_ld_library_path(key)

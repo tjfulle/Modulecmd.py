@@ -120,7 +120,7 @@ def test_mc_execmodule_source(tmpdir, modulecmds, mock_modulepath, capsys):
     mp = mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a')
     captured = capsys.readouterr()
-    command = 'source {};'.format(baz.strpath)
+    command = 'source {0};'.format(baz.strpath)
     assert captured[0].strip() == command.strip()
 
 

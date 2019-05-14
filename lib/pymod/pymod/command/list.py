@@ -42,10 +42,10 @@ def list_loaded(args):
         elif args.show_command:
             output = ''
             for module in loaded_modules:
-                output += 'module load {}\n'.format(module)
+                output += 'module load {0}\n'.format(module)
         else:
             output = '\nCurrently loaded modules\n'
-            loaded = ['{}) {}'.format(i+1, m) for i, m in enumerate(loaded_modules)]
+            loaded = ['{0}) {1}'.format(i+1, m) for i, m in enumerate(loaded_modules)]
             _, width = terminal_size()
             output += colified(loaded, indent=4, width=max(100, width))
 

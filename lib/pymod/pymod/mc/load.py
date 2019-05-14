@@ -33,7 +33,7 @@ def load(name, opts=None, insert_at=None, caller='command_line'):
     ModuleNotFoundError
 
     """
-    tty.verbose('Loading {}'.format(name))
+    tty.verbose('Loading {0}'.format(name))
 
     # Execute the module
     module = pymod.modulepath.get(name)

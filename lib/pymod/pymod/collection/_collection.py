@@ -85,7 +85,7 @@ class Collections:
                 s = '(None)'.center(width)
             else:
                 s = colified(names, width=width)
-            sio.write('{}\n{}\n'
+            sio.write('{0}\n{1}\n'
                       .format(' Saved collections '.center(width, '-'), s))
         elif names:
             sio.write('\n'.join(c for c in names))

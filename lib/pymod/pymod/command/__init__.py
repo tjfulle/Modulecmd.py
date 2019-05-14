@@ -74,7 +74,7 @@ def get_module(cmd_name):
     pname = python_name(cmd_name)
 
     # Import the command from the built-in directory
-    module_name = '{}.{}'.format(__name__, pname)
+    module_name = '{0}.{1}'.format(__name__, pname)
     module = __import__(module_name,
                         fromlist=[pname, SETUP_PARSER, DESCRIPTION],
                         level=0)
