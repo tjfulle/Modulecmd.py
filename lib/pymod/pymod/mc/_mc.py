@@ -130,7 +130,7 @@ def register_module(module):
     if not pymod.modulepath.contains(module.modulepath):
         raise pymod.error.InconsistentModuleStateError(module)
     if (pymod.config.get('skip_add_devpack') and
-        module.name.startswith('devpack')):
+        module.name.startswith(('sems-devpack', 'devpack'))):
         return
     loaded_modules = get_loaded_modules()
     if module not in loaded_modules:
