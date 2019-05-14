@@ -106,7 +106,9 @@ def find_modules_nvv(dirname, name, version):
         assert os.path.isdir(version)
         variants, dirs = listdir(version)
         if dirs:  # pragma: no cover
-            raise ValueError('Expected NVV module structure not NVVx')
+            tty.debug('In {0}, expected NVV module structure not '
+                      'NVVx'.format(basedir))
+            return None
         for variant in variants:
             module = pymod.module.module(dirname, name, version, variant)
             if module is not None:
