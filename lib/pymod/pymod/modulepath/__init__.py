@@ -57,3 +57,7 @@ def contains(path):
 
 def size():
     return len(_path)
+
+
+def clear():
+    _path.clear()

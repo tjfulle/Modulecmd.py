@@ -87,6 +87,7 @@ def test_collection_named(modules_path, mock_modulepath):
         assert pymod.modulepath.get(x) is not None
 
     pymod.mc.purge()
+
     # remove a module
     f = os.path.join(pymod.modulepath._path.path[0].path, 'a.py')
     os.remove(f)

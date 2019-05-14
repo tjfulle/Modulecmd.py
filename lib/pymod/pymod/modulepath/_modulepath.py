@@ -11,55 +11,25 @@ from contrib.util import join
 from contrib.util.tty import grep_pat_in_string
 from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
-from contrib.functools_backport import cmp_to_key
 
 
 class Path:
     def __init__(self, dirname):
         self.path = dirname
         self.modules = find_modules(dirname)
-        if not self.modules:
+        if not self.modules: # pragma: no cover
             tty.verbose('Path: no modules found in {0}'.format(dirname))
-
-    def getby_name(self, name):
-        candidates = []
-        for module in self.modules:
-            if module.name == name:
-                if module.is_explicit_default:
-                    return module
-                else:
-                    candidates.append(module)
-        if not candidates:
-            return None
-        return candidates[0]
-
-    def getby_fullname(self, fullname):
-        for module in self.modules:
-            if module.fullname == fullname:
-                return module
-        return None
-
-    def getby_filename(self, filename):
-        for module in self.modules:
-            if module.filename == filename:
-                return module
-        return None
 
 
 class Modulepath:
     def __init__(self, directories):
+        self.clear()
+        self.set_path(directories)
+
+    def clear(self):
         self.path = []
         self.defaults = {}
         self._modified = False
-        self.set_path(directories)
-
-    def export_env(self):
-        env = dict()
-        if self._modified:
-            key = pymod.names.modulepath
-            value = join([p.path for p in self.path], os.pathsep)
-            env.update({key: value})
-        return env
 
     def __contains__(self, dirname):
         return dirname in [p.path for p in self.path]
@@ -70,28 +40,46 @@ class Modulepath:
     def __len__(self):
         return len(self.path)
 
-    def get(self, key):
-        """Get a module from the available modules.
-
-        """
-        if isinstance(key, pymod.module.Module):
-            return key
-        if os.path.isdir(key) and key in self:
-            return self.getby_dirname(key)
-        if os.path.isfile(key):
-            return self.getby_filename(key)
-        parts = key.split(os.path.sep)
-        if len(parts) == 1:
-            return self.getby_name(key)
-        if len(parts) == 2:
-            return self.getby_fullname(key)
-        return None
-
     def index(self, dirname):
         for (i, path) in enumerate(self.path):
             if path.path == dirname:
                 return i
         raise ValueError('{0} not in Modulepath'.format(dirname))
+
+    def get(self, key):
+        """Get a module from the available modules using the following rules:
+
+        If `key`:
+
+            1. is a Module, just return it;
+            2. is a directory, return all of the modules in that directory;
+            3. is a file name, return the module pointed to by the name;
+            4. is a module name (with no version info), return the default
+               version; and
+            5. meets none of the above criteria, the best match will be
+               returned. The best match is found by looking through all
+               MODULEPATH directories and returning the first module whose
+               filename ends with `key`.
+
+        """
+        if isinstance(key, pymod.module.Module):
+            return key
+        elif os.path.isdir(key) and key in self:
+            return self.getby_dirname(key)
+        if os.path.isfile(key):
+            return self.getby_filename(key)
+        parts = key.split(os.path.sep)
+        if len(parts) == 1:
+            # with length of 1, it must be a name
+            return self.defaults.get(key)
+        else:
+            for path in self.path:
+                for module in path.modules:
+                    if module.fullname == key:
+                        return module
+                    elif module.endswith(key):
+                        return module
+        return None
 
     def getby_dirname(self, dirname):
         for path in self:
@@ -99,22 +87,11 @@ class Modulepath:
                 return path.modules
         return []
 
-    def getby_name(self, name):
-        default = self.defaults.get(name)
-        return default
-
-    def getby_fullname(self, fullname):
-        for path in self.path:
-            module = path.getby_fullname(fullname)
-            if module is not None:
-                return module
-        return None
-
     def getby_filename(self, filename):
         for path in self.path:
-            module = path.getby_filename(filename)
-            if module is not None:
-                return module
+            for module in path.modules:
+                if filename == module.filename:
+                    return module
         return None
 
     def _path_modified(self):
@@ -159,7 +136,7 @@ class Modulepath:
     def remove_path(self, dirname):
         modules_in_dir, orphaned, gained_precedence = [], [], []
 
-        if dirname not in self:
+        if dirname not in self:  # pragma: no cover
             tty.warn('Modulepath: {0!r} is not in modulepath'.format(dirname))
             return modules_in_dir, orphaned, gained_precedence
 
@@ -171,11 +148,11 @@ class Modulepath:
         # Determine which modules may have moved up in priority due to removal
         # of directory from path
         for orphan in orphaned:
-            other = self.getby_fullname(orphan.fullname)
+            other = self.get(orphan.fullname)
             if other is not None:
                 gained_precedence.append(other)
                 continue
-            other = self.getby_name(orphan.name)
+            other = self.defaults.get(orphan.name)
             if other is not None:
                 gained_precedence.append(other)
                 continue
@@ -200,29 +177,26 @@ class Modulepath:
         self._path_modified()
 
     def assign_defaults(self):
-        """Assign defaults to modules.  Given a module with multiple versions,
-        the default is the module with the highest version across all modules,
-        unless explicitly made the default.  A module is explicitly made the
-        default by creating a symlink to it (in the same directory) named
-        'default'"""
-        def compare_module_versions(a, b):
-            if a.is_explicit_default:
-                return 1
-            elif b.is_explicit_default:
-                return -1
-            elif a.version > b.version:
-                return 1
-            elif b.version > a.version:
-                return -1
-            ai = self.index(a.modulepath)
-            bi = self.index(b.modulepath)
-            if ai < bi:
-                return 1
-            elif bi < ai:
-                return -1
-            raise ValueError(  # pragma: no cover
-                "This is a state of module version comparison that should "
-                "never be reached.  Please inform the Modulecmd.py developers")
+        """Assign defaults to modules.
+        1. Look for an exact match in all MODULEPATH directories. Pick the
+           first match.
+        2. If the name doesn't contain a version, look for a marked default in
+           the first directory that has one.
+        3. Look for the Highest version in all MODULEPATH directories. If there
+           are two or more modulefiles with the Highest version then the first one
+           in MODULEPATH order will be picked.
+
+        Given a module with multiple versions, the default is the module with
+        the highest version across all modules, unless explicitly made the
+        default. A module is explicitly made the default by creating a symlink
+        to it (in the same directory) named 'default'
+        """
+        def module_default_sort_key(module):
+            sort_key = (1 if module.marked_as_default else -1,
+                        module.version,
+                        module.variant,
+                        -self.index(module.modulepath))
+            return sort_key
         self.defaults = {}
         grouped = groupby(
             [module for path in self.path for module in path.modules],
@@ -232,7 +206,7 @@ class Modulepath:
                 module.is_default = False
             if len(modules) > 1:
                 modules = sorted(modules,
-                                 key=cmp_to_key(compare_module_versions),
+                                 key=module_default_sort_key,
                                  reverse=True)
                 modules[0].is_default = True
             self.defaults[modules[0].name] = modules[0]
@@ -256,6 +230,14 @@ class Modulepath:
     def sort_key(module):
         return (module.name, module.version)
 
+    def export_env(self):
+        env = dict()
+        if self._modified:
+            key = pymod.names.modulepath
+            value = join([p.path for p in self.path], os.pathsep)
+            env.update({key: value})
+        return env
+
     def format_available(self, terse=False, regex=None, fulloutput=False):
 
         sio = StringIO()
@@ -271,7 +253,7 @@ class Modulepath:
                         continue
                     s = colorize('@r{(Directory does not exist)}'.center(width))
                 elif not modules:
-                    if not fulloutput:
+                    if not fulloutput:  # pragma: no cover
                         continue
                     s = colorize('@r{(None)}'.center(width))
                 else:

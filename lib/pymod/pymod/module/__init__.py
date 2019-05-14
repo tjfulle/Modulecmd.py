@@ -27,12 +27,25 @@ tcl = 'TCL'
 # --------------------------- MODULE CLASS ---------------------------------- #
 # --------------------------------------------------------------------------- #
 class Module(object):
-    def __init__(self, name, fullname, version, type, path, modulepath, meta):
-        self.name = name
-        self.fullname = fullname
+    type = None
+    ext = None
+    def __init__(self, modulepath, *parts):
+        self.filename = os.path.join(modulepath, *parts)
+        if self.ext:
+            self.filename += self.ext
+        assert os.path.isfile(self.filename)
+        version = variant = None
+        if len(parts) == 1:
+            self.name, = parts
+        elif len(parts) == 2:
+            self.name, version = parts
+        elif len(parts) == 3:
+            self.name, version, variant = parts
+        else:
+            raise ValueError('Too many parts to construct module definition')
         self.version = Version(version)
-        self.type = type
-        self.filename = path
+        self.variant = Version(variant)
+
         self.modulepath = modulepath
         self.parser = ModuleArgumentParser()
         self.family = None
@@ -40,10 +53,10 @@ class Module(object):
         self.configure_options = None
         self._whatis = {}
         self._helpstr = None
-        self.metadata = meta
         self.is_default = False
         self._opts = None
         self._unlocks = []
+        self.marked_as_default = False
 
     def __str__(self):
         return 'Module(name={0})'.format(self.fullname)
@@ -59,7 +72,7 @@ class Module(object):
 
     @property
     def is_enabled(self):
-        return self.metadata.is_enabled
+        return True
 
     @property
     def is_hidden(self):
@@ -67,7 +80,10 @@ class Module(object):
 
     @property
     def do_not_register(self):
-        return self.metadata.do_not_register
+        return False
+
+    def endswith(self, string):
+        return self.filename.endswith(string)
 
     def unlocks_dir(self, dirname):
         if dirname not in self._unlocks:
@@ -105,6 +121,15 @@ class Module(object):
 
     def reset_state(self):
         self._opts = None
+
+    @property
+    def fullname(self):
+        if not self.version:
+            assert not self.variant
+            return self.name
+        elif not self.variant:
+            return os.path.sep.join((self.name, self.version.string))
+        return os.path.sep.join((self.name, self.version.string, self.variant.string))
 
     @property
     def opts(self):
@@ -201,39 +226,58 @@ class Module(object):
         self._helpstr = helpstr
 
 
-def from_file(modulepath, filepath):
-    if not os.path.isfile(filepath):
-        tty.verbose('{0} does not exist'.format(filepath))
+class PyModule(Module):
+    ext = '.py'
+    type = python
+    def __init__(self, modulepath, *parts):
+        # strip the file extension off the last part and call class initializer
+        parts = list(parts)
+        parts[-1], ext = os.path.splitext(parts[-1])
+        assert ext == self.ext
+        superini = super(PyModule, self).__init__(modulepath, *parts)
+        self.metadata = MetaData()
+        self.metadata.parse(self.filename)
+
+    @property
+    def do_not_register(self):
+        return self.metadata.do_not_register
+
+    @property
+    def is_enabled(self):
+        return self.metadata.is_enabled
+
+    def endswith(self, string):
+        return os.path.splitext(self.filename)[0].endswith(string)
+
+
+class TclModule(Module):
+    type = tcl
+
+
+def module(dirname, *parts):
+    filename = os.path.join(dirname, *parts)
+    if not os.path.isfile(filename):  # pragma: no cover
+        tty.verbose('{0} does not exist'.format(filename))
         return None
-    if filepath.endswith(('~',)) or filepath.startswith(('.#',)):
+    elif filename.endswith(('~',)) or filename.startswith(('.#',)):  # pragma: no cover
         # Don't read backup files
         return None
 
-    if filepath.endswith('.py'):
-        m_type = python
-    elif is_tcl_module(filepath):
-        m_type = tcl
+    if filename.endswith('.py'):
+        module_type = PyModule
+    elif is_tcl_module(filename):
+        module_type = TclModule
     else:
         return None
 
-    root = filepath if m_type == tcl else os.path.splitext(filepath)[0]
-    fullname = root.replace(modulepath, '').lstrip(os.path.sep)
-    try:
-        name, version = fullname.split(os.path.sep)
-    except ValueError:
-        name, version = fullname, None
-
-    meta = MetaData()
-    if m_type == python:
-        meta.parse(filepath)
-
+    module = module_type(dirname, *parts)
     if pymod.config.get('debug'):  # pragma: no cover
-        if m_type == tcl and 'gcc' in filepath:
-            tty.debug(name)
-            tty.debug(modulepath)
-            tty.debug(filepath, '\n')
+        if module_type == TclModule and 'gcc' in filename:
+            tty.debug(module.name)
+            tty.debug(module.modulepath)
+            tty.debug(module.filename, '\n')
 
-    return Module(name, fullname, version, m_type, filepath, modulepath, meta)
+    return module
 
 
 def is_tcl_module(filename):

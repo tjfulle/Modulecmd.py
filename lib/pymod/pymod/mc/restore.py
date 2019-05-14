@@ -22,6 +22,9 @@ def restore(name):
     for module in loaded_modules[::-1]:
         pymod.mc.unload_impl(module)
 
+    # clear the modulepath
+    pymod.modulepath.clear()
+
     # Now load the collection, one module at a time
     for (directory, modules) in collection:
         pymod.mc.use(directory, append=True)

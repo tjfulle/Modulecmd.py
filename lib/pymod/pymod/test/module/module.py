@@ -8,18 +8,14 @@ def basic_python_module(tmpdir):
     tmpdir.join('a.py').write(
         'add_option("+foo", action="store_true")\n'
         'setenv("a", "a")')
-    filename = os.path.join(tmpdir.strpath, 'a.py')
-    assert os.path.isfile(filename)
-    m = pymod.module.from_file(tmpdir.strpath, filename)
+    m = pymod.module.module(tmpdir.strpath, 'a.py')
     return m
 
 
 @pytest.fixture()
 def basic_tcl_module(tmpdir):
     tmpdir.join('a').write('#%Module1.0\nsetenv a "a"')
-    filename = os.path.join(tmpdir.strpath, 'a')
-    assert os.path.isfile(filename)
-    m = pymod.module.from_file(filename)
+    m = pymod.module.module(tmpdir.strpath, 'a')
     return m
 
 
