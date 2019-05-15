@@ -61,7 +61,6 @@ def module_exec_sandbox(module, mode):
         raise StopLoadingModuleError
     cb = pymod.mc.callback
     callback = pymod.mc.callback.callback
-    reported_by = ' (reported by {0!r})'.format(module.filename)
     ns = {
         'os': os,
         'sys': sys,
@@ -81,9 +80,9 @@ def module_exec_sandbox(module, mode):
         'add_option': module.parser.add_argument,
         'parse_opts': module.parse_args,
         #
-        'log_info': lambda s: tty.info(s, reported_by=module.filename),
-        'log_warning': lambda s: tty.warn(s, reported_by=module.filename),
-        'log_error': lambda s: tty.die(s, reported_by=module.filename),
+        'log_info': lambda s: tty.info(s, reported_by=module.fullname),
+        'log_warning': lambda s: tty.warn(s, reported_by=module.fullname),
+        'log_error': lambda s: tty.die(s, reported_by=module.fullname),
         'execute': callback(cb.execute, mode, module),
         #
         'setenv': callback(cb.setenv, mode, module),
