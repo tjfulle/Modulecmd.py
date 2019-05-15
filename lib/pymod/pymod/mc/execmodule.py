@@ -12,6 +12,7 @@ import llnl.util.tty as tty
 from contrib.util import which, check_output, listdir
 
 from llnl.util.tty.color import colorize
+from llnl.util.filesystem import mkdirp
 from spack.util.executable import Executable
 from six import exec_
 from pymod.error import FamilyLoadedError
@@ -65,6 +66,7 @@ def module_exec_sandbox(module, mode):
         'os': os,
         'sys': sys,
         'stop': stop,
+        'mkdirp': mkdirp,
         'env': pymod.environ.copy(),
         'user_env': pymod.user.env,
         'getenv': pymod.environ.get,
@@ -80,7 +82,7 @@ def module_exec_sandbox(module, mode):
         'parse_opts': module.parse_args,
         #
         'log_info': lambda s: tty.info(s, reported_by=module.filename),
-        'log_warn': lambda s: tty.warn(s, reported_by=module.filename),
+        'log_warning': lambda s: tty.warn(s, reported_by=module.filename),
         'log_error': lambda s: tty.die(s, reported_by=module.filename),
         'execute': callback(cb.execute, mode, module),
         #
