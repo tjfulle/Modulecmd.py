@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import json
 from six import StringIO
