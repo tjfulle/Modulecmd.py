@@ -1,6 +1,3 @@
-import llnl.util.tty as tty
-
-
 def parse_module_options(args):
     # To pass arguments to a module, do
     #
@@ -11,7 +8,7 @@ def parse_module_options(args):
     for item in args:
         if item.startswith('+'):
             if not argv:
-                tty.die('Options must be specified after module name')
+                raise ValueError('Options must be specified after module name')
             argv[-1][-1].append(item)
         else:
             argv.append((item, []))
