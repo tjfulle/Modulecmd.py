@@ -1,6 +1,7 @@
 import pymod.mc
 import pymod.modes
 import pymod.modulepath
+import pymod.collection
 
 from pymod.mc.execmodule import execmodule
 from pymod.error import ModuleNotFoundError, ModuleLoadError
@@ -38,6 +39,10 @@ def load(name, opts=None, insert_at=None, caller='command_line'):
     # Execute the module
     module = pymod.modulepath.get(name)
     if module is None:
+        if caller == 'command_line':
+            collection = pymod.collection.get(name)
+            if collection is not None:
+                return pymod.mc.restore_impl(collection)
         raise ModuleNotFoundError(name, mp=pymod.modulepath)
 
     # Set the command line options

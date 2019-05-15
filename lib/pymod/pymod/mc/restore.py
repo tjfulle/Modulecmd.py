@@ -3,7 +3,6 @@ import pymod.modes
 import pymod.names
 import pymod.error
 import pymod.collection
-import llnl.util.tty as tty
 
 
 def restore(name):
@@ -16,6 +15,10 @@ def restore(name):
     if collection is None:
         raise pymod.error.CollectionNotFoundError(name)
 
+    return restore_impl(collection)
+
+
+def restore_impl(collection):
     # First unload all loaded modules
     pymod.mc.purge(load_after_purge=False)
     loaded_modules = pymod.mc.get_loaded_modules()

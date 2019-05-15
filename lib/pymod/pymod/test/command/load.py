@@ -95,3 +95,33 @@ def test_command_load_3(modules_path, mock_modulepath):
 
     unload('a')
     assert pymod.environ.get('a') is None
+
+
+def test_command_load_collection(tmpdir, mock_modulepath):
+    save = PymodCommand('save')
+    load = PymodCommand('load')
+    purge = PymodCommand('purge')
+    restore = PymodCommand('restore')
+    tmpdir.join('a.py').write('')
+    tmpdir.join('b.py').write('')
+    tmpdir.join('c.py').write('')
+    tmpdir.join('d.py').write('')
+    mp = mock_modulepath(tmpdir.strpath)
+    a = load('a')
+    b = load('b')
+    c = load('c')
+    d = load('d')
+    save('foo')
+    purge()
+    restore('foo')
+    for x in 'abcd':
+        m = pymod.modulepath.get(x)
+        assert m.is_loaded
+    purge()
+    for x in 'abcd':
+        m = pymod.modulepath.get(x)
+        assert not m.is_loaded
+    load('foo')
+    for x in 'abcd':
+        m = pymod.modulepath.get(x)
+        assert m.is_loaded

@@ -1,4 +1,5 @@
 import os
+import re
 from .shell import Shell
 
 # --------------------------------------------------------------------------- #
@@ -36,3 +37,13 @@ class Bash(Shell):
 
     def filter_key(self, key):
         return key.startswith(('BASH_FUNC',))
+
+    def cloned_env(self, environ):  # pragma: no cover
+        env = dict()
+        for (key, val) in environ.items():
+            match = re.search('BASH_FUNC_(?P<n>.*?)%%', key)
+            if match:
+                key = match.group('n')
+                val = val[val.find('{')+1:val.rfind('}')].strip()
+            env[key] = val
+        return env
