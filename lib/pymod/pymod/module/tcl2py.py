@@ -38,18 +38,17 @@ def tcl2py(module, mode):
 
     kwargs = {'env': env, 'output': str}
     output = tcl2py(*args, **kwargs)
-    name = module.name
-    family = None
-    #if name.endswith('python'):
-    #    family = 'python'
-    #elif name.startswith(('gcc', 'intel', 'pgi')):
-    #    family = 'compiler'
-    #elif name.startswith(('openmpi', 'mpich', )):
-    #    family = 'mpi'
-    #else:
-    #    family = None
-
-    if family is not None:
-        output = 'family("{0}")\n'.format(family) + output
-
+    #  name = module.name
+    #  family = None
+    #  if name.endswith('python'):
+    #      family = 'python'
+    #  elif name.startswith(('gcc', 'intel', 'pgi')):
+    #      family = 'compiler'
+    #  elif name.startswith(('openmpi', 'mpich', )):
+    #      family = 'mpi'
+    #  else:
+    #      family = None
+    #
+    #  if family is not None:
+    #      output = 'family("{0}")\n'.format(family) + output
     return output
