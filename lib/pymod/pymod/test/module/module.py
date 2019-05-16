@@ -43,3 +43,31 @@ def test_module_format_info(basic_python_module):
     m.format_info()
     m.is_default = True
     m.format_info()
+
+
+def test_module_parts(tmpdir):
+    d = tmpdir
+    s = 'abcde'
+    for x in s:
+        d = d.mkdir(x)
+
+    with pytest.raises(ValueError):
+        pymod.module.Module(tmpdir.strpath, *list(s))
+
+    f = d.join('f')
+    f.write('')
+    parts = list(s + 'f')
+    ff = os.path.join(tmpdir.strpath, *parts)
+    assert f.strpath == ff
+    assert os.path.isfile(ff)
+    with pytest.raises(ValueError):
+        pymod.module.Module(tmpdir.strpath, *parts)
+
+
+def test_module_basic(tmpdir):
+    one = tmpdir.mkdir('1')
+    one.join('a').write('')
+    a = pymod.module.Module(one.strpath, 'a')
+    assert a.is_enabled
+    assert not a.do_not_register
+    a.format_help()

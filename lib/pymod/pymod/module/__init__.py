@@ -33,7 +33,8 @@ class Module(object):
         self.filename = os.path.join(modulepath, *parts)
         if self.ext:
             self.filename += self.ext
-        assert os.path.isfile(self.filename)
+        if not os.path.isfile(self.filename):
+            raise ValueError('{0} is not a file'.format(self.filename))
         version = variant = None
         if len(parts) == 1:
             self.name, = parts
@@ -104,11 +105,11 @@ class Module(object):
 
     def read(self, mode):
         if self.type == tcl:
-            if not pymod.config.has_tclsh:
+            if not pymod.config.has_tclsh:  # pragma: no cover
                 raise TCLSHNotFoundError
             try:
                 return tcl2py(self, mode)
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 tty.die(e.args[0])
                 return ''
         return open(self.filename, 'r').read()
@@ -143,7 +144,7 @@ class Module(object):
     def format_info(self):
         if self.is_default and self.is_loaded:
             return self.fullname + ' (D,L)'
-        elif self.is_default:
+        elif self.is_default:  # pragma: no cover
             return self.fullname + ' (D)'
         elif self.is_loaded:
             return self.fullname + ' (L)'
@@ -185,7 +186,7 @@ class Module(object):
             sio.write('{0}: {1}\n'.format(key, ss))
 
         parser_help = self.parser.help_string()
-        if parser_help:
+        if parser_help:  # pragma: no cover
             sio.write(parser_help + '\n')
 
         sio.write('=' * width)
