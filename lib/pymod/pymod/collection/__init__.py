@@ -11,8 +11,10 @@ def _collections():
     for dirname in (pymod.paths.user_config_platform_path,
                     pymod.paths.user_config_path):
         filename = os.path.join(dirname, basename)
-        if os.path.exists(filename):
+        if os.path.exists(filename):  # pragma: no cover
             break
+        # it is okay that we may not have found a config file, if it doesn't
+        # exist, Collections will create it
     return Collections(filename)
 
 
