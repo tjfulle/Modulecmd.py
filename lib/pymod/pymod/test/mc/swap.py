@@ -63,3 +63,32 @@ def test_mc_swap_3(modules_path, mock_modulepath):
         pymod.mc.load('e')
     pymod.mc.load('c')
     assert pymod.environ.get('module_swap') == 'b'
+
+
+def test_mc_swap_use(tmpdir, mock_modulepath):
+    two = tmpdir.mkdir('2')
+    two.join('b.py').write('')
+    two.join('c.py').write('')
+
+    one = tmpdir.mkdir('1')
+    one.join('a.py').write('use({0!r})'.format(two.strpath))
+    one.join('c.py').write('')
+    one.join('d.py').write('')
+
+    mp = mock_modulepath(one.strpath)
+    with pytest.raises(pymod.error.ModuleNotFoundError):
+        pymod.mc.load('b')
+
+    a = pymod.mc.load('a')
+    b = pymod.mc.load('b')
+    c = pymod.mc.load('c')
+    assert c.is_loaded
+    assert c.modulepath == two.strpath
+
+    # Now, swap a and d, b will be left unavailable, c will swap with the
+    # version in `one`
+    pymod.mc.swap('a', 'd')
+    assert pymod.mc._mc._unloaded_on_mp_change[0] == b
+    c = pymod.modulepath.get('c')
+    assert c.is_loaded
+    assert c.modulepath == one.strpath

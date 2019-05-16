@@ -111,9 +111,11 @@ def test_mc_use_prepend_bumped(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.one)
 
     a1 = pymod.mc.load('a/1.0')
+    assert a1.is_loaded
 
     # Using 2 will automatically unload 1/a/1.0 and load 2/a/1.0
     pymod.mc.use(modules_path.two)
+
     a2 = pymod.modulepath.get('a/1.0')
     assert a1.version == a2.version
     assert a1.filename != a2.filename

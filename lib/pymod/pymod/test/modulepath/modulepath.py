@@ -218,14 +218,12 @@ def test_modulepath_append_path(modules_path, mock_modulepath):
 
     xxx = pymod.mc.load('xxx')
 
-    removed, orphaned = pymod.modulepath.remove_path(d2)
+    removed = pymod.modulepath.remove_path(d2)
     assert len(removed) == 3
-    assert len(orphaned) == 1
     removed_full_names = [m.fullname for m in removed]
     assert 'ucc/1.0.0' in removed_full_names
     assert 'ucc/4.0.0' in removed_full_names
     assert 'xxx/1.0.0' in removed_full_names
-    assert orphaned[0][0] == xxx
 
     module = pymod.modulepath.get('ucc')
     assert module.fullname == 'ucc/2.0.0'
@@ -250,10 +248,7 @@ def test_modulepath_prepend_path(modules_path, mock_modulepath):
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
     d2 = modules_path.join('2').strpath
-    _, bumped = pymod.modulepath.prepend_path(d2)
-
-    assert len(bumped) == 2
-    assert bumped[1].fullname == 'ucc/1.0.0'
+    pymod.modulepath.prepend_path(d2)
 
     module = pymod.modulepath.get('ucc/1.0.0')
     assert module.fullname == 'ucc/1.0.0'
@@ -263,7 +258,7 @@ def test_modulepath_prepend_path(modules_path, mock_modulepath):
     assert module.fullname == 'ucc/4.0.0'
     assert module.filename == os.path.join(d2, module.fullname + '.py')
 
-    removed, _ = pymod.modulepath.remove_path(d2)
+    removed = pymod.modulepath.remove_path(d2)
     assert len(removed) == 3
     removed_full_names = [m.fullname for m in removed]
     assert 'ucc/1.0.0' in removed_full_names
@@ -284,8 +279,8 @@ def test_modulepath_prepend_path(modules_path, mock_modulepath):
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
     modules_path.mkdir('FOO')
-    a, b = pymod.modulepath.prepend_path(modules_path.join('FOO').strpath)
-    assert len(a) == len(b) == 0
+    a = pymod.modulepath.prepend_path(modules_path.join('FOO').strpath)
+    assert len(a) == 0
 
 
 def test_modulepath_auto_bump(modules_path, mock_modulepath):
@@ -297,9 +292,7 @@ def test_modulepath_auto_bump(modules_path, mock_modulepath):
     m1 = pymod.modulepath.get('ucc')
     assert m1.version == '2.0.0'
 
-    modules, bounced = pymod.modulepath.prepend_path(d2)
-    assert len(bounced) == 2
-    assert m1 in bounced
+    modules = pymod.modulepath.prepend_path(d2)
 
     m2 = pymod.modulepath.get('ucc')
     assert m2.version == '4.0.0'

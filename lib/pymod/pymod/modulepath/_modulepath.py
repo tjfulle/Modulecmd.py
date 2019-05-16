@@ -37,6 +37,11 @@ class Modulepath:
     def __iter__(self):
         return iter(self.path)
 
+    def walk(self, start=0):
+        assert start >= 0
+        for path in self.path[start:]:
+            yield path
+
     def __len__(self):
         return len(self.path)
 
@@ -44,7 +49,7 @@ class Modulepath:
         for (i, path) in enumerate(self.path):
             if path.path == dirname:
                 return i
-        raise ValueError('{0} not in Modulepath'.format(dirname))
+        raise ValueError('{0} not in Modulepath'.format(dirname))  # pragma: no cover
 
     def get(self, key):
         """Get a module from the available modules using the following rules:
@@ -113,25 +118,16 @@ class Modulepath:
     def prepend_path(self, dirname):
         if not os.path.isdir(dirname):  # pragma: no cover
             tty.warn('Modulepath: {0!r} is not a directory'.format(dirname))
-            return [], []
+            return []
         if dirname in self:
             path = self.path.pop(self.index(dirname))
         else:
             path = Path(dirname)
             if not path.modules:
-                return [], []
+                return []
         self.path.insert(0, path)
         self._path_modified()
-
-        # Determine which modules changed in priority due to insertion of new
-        # directory in to path
-        bounced = []
-        names = [x for m in self.path[0].modules for x in (m.name, m.fullname)]
-        for p in self.path[1:]:
-            for module in p.modules:
-                if module.fullname in names or module.name in names:
-                    bounced.append(module)
-        return path.modules, bounced
+        return path.modules
 
     def remove_path(self, dirname):
         """Remove `dirname` from the modulepath
@@ -145,38 +141,18 @@ class Modulepath:
         -------
         modules_in_dir : list of Module
             The modules in the directory that was removed
-        orphans : list of tuple
-            orphans[i][0] loaded module left orphaned by the removal of dirname
-            orphans[i][1] module to be loaded in its place, or None
 
         """
 
         if dirname not in self:  # pragma: no cover
             tty.warn('Modulepath: {0!r} is not in modulepath'.format(dirname))
-            return [], []
+            return []
 
-        modules_in_dir, orphaned, = [], []
-
-        modules_in_dir.extend(self.getby_dirname(dirname))
-        orphaned.extend([m for m in modules_in_dir if m.is_loaded])
+        modules_in_dir = self.getby_dirname(dirname)
         self.path.pop(self.index(dirname))
         self._path_modified()
 
-        # Determine which modules may have moved up in priority due to removal
-        # of directory from path. If they have the same name as an orphan, it
-        # will be loaded in the orphans place
-        replacement = []
-        for (i, orphan) in enumerate(orphaned):
-            other = self.get(orphan.fullname)
-            if other is not None:
-                orphaned[i] = (orphan, other)
-                continue
-            other = self.defaults.get(orphan.name)
-            if other is not None:
-                orphaned[i] = (orphan, other)
-                continue
-            orphaned[i] = (orphan, None)
-        return modules_in_dir, orphaned
+        return modules_in_dir
 
     def set_path(self, directories):
         self.path = []

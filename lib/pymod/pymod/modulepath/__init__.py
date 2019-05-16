@@ -55,6 +55,10 @@ def contains(path):
     return path in _path
 
 
+def walk(start=0):
+    return _path.walk(start=0)
+
+
 def size():
     return len(_path)
 
