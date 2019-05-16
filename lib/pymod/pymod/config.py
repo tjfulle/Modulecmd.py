@@ -7,11 +7,9 @@ from llnl.util.lang import Singleton
 from spack.util.executable import which
 
 
-def load_yaml(filename, section=None):
+def load_config(filename):
     dict = yaml.load(open(filename))
-    if section is not None:
-        return dict.get(section)
-    return dict
+    return dict.get('config')
 
 
 has_tclsh = which('tclsh') is not None
@@ -43,7 +41,7 @@ class Configuration(object):
                 raise ValueError(msg)
 
     def remove_scope(self, scope_name):
-        return self.scopes.pop(scope_name)
+        return self.scopes.pop(scope_name, None)
 
     def get(self, key, default=None, scope=None):
         if key is None:
@@ -91,19 +89,19 @@ def _config():
 
     config_basename = pymod.names.config_file_basename
     default_config_file = os.path.join(pymod.paths.etc_path, config_basename)
-    defaults = load_yaml(default_config_file, 'config')
+    defaults = load_config(default_config_file)
     cfg.push_scope('defaults', defaults)
 
     user_config_file = os.getenv(pymod.names.config_file_envar)
     if user_config_file is not None:  # pragma: no cover
-        user = load_yaml(user_config_file, 'config')
+        user = load_config(user_config_file)
         cfg.push_scope('user', user)
     else:  # pragma: no cover
         for dirname in (pymod.paths.user_config_path,
                         pymod.paths.user_config_platform_path):
             user_config_file = os.path.join(dirname, config_basename)
             if os.path.exists(user_config_file):
-                user = load_yaml(user_config_file, 'config')
+                user = load_config(user_config_file)
                 cfg.push_scope('user', user)
 
     # Environment variable

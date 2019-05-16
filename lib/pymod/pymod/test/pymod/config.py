@@ -3,7 +3,7 @@ import pytest
 import pymod.names
 import pymod.paths
 
-from pymod.config import Configuration, load_yaml
+from pymod.config import Configuration, load_config
 
 
 @pytest.fixture()
@@ -11,7 +11,7 @@ def mock_test_config():
     cfg = Configuration()
     config_basename = pymod.names.config_file_basename
     default_config_file = os.path.join(pymod.paths.etc_path, config_basename)
-    defaults = load_yaml(default_config_file, 'config')
+    defaults = load_config(default_config_file)
     cfg.push_scope('defaults', defaults)
     return cfg
 
@@ -42,6 +42,7 @@ def test_config_user(mock_test_config):
     assert isinstance(cfg.get(None), dict)
     cfg.get(None)
     cfg.get(None, scope='user')
+    cfg.remove_scope('user')
 
 
 def test_config_user_unknown_var(mock_test_config):
