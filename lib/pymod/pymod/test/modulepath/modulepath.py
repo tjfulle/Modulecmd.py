@@ -296,3 +296,15 @@ def test_modulepath_auto_bump(modules_path, mock_modulepath):
 
     m2 = pymod.modulepath.get('ucc')
     assert m2.version == '4.0.0'
+
+    for path in pymod.modulepath.walk():
+        assert path.path is not None
+
+
+def test_modulepath_walk(modules_path, mock_modulepath):
+
+    d1 = modules_path.join('1').strpath
+    d2 = modules_path.join('2').strpath
+    mp = mock_modulepath([d1, d2])
+    for path in pymod.modulepath.walk():
+        assert path.path == d1 or path.path == d2

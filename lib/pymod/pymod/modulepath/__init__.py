@@ -6,7 +6,7 @@ from llnl.util.lang import Singleton
 from pymod.modulepath._modulepath import Modulepath, Path
 
 
-def _modulepath():
+def _modulepath():  # pragma: no cover
     path = split(os.getenv(pymod.names.modulepath), os.pathsep)
     return Modulepath(path)
 

@@ -247,7 +247,7 @@ class Modulepath:
                     if not fulloutput:
                         continue
                     s = colorize('@r{(Directory does not exist)}'.center(width))
-                elif not modules:
+                elif not modules:  # pragma: no cover
                     if not fulloutput:  # pragma: no cover
                         continue
                     s = colorize('@r{(None)}'.center(width))
@@ -265,7 +265,7 @@ class Modulepath:
                     continue
                 modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
                 modules = self.filter_modules_by_regex(modules, regex)
-                if not modules:
+                if not modules:  # pragma: no cover
                     continue
                 sio.write(directory + ':\n')
                 sio.write('\n'.join(m.fullname for m in modules))

@@ -21,7 +21,7 @@ def find_modules(dirname):
     if not os.access(dirname, os.R_OK):  # pragma: no cover
         return None
 
-    if not os.path.isdir(dirname):
+    if not os.path.isdir(dirname):  # pragma: no cover
         return None
 
     first_level_files, first_level_dirs = listdir(dirname)
@@ -138,14 +138,14 @@ def pop_linked_default(dirname, files):
         return None
 
     linked_default_file = os.path.join(dirname, linked_default_name)
-    if not os.path.islink(linked_default_file):
+    if not os.path.islink(linked_default_file):  # pragma: no cover
         tty.verbose(
             'Modulepath: expected file named `default` in {0} '
             'to be a link to a modulefile'.format(dirname))
         return None
 
     linked_default_source = os.path.realpath(linked_default_file)
-    if not linked_default_source.startswith(dirname):
+    if not linked_default_source.startswith(dirname):  # pragma: no cover
         tty.warn(
             'Modulepath: expected file named `default` in {0} to be '
             'a link to a modulefile in the same directory'.format(dirname))
@@ -163,7 +163,7 @@ def pop_versioned_default(dirname, files):
         return None
     version_file = os.path.join(dirname, version_file_name)
     version = read_tcl_default_version(version_file)
-    if version is None:
+    if version is None:  # pragma: no cover
         tty.warn(
             'Could not determine .version default in {0}'.format(dirname))
     else:
