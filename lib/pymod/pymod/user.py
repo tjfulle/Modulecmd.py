@@ -20,7 +20,7 @@ class UserEnv:
             self._modulename = modulename
 
     def __getattr__(self, attr):
-        if self._module is None:
+        if self._module is None:  # pragma: no cover
             return None
         return getattr(self._module, attr)
 
