@@ -5,7 +5,7 @@ import pymod.error
 import pymod.names
 import pymod.paths
 import pymod.environ
-from contrib.util import str2dict
+from contrib.util import str2dict, split
 
 
 def read(filename):
@@ -59,7 +59,7 @@ def restore_clone(name):
 
     # Purge current environment
     pymod.mc.purge(load_after_purge=False)
-    dirnames = the_clone[pymod.names.modulepath].split(os.pathsep)
+    dirnames = split(the_clone.pop(pymod.names.modulepath, None), os.pathsep)
     path = pymod.modulepath.Modulepath(dirnames)
     pymod.modulepath.set_path(path)
 

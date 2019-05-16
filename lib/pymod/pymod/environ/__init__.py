@@ -26,7 +26,7 @@ def get(key, default=None):
 
 
 def get_bool(key):
-    return eniron.get_bool(key)
+    return environ.get_bool(key)
 
 
 def set(key, value):

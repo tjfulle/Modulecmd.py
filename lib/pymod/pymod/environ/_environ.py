@@ -94,6 +94,10 @@ class Environ(dict):
             self['__{0}__'.format(key)] = self[key]
 
     def set(self, key, value):
+        if key == pymod.names.modulepath:
+            raise ValueError(
+                'Do not set MODULEPATH directly in Environ object.  '
+                'Set it in the Modulepath instead')
         key = self.fix_ld_library_path(key)
         self[key] = value
         self.save_ld_library_path(key)
@@ -153,8 +157,8 @@ class Environ(dict):
     def remove_path(self, key, value, sep=os.pathsep):
         if key == pymod.names.modulepath:
             raise ValueError(
-                'Do not set MODULEPATH directly in Environ object.  '
-                'Set it in the Modulepath instead')
+                'Do not remove MODULEPATH directly from Environ object.  '
+                'Use the Modulepath object instead')
         key = self.fix_ld_library_path(key)
         allow_dups = self.get_bool(pymod.names.allow_dup_entries)
         current_path = self.get_path(key, sep=sep)
