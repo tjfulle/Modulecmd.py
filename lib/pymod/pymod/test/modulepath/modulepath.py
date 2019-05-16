@@ -252,8 +252,8 @@ def test_modulepath_prepend_path(modules_path, mock_modulepath):
     d2 = modules_path.join('2').strpath
     _, bumped = pymod.modulepath.prepend_path(d2)
 
-    assert len(bumped) == 1
-    assert bumped[0].fullname == 'ucc/1.0.0'
+    assert len(bumped) == 2
+    assert bumped[1].fullname == 'ucc/1.0.0'
 
     module = pymod.modulepath.get('ucc/1.0.0')
     assert module.fullname == 'ucc/1.0.0'
@@ -294,12 +294,12 @@ def test_modulepath_auto_bump(modules_path, mock_modulepath):
     d2 = modules_path.join('2').strpath
     mp = mock_modulepath(d1)
 
-    m1 = pymod.mc.load('ucc/1.0.0')
-    assert m1.is_loaded
+    m1 = pymod.modulepath.get('ucc')
+    assert m1.version == '2.0.0'
 
     modules, bounced = pymod.modulepath.prepend_path(d2)
-    assert bounced[0] == m1
-    assert len(bounced) == 1
-    m2 = pymod.modulepath.get('ucc/1.0.0')
-    assert m2.is_loaded
-    assert m2.filename.startswith(d2)
+    assert len(bounced) == 2
+    assert m1 in bounced
+
+    m2 = pymod.modulepath.get('ucc')
+    assert m2.version == '4.0.0'

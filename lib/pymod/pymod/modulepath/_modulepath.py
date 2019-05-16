@@ -126,10 +126,10 @@ class Modulepath:
         # Determine which modules changed in priority due to insertion of new
         # directory in to path
         bounced = []
-        fullnames = [m.fullname for m in self.path[0].modules]
+        names = [x for m in self.path[0].modules for x in (m.name, m.fullname)]
         for p in self.path[1:]:
             for module in p.modules:
-                if module.fullname in fullnames:
+                if module.fullname in names or module.name in names:
                     bounced.append(module)
         return path.modules, bounced
 
