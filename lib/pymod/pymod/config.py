@@ -33,8 +33,6 @@ class Configuration(object):
             except KeyError:
                 msg = 'Unknown user config var {0!r}'.format(key)
                 raise ValueError(msg)
-            if default is None:
-                continue
             if type(default) != type(val):
                 m = 'User config var {0!r} must be of type {1!r}, not {2!r}'
                 msg = m.format(key, type(default).__name__, type(val).__name__)
