@@ -125,20 +125,37 @@ class Modulepath:
 
         # Determine which modules changed in priority due to insertion of new
         # directory in to path
-        lost_precedence = []
+        bounced = []
         fullnames = [m.fullname for m in self.path[0].modules]
         for p in self.path[1:]:
             for module in p.modules:
                 if module.fullname in fullnames:
-                    lost_precedence.append(module)
-        return path.modules, lost_precedence
+                    bounced.append(module)
+        return path.modules, bounced
 
     def remove_path(self, dirname):
-        modules_in_dir, orphaned, gained_precedence = [], [], []
+        """Remove `dirname` from the modulepath
+
+        Parameters
+        ----------
+        dirname : str
+            The directory to remove
+
+        Returns
+        -------
+        modules_in_dir : list of Module
+            The modules in the directory that was removed
+        orphans : list of tuple
+            orphans[i][0] loaded module left orphaned by the removal of dirname
+            orphans[i][1] module to be loaded in its place, or None
+
+        """
 
         if dirname not in self:  # pragma: no cover
             tty.warn('Modulepath: {0!r} is not in modulepath'.format(dirname))
-            return modules_in_dir, orphaned, gained_precedence
+            return [], []
+
+        modules_in_dir, orphaned, = [], []
 
         modules_in_dir.extend(self.getby_dirname(dirname))
         orphaned.extend([m for m in modules_in_dir if m.is_loaded])
@@ -146,22 +163,24 @@ class Modulepath:
         self._path_modified()
 
         # Determine which modules may have moved up in priority due to removal
-        # of directory from path
-        for orphan in orphaned:
+        # of directory from path. If they have the same name as an orphan, it
+        # will be loaded in the orphans place
+        replacement = []
+        for (i, orphan) in enumerate(orphaned):
             other = self.get(orphan.fullname)
             if other is not None:
-                gained_precedence.append(other)
+                orphaned[i] = (orphan, other)
                 continue
             other = self.defaults.get(orphan.name)
             if other is not None:
-                gained_precedence.append(other)
+                orphaned[i] = (orphan, other)
                 continue
-            gained_precedence.append(None)
-        return modules_in_dir, orphaned, gained_precedence
+            orphaned[i] = (orphan, None)
+        return modules_in_dir, orphaned
 
     def set_path(self, directories):
         self.path = []
-        if not directories:
+        if not directories:  # pragma: no cover
             return
         for directory in directories:
             if not os.path.isdir(directory):  # pragma: no cover
