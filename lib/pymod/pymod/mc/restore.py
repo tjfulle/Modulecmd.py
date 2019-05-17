@@ -18,9 +18,6 @@ def restore(name):
 def restore_impl(collection):
     # First unload all loaded modules
     pymod.mc.purge(load_after_purge=False)
-    loaded_modules = pymod.mc.get_loaded_modules()
-    for module in loaded_modules[::-1]:
-        pymod.mc.unload_impl(module)
 
     # clear the modulepath
     pymod.modulepath.clear()

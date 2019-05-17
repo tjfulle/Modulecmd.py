@@ -13,6 +13,8 @@ def modules_path(tmpdir, namespace, modulecmds):
     tmpdir.join('a1.py').write(m.setenv('a1')+m.load('a'))
     tmpdir.join('a2.py').write(m.setenv('a2')+m.load('a'))
     tmpdir.join('b.py').write(m.setenv('b')+m.unload('a'))
+    x = tmpdir.mkdir('x')
+    x.join('1.0.py').write('')
     ns = namespace()
     ns.path = tmpdir.strpath
     return ns
@@ -26,6 +28,10 @@ def test_mc_unload_1(modules_path, mock_modulepath):
     pymod.mc.unload('a')
     assert pymod.environ.get('a') is None
     assert not a.is_loaded
+    x = pymod.mc.load('x/1.0')
+    assert x.is_loaded
+    x = pymod.mc.unload('x/1.0')
+    assert not x.is_loaded
 
 
 def test_mc_unload_2(modules_path, mock_modulepath):

@@ -29,7 +29,7 @@ def _clone_file():
     else:
         if os.path.exists(pymod.paths.user_config_platform_path):
             dirname = pymod.paths.user_config_platform_path
-        else:
+        else:  # pragma: no cover
             dirname = pymod.paths.user_config_path
         return os.path.join(dirname, basename)
 
