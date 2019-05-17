@@ -38,8 +38,15 @@ def test_mc_callback_conflict(tmpdir, mock_modulepath):
     a = pymod.modulepath.get('a')
 
     b = pymod.mc.load('b')
+    x = pymod.config.get('resolve_conflicts')
+    pymod.config.set('resolve_conflicts', False)
     with pytest.raises(pymod.error.ModuleConflictError):
         conflict(pymod.modes.load, a, 'b')
+
+    pymod.config.set('resolve_conflicts', True)
+    conflict(pymod.modes.load, a, 'b')
+
+    pymod.config.set('resolve_conflicts', x)
 
     b = pymod.mc.unload('b')
     conflict(pymod.modes.load, a, 'b')

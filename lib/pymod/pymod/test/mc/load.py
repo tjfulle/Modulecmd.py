@@ -129,3 +129,23 @@ def test_mc_load_nvv(tmpdir, mock_modulepath):
     assert m.name == 'a'
     assert m.version.string == '1.0'
     assert m.variant == 'base'
+
+
+def test_mc_load_inserted_2(tmpdir, mock_modulepath):
+
+    two = tmpdir.mkdir('2')
+    two.join('b.py').write('')
+
+    one = tmpdir.mkdir('1')
+    one.join('a.py').write('')
+    one.join('c.py').write('unuse({0!r})'.format(two.strpath))
+
+    mp = mock_modulepath([one.strpath, two.strpath])
+
+    a = pymod.mc.load('a')
+    b = pymod.mc.load('b')
+    c = pymod.mc.load('c', insert_at=1)
+    assert not b.is_loaded
+
+    assert len(pymod.mc._mc._unloaded_on_mp_change) == 1
+    assert pymod.mc._mc._unloaded_on_mp_change[0] == b
