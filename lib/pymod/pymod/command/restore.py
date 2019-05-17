@@ -1,5 +1,4 @@
 import os
-import sys
 import pymod.mc
 
 description = 'Restore saved modules or, optionally, a clone'

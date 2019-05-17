@@ -24,6 +24,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     one = tmpdir.mkdir('1')
     one.join('a.py').write(m.setenv('a'))
     one.join('b.py').write(m.setenv('b'))
+    one.join('b2.py').write(m.setenv('b2'))
     two = tmpdir.mkdir('2')
     two.join('c.py').write(m.setenv('c'))
     two.join('d.py').write(m.setenv('d'))
@@ -51,11 +52,14 @@ def test_mc_command_save(modules_path, mock_modulepath):
     assert not c.is_loaded
     assert not d.is_loaded
 
+    b2 = pymod.mc.load('b2')
+
     restore('foo')
     assert a.is_loaded
     assert b.is_loaded
     assert c.is_loaded
     assert d.is_loaded
+    assert not b2.is_loaded
 
     cat = PymodCommand('cat')
     cat('foo')

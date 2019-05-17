@@ -58,7 +58,7 @@ def determine_swaps_due_to_prepend(prepended_modules):
     for (i, module) in enumerate(loaded_modules):
         if module is None or module.name not in names:
             continue
-        prepended_module = prepended_modules[names.index(module.fullname)]
+        prepended_module = prepended_modules[names.index(module.name)]
         if prepended_module.filename != module.filename:
             bumped.append((module, prepended_modules[i]))
 

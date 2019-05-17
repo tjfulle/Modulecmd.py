@@ -23,9 +23,9 @@ def modules_path(tmpdir, namespace, modulecmds):
 def test_mc_purge(modules_path, mock_modulepath):
     mp = mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
-    b = pymod.mc.load('a')
-    c = pymod.mc.load('a')
-    d = pymod.mc.load('a')
+    b = pymod.mc.load('b')
+    c = pymod.mc.load('c')
+    d = pymod.mc.load('d')
     assert a.is_loaded
     assert b.is_loaded
     assert c.is_loaded
@@ -35,3 +35,22 @@ def test_mc_purge(modules_path, mock_modulepath):
     assert not b.is_loaded
     assert not c.is_loaded
     assert not d.is_loaded
+
+@pytest.mark.unit
+def test_mc_purge_load_after(modules_path, mock_modulepath):
+    pymod.config.set('load_after_purge', ['a', 'b'])
+    mp = mock_modulepath(modules_path.path)
+    a = pymod.mc.load('a')
+    b = pymod.mc.load('b')
+    c = pymod.mc.load('c')
+    d = pymod.mc.load('d')
+    assert a.is_loaded
+    assert b.is_loaded
+    assert c.is_loaded
+    assert d.is_loaded
+    pymod.mc.purge()
+    assert a.is_loaded
+    assert b.is_loaded
+    assert not c.is_loaded
+    assert not d.is_loaded
+    pymod.config.set('load_after_purge', [])

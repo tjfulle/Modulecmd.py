@@ -70,8 +70,7 @@ class Collections:
         return collections
 
     def format_available(self, terse=False, regex=None):
-        skip = (pymod.names.default_user_collection,
-                pymod.names.default_sys_collection)
+        skip = (pymod.names.default_user_collection,)
         names = sorted([x for x in self.collections if x not in skip])
 
         if regex:

@@ -8,9 +8,6 @@ import pymod.collection
 def restore(name):
     """Restore a collection of modules previously saved"""
 
-    if name == 'system':
-        name = pymod.names.default_sys_collection
-
     collection = pymod.collection.get(name)
     if collection is None:
         raise pymod.error.CollectionNotFoundError(name)

@@ -117,6 +117,9 @@ def test_mc_callback_source(tmpdir, capsys):
     command = r'source {0};'.format(baz.strpath)
     assert captured[0].strip() == command.strip()
 
+    with pytest.raises(ValueError):
+        pymod.mc.callback.source(pymod.modes.load, None, 'fake.txt')
+
 
 def test_mc_callback_load(tmpdir, mock_modulepath):
     load = pymod.mc.callback.load
