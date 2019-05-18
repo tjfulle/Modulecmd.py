@@ -48,3 +48,23 @@ def test_mc_decrement_refcount(tmpdir, mock_modulepath):
     pymod.mc.unload('a')
     count = pymod.mc._mc.get_lm_refcount().get(a.fullname)
     assert count is None
+
+
+def test_mc_refcount(tmpdir, mock_modulepath):
+    tmpdir.join('a.py').write('')
+    a = module(tmpdir.strpath, 'a.py')
+    pymod.mc.set_refcount(a, 1)
+    count = pymod.mc.get_refcount(a)
+    assert count == 1
+
+    pymod.mc.increment_refcount(a)
+    count = pymod.mc.get_refcount(a)
+    assert count == 2
+
+    pymod.mc.decrement_refcount(a)
+    count = pymod.mc.get_refcount(a)
+    assert count == 1
+
+    pymod.mc.decrement_refcount(a)
+    count = pymod.mc.get_refcount().get(a.fullname)
+    assert count is None
