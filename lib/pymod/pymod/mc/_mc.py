@@ -70,6 +70,10 @@ def set_loaded_modules(modules):
     pymod.environ.set_dict(pymod.names.loaded_module_opts, lm_opts)
 
 
+def loaded_module_opts():
+    return pymod.environ.get_dict(pymod.names.loaded_module_opts)
+
+
 def loaded_module_files():
     return pymod.environ.get_path(pymod.names.loaded_module_files)
 

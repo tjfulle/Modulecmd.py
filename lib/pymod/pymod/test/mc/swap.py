@@ -92,3 +92,30 @@ def test_mc_swap_use(tmpdir, mock_modulepath):
     c = pymod.modulepath.get('c')
     assert c.is_loaded
     assert c.modulepath == one.strpath
+
+
+def test_mc_swap_use_opts(tmpdir, mock_modulepath):
+    content = """\
+add_option('+x')
+opts = parse_opts()
+assert opts.x == 'foo'"""
+
+    foo = tmpdir.mkdir('foo')
+    a = foo.mkdir('a')
+    a.join('1.0.py').write(content)
+
+    baz = tmpdir.mkdir('baz')
+    a = baz.mkdir('a')
+    a.join('1.0.py').write(content)
+
+    core = tmpdir.mkdir('core')
+    core.join('foo.py').write('family("spam")\nuse({0!r})'.format(foo.strpath))
+    core.join('baz.py').write('family("spam")\nuse({0!r})'.format(baz.strpath))
+
+    mp = mock_modulepath(core.strpath)
+
+    pymod.mc.load('foo')
+    pymod.mc.load('a', opts=['+x=foo'])
+
+    # swapping will load baz/a/1.0.py and the opts should also be preserved
+    pymod.mc.swap('foo', 'baz')

@@ -52,6 +52,7 @@ def swap_impl(module_a, module_b, maintain_state=False, caller='command_line'):
 
     # Before swapping, unload modules and later reload
     loaded = pymod.mc.get_loaded_modules()
+    opts = dict([(m.name, m.opts) for m in loaded])
     for (i, other) in enumerate(loaded):
         if other.name == module_a.name:
             # All modules coming after this one will be unloaded and
@@ -90,6 +91,7 @@ def swap_impl(module_a, module_b, maintain_state=False, caller='command_line'):
             pymod.mc.swapped_on_mp_change(other, this_module)
 
         # Now load the thing
+        this_module.opts = opts.get(this_module.name, this_module.opts)
         pymod.mc.load_impl(this_module)
 
     return module_b
