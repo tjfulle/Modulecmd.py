@@ -93,7 +93,7 @@ def load_impl(module):
         # exception and swaps this module with the module of the same family.
         # The swap completes the load.
         if not (pymod.mc._mc._swapped_on_family_update and
-                module == pymod.mc._mc._swapped_on_family_update[-1][1]):
+                module == pymod.mc._mc._swapped_on_family_update[-1][1]): # pragma: no cover
             raise ModuleLoadError('Expected 0 ref_count')
     else:
         pymod.mc.register_module(module)
