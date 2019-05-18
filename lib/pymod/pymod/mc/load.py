@@ -114,19 +114,16 @@ def load_inserted_impl(module, insert_at):
     load_impl(module)
 
     # Reload any that need to be unloaded first
+    # FIXME: what if user loaded by fullname, we would want to reload it by
+    # fullname as well, not by name below
     for other in to_unload_and_reload:
         assert not other.is_loaded
-        other_module = pymod.modulepath.get(other.fullname)
+        other_module = pymod.modulepath.get(other.name)
         if other_module is None:
-            m_tmp = pymod.modulepath.get(other.name)
-            if m_tmp is not None:
-                other_module = m_tmp
-            else:
-                # The only way this_module is None is if inserting
-                # caused a change to MODULEPATH making this module
-                # unavailable.
-                pymod.mc.unloaded_on_mp_change(other)
-                continue
+            # The only way this_module is None is if inserting caused a change
+            # to MODULEPATH making this module unavailable.
+            pymod.mc.unloaded_on_mp_change(other)
+            continue
 
         if other_module.filename != other.filename:
             pymod.mc.swapped_on_mp_change(other, other_module)

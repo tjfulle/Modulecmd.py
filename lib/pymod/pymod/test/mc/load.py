@@ -168,3 +168,30 @@ def test_mc_load_inserted_3(tmpdir, mock_modulepath):
     assert not a.is_loaded
     assert xx.is_loaded
     assert xx.fullname == a.fullname
+
+
+def test_mc_load_inserted_4(tmpdir, mock_modulepath):
+
+    foo = tmpdir.mkdir('foo')
+    a = foo.mkdir('a')
+    a.join('2.0.py').write('')
+
+    core = tmpdir.mkdir('core')
+    a = core.mkdir('a')
+    a.join('1.0.py').write('')
+    core.join('foo.py').write('use({0!r})'.format(foo.strpath))
+
+    mp = mock_modulepath(core.strpath)
+
+    a = pymod.mc.load('a')
+    assert a.modulepath == core.strpath
+    assert a.version == '1.0'
+
+    m = pymod.mc.load('foo', insert_at=1)
+    a2 = pymod.modulepath.get('a')
+    print(pymod.modulepath.path())
+    assert a2.modulepath == foo.strpath
+
+    assert not a.is_loaded
+    assert a2.is_loaded
+    assert a2.name == a.name
