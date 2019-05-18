@@ -90,7 +90,6 @@ class Modulepath:
         for path in self:
             if path.path == dirname:
                 return path.modules
-        return []
 
     def getby_filename(self, filename):
         for path in self.path:
