@@ -7,44 +7,29 @@ from pymod.error import ModuleNotFoundError
 
 
 @pytest.fixture()
-def directory_tree(tmpdir, namespace, modulecmds):
-    m = modulecmds
-    one = tmpdir.mkdir('1')
-    one.join('a.py').write(m.setenv('a'))
-    one.join('b.py').write(m.setenv('b')+m.load('c'))
-    one.join('c.py').write(m.setenv('c')+m.load('d'))
-    one.join('d.py').write(m.setenv('d')+m.load('e'))
-    one.join('e.py').write(m.setenv('e'))
-    two = tmpdir.mkdir('2')
-    two.join('a.py').write(m.setenv('a'))
-    two.join('b.py').write(m.setenv('b')+m.load_first('c','e','d'))
-    two.join('d.py').write(m.setenv('d'))
-    three = tmpdir.mkdir('3')
-    two.join('g.py').write(m.setenv('g')+m.load_first('x','y','z'))
-    two.join('h.py').write(m.setenv('h')+m.load_first('x','y','z',None))
-    ns = namespace()
-    ns.one = one.strpath
-    ns.two = two.strpath
-    ns.three = two.strpath
-    return ns
-
-
-def test_mc_load_1(directory_tree, mock_modulepath):
+def test_mc_load_1(tmpdir, mock_modulepath):
     """Just load and then unload a"""
-    mp = mock_modulepath(directory_tree.one)
+    tmpdir.join('a.py').write('setenv("__AA__", "AA")')
+    mp = mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a')
     assert pymod.mc.get_refcount(a) == 1
     assert pymod.mc.get_refcount().get(a.fullname) == 1
-    assert pymod.environ.get('a') == 'a'
+    assert pymod.environ.get('__AA__') == 'AA'
     pymod.mc.unload('a')
-    assert pymod.environ.get('a') is None
+    assert pymod.environ.get('__AA__') is None
 
 
-def test_mc_load_2(directory_tree, mock_modulepath):
+def test_mc_load_2(tmpdir, mock_modulepath):
     """Load a and b, b loads c, d, e. Then, unload b (c, d, e should also
     unload)
     """
-    mp = mock_modulepath(directory_tree.one)
+    tmpdir.join('a.py').write('setenv("a", "a")')
+    tmpdir.join('b.py').write('setenv("b", "b")\nload("c")')
+    tmpdir.join('c.py').write('setenv("c", "c")\nload("d")')
+    tmpdir.join('d.py').write('setenv("d", "d")\nload("e")')
+    tmpdir.join('e.py').write('setenv("e", "e")')
+    mp = mock_modulepath(tmpdir.strpath)
+
     pymod.mc.load('a')
     assert pymod.environ.get('a') == 'a'
 
@@ -72,9 +57,12 @@ def test_mc_load_2(directory_tree, mock_modulepath):
     assert pymod.environ.get('a') is None
 
 
-def test_mc_load_3(directory_tree, mock_modulepath):
+def test_mc_load_3(tmpdir, mock_modulepath):
     """Load a and b, b loads d. Then, unload b (d should also unload)"""
-    mp = mock_modulepath(directory_tree.two)
+    tmpdir.join('a.py').write('setenv("a", "a")\n')
+    tmpdir.join('b.py').write('setenv("b", "b")\nload_first("c","e","d")\n')
+    tmpdir.join('d.py').write('setenv("d", "d")\n')
+    mp = mock_modulepath(tmpdir.strpath)
     pymod.mc.load('a')
     assert pymod.environ.get('a') == 'a'
 
@@ -99,23 +87,31 @@ def test_mc_load_3(directory_tree, mock_modulepath):
     assert pymod.environ.get('a') is None
 
 
-def test_mc_load_inserted(directory_tree, mock_modulepath):
-    mp = mock_modulepath(directory_tree.one)
+def test_mc_load_inserted(tmpdir, mock_modulepath):
+    tmpdir.join('a.py').write('setenv("a", "a")')
+    tmpdir.join('b.py').write('setenv("b", "b")\nload("c")')
+    tmpdir.join('c.py').write('setenv("c", "c")\nload("d")')
+    tmpdir.join('d.py').write('setenv("d", "d")\nload("e")')
+    tmpdir.join('e.py').write('setenv("e", "e")')
+    mp = mock_modulepath(tmpdir.strpath)
+
     pymod.mc.load('e')
     pymod.mc.load('a', insert_at=1)
     assert ''.join(pymod.mc._mc.loaded_module_names()) == 'ae'
 
 
-def test_mc_load_first(directory_tree, mock_modulepath):
-    mp = mock_modulepath(directory_tree.three)
+def test_mc_load_first(tmpdir, mock_modulepath):
+    tmpdir.join('a.py').write('load_first("x","y","z")\n')
+    tmpdir.join('b.py').write('load_first("x","y","z",None)\n')
+    mp = mock_modulepath(tmpdir.strpath)
     with pytest.raises(ModuleNotFoundError):
         # None of the modules in the load_first command in module 'g' can be
         # found
-        pymod.mc.load('g')
+        pymod.mc.load('a')
     # None of the modules in the load_first command in module 'g' can be found,
     # but the last is `None` so no error is issued
-    h = pymod.mc.load('h')
-    assert h.is_loaded
+    b = pymod.mc.load('b')
+    assert b.is_loaded
 
 
 def test_mc_load_nvv(tmpdir, mock_modulepath):
