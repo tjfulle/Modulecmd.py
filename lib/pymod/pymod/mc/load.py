@@ -105,8 +105,9 @@ def load_inserted_impl(module, insert_at):
     """Load the `module` at `insert_at` by unloading all modules beyond
     `insert_at`, loading `module`, then reloading the unloaded modules"""
 
+    insertion_loc = insert_at - 1
     loaded_modules = pymod.mc.get_loaded_modules()
-    to_unload_and_reload = loaded_modules[(insert_at)-1:]
+    to_unload_and_reload = loaded_modules[insertion_loc:]
     for other in to_unload_and_reload[::-1]:
         pymod.mc.unload_impl(other)
 
@@ -114,7 +115,8 @@ def load_inserted_impl(module, insert_at):
 
     # Reload any that need to be unloaded first
     for other in to_unload_and_reload:
-        other_module = pymod.modulepath.get(other.filename)
+        assert not other.is_loaded
+        other_module = pymod.modulepath.get(other.fullname)
         if other_module is None:
             m_tmp = pymod.modulepath.get(other.name)
             if m_tmp is not None:

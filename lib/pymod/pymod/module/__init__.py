@@ -67,9 +67,9 @@ class Module(object):
 
     @property
     def is_loaded(self):
-        loaded_modules = split(
-            pymod.environ.get(pymod.names.loaded_modules), os.pathsep)
-        return self.fullname in loaded_modules
+        lm_files = split(
+            pymod.environ.get(pymod.names.loaded_module_files), os.pathsep)
+        return self.filename in lm_files
 
     @property
     def is_enabled(self):

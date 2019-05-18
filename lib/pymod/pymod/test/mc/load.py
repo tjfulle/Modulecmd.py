@@ -149,3 +149,22 @@ def test_mc_load_inserted_2(tmpdir, mock_modulepath):
 
     assert len(pymod.mc._mc._unloaded_on_mp_change) == 1
     assert pymod.mc._mc._unloaded_on_mp_change[0] == b
+
+
+def test_mc_load_inserted_3(tmpdir, mock_modulepath):
+
+    foo = tmpdir.mkdir('foo')
+    foo.join('a.py').write('')
+
+    core = tmpdir.mkdir('core')
+    core.join('a.py').write('')
+    core.join('foo.py').write('use({0!r})'.format(foo.strpath))
+
+    mp = mock_modulepath(core.strpath)
+
+    a = pymod.mc.load('a')
+    c = pymod.mc.load('foo', insert_at=1)
+    xx = pymod.modulepath.get('a')
+    assert not a.is_loaded
+    assert xx.is_loaded
+    assert xx.fullname == a.fullname
