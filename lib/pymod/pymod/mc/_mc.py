@@ -49,7 +49,7 @@ def module_is_loaded(key):
 
 def get_loaded_modules():
     lm_files = loaded_module_files()
-    lm_opts = pymod.environ.get_dict(pymod.names.loaded_module_opts)
+    lm_opts = loaded_module_opts()
     loaded_modules = [pymod.modulepath.get(f) for f in lm_files]
     for module in loaded_modules:
         m_opts = lm_opts.get(module.fullname)
