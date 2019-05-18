@@ -119,3 +119,28 @@ assert opts.x == 'foo'"""
 
     # swapping will load baz/a/1.0.py and the opts should also be preserved
     pymod.mc.swap('foo', 'baz')
+
+
+def test_mc_swap_use_2(tmpdir, mock_modulepath):
+    foo = tmpdir.mkdir('foo')
+    a = foo.mkdir('a')
+    a.join('2.0.py').write('')
+
+    baz = tmpdir.mkdir('baz')
+    a = baz.mkdir('a')
+    a.join('1.0.py').write('')
+
+    core = tmpdir.mkdir('core')
+    core.join('foo.py').write('use({0!r})'.format(foo.strpath))
+    core.join('baz.py').write('use({0!r})'.format(baz.strpath))
+
+    mp = mock_modulepath(core.strpath)
+
+    foo_module = pymod.mc.load('foo')
+    foo_a = pymod.mc.load('a')
+
+    baz_module = pymod.modulepath.get('baz')
+    pymod.mc.swap_impl(foo_module, baz_module, maintain_state=True)
+    assert len(pymod.mc._mc._unloaded_on_mp_change) == 0
+    baz_a = pymod.modulepath.get('a')
+    assert baz_a.modulepath == baz.strpath
