@@ -283,13 +283,13 @@ class Modulepath:
         regex = re.compile(key)
         for path in self:
             modules = path.modules
-            if not modules:
+            if not modules:  # pragma: no cover
                 continue
             for module in modules:
                 if regex.search(module.filename):
                     the_candidates.add(module.fullname)
-                elif regex.search(module.name) and module.is_default:
+                elif regex.search(module.name) and module.is_default:  # pragma: no cover
                     the_candidates.add(module.fullname)
-                elif regex.search(module.fullname):
+                elif regex.search(module.fullname):  # pragma: no cover
                     the_candidates.add(module.fullname)
         return sorted(list(the_candidates))
