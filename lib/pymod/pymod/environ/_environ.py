@@ -4,6 +4,8 @@ from argparse import Namespace
 import pymod.names
 import pymod.shell
 import pymod.modulepath
+
+import llnl.util.tty as tty
 from contrib.util import str2dict, dict2str, boolean, split, join, pop
 
 class Environ(dict):
@@ -163,8 +165,11 @@ class Environ(dict):
         allow_dups = self.get_bool(pymod.names.allow_dup_entries)
         current_path = self.get_path(key, sep=sep)
         count, priority = current_path.meta.pop(value, (0, -1))
-        if count == 0 and value in current_path.value:
+        if count == 0 and value in current_path.value: # pragma: no cover
+            tty.warn('Inconsistent refcount state')
             count = current_path.value.count(value)
+            if pymod.config.get('debug'):
+                raise Exception('Inconsistent refcount state')
         count -= 1
         if (allow_dups and count > 0) or count <= 0:
             pop(current_path.value, value)
