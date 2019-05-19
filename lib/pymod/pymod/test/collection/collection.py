@@ -31,7 +31,6 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
 def test_collection_default(modules_path, mock_modulepath):
 
     mp = mock_modulepath(modules_path.path)
@@ -50,7 +49,6 @@ def test_collection_default(modules_path, mock_modulepath):
     assert s == '(None)'
 
 
-@pytest.mark.unit
 def test_collection_named(modules_path, mock_modulepath):
 
     mp = mock_modulepath(modules_path.path)
@@ -99,3 +97,22 @@ def test_collection_named(modules_path, mock_modulepath):
 
     with pytest.raises(pymod.error.CollectionNotFoundError):
         pymod.mc.restore('foo')
+
+
+def test_collection_bad(tmpdir):
+    from json.decoder import JSONDecodeError
+
+    # nonexistent file: okay
+    f = tmpdir.join('collections.json')
+    collections = pymod.collection.Collections(f.strpath)
+
+    # existing file: okay
+    f = tmpdir.join('collections.json')
+    f.write('{}')
+    collections = pymod.collection.Collections(f.strpath)
+
+    # badly formatted file: not okay
+    f = tmpdir.join('f.json')
+    f.write('{"default": ')
+    with pytest.raises(JSONDecodeError):
+        collections = pymod.collection.Collections(f.strpath)
