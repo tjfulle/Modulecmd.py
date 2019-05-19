@@ -100,8 +100,6 @@ def test_collection_named(modules_path, mock_modulepath):
 
 
 def test_collection_bad(tmpdir):
-    from json.decoder import JSONDecodeError
-
     # nonexistent file: okay
     f = tmpdir.join('collections.json')
     collections = pymod.collection.Collections(f.strpath)
@@ -114,5 +112,9 @@ def test_collection_bad(tmpdir):
     # badly formatted file: not okay
     f = tmpdir.join('f.json')
     f.write('{"default": ')
-    with pytest.raises(JSONDecodeError):
+    try:
+        from json.decoder import JSONDecodeError as error_type
+    except ImportError:
+        error_type = ValueError
+    with pytest.raises(error_type):
         collections = pymod.collection.Collections(f.strpath)
