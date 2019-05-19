@@ -1,6 +1,8 @@
 import os
 
-from contrib.util import join, split, dict2str, str2dict
+from contrib.util import join, split
+from contrib.util import dict_to_str, str_to_dict
+from contrib.util import list_to_str, str_to_list
 from pymod.environ._environ import Environ
 from llnl.util.lang import Singleton
 
@@ -75,11 +77,20 @@ def set_path(key, path, sep=os.pathsep):
 
 
 def get_dict(key):
-    return str2dict(environ.get(key))
+    return str_to_dict(environ.get(key))
 
 
-def set_dict(key, dict):
-    value = dict2str(dict)
+def set_dict(key, arg):
+    value = dict_to_str(arg)
+    return environ.set(key, value)
+
+
+def get_list(key):
+    return str_to_list(environ.get(key))
+
+
+def set_list(key, arg):
+    value = list_to_str(arg)
     return environ.set(key, value)
 
 

@@ -6,7 +6,7 @@ import pymod.shell
 import pymod.modulepath
 
 import llnl.util.tty as tty
-from contrib.util import str2dict, dict2str, boolean, split, join, pop
+from contrib.util import str_to_dict, dict_to_str, boolean, split, join, pop
 
 class Environ(dict):
 
@@ -50,7 +50,7 @@ class Environ(dict):
         p.meta_key = pymod.names.loaded_module_meta(key)
         p.sep = sep
         p.value = split(self.get(key), sep=sep)
-        p.meta = str2dict(self.get(p.meta_key))
+        p.meta = str_to_dict(self.get(p.meta_key))
         return p
 
     def set_path(self, path):
@@ -59,7 +59,7 @@ class Environ(dict):
             self[path.meta_key] = None
         else:
             self[path.key] = join(path.value, path.sep)
-            self[path.meta_key] = dict2str(path.meta)
+            self[path.meta_key] = dict_to_str(path.meta)
         self.save_ld_library_path(path.key)
 
     def filtered(self, include_os=True):

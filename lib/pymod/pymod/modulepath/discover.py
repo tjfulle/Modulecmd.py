@@ -12,6 +12,8 @@ marked_default_names = ('default', '.version')
 
 
 def find_modules(dirname):
+    # Lazy import to avoid circular imports
+    import pymod.mc
 
     dirname = os.path.expanduser(dirname)
 
@@ -51,9 +53,14 @@ def find_modules(dirname):
             if modules_nv:
                 modules.extend(modules_nv)
 
-    module_opts = pymod.environ.get_dict(pymod.names.loaded_module_opts)
+    lm_cellar = pymod.mc.get_cellar()
     for module in modules:
-        module.opts = module_opts.get(module.fullname)
+        for item in lm_cellar:
+            if item.fullname == module.fullname:
+                module.opts = item.opts
+                break
+        else:
+            module.opts = None
 
     return modules
 

@@ -5,7 +5,6 @@ import pymod.mc
 import pymod.error
 import pymod.modes
 import pymod.environ
-from contrib.util import str2dict
 
 """Test of the callback functions sent to modules"""
 

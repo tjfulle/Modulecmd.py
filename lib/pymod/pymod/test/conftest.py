@@ -17,9 +17,9 @@ def os_environ():
     real_env = os.environ.copy()
     os.environ.pop(pymod.names.modulepath, None)
     os.environ.pop(pymod.names.loaded_modules, None)
-    os.environ.pop(pymod.names.loaded_module_opts, None)
     os.environ.pop(pymod.names.loaded_module_files, None)
     os.environ.pop(pymod.names.loaded_module_refcount, None)
+    os.environ.pop(pymod.names.loaded_module_cellar, None)
     os.environ.pop(pymod.names.config_file_envar, None)
     to_pop = []
     for (key, val) in os.environ.items():

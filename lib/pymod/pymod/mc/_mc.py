@@ -22,6 +22,7 @@ __all__ = [
     'set_loaded_modules',
     'get_refcount',
     'set_refcount',
+    'get_cellar',
     'increment_refcount',
     'decrement_refcount',
     'swapped_explicitly',
@@ -48,13 +49,14 @@ def module_is_loaded(key):
 
 
 def get_loaded_modules():
-    lm_files = loaded_module_files()
-    lm_opts = loaded_module_opts()
-    loaded_modules = [pymod.modulepath.get(f) for f in lm_files]
-    for module in loaded_modules:
-        m_opts = lm_opts.get(module.fullname)
-        if m_opts and not module.opts:
-            module.opts = m_opts
+    loaded_modules = []
+    lm = pymod.environ.get_list(pymod.names.loaded_module_cellar)
+    for (fullname, filename, opts) in lm:
+        module = pymod.modulepath.get(filename)
+        assert module.fullname == fullname
+        if opts and not module.opts:
+            module.opts = opts
+        loaded_modules.append(module)
     return loaded_modules
 
 
@@ -66,12 +68,8 @@ def set_loaded_modules(modules):
     lm_files = [m.filename for m in modules]
     pymod.environ.set_path(pymod.names.loaded_module_files, lm_files)
 
-    lm_opts = dict([(m.fullname, m.opts) for m in modules if m.opts])
-    pymod.environ.set_dict(pymod.names.loaded_module_opts, lm_opts)
-
-
-def loaded_module_opts():
-    return pymod.environ.get_dict(pymod.names.loaded_module_opts)
+    lm = [(m.fullname, m.filename, m.opts) for m in modules]
+    pymod.environ.set_list(pymod.names.loaded_module_cellar, lm)
 
 
 def loaded_module_files():
@@ -80,6 +78,19 @@ def loaded_module_files():
 
 def loaded_module_names():
     return pymod.environ.get_path(pymod.names.loaded_modules)
+
+
+def get_cellar():
+    lm_cellar = []
+    class Namespace: pass
+    lm = pymod.environ.get_list(pymod.names.loaded_module_cellar)
+    for item in lm:
+        ns = Namespace()
+        ns.fullname = item[0]
+        ns.filename = item[1]
+        ns.opts = item[2]
+        lm_cellar.append(ns)
+    return lm_cellar
 
 
 def get_lm_refcount():

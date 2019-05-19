@@ -5,7 +5,7 @@ import pymod.error
 import pymod.names
 import pymod.paths
 import pymod.environ
-from contrib.util import str2dict, split
+from contrib.util import str_to_list, split
 
 
 def read(filename):
@@ -68,12 +68,11 @@ def restore_clone(name):
         pymod.environ.set(key, val)
 
     # Load modules to make sure aliases/functions are restored
-    module_files = the_clone[pymod.names.loaded_module_files].split(os.pathsep)
-    module_opts = str2dict(the_clone[pymod.names.loaded_module_opts])
-
-    for (i, filename) in enumerate(module_files):
+    lm_cellar = str_to_list(the_clone[pymod.names.loaded_module_cellar])
+    for item in lm_cellar:
+        fullname, filename, opts = item[:3]
         module = pymod.modulepath.get(filename)
         if module is None:
             raise pymod.error.ModuleNotFoundError(filename, mp=pymod.modulepath)
-        module.opts = module_opts.get(module.fullname)
+        module.opts = opts
         pymod.mc.load_partial(module)

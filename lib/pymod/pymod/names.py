@@ -6,7 +6,7 @@ loaded_modules = 'LOADEDMODULES'
 loaded_module_files = '_LMFILES_'
 loaded_module_meta = lambda key: '_LMMETA_{0}'.format(key)
 loaded_module_refcount = '_LMREFCNT_'
-loaded_module_opts = '_LMOPTS_'
+loaded_module_cellar = '_LMCELLAR_'
 
 sourced_files = 'PYMOD_SOURCED_FILES'
 allow_dup_entries = 'PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES'

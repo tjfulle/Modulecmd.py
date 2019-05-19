@@ -1,6 +1,6 @@
 import os
 import sys
-import pymod.names
+import pymod.mc
 from contrib.util import split
 from contrib.util.tty import grep_pat_in_string
 from llnl.util.tty import terminal_size
@@ -26,16 +26,17 @@ def setup_parser(subparser):
 
 
 def list_loaded(args):
-    loaded_modules = pymod.environ.get_path(pymod.names.loaded_modules)
-    if not loaded_modules:
+    lm_cellar = pymod.mc.get_cellar()
+    if not lm_cellar:
         output = 'No loaded modules'
 
     else:
-        loaded_module_opts = pymod.environ.get_dict(pymod.names.loaded_module_opts)
-        for (i, module) in enumerate(loaded_modules):
-            opts = loaded_module_opts.get(module)
-            if opts is not None:
-                loaded_modules[i] = module + ' ' + ' '.join(opts)
+        loaded_modules = []
+        for item in lm_cellar:
+            fullname = item.fullname
+            if item.opts:
+                fullname += ' ' + ' '.join(item.opts)
+            loaded_modules.append(fullname)
 
         if args.terse:
             output = '\n'.join(loaded_modules)
