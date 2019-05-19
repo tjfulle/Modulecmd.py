@@ -207,7 +207,7 @@ class Modulepath:
 
     def filter_modules_by_regex(self, modules, regex):
         if regex:
-            modules = [m for m in modules if re.search(regex, m.name)]
+            modules = [m for m in modules if re.search(regex, m.fullname)]
         return modules
 
     def colorize(self, string):
@@ -242,6 +242,7 @@ class Modulepath:
                 directory = path.path
                 modules = path.modules
                 modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
+                modules = self.filter_modules_by_regex(modules, regex)
                 if not os.path.isdir(directory):  # pragma: no cover
                     if not fulloutput:
                         continue
@@ -271,8 +272,8 @@ class Modulepath:
             sio.write('\n')
 
         description = sio.getvalue()
-        if regex is not None:
-            description = grep_pat_in_string(description, regex)
+#        if regex is not None:
+#            description = grep_pat_in_string(description, regex)
 
         return description
 

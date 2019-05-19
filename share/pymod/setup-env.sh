@@ -28,10 +28,10 @@ export MODULESHOME
 #  then the "eval" converts the text into changes in the current shell.
 module()
 {
-  eval $($PYMOD_CMD bash "$@")
+  eval $(python -E $PYMOD_CMD bash "$@")
 }
 
-PYMOD_VERSION="1.2"
+PYMOD_VERSION="3.0"
 export PYMOD_VERSION
 
 export_module=$(echo "YES" | /usr/bin/tr '[:upper:]' '[:lower:]')
