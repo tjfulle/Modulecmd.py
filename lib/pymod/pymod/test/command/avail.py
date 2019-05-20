@@ -1,33 +1,27 @@
 import pytest
-
 from pymod.main import PymodCommand
 
 
-@pytest.fixture()
-def modules_path(tmpdir, namespace, modulecmds):
-    m = modulecmds
-    one = tmpdir.mkdir('1')
-    one.join('a.py').write(m.setenv('a'))
-    one.join('b.py').write(m.setenv('b')+m.load('c'))
-    one.join('c.py').write(m.setenv('c')+m.load('d'))
-    one.join('d.py').write(m.setenv('d')+m.load('e'))
-    one.join('e.py').write(m.setenv('e'))
-    two = tmpdir.mkdir('2')
-    two.join('a.py').write(m.setenv('a'))
-    two.join('b.py').write(m.setenv('b')+m.load_first('c','e','d'))
-    two.join('d.py').write(m.setenv('d'))
-    two.join('g.py').write(m.setenv('b')+m.load_first('x','y','z',None))
-    ns = namespace()
-    ns.one = one.strpath
-    ns.two = two.strpath
-    return ns
-
-
-def test_command_avail(modules_path, mock_modulepath):
+def test_command_avail(tmpdir, mock_modulepath):
     load = PymodCommand('load')
     avail = PymodCommand('avail')
     save = PymodCommand('save')
-    mock_modulepath([modules_path.one, modules_path.two])
+
+    # Build modules
+    one = tmpdir.mkdir('1')
+    one.join('a.py').write('setenv("a", "a")\n')
+    one.join('b.py').write('setenv("b", "b")\nload("c")')
+    one.join('c.py').write('setenv("c", "c")\nload("d")')
+    one.join('d.py').write('setenv("d", "d")\nload("e")')
+    one.join('e.py').write('setenv("e", "e")\n')
+
+    two = tmpdir.mkdir('2')
+    two.join('a.py').write('setenv("a", "a")\n')
+    two.join('b.py').write('setenv("b", "b")\nload_first("c", "e", "d")')
+    two.join('d.py').write('setenv("d", "c")\n')
+    two.join('g.py').write('setenv("g", "d")\nload_first("x", "y", "z", None)')
+
+    mock_modulepath([one.strpath, two.strpath])
     load('a')
     load('b')
     load('c')

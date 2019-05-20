@@ -58,12 +58,6 @@ def modules_path(tmpdir):
     default = X.join('default')
     default.mksymlinkto(X.join('2.0.0.py'))
 
-    # bad default
-    Y = one.mkdir('Y')
-    Y.join('3.0.0').write(basic_tcl_module.format('Y', '3.0.0'))
-    Y.join('4.0.0').write(basic_tcl_module.format('Y', '4.0.0'))
-    Y.join('.version').write('set ModulesVersion "5.0.0"')
-
     return tmpdir
 
 
@@ -91,11 +85,15 @@ def test_modulepath_two_defaults(tmpdir, mock_modulepath):
     assert isinstance(x, pymod.module.PyModule)
 
 
-def test_modulepath_bad_default(modules_path, mock_modulepath):
-    mock_modulepath(modules_path.join('1').strpath)
-    y = pymod.modulepath.get('Y')
-    assert y.version.string == '4.0.0'
-    assert y.type == pymod.module.tcl
+def test_modulepath_bad_default(tmpdir, mock_modulepath):
+    a = tmpdir.mkdir('a')
+    a.join('3.0.0').write(basic_tcl_module.format('a', '3.0.0'))
+    a.join('4.0.0').write(basic_tcl_module.format('a', '4.0.0'))
+    a.join('.version').write('set ModulesVersion "5.0.0"')
+    mock_modulepath(tmpdir.strpath)
+    ma = pymod.modulepath.get('a')
+    assert ma.version.string == '4.0.0'
+    assert isinstance(ma, pymod.module.TclModule)
 
 
 def test_modulepath_available_1(modules_path, mock_modulepath):
@@ -170,7 +168,7 @@ def test_modulepath_get(modules_path, mock_modulepath):
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
     modules = pymod.modulepath.get(d1)
-    assert len(modules) == 14
+    assert len(modules) == 12
 
     d2 = modules_path.join('2').strpath
     pymod.modulepath.prepend_path(d2)
@@ -306,5 +304,13 @@ def test_modulepath_walk(modules_path, mock_modulepath):
     d1 = modules_path.join('1').strpath
     d2 = modules_path.join('2').strpath
     mock_modulepath([d1, d2])
+    i = 0
     for path in pymod.modulepath.walk():
-        assert path.path == d1 or path.path == d2
+        if i == 0:
+            assert path.path == d1
+            i+= 1
+        elif i == 1:
+            assert path.path == d2
+            i += 1
+        else:
+            assert False, 'Should never get here'

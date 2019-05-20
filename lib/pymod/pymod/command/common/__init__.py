@@ -1,2 +1,1 @@
 from pymod.command.common.parse_module_options import parse_module_options
-from pymod.command.common.get_entity_text import get_entity_text
