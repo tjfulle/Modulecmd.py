@@ -1,4 +1,3 @@
-import os
 import pytest
 from pymod.module.argument_parser import ModuleArgumentParser
 

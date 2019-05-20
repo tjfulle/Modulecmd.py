@@ -1,4 +1,3 @@
-import os
 import pytest
 
 import pymod.modulepath
@@ -27,7 +26,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 @pytest.mark.unit
 def test_command_unuse(modules_path, mock_modulepath):
     unuse = PymodCommand('unuse')
-    mp = mock_modulepath([modules_path.one, modules_path.two])
+    mock_modulepath([modules_path.one, modules_path.two])
     unuse(modules_path.two)
     unuse(modules_path.one)
     assert pymod.modulepath.size() == 0

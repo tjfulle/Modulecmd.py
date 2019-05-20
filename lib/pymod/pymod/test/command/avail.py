@@ -1,8 +1,5 @@
-import os
 import pytest
 
-import pymod.mc
-import pymod.environ
 from pymod.main import PymodCommand
 
 

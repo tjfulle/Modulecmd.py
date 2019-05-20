@@ -1,5 +1,4 @@
 import os
-import sys
 import ruamel.yaml as yaml
 import pymod.paths
 import pymod.names

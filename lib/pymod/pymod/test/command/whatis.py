@@ -1,6 +1,5 @@
 import pytest
 
-import pymod.mc
 from pymod.main import PymodCommand
 from pymod.error import ModuleNotFoundError
 

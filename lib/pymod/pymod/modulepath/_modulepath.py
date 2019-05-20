@@ -8,7 +8,6 @@ from pymod.modulepath.discover import find_modules
 from contrib.util import groupby
 import llnl.util.tty as tty
 from contrib.util import join
-from contrib.util.tty import grep_pat_in_string
 from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
 
@@ -272,8 +271,6 @@ class Modulepath:
             sio.write('\n')
 
         description = sio.getvalue()
-#        if regex is not None:
-#            description = grep_pat_in_string(description, regex)
 
         return description
 

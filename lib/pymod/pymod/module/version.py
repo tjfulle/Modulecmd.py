@@ -1,4 +1,3 @@
-import re
 from contrib.util import split
 
 

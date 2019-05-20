@@ -1,6 +1,5 @@
 import pymod.mc
 from pymod.error import ModuleConflictError
-import llnl.util.tty as tty
 
 def conflict(module, *conflicting):
     """The module we are trying to load, `module` conflicts with the module

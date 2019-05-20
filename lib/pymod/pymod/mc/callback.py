@@ -1,14 +1,9 @@
 import os
-import sys
 
 import pymod.mc
 import pymod.modes
 import pymod.modulepath
-from contrib.util import split
 from pymod.error import ModuleNotFoundError
-
-import llnl.util.tty as tty
-from spack.util.executable import Executable
 
 """Module defines callback functions between modules and pymod.
 

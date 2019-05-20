@@ -3,10 +3,8 @@ import sys
 import pymod.mc
 import pymod.command
 import pymod.modulepath
-from pymod.error import ModuleNotFoundError
 from contrib.util.tty.pager import pager
 from llnl.util.tty.color import colorize
-from llnl.util.tty import terminal_size
 from contrib.util.tty import redirect_stdout
 
 description = "get help on pymod and its commands"

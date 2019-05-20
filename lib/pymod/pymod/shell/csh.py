@@ -2,6 +2,7 @@ import os
 import re
 
 from .shell import Shell
+import llnl.util.tty as tty
 
 CSH_LIMIT = 4000
 

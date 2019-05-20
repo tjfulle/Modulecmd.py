@@ -1,5 +1,4 @@
 import os
-import re
 import py
 import pytest
 import tempfile

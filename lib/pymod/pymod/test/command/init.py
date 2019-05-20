@@ -1,6 +1,3 @@
-import pytest
-
-import pymod.mc
 from pymod.main import PymodCommand
 
 

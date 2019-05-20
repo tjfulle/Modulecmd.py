@@ -1,6 +1,4 @@
 import os
-import re
-import sys
 from textwrap import fill
 from six import StringIO
 
@@ -14,7 +12,6 @@ from pymod.module.version import Version
 from contrib.util import split, textfill, encode_str
 import llnl.util.tty as tty
 from llnl.util.tty import terminal_size
-from spack.util.executable import which
 from pymod.module.argument_parser import ModuleArgumentParser
 
 
@@ -235,7 +232,7 @@ class PyModule(Module):
         parts = list(parts)
         parts[-1], ext = os.path.splitext(parts[-1])
         assert ext == self.ext
-        superini = super(PyModule, self).__init__(modulepath, *parts)
+        super(PyModule, self).__init__(modulepath, *parts)
         self.metadata = MetaData()
         self.metadata.parse(self.filename)
 

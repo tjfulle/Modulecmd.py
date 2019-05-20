@@ -1,6 +1,3 @@
-import os
-import pytest
-
 import pymod.mc
 import pymod.environ
 

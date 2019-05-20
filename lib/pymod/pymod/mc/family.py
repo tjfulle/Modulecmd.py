@@ -4,7 +4,6 @@ import pymod.modes
 import pymod.module
 import pymod.environ
 from pymod.error import FamilyLoadedError
-import llnl.util.tty as tty
 
 def family(mode, module, family_name):
     """Assign a family"""

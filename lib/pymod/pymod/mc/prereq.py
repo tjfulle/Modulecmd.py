@@ -1,6 +1,5 @@
 import pymod.mc
 from pymod.error import PrereqMissingError
-import llnl.util.tty as tty
 
 
 def prereq_any(*prereqs):

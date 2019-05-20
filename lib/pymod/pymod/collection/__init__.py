@@ -3,7 +3,6 @@ import pymod.paths
 import pymod.config
 from llnl.util.lang import Singleton
 from pymod.collection._collection import Collections
-import llnl.util.tty as tty
 
 
 def _collections():

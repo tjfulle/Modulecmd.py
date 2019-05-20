@@ -1,7 +1,6 @@
 import os
 import sys
 import socket
-import subprocess
 
 import pymod.mc
 import pymod.user
@@ -13,7 +12,6 @@ from contrib.util import which, check_output, listdir
 
 from llnl.util.tty.color import colorize
 from llnl.util.filesystem import mkdirp
-from spack.util.executable import Executable
 from six import exec_
 from pymod.error import FamilyLoadedError
 

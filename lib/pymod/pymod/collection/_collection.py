@@ -9,7 +9,6 @@ import pymod.environ
 import llnl.util.tty as tty
 from llnl.util.tty import terminal_size
 from llnl.util.tty.colify import colified
-from contrib.util.tty import grep_pat_in_string
 
 """Manages a collection of modules"""
 
@@ -90,8 +89,6 @@ class Collections:
         elif names:
             sio.write('\n'.join(c for c in names))
         string = sio.getvalue()
-#        if regex is not None:
-#            string = grep_pat_in_string(string, regex)
         return string
 
     def format_show(self, name):

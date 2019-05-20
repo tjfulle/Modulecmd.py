@@ -4,7 +4,7 @@ import pymod.module
 import pymod.environ
 import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir
-from contrib.util import strip_quotes, split
+from contrib.util import strip_quotes
 
 """Functions for finding modules on MODULEPATH"""
 
@@ -182,7 +182,6 @@ def pop_versioned_default(dirname, files):
 
 
 def read_tcl_default_version(version_file):
-    regex = """(?i)^\s*set\s+ModulesVersion"""
     for line in open(version_file).readlines():
         if " ".join(line.split()).startswith('set ModulesVersion'):
             tmp = line.split("#", 1)[0].split()[-1]

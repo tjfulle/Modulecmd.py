@@ -7,8 +7,6 @@ from __future__ import print_function
 
 import os
 import re
-import sys
-import argparse
 
 from llnl.util.lang import attr_setdefault
 import llnl.util.tty as tty

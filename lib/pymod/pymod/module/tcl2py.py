@@ -1,11 +1,9 @@
 import os
-import subprocess
 
 import pymod.modes
 import pymod.paths
 import pymod.names
 import pymod.environ
-import llnl.util.tty as tty
 from spack.util.executable import Executable
 
 

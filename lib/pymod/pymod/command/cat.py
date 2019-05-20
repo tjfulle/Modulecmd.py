@@ -1,5 +1,3 @@
-import os
-import sys
 from contrib.util.tty.pager import pager
 from pymod.command.common import get_entity_text
 

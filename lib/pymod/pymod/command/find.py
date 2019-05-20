@@ -1,4 +1,3 @@
-import os
 import sys
 import pymod.modulepath
 from pymod.error import ModuleNotFoundError

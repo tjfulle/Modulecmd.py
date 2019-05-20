@@ -1,5 +1,3 @@
-import os
-import sys
 import pymod.mc
 
 description = 'Clone current environment'

@@ -1,4 +1,3 @@
-import os
 import pymod.mc
 
 description = 'Restore saved modules or, optionally, a clone'

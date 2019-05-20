@@ -1,5 +1,3 @@
-import os
-import pytest
 from pymod.module.version import Version
 
 

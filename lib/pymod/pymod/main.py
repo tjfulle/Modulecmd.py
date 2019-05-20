@@ -311,9 +311,6 @@ def make_argument_parser(**kwargs):
             'original TCL environment modules.'),
         **kwargs)
 
-    # stat names in groups of 7, for nice wrapping.
-    stat_lines = list(zip(*(iter(stat_names),) * 7))
-
     parser.add_argument(
         '-h', '--help',
         dest='help', action='store_const', const='short', default=None,

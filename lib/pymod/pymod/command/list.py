@@ -1,7 +1,5 @@
-import os
 import sys
 import pymod.mc
-from contrib.util import split
 from contrib.util.tty import grep_pat_in_string
 from llnl.util.tty import terminal_size
 from llnl.util.tty.colify import colified
@@ -54,6 +52,7 @@ def list_loaded(args):
             output = grep_pat_in_string(output, args.regex)
 
     sys.stderr.write(output)
+
 
 def list(parser, args):
     list_loaded(args)
