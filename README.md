@@ -1,4 +1,5 @@
 [![codecov](https://codecov.io/gh/tjfulle/Modulecmd.py/branch/master/graph/badge.svg)](https://codecov.io/gh/tjfulle/Modulecmd.py/branch/master)
+[![Build Status](https://travis-ci.org/tjfulle/Modulecmd.py.svg?branch=master)](https://travis-ci.org/tjfulle/Modulecmd.py)
 
 # Introduction
 
