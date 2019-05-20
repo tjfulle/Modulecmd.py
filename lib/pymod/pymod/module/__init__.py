@@ -47,8 +47,6 @@ class Module(object):
         self.modulepath = modulepath
         self.parser = ModuleArgumentParser()
         self.family = None
-        self.short_description = None
-        self.configure_options = None
         self._whatis = {}
         self._helpstr = None
         self.is_default = False
@@ -148,17 +146,19 @@ class Module(object):
         return self.fullname
 
     def format_whatis(self):
-        if 'explicit' in self._whatis:
-            return '\n'.join(self._whatis['explicit'])
+        if 'direct set' in self._whatis:
+            return '\n'.join(self._whatis['direct set'])
 
         sio = StringIO()
         _, width = terminal_size()
-        head = '{0}'.format((" " + self.name + " ").center(width, '='))
+        name = self._whatis.get('name', self.name)
+        head = '{0}'.format((" " + name + " ").center(width, '='))
         sio.write(head + '\n')
 
-        sio.write('Name: {0}\n'.format(self.name))
-        if self.version.string:
-            sio.write('Version: {0}\n'.format(self.version))
+        sio.write('Name: {0}\n'.format(name))
+        version = self._whatis.get('version', self.version.string)
+        if version:
+            sio.write('Version: {0}\n'.format(version))
         sio.write(
             'Type: {0}\n'
             'Family: {1}\n'
@@ -166,21 +166,25 @@ class Module(object):
             'Filename: {3}\n'
             .format(self.type, self.family, self.fullname, self.filename))
 
-        if self.short_description is not None:
+        short_description = self._whatis.get('short description')
+        if short_description is not None:
             key = 'Description'
             N = len(key) + 2
-            ss = textfill(self.short_description, indent=N)
+            ss = textfill(short_description, indent=N)
             sio.write('{0}: {1}\n'.format(key, ss))
 
-        if self.configure_options is not None:
+        configure_options = self._whatis.get('configure options')
+        if configure_options is not None:
             key = 'Configure Options'
-            ss = '\n    '.join(self.configure_options.split())
+            ss = '\n    '.join(configure_options.split())
             sio.write('{0}:\n    {1}\n'.format(key, ss))
 
         for (key, item) in self._whatis.items():
+            if key in ('short description', 'configure options'):
+                continue
             N = len(key) + 2
             ss = textfill(item, indent=N)
-            sio.write('{0}: {1}\n'.format(key, ss))
+            sio.write('{0}: {1}\n'.format(key.title(), ss))
 
         parser_help = self.parser.help_string()
         if parser_help:  # pragma: no cover
@@ -194,17 +198,13 @@ class Module(object):
         if self.type == tcl:
             if len(args) != 1:
                 raise ValueError('unknown whatis args length for tcl module')
-            kwargs['short_description'] = args[0]
+            self._whatis['short description'] = args[0]
         else:
             for arg in args:
-                self._whatis.setdefault('explicit', []).append(arg)
-        for (key, item) in kwargs.items():
-            if key in ('name', 'short_description', 'configure_options'):
-                setattr(self, key, item)
-            elif key == 'version':
-                self.version = Version(item)
-            else:
-                self._whatis[' '.join(key.split('_')).title()] = item
+                self._whatis.setdefault('direct set', []).append(arg)
+        for (key, value) in kwargs.items():
+            key = ' '.join(key.split('_'))
+            self._whatis[key] = value
 
     def format_help(self):
         if self._helpstr is None:

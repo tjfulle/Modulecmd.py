@@ -301,18 +301,18 @@ def test_mc_callback_whatis(tmpdir, mock_modulepath):
     a = pymod.modulepath.get('a')
     whatis_str = 'a whatis string'
     whatis(pymod.modes.load, a, whatis_str)
-    assert a._whatis['explicit'][0] == whatis_str
+    assert a._whatis['direct set'][0] == whatis_str
     whatis(pymod.modes.load, a, name='foo', version='x',
            short_description='a short description',
-           foo='baz')
-    assert a.name == 'foo'
-    assert a.version.string == 'x'
-    assert a._whatis['Foo'] == 'baz'
-    assert a.short_description == 'a short description'
+           foo_bar='baz')
+    assert a._whatis['name'] == 'foo'
+    assert a._whatis['version'] == 'x'
+    assert a._whatis['foo bar'] == 'baz'
+    assert a._whatis['short description'] == 'a short description'
 
     b = pymod.modulepath.get('b')
     whatis(pymod.modes.load, b, whatis_str)
-    assert b.short_description == whatis_str
+    assert b._whatis['short description'] == whatis_str
     with pytest.raises(ValueError):
         whatis(pymod.modes.load, b, whatis_str, whatis_str, whatis_str)
 
