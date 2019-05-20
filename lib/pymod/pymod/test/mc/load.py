@@ -96,7 +96,7 @@ def test_mc_load_inserted(tmpdir, mock_modulepath):
 
     pymod.mc.load('e')
     pymod.mc.load('a', insert_at=1)
-    assert ''.join(pymod.mc._mc.loaded_module_names()) == 'ae'
+    assert ''.join(pymod.mc._mc.get_lm_names()) == 'ae'
 
 
 def test_mc_load_first(tmpdir, mock_modulepath):

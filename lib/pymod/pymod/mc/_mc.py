@@ -40,12 +40,20 @@ def module_is_loaded(key):
     if isinstance(key, pymod.module.Module):
         return key in get_loaded_modules()
     elif os.path.isfile(key):
-        return key in loaded_module_files()
+        return key in get_lm_files()
     else:
         for module in get_loaded_modules():
             if module.name == key or module.fullname == key:
                 return True
     return False
+
+
+def get_lm_files():
+    return pymod.environ.get_path(pymod.names.loaded_module_files)
+
+
+def get_lm_names():
+    return pymod.environ.get_path(pymod.names.loaded_modules)
 
 
 def get_loaded_modules():
@@ -69,15 +77,6 @@ def set_loaded_modules(modules):
 
     lm_files = [m.filename for m in modules]
     pymod.environ.set_path(pymod.names.loaded_module_files, lm_files)
-
-
-
-def loaded_module_files():
-    return pymod.environ.get_path(pymod.names.loaded_module_files)
-
-
-def loaded_module_names():
-    return pymod.environ.get_path(pymod.names.loaded_modules)
 
 
 def get_lm_cellar():
@@ -170,7 +169,7 @@ def unregister_module(module):
     # "unusing" a directory on the MODULEPATH which has loaded modules.
     # Those modules are automaically unloaded since they are no longer
     # available.
-    lm_files = loaded_module_files()
+    lm_files = get_lm_files()
     if module.filename in lm_files:
         i = lm_files.index(module.filename)
         lm_files.pop(i)
@@ -228,7 +227,7 @@ def format_changed_module_state():
 
     # Report changes due to to change in modulepath
     if _unloaded_on_mp_change:  # pragma: no cover
-        lm_files = loaded_module_files()
+        lm_files = get_lm_files()
         unloaded = [m for m in _unloaded_on_mp_change
                     if m.filename not in lm_files]
         sio.write('\nThe following modules have been unloaded '

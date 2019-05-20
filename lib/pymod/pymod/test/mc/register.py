@@ -8,7 +8,7 @@ def test_mc_register_1(tmpdir, mock_modulepath):
     a = module(tmpdir.strpath, 'a.py')
     mock_modulepath(tmpdir.strpath)
     pymod.mc.register_module(a)
-    assert a.filename in pymod.mc._mc.loaded_module_files()
+    assert a.filename in pymod.mc._mc.get_lm_files()
 
 
 def test_mc_register_2(tmpdir, mock_modulepath):
@@ -21,7 +21,7 @@ def test_mc_register_2(tmpdir, mock_modulepath):
     print(tmpdir.strpath)
     print(pymod.modulepath.path())
     pymod.mc.register_module(m)
-    assert m.filename not in pymod.mc._mc.loaded_module_files()
+    assert m.filename not in pymod.mc._mc.get_lm_files()
     pymod.config.set('skip_add_devpack', value)
 
 
