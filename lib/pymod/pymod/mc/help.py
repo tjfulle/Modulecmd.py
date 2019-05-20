@@ -1,5 +1,3 @@
-import sys
-
 import pymod.modes
 import pymod.modulepath
 from pymod.mc.execmodule import execmodule_in_sandbox
@@ -11,6 +9,5 @@ def help(modulename):
     module = pymod.modulepath.get(modulename)
     if module is None:
         raise ModuleNotFoundError(modulename, mp=pymod.modulepath)
-    execmodule_in_sandbox(module, pymod.modes.help)
-    s = module.format_help()
-    sys.stderr.write(s + '\n')
+    pymod.mc.load_partial(module, mode=pymod.modes.help)
+    return module.format_help()

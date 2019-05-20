@@ -1,7 +1,5 @@
 import sys
-
-import pymod.modulepath
-import pymod.collection
+import pymod.mc
 
 
 description = 'Displays available modules'
@@ -24,8 +22,6 @@ def setup_parser(subparser):
 
 
 def avail(parser, args):
-    avail = pymod.modulepath.format_available(
-        terse=args.terse, regex=args.regex, fulloutput=args.F)
-    avail += pymod.collection.format_available(
-        terse=args.terse, regex=args.regex)
+    avail = pymod.mc.avail(terse=args.terse, regex=args.regex,
+                           fulloutput=args.F)
     sys.stderr.write(avail)

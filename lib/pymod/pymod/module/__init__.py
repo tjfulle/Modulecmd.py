@@ -208,8 +208,7 @@ class Module(object):
 
     def format_help(self):
         if self._helpstr is None:
-            return '{0!r}: no help string provided'.format(
-                encode_str(self.fullname))
+            return '{0}: no help string provided'.format(self.fullname)
 
         sio = StringIO()
         _, width = terminal_size()

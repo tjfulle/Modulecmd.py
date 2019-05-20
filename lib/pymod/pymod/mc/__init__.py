@@ -1,5 +1,6 @@
 from pymod.mc._mc import *
 
+from pymod.mc.avail import avail
 from pymod.mc.conflict import conflict
 from pymod.mc.clone import clone, restore_clone, remove_clone
 from pymod.mc.dump import dump
@@ -7,6 +8,7 @@ from pymod.mc.execmodule import execmodule
 from pymod.mc.execute import execute
 from pymod.mc.family import family
 from pymod.mc.help import help
+from pymod.mc.list import list
 from pymod.mc.load import load, load_impl, load_partial
 from pymod.mc.prereq import prereq, prereq_any
 from pymod.mc.purge import purge

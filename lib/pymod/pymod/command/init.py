@@ -29,4 +29,3 @@ def init(parser, args):
         pymod.mc.restore(pymod.names.default_user_collection)
 
     pymod.mc.dump()
-    return 0

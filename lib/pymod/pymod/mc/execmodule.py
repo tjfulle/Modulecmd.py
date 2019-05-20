@@ -111,8 +111,8 @@ def module_exec_sandbox(module, mode):
         'append_path': callback(cb.append_path, mode, module),
         'remove_path': callback(cb.remove_path, mode, module),
         #
-        'whatis': callback(cb.whatis, mode, module),
-        'help': callback(cb.help, mode, module),
+        'whatis': callback(cb.whatis, mode, module, when=mode==pymod.modes.whatis),
+        'help': callback(cb.help, mode, module, when=mode==pymod.modes.help),
         'which': which,
         'check_output': check_output,
         #

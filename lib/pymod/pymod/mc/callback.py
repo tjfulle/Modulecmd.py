@@ -17,7 +17,8 @@ __all__ = ['callback']
 
 def callback(func, mode, module, when=None, **kwds):
     if when is None:
-        when = mode != pymod.modes.load_partial
+        when = (mode != pymod.modes.load_partial and
+                mode not in pymod.modes.informational)
     if not when:
         func = lambda *args, **kwargs: None
     def wrapper(*args, **kwargs):

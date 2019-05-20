@@ -14,4 +14,3 @@ def setup_parser(subparser):
 def refresh(parser, args):
     pymod.mc.refresh()
     pymod.mc.dump()
-    return 0

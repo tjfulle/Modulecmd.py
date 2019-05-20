@@ -17,6 +17,7 @@ whatis = Modes.WHATIS
 help = Modes.HELP
 show = Modes.SHOW
 load_partial = Modes.LOAD_PARTIAL
+informational = (whatis, help)
 
 
 def assert_known_mode(mode):

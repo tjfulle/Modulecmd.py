@@ -133,7 +133,7 @@ def load_inserted_impl(module, insert_at):
     return
 
 
-def load_partial(module):
+def load_partial(module, mode=None):
     """Implementation of load, but only load partially.
 
     Parameters
@@ -150,5 +150,8 @@ def load_partial(module):
 
     """
     # Execute the module
-    execmodule(module, pymod.modes.load_partial)
+    if mode is not None:
+        assert mode in pymod.modes.informational
+    mode = mode or pymod.modes.load_partial
+    execmodule(module, mode)
     return

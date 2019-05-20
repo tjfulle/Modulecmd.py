@@ -16,4 +16,3 @@ def setup_parser(subparser):
 def swap(parser, args):
     pymod.mc.swap(args.first, args.second)
     pymod.mc.dump()
-    return 0

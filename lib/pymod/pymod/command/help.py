@@ -34,16 +34,17 @@ def help(parser, args):
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'guides', args.guide + '.txt')
         pager(colorize(open(filename, 'r').read()))
-        return 0
 
-    if args.help_command:
+    elif args.help_command:
         if args.help_command in pymod.command.all_commands():  # pragma: no cover
             parser.add_command(args.help_command)
             with redirect_stdout():
                 parser.parse_args([args.help_command, '-h'])
         else:
             with redirect_stdout():
-                pymod.mc.help(args.help_command)
+                s = pymod.mc.help(args.help_command)
+                sys.stderr.write(s)
+
     else:
         with redirect_stdout():
             sys.stderr.write(parser.format_help(level=args.all))

@@ -1,16 +1,13 @@
-import sys
-
+import pymod.mc
 import pymod.modes
 import pymod.modulepath
-from pymod.mc.execmodule import execmodule_in_sandbox
 from pymod.error import ModuleNotFoundError
 
 
-def whatis(modulename):
-    """Display 'whatis' message for the module given by `modulename`"""
-    module = pymod.modulepath.get(modulename)
+def whatis(name):
+    """Display 'whatis' message for the module given by `name`"""
+    module = pymod.modulepath.get(name)
     if module is None:
-        raise ModuleNotFoundError(modulename, mp=pymod.modulepath)
-    execmodule_in_sandbox(module, pymod.modes.whatis)
-    s = module.format_whatis()
-    sys.stderr.write(s + '\n')
+        raise ModuleNotFoundError(name, mp=pymod.modulepath)
+    pymod.mc.load_partial(module, mode=pymod.modes.whatis)
+    return module.format_whatis()

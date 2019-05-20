@@ -26,4 +26,3 @@ def load(parser, args):
     for (name, opts) in argv:
         pymod.mc.load(name, opts=opts, insert_at=args.insert_at)
     pymod.mc.dump()
-    return 0

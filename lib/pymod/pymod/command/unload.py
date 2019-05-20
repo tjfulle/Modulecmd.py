@@ -18,4 +18,3 @@ def unload(parser, args):
     for name in args.names:
         pymod.mc.unload(name)
     pymod.mc.dump()
-    return 0
