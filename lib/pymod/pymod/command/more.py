@@ -1,5 +1,4 @@
-from contrib.util.tty.pager import pager
-from pymod.command.common import get_entity_text
+import pymod.mc
 
 description = (
     'Print contents of a module or collection to the console output one\n'
@@ -18,4 +17,4 @@ def setup_parser(subparser):
 
 
 def more(parser, args):
-    pager(get_entity_text(args.name))
+    pymod.mc.more(args.name)

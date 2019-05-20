@@ -3,6 +3,7 @@ from pymod.mc._mc import *
 from pymod.mc.avail import avail
 from pymod.mc.conflict import conflict
 from pymod.mc.clone import clone, restore_clone, remove_clone
+from pymod.mc.disp import cat, more
 from pymod.mc.dump import dump
 from pymod.mc.execmodule import execmodule
 from pymod.mc.execute import execute

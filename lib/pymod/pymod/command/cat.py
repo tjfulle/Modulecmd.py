@@ -1,5 +1,4 @@
-from contrib.util.tty.pager import pager
-from pymod.command.common import get_entity_text
+import pymod.mc
 
 description = 'Print contents of a module or collection to the console output.'
 level = 'short'
@@ -15,4 +14,4 @@ def setup_parser(subparser):
 
 
 def cat(parser, args):
-    pager(get_entity_text(args.name), plain=True)
+    pymod.mc.cat(args.name)

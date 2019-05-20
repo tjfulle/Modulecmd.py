@@ -73,3 +73,9 @@ class CloneDoesNotExistError(Exception):
     def __init__(self, name):
         msg = '{0!r} is not a cloned environment'.format(name)
         super(CloneDoesNotExistError, self).__init__(msg)
+
+
+class EntityNotFoundError(Exception):
+    def __init__(self, name):
+        msg = 'Unknown named entity {0!r}'.format(name)
+        super(EntityNotFoundError, self).__init__(msg)
