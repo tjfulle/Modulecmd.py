@@ -31,7 +31,7 @@ module()
   eval $(python -E $PYMOD_CMD bash "$@")
 }
 
-PYMOD_VERSION="3.0"
+PYMOD_VERSION="3.0.5"
 export PYMOD_VERSION
 
 export_module=$(echo "YES" | /usr/bin/tr '[:upper:]' '[:lower:]')
