@@ -4,9 +4,9 @@ modulepath = 'MODULEPATH'
 
 loaded_modules = 'LOADEDMODULES'
 loaded_module_files = '_LMFILES_'
-loaded_module_meta = lambda key: '_LMMETA_{0}'.format(key)
-loaded_module_refcount = '_LMREFCNT_'
-loaded_module_cellar = '_LMCELLAR_'
+loaded_module_cellar = '_LMX0_'
+loaded_module_refcount = '_LMX1_'
+loaded_module_meta = lambda key: '_LMX2_{0}'.format(key)
 
 sourced_files = 'PYMOD_SOURCED_FILES'
 allow_dup_entries = 'PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES'

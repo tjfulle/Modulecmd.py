@@ -50,8 +50,7 @@ def module_is_loaded(key):
 
 def get_loaded_modules():
     loaded_modules = []
-    lm = pymod.environ.get_list(pymod.names.loaded_module_cellar)
-    for (fullname, filename, opts) in lm:
+    for (fullname, filename, opts) in get_lm_cellar():
         module = pymod.modulepath.get(filename)
         assert module.fullname == fullname
         if opts and not module.opts:
@@ -62,14 +61,15 @@ def get_loaded_modules():
 
 def set_loaded_modules(modules):
     """Set environment variables for loaded module names and files"""
+    set_lm_cellar(modules)
+
+    # The following are for compatibility with other module programs
     lm_names = [m.fullname for m in modules]
     pymod.environ.set_path(pymod.names.loaded_modules, lm_names)
 
     lm_files = [m.filename for m in modules]
     pymod.environ.set_path(pymod.names.loaded_module_files, lm_files)
 
-    lm = [(m.fullname, m.filename, m.opts) for m in modules]
-    pymod.environ.set_list(pymod.names.loaded_module_cellar, lm)
 
 
 def loaded_module_files():
@@ -80,15 +80,21 @@ def loaded_module_names():
     return pymod.environ.get_path(pymod.names.loaded_modules)
 
 
+def get_lm_cellar():
+    return pymod.environ.get_list(pymod.names.loaded_module_cellar)
+
+
+def set_lm_cellar(modules):
+    lm = [(m.fullname, m.filename, m.opts) for m in modules]
+    pymod.environ.set_list(pymod.names.loaded_module_cellar, lm)
+
+
 def get_cellar():
     lm_cellar = []
     class Namespace: pass
-    lm = pymod.environ.get_list(pymod.names.loaded_module_cellar)
-    for item in lm:
+    for item in get_lm_cellar():
         ns = Namespace()
-        ns.fullname = item[0]
-        ns.filename = item[1]
-        ns.opts = item[2]
+        ns.fullname, ns.filnae, ns.opts = item
         lm_cellar.append(ns)
     return lm_cellar
 
@@ -161,8 +167,8 @@ def unregister_module(module):
     # Don't use `get_loaded_modules` because the module we are unregistering
     # may no longer be available. `get_loaded_modules` makes some assumptions
     # that can be violated in certain situations. Like, for example, # when
-    # "unusing" a # directory on # the MODULEPATH which has loaded modules.
-    # Those modules are # automaically unloaded since they are no longer
+    # "unusing" a directory on the MODULEPATH which has loaded modules.
+    # Those modules are automaically unloaded since they are no longer
     # available.
     lm_files = loaded_module_files()
     if module.filename in lm_files:
