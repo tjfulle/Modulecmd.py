@@ -38,7 +38,7 @@ def clone(name):
     """Clone current environment"""
     filename = _clone_file()
     clones = read(filename)
-    clones[name] = pymod.environ.filtered()
+    clones[name] = pymod.environ.filtered(include_os=True)
     write(clones, filename)
     return 0
 

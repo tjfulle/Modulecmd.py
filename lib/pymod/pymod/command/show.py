@@ -1,3 +1,4 @@
+import sys
 import argparse
 
 import pymod.mc
@@ -25,3 +26,4 @@ def show(parser, args):
     argv = parse_module_options(args.args)
     for (name, opts) in argv:
         pymod.mc.show(name, opts=opts, insert_at=args.insert_at)
+        pymod.mc.dump(stream=sys.stderr)

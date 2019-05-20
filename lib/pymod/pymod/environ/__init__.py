@@ -94,8 +94,8 @@ def set_list(key, arg):
     return environ.set(key, value)
 
 
-def filtered():
-    return environ.filtered()
+def filtered(include_os=False):
+    return environ.filtered(include_os=include_os)
 
 
 def copy():

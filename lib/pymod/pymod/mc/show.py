@@ -1,4 +1,3 @@
-import sys
 import pymod.mc
 import pymod.modes
 import pymod.modulepath
@@ -33,4 +32,3 @@ def show(name, opts=None, insert_at=None):
 
     # Now load it
     execmodule(module, pymod.modes.show)
-    pymod.mc.dump(stream=sys.stderr)

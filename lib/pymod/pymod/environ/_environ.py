@@ -62,20 +62,15 @@ class Environ(dict):
             self[path.meta_key] = dict_to_str(path.meta)
         self.save_ld_library_path(path.key)
 
-    def filtered(self, include_os=True):
-        env = dict() if not include_os else dict(os.environ)
-        env.update(dict([item for item in self.items() if item[1] is not None]))
-        env.update(pymod.modulepath.export_env())
-        pymod_env = dict()
-        for (key, val) in env.items():
-            if pymod.shell.filter_key(key):
-                continue
-            pymod_env[key] = val
-        return pymod_env
+    def filtered(self, include_os=False):
+        return self.copy(include_os=include_os, filter_None=True)
 
-    def copy(self, include_os=True):
+    def copy(self, include_os=False, filter_None=False):
         env = dict() if not include_os else dict(os.environ)
-        env.update(self)
+        if filter_None:
+            env.update(dict([item for item in self.items() if item[1] is not None]))
+        else:
+            env.update(self)
         env.update(pymod.modulepath.export_env())
         pymod_env = dict()
         for (key, val) in env.items():
