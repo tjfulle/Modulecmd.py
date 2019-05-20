@@ -20,7 +20,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 def test_mc_unload_1(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     assert pymod.environ.get('a') == 'a'
     assert a.is_loaded
@@ -34,7 +34,7 @@ def test_mc_unload_1(modules_path, mock_modulepath):
 
 
 def test_mc_unload_2(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     assert pymod.environ.get('a') == 'a'
     b = pymod.mc.load('b')
@@ -45,7 +45,7 @@ def test_mc_unload_2(modules_path, mock_modulepath):
 
 
 def test_mc_unload_3(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     a1 = pymod.mc.load('a1')
     a2 = pymod.mc.load('a2')
@@ -63,7 +63,7 @@ def test_mc_unload_3(modules_path, mock_modulepath):
 
 
 def test_mc_unload_bad(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.modulepath.get('a')
     assert not a.is_loaded
     with pytest.raises(pymod.error.ModuleNotLoadedError):
@@ -74,7 +74,7 @@ def test_mc_unload_right_version(tmpdir, mock_modulepath):
     a = tmpdir.mkdir('a')
     a.join('1.0.py').write('')
     a.join('2.0.py').write('')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a/1.0')
     # This will unload `a` by name, even though the version 1.0 is not the default
     pymod.mc.unload('a')

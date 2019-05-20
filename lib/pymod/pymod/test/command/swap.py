@@ -19,7 +19,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 def test_command_swap(modules_path, mock_modulepath):
     load = PymodCommand('load')
     swap = PymodCommand('swap')
-    mp = mock_modulepath(modules_path.one)
+    mock_modulepath(modules_path.one)
     load('a')
     loaded = ''.join(pymod.mc._mc.loaded_module_names())
     assert loaded == 'a'

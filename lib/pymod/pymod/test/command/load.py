@@ -28,7 +28,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 def test_command_load_1(modules_path, mock_modulepath):
     load = PymodCommand('load')
     unload = PymodCommand('unload')
-    mp = mock_modulepath(modules_path.one)
+    mock_modulepath(modules_path.one)
     load('a')
     assert pymod.environ.get('a') == 'a'
     unload('a')
@@ -41,7 +41,7 @@ def test_command_load_2(modules_path, mock_modulepath):
     """
     load = PymodCommand('load')
     unload = PymodCommand('unload')
-    mp = mock_modulepath(modules_path.one)
+    mock_modulepath(modules_path.one)
     load('a')
     assert pymod.environ.get('a') == 'a'
 
@@ -70,7 +70,7 @@ def test_command_load_3(modules_path, mock_modulepath):
     """Load a and b, b loads d. Then, unload b (d should also unload)"""
     load = PymodCommand('load')
     unload = PymodCommand('unload')
-    mp = mock_modulepath(modules_path.two)
+    mock_modulepath(modules_path.two)
 
     load('a')
     assert pymod.environ.get('a') == 'a'
@@ -105,7 +105,7 @@ def test_command_load_collection(tmpdir, mock_modulepath):
     tmpdir.join('b.py').write('')
     tmpdir.join('c.py').write('')
     tmpdir.join('d.py').write('')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = load('a')
     b = load('b')
     c = load('c')

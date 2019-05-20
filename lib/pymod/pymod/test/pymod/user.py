@@ -33,7 +33,7 @@ def test_user_3(tmpdir, mock_config, mock_modulepath):
     one = tmpdir.mkdir('1')
     one.join('a.py').write('assert user_env.foo == 1\n')
 
-    mp = mock_modulepath(one.strpath)
+    mock_modulepath(one.strpath)
     a = pymod.mc.load('a')
     assert a.is_loaded
 

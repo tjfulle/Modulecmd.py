@@ -38,7 +38,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 def test_mc_use_prepend(modules_path, mock_modulepath):
     is_module = lambda x: pymod.modulepath.get(x) is not None
-    mp = mock_modulepath(modules_path.one)
+    mock_modulepath(modules_path.one)
 
     a = pymod.modulepath.get('a')
     assert a.version.string == '1.5'
@@ -73,7 +73,7 @@ def test_mc_use_prepend(modules_path, mock_modulepath):
 
 def test_mc_use_append(modules_path, mock_modulepath):
     is_module = lambda x: pymod.modulepath.get(x) is not None
-    mp = mock_modulepath(modules_path.one)
+    mock_modulepath(modules_path.one)
 
     a = pymod.modulepath.get('a')
     assert a.version.string == '1.5'
@@ -119,7 +119,7 @@ def test_mc_use_prepend_bumped(tmpdir, mock_modulepath):
     b = two.mkdir('b')
     b.join('1.0.py').write('')
 
-    mp = mock_modulepath(one.strpath)
+    mock_modulepath(one.strpath)
 
     a1 = pymod.mc.load('a/1.0')
     b = pymod.mc.load('b')

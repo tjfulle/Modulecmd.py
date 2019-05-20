@@ -9,7 +9,7 @@ from pymod.error import ModuleNotFoundError
 def test_mc_load_1(tmpdir, mock_modulepath):
     """Just load and then unload a"""
     tmpdir.join('a.py').write('setenv("__AA__", "AA")')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a')
     assert pymod.mc.get_refcount(a) == 1
     assert pymod.mc.get_refcount().get(a.fullname) == 1
@@ -27,7 +27,7 @@ def test_mc_load_2(tmpdir, mock_modulepath):
     tmpdir.join('c.py').write('setenv("c", "c")\nload("d")')
     tmpdir.join('d.py').write('setenv("d", "d")\nload("e")')
     tmpdir.join('e.py').write('setenv("e", "e")')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
 
     pymod.mc.load('a')
     assert pymod.environ.get('a') == 'a'
@@ -61,7 +61,7 @@ def test_mc_load_3(tmpdir, mock_modulepath):
     tmpdir.join('a.py').write('setenv("a", "a")\n')
     tmpdir.join('b.py').write('setenv("b", "b")\nload_first("c","e","d")\n')
     tmpdir.join('d.py').write('setenv("d", "d")\n')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     pymod.mc.load('a')
     assert pymod.environ.get('a') == 'a'
 
@@ -92,7 +92,7 @@ def test_mc_load_inserted(tmpdir, mock_modulepath):
     tmpdir.join('c.py').write('setenv("c", "c")\nload("d")')
     tmpdir.join('d.py').write('setenv("d", "d")\nload("e")')
     tmpdir.join('e.py').write('setenv("e", "e")')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
 
     pymod.mc.load('e')
     pymod.mc.load('a', insert_at=1)
@@ -102,7 +102,7 @@ def test_mc_load_inserted(tmpdir, mock_modulepath):
 def test_mc_load_first(tmpdir, mock_modulepath):
     tmpdir.join('a.py').write('load_first("x","y","z")\n')
     tmpdir.join('b.py').write('load_first("x","y","z",None)\n')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     with pytest.raises(ModuleNotFoundError):
         # None of the modules in the load_first command in module 'g' can be
         # found
@@ -135,7 +135,7 @@ def test_mc_load_inserted_2(tmpdir, mock_modulepath):
     one.join('a.py').write('')
     one.join('c.py').write('unuse({0!r})'.format(two.strpath))
 
-    mp = mock_modulepath([one.strpath, two.strpath])
+    mock_modulepath([one.strpath, two.strpath])
 
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
@@ -155,7 +155,7 @@ def test_mc_load_inserted_3(tmpdir, mock_modulepath):
     core.join('a.py').write('')
     core.join('foo.py').write('use({0!r})'.format(foo.strpath))
 
-    mp = mock_modulepath(core.strpath)
+    mock_modulepath(core.strpath)
 
     a = pymod.mc.load('a')
     c = pymod.mc.load('foo', insert_at=1)
@@ -176,7 +176,7 @@ def test_mc_load_inserted_4(tmpdir, mock_modulepath):
     a.join('1.0.py').write('')
     core.join('foo.py').write('use({0!r})'.format(foo.strpath))
 
-    mp = mock_modulepath(core.strpath)
+    mock_modulepath(core.strpath)
 
     a = pymod.mc.load('a')
     assert a.modulepath == core.strpath

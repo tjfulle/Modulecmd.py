@@ -22,7 +22,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 def test_command_reload_1(modules_path, mock_modulepath):
     load = PymodCommand('load')
     reload = PymodCommand('reload')
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     load('a')
     assert pymod.environ.get('a') == 'a'
     reload('a')
@@ -36,7 +36,7 @@ def test_command_reload_1(modules_path, mock_modulepath):
 def test_command_reload_2(modules_path, mock_modulepath):
     load = PymodCommand('load')
     reload = PymodCommand('reload')
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     load('a')
     load('b')
     assert pymod.environ.get('a') == 'a'

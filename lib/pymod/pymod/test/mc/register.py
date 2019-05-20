@@ -6,7 +6,7 @@ from pymod.module import module
 def test_mc_register_1(tmpdir, mock_modulepath):
     tmpdir.join('a.py').write('')
     a = module(tmpdir.strpath, 'a.py')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     pymod.mc.register_module(a)
     assert a.filename in pymod.mc._mc.loaded_module_files()
 
@@ -15,7 +15,7 @@ def test_mc_register_2(tmpdir, mock_modulepath):
     value = pymod.config.get('skip_add_devpack')
     pymod.config.set('skip_add_devpack', True)
     tmpdir.join('devpack.py').write('')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     m = module(tmpdir.strpath, 'devpack.py')
     print(m.modulepath)
     print(tmpdir.strpath)
@@ -37,7 +37,7 @@ def test_mc_decrement_refcount(tmpdir, mock_modulepath):
     a = module(tmpdir.strpath, 'a.py')
     count = pymod.mc._mc.get_lm_refcount().get(a.fullname)
     assert count is None
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     pymod.mc.load('a')
     count = pymod.mc._mc.get_lm_refcount()[a.fullname]
     assert count == 1

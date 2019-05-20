@@ -23,7 +23,7 @@ def test_mc_execmodule_path_ops(tmpdir, modulecmds, mock_modulepath):
     tmpdir.join('d.py').write(
         m.remove_path('spam', 'ham', sep=';')+
         m.remove_path('spam', 'eggs', sep=';'))
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
 
     c = pymod.mc.load('c')
     assert pymod.environ.get('spam') == 'eggs;ham'
@@ -45,7 +45,7 @@ def test_mc_execmodule_conflict(tmpdir, modulecmds, mock_modulepath):
     m = modulecmds
     tmpdir.join('a.py').write(m.setenv('a')+m.setenv('__x__')+m.unsetenv('__x__'))
     tmpdir.join('b.py').write(m.conflict('a'))
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a')
     with pytest.raises(pymod.error.ModuleConflictError):
         b = pymod.mc.load('b')
@@ -56,7 +56,7 @@ def test_mc_execmodule_prereq(tmpdir, modulecmds, mock_modulepath):
     tmpdir.join('a.py').write(m.setenv('a'))
     tmpdir.join('b.py').write(m.prereq('a'))
     tmpdir.join('c.py').write(m.prereq_any('x', 'y', 'b'))
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a')
     # no problem, prereq a is loaded
     b = pymod.mc.load('b')
@@ -83,7 +83,7 @@ def test_mc_execmodule_set_alias(tmpdir, modulecmds, mock_modulepath):
     m = modulecmds
     tmpdir.join('a.py').write(m.set_alias('foo', 'bar'))
     tmpdir.join('b.py').write(m.unset_alias('foo'))
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a')
     assert pymod.environ.environ.aliases['foo'] == 'bar'
     b = pymod.mc.load('b')
@@ -99,7 +99,7 @@ def test_mc_execmodule_set_shell_function(tmpdir, modulecmds, mock_modulepath):
     m = modulecmds
     tmpdir.join('a.py').write(m.set_shell_function('baz', 'bar $@'))
     tmpdir.join('b.py').write(m.unset_shell_function('baz'))
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a')
     assert pymod.environ.environ.shell_functions['baz'] == 'bar $@'
     b = pymod.mc.load('b')
@@ -116,7 +116,7 @@ def test_mc_execmodule_source(tmpdir, modulecmds, mock_modulepath, capsys):
     baz = tmpdir.join('baz')
     baz.write('echo BAZ')
     tmpdir.join('a.py').write(m.source(baz.strpath))
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a')
     captured = capsys.readouterr()
     command = 'source {0};'.format(baz.strpath)
@@ -124,7 +124,7 @@ def test_mc_execmodule_source(tmpdir, modulecmds, mock_modulepath, capsys):
 
 
 def test_mc_execmodule_load_first(tmpdir, mock_modulepath):
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     with pytest.raises(pymod.error.ModuleNotFoundError):
         pymod.mc.callback.load_first(pymod.modes.load, 'x', 'y', 'z')
     pymod.mc.callback.load_first(pymod.modes.load, 'x', 'y', 'z', None)
@@ -137,7 +137,7 @@ def test_mc_execmodule_is_loaded(tmpdir, mock_modulepath):
         '    stop()\n'
         'if is_loaded("a"):\n'
         '    raise ValueError("a loaded!")\n')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     pymod.mc.load('a')
     with pytest.raises(ValueError):
         pymod.mc.load('b')
@@ -154,7 +154,7 @@ def test_mc_execmodule_modulepath_ops(tmpdir, mock_modulepath):
         pymod.names.modulepath, one.strpath))
     f2 = x.join('2.py').write('prepend_path({0!r}, {1!r})'.format(
         pymod.names.modulepath, two.strpath))
-    mp = mock_modulepath(core.strpath)
+    mock_modulepath(core.strpath)
 
     x = pymod.mc.load('x/1')
     a = pymod.modulepath.get('a')
@@ -172,7 +172,7 @@ def test_mc_execmodule_stop(tmpdir, mock_modulepath):
         'setenv("a", "baz")\n'
         'stop()\n'
         'setenv("b", "foo")\n')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     pymod.mc.load('a')
     assert pymod.environ.get('a') == 'baz'
     assert pymod.environ.get('b') is None

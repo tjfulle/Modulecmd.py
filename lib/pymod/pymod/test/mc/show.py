@@ -15,7 +15,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 def test_mc_show(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path)
+    mock_modulepath(modules_path)
     pymod.mc.show('a')
 
     pymod.mc.show('a', opts=['+x'])

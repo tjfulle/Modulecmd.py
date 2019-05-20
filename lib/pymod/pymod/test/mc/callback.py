@@ -33,7 +33,7 @@ def test_mc_callback_conflict(tmpdir, mock_modulepath):
     conflict = pymod.mc.callback.conflict
     tmpdir.join('a.py').write('')
     tmpdir.join('b.py').write('')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.modulepath.get('a')
 
     b = pymod.mc.load('b')
@@ -56,7 +56,7 @@ def test_mc_callback_prereq(tmpdir, mock_modulepath):
     prereq_any = pymod.mc.callback.prereq_any
     tmpdir.join('a.py').write('')
     tmpdir.join('b.py').write('')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
 
     with pytest.raises(pymod.error.PrereqMissingError):
         prereq(pymod.modes.load, None, 'b')
@@ -127,7 +127,7 @@ def test_mc_callback_load(tmpdir, mock_modulepath):
     load_first = pymod.mc.callback.load_first
 
     tmpdir.join('a.py').write('')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
 
     with pytest.raises(pymod.error.ModuleNotFoundError):
         load(pymod.modes.load, None, 'x')
@@ -166,7 +166,7 @@ def test_mc_callback_swap(tmpdir, mock_modulepath):
     swap = pymod.mc.callback.swap
     tmpdir.join('a.py').write('')
     tmpdir.join('b.py').write('')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
 
     a = pymod.mc.load('a')
     assert a.is_loaded
@@ -190,7 +190,7 @@ def test_mc_callback_is_loaded(tmpdir, mock_modulepath):
         '    stop()\n'
         'if is_loaded("a"):\n'
         '    raise ValueError("a loaded!")\n')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     pymod.mc.load('a')
     with pytest.raises(ValueError):
         pymod.mc.load('b')
@@ -203,7 +203,7 @@ def test_mc_callback_modulepath_ops(tmpdir, mock_modulepath):
     two = tmpdir.mkdir('2')
     two.join('a.py').write('')
 
-    mp = mock_modulepath(one.strpath)
+    mock_modulepath(one.strpath)
     x = pymod.modulepath.get('x')  # just to set `unlocks`
     a = pymod.modulepath.get('a')
     assert a.filename == os.path.join(one.strpath, 'a.py')
@@ -237,7 +237,7 @@ def test_mc_callback_stop(tmpdir, mock_modulepath):
         'setenv("a", "baz")\n'
         'stop()\n'
         'setenv("b", "foo")\n')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     pymod.mc.load('a')
     assert pymod.environ.get('a') == 'baz'
     assert pymod.environ.get('b') is None
@@ -266,7 +266,7 @@ def test_mc_callback_setenv():
 def test_mc_callback_family(tmpdir, mock_modulepath):
     family = pymod.mc.callback.family
     tmpdir.mkdir('ucc').join('1.2.py').write('')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     module = pymod.modulepath.get('ucc')
     family_name = 'compiler'
     family(pymod.modes.load, module, family_name)
@@ -286,7 +286,7 @@ def test_mc_callback_family(tmpdir, mock_modulepath):
 def test_mc_callback_help(tmpdir, mock_modulepath):
     help = pymod.mc.callback.help
     tmpdir.join('a.py').write('')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.modulepath.get('a')
     helpstr = 'a help string'
     help(pymod.modes.load, a, helpstr)
@@ -297,7 +297,7 @@ def test_mc_callback_whatis(tmpdir, mock_modulepath):
     whatis = pymod.mc.callback.whatis
     tmpdir.join('a.py').write('')
     tmpdir.join('b').write('#%Module1.0')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.modulepath.get('a')
     whatis_str = 'a whatis string'
     whatis(pymod.modes.load, a, whatis_str)
@@ -327,7 +327,7 @@ def test_mc_callback_use(tmpdir, mock_modulepath):
     two = tmpdir.mkdir('2')
     two.join('a.py').write('')
     two.join('b.py').write('')
-    mp = mock_modulepath(one.strpath)
+    mock_modulepath(one.strpath)
 
     x = pymod.modulepath.get('x')
     a = pymod.modulepath.get('a')

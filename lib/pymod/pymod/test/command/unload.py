@@ -22,7 +22,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 def test_command_unload_1(modules_path, mock_modulepath):
     load = PymodCommand('load')
     unload = PymodCommand('unload')
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     load('a')
     a = pymod.modulepath.get('a')
     assert pymod.environ.get('a') == 'a'
@@ -36,7 +36,7 @@ def test_command_unload_1(modules_path, mock_modulepath):
 def test_command_unload_2(modules_path, mock_modulepath):
     load = PymodCommand('load')
     unload = PymodCommand('unload')
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     load('a')
     a = pymod.modulepath.get('a')
     assert pymod.environ.get('a') == 'a'
@@ -52,7 +52,7 @@ def test_command_unload_2(modules_path, mock_modulepath):
 def test_command_unload_3(modules_path, mock_modulepath):
     load = PymodCommand('load')
     unload = PymodCommand('unload')
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     load('a')
     load('a1')
     load('a2')

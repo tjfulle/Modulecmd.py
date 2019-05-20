@@ -33,7 +33,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 def test_collection_default(modules_path, mock_modulepath):
 
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     pymod.mc.save(pymod.names.default_user_collection)
@@ -51,7 +51,7 @@ def test_collection_default(modules_path, mock_modulepath):
 
 def test_collection_named(modules_path, mock_modulepath):
 
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     c = pymod.mc.load('c')

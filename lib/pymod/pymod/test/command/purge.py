@@ -31,7 +31,7 @@ def test_command_purge(modules_path, mock_modulepath):
     """
     load = PymodCommand('load')
     purge = PymodCommand('purge')
-    mp = mock_modulepath(modules_path.one)
+    mock_modulepath(modules_path.one)
     load('a')
     assert pymod.environ.get('a') == 'a'
 

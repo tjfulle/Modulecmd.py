@@ -21,7 +21,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 def test_command_refresh(modules_path, mock_modulepath):
     load = PymodCommand('load')
     refresh = PymodCommand('refresh')
-    mp = mock_modulepath(modules_path.one)
+    mock_modulepath(modules_path.one)
     load('a', 'b', 'c', 'd')
     refresh()
     loaded = ''.join(pymod.mc._mc.loaded_module_names())

@@ -92,7 +92,7 @@ def test_mc_hierarchy_1(modules_path, mock_modulepath):
     """Loop through the module hierarchy to make sure it is laid out
     correctly"""
     core_path = modules_path.core
-    mp = mock_modulepath(modules_path.core)
+    mock_modulepath(modules_path.core)
 
     is_module = lambda x: pymod.modulepath.get(x) is not None
 
@@ -150,7 +150,7 @@ def test_mc_hierarchy_2(modules_path, mock_modulepath):
 
     """
     core_path = modules_path.core
-    mp = mock_modulepath(modules_path.core)
+    mock_modulepath(modules_path.core)
 
     _compiler_unlocks_dir = lambda cc, cv: os.path.normpath(
         os.path.join(core_path, '..', 'compiler', cc, cv))

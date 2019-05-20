@@ -85,14 +85,14 @@ def test_modulepath_two_defaults(tmpdir, mock_modulepath):
     X.join('.version').write('set ModulesVersion "3.0.0"')
     default = X.join('default')
     default.mksymlinkto(f2)
-    mp = mock_modulepath(one.strpath)
+    mock_modulepath(one.strpath)
     x = pymod.modulepath.get('X')
     assert x.version == '2.0.0'
     assert isinstance(x, pymod.module.PyModule)
 
 
 def test_modulepath_bad_default(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.join('1').strpath)
+    mock_modulepath(modules_path.join('1').strpath)
     y = pymod.modulepath.get('Y')
     assert y.version.string == '4.0.0'
     assert y.type == pymod.module.tcl
@@ -100,7 +100,7 @@ def test_modulepath_bad_default(modules_path, mock_modulepath):
 
 def test_modulepath_available_1(modules_path, mock_modulepath):
     dirname = modules_path.join('1').strpath
-    mp = mock_modulepath(dirname)
+    mock_modulepath(dirname)
     assert pymod.modulepath.size() == 1
     modules = pymod.modulepath.get(dirname)
 
@@ -137,7 +137,7 @@ def test_modulepath_available_1(modules_path, mock_modulepath):
 
 def test_modulepath_get(modules_path, mock_modulepath):
     d1 = modules_path.join('1').strpath
-    mp = mock_modulepath(d1)
+    mock_modulepath(d1)
 
     module = pymod.modulepath.get('a')
     assert module.fullname == 'a'
@@ -192,7 +192,7 @@ def test_modulepath_get(modules_path, mock_modulepath):
 def test_modulepath_append_path(modules_path, mock_modulepath):
 
     d1 = modules_path.join('1').strpath
-    mp = mock_modulepath(d1)
+    mock_modulepath(d1)
 
     module = pymod.modulepath.get('ucc/1.0.0')
     assert module.fullname == 'ucc/1.0.0'
@@ -237,7 +237,7 @@ def test_modulepath_append_path(modules_path, mock_modulepath):
 
 def test_modulepath_prepend_path(modules_path, mock_modulepath):
     d1 = modules_path.join('1').strpath
-    mp = mock_modulepath(d1)
+    mock_modulepath(d1)
 
     module = pymod.modulepath.get('ucc/1.0.0')
     assert module.fullname == 'ucc/1.0.0'
@@ -287,7 +287,7 @@ def test_modulepath_auto_bump(modules_path, mock_modulepath):
 
     d1 = modules_path.join('1').strpath
     d2 = modules_path.join('2').strpath
-    mp = mock_modulepath(d1)
+    mock_modulepath(d1)
 
     m1 = pymod.modulepath.get('ucc')
     assert m1.version == '2.0.0'
@@ -305,6 +305,6 @@ def test_modulepath_walk(modules_path, mock_modulepath):
 
     d1 = modules_path.join('1').strpath
     d2 = modules_path.join('2').strpath
-    mp = mock_modulepath([d1, d2])
+    mock_modulepath([d1, d2])
     for path in pymod.modulepath.walk():
         assert path.path == d1 or path.path == d2

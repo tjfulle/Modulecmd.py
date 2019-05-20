@@ -25,7 +25,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 @pytest.mark.unit
 def test_command_use(modules_path, mock_modulepath):
     use = PymodCommand('use')
-    mp = mock_modulepath(modules_path.one)
+    mock_modulepath(modules_path.one)
     use(modules_path.two)
     use(modules_path.three, '--append')
     use(modules_path.two, '--delete')

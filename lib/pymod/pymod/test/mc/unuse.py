@@ -40,7 +40,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 def test_mc_unuse(modules_path, mock_modulepath):
     is_module = lambda x: pymod.modulepath.get(x) is not None
-    mp = mock_modulepath(
+    mock_modulepath(
         [modules_path.one, modules_path.two, modules_path.three, modules_path.four])
 
     a = pymod.modulepath.get('a')
@@ -89,7 +89,7 @@ def test_mc_unuse(modules_path, mock_modulepath):
 
 
 def test_mc_unuse_2(modules_path, mock_modulepath):
-    mp = mock_modulepath(
+    mock_modulepath(
         [modules_path.one, modules_path.two,
          modules_path.three, modules_path.four])
 
@@ -112,6 +112,6 @@ def test_mc_unuse_2(modules_path, mock_modulepath):
 
 
 def test_mc_unuse_fake(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.one)
+    mock_modulepath(modules_path.one)
     # Nothing to do for nonexistent directory
     pymod.mc.unuse('fake')

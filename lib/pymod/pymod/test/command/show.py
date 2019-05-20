@@ -9,7 +9,7 @@ def test_command_show(tmpdir, mock_modulepath):
     save = PymodCommand('save')
     show = PymodCommand('show')
     load('a', '+x')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     show('a')
     show('a', '+x')
     with pytest.raises(ModuleNotFoundError):

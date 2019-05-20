@@ -82,7 +82,7 @@ set-alias foo SPAM""")
 
 @pytest.mark.tcl
 def test_tcl_tcl2py_1(tcl_module_path, mock_modulepath):
-    mp = mock_modulepath(tcl_module_path)
+    mock_modulepath(tcl_module_path)
     module = pymod.modulepath.get('tcl2')
     assert module.type == pymod.module.tcl
     assert module.version.string == '1.0'
@@ -92,7 +92,7 @@ def test_tcl_tcl2py_1(tcl_module_path, mock_modulepath):
 
 @pytest.mark.tcl
 def test_tcl_tcl2py_2(tcl_module_path, mock_modulepath):
-    mp = mock_modulepath(tcl_module_path)
+    mock_modulepath(tcl_module_path)
     pymod.environ.set(pymod.names.ld_library_path, 'path_a')
     pymod.environ.set(pymod.names.ld_preload, 'path_c')
     module = pymod.modulepath.get('tcl2')
@@ -105,7 +105,7 @@ def test_tcl_tcl2py_2(tcl_module_path, mock_modulepath):
 @pytest.mark.unit
 @pytest.mark.tcl
 def test_tcl_unit(tcl_module_path, mock_modulepath):
-    mp = mock_modulepath(tcl_module_path)
+    mock_modulepath(tcl_module_path)
 
     tcl = pymod.modulepath.get('tcl')
     assert tcl is not None

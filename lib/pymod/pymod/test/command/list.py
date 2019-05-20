@@ -7,7 +7,7 @@ def test_command_list(tmpdir, mock_modulepath):
     tmpdir.join('c.py').write('')
     load = PymodCommand('load')
     list = PymodCommand('list')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     list()
     load('a')
     load('b', '+x=foo')

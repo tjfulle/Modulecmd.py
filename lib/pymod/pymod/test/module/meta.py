@@ -1,4 +1,5 @@
 import os
+import sys
 import pytest
 from pymod.module.meta import (
     MetaData, MetaDataValueError, MetaDataUnknownFieldsError)

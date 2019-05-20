@@ -94,7 +94,7 @@ def test_command_hierarchy_1(modules_path, mock_modulepath):
     correctly"""
     load = PymodCommand('load')
     core_path = modules_path.core
-    mp = mock_modulepath(modules_path.core)
+    mock_modulepath(modules_path.core)
 
     is_module = lambda x: pymod.modulepath.get(x) is not None
 
@@ -155,7 +155,7 @@ def test_command_hierarchy_2(modules_path, mock_modulepath):
     """
     load = PymodCommand('load')
     core_path = modules_path.core
-    mp = mock_modulepath(modules_path.core)
+    mock_modulepath(modules_path.core)
 
     _compiler_unlocks_dir = lambda cc, cv: os.path.normpath(
         os.path.join(core_path, '..', 'compiler', cc, cv))

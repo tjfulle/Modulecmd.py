@@ -60,7 +60,7 @@ def test_mc_family_xyz(modules_path, mock_modulepath, get_loaded_modules):
                 else:
                     assert id not in loaded_modules
 
-    mp = mock_modulepath(modules_path)
+    mock_modulepath(modules_path)
 
     a1 = pymod.modulepath.get('A/1.0')
     assert a1 is not None

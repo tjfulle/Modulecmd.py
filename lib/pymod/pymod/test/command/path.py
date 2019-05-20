@@ -26,7 +26,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 def test_command_path(modules_path, mock_modulepath):
     load = PymodCommand('load')
     path = PymodCommand('path')
-    mp = mock_modulepath([modules_path.one, modules_path.two])
+    mock_modulepath([modules_path.one, modules_path.two])
     load('a')
     load('b')
     path()

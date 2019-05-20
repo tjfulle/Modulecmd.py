@@ -36,7 +36,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 def test_mc_command_save(modules_path, mock_modulepath):
 
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     save = PymodCommand('save')
     restore = PymodCommand('restore')
     a = pymod.mc.load('a')
@@ -72,7 +72,7 @@ def test_mc_command_restore_bad(modules_path, mock_modulepath):
 
 def test_mc_command_clone(modules_path, mock_modulepath):
 
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     clone = PymodCommand('clone')
     restore = PymodCommand('restore')
     a = pymod.mc.load('a')

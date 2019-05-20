@@ -37,6 +37,8 @@ class MetaData:
 
 
 def eval_bool_expr(expr):
+    import os, sys
+    # The above inserts aren't used locally, but might be in the eval below
     try:
         return bool(eval(expr))
     except:

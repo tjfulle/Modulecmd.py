@@ -27,7 +27,7 @@ def test_command_avail(modules_path, mock_modulepath):
     load = PymodCommand('load')
     avail = PymodCommand('avail')
     save = PymodCommand('save')
-    mp = mock_modulepath([modules_path.one, modules_path.two])
+    mock_modulepath([modules_path.one, modules_path.two])
     load('a')
     load('b')
     load('c')

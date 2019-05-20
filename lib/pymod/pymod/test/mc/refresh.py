@@ -18,7 +18,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 def test_mc_refresh(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     assert pymod.environ.get('a') == 'a'

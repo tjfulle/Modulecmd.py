@@ -19,7 +19,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 def test_mc_reload_1(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     assert pymod.environ.get('a') == 'a'
     pymod.mc.reload('a')
@@ -29,7 +29,7 @@ def test_mc_reload_1(modules_path, mock_modulepath):
 
 
 def test_mc_reload_2(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     assert a.is_loaded
@@ -46,7 +46,7 @@ def test_mc_reload_2(modules_path, mock_modulepath):
 
 
 def test_mc_reload_3(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     x = pymod.mc.reload('a')
     assert x is None
     with pytest.raises(ModuleNotFoundError):

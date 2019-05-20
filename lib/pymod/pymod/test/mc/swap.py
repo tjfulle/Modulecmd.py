@@ -21,7 +21,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 @pytest.mark.unit
 def test_mc_swap_1(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     pymod.mc.load('a')
     assert pymod.environ.get('module_swap') == 'a'
     pymod.mc.swap('a', 'b')
@@ -29,7 +29,7 @@ def test_mc_swap_1(modules_path, mock_modulepath):
 
 
 def test_mc_swap_2(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     assert a.is_loaded
     assert pymod.environ.get('module_swap') == 'a'
@@ -54,7 +54,7 @@ def test_mc_swap_2(modules_path, mock_modulepath):
 
 
 def test_mc_swap_3(modules_path, mock_modulepath):
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     pymod.mc.load('a')
     with pytest.raises(pymod.error.ModuleNotFoundError):
         pymod.mc.load('d')
@@ -74,7 +74,7 @@ def test_mc_swap_use(tmpdir, mock_modulepath):
     one.join('c.py').write('')
     one.join('d.py').write('')
 
-    mp = mock_modulepath(one.strpath)
+    mock_modulepath(one.strpath)
     with pytest.raises(pymod.error.ModuleNotFoundError):
         pymod.mc.load('b')
 
@@ -111,7 +111,7 @@ assert opts.x == 'foo'"""
     core.join('foo.py').write('family("spam")\nuse({0!r})'.format(foo.strpath))
     core.join('baz.py').write('family("spam")\nuse({0!r})'.format(baz.strpath))
 
-    mp = mock_modulepath(core.strpath)
+    mock_modulepath(core.strpath)
 
     pymod.mc.load('foo')
     pymod.mc.load('a', opts=['+x=foo'])
@@ -133,7 +133,7 @@ def test_mc_swap_use_2(tmpdir, mock_modulepath):
     core.join('foo.py').write('use({0!r})'.format(foo.strpath))
     core.join('baz.py').write('use({0!r})'.format(baz.strpath))
 
-    mp = mock_modulepath(core.strpath)
+    mock_modulepath(core.strpath)
 
     foo_module = pymod.mc.load('foo')
     foo_a = pymod.mc.load('a')

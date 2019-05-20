@@ -35,7 +35,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 @pytest.mark.unit
 def test_mc_restore_goo(modules_path, mock_modulepath):
 
-    mp = mock_modulepath(modules_path.path)
+    mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     c = pymod.mc.load('c')

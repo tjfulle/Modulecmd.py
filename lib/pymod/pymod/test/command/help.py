@@ -7,7 +7,7 @@ def test_command_help_module(tmpdir, modulecmds, mock_modulepath):
     m = modulecmds
     help = PymodCommand('help')
     tmpdir.join('a.py').write(m.help('HELP A'))
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     help('a')
 
 

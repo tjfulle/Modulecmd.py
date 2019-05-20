@@ -7,7 +7,7 @@ def test_mc_module_opts(tmpdir, mock_modulepath):
         'add_option("+x")\n'
         'opts = parse_opts()\n'
         'self.x = opts.x')
-    mp = mock_modulepath(tmpdir.strpath)
+    mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a', opts=['+x=spam'])
     assert a.x == 'spam'
 
