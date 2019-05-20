@@ -98,5 +98,5 @@ def filtered(include_os=False):
     return environ.filtered(include_os=include_os)
 
 
-def copy():
-    return environ.copy()
+def copy(include_os=False):
+    return environ.copy(include_os=include_os)

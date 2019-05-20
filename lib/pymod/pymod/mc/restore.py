@@ -3,6 +3,7 @@ import pymod.modes
 import pymod.names
 import pymod.error
 import pymod.collection
+import llnl.util.tty as tty
 
 
 def restore(name):
@@ -27,8 +28,10 @@ def restore_impl(collection):
         pymod.mc.use(directory, append=True)
         for (fullname, filename, opts) in modules:
             module = pymod.modulepath.get(filename)
+            tty.verbose('Loading part of collection: {0}'.format(module))
             if module is None:
                 raise pymod.error.CollectionModuleNotFoundError(fullname, filename)
             module.opts = opts
             pymod.mc.load_impl(module)
+            assert module.is_loaded
     return None

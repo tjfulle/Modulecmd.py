@@ -64,7 +64,7 @@ def module_exec_sandbox(module, mode):
         'sys': sys,
         'stop': stop,
         'mkdirp': mkdirp,
-        'env': pymod.environ.copy(),
+        'env': pymod.environ.copy(include_os=True),
         'user_env': pymod.user.env,
         'getenv': pymod.environ.get,
         'is_darwin': 'darwin' in sys.platform,

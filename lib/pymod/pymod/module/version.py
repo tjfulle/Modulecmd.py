@@ -31,7 +31,7 @@ class Version:
     def __repr__(self):
         return self.string
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.string
 
     def __gt__(self, other):
