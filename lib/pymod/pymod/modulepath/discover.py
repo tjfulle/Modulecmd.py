@@ -66,7 +66,7 @@ def find_modules(dirname):
             module.opts = None
 
     if not modules:  # pragma: no cover
-        tty.verbose('Modulepath: no modules found in {0}'.format(directory))
+        tty.verbose('Modulepath: no modules found in {0}'.format(dirname))
         return None
 
     return modules
