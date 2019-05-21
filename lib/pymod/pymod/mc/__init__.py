@@ -15,6 +15,7 @@ from pymod.mc.prereq import prereq, prereq_any
 from pymod.mc.purge import purge
 from pymod.mc.refresh import refresh
 from pymod.mc.reload import reload
+from pymod.mc.remove import remove
 from pymod.mc.restore import restore, restore_impl
 from pymod.mc.save import save
 from pymod.mc.show import show

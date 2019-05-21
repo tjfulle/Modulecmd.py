@@ -98,3 +98,50 @@ def test_mc_command_restore_clone_bad(modules_path, mock_modulepath):
     restore = PymodCommand('restore')
     with pytest.raises(CloneDoesNotExistError):
         restore('fake', '-c')
+
+
+def test_mc_command_remove(modules_path, mock_modulepath):
+
+    mock_modulepath(modules_path.path)
+    save = PymodCommand('save')
+    remove = PymodCommand('remove')
+    a = pymod.mc.load('a')
+    b = pymod.mc.load('b')
+    c = pymod.mc.load('c')
+    d = pymod.mc.load('d')
+
+    save('foo')
+    assert pymod.collection.contains('foo')
+
+    remove('foo')
+    assert not pymod.collection.contains('foo')
+
+
+
+def test_mc_command_restore_bad(modules_path, mock_modulepath):
+    with pytest.raises(CollectionNotFoundError):
+        pymod.mc.restore('fake')
+
+
+def test_mc_command_clone(modules_path, mock_modulepath):
+
+    mock_modulepath(modules_path.path)
+    clone = PymodCommand('clone')
+    restore = PymodCommand('restore')
+    a = pymod.mc.load('a')
+    b = pymod.mc.load('b')
+    c = pymod.mc.load('c')
+    d = pymod.mc.load('d')
+
+    clone('foo')
+
+    pymod.mc.purge()
+    assert not a.is_loaded
+    assert not b.is_loaded
+    assert not c.is_loaded
+    assert not d.is_loaded
+
+    restore('foo', '-c')
+    for x in 'abcd':
+        m = pymod.modulepath.get(x)
+        assert m.is_loaded
