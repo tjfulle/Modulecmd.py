@@ -652,7 +652,7 @@ proc myPuts args {
     if {$putMode != "inHelp"} {
         if { ($channel == "stdout") || ($channel == "stderr") } {
             set channel "stdout"
-            set text "log_message(\"$text\")"
+            set text "log_info(\"$text\")"
         }
     } else {
         set channel  "stdout"
@@ -740,7 +740,7 @@ proc module { command args } {
 
 proc reportError {message} {
     global ModulesCurrentModulefile g_fullName
-    puts stdout "log_error(\"\"\"$ModulesCurrentModulefile: ($g_fullName): $message\"\"\", noraise=1)"
+    puts stdout "log_error(\"\"\"$ModulesCurrentModulefile: ($g_fullName): $message\"\"\")"
 }
 
 proc execute-modulefile {modfile } {

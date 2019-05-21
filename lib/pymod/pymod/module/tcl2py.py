@@ -11,7 +11,7 @@ def tcl2py(module, mode):
     tcl2py_exe = os.path.join(pymod.paths.bin_path, 'tcl2py.tcl')
     tcl2py = Executable(tcl2py_exe)
 
-    env = pymod.environ.filtered()
+    env = pymod.environ.filtered(include_os=True)
 
     mode = pymod.modes.as_string(mode)
     mode = {'show': 'display'}.get(mode, mode)

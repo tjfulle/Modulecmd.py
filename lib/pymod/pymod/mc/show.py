@@ -1,8 +1,7 @@
 import pymod.mc
 import pymod.modes
+import pymod.module
 import pymod.modulepath
-
-from pymod.mc.execmodule import execmodule
 from pymod.error import ModuleNotFoundError
 
 
@@ -30,5 +29,8 @@ def show(name, opts=None, insert_at=None):
     if opts:
         module.opts = opts
 
-    # Now load it
-    execmodule(module, pymod.modes.show)
+    if isinstance(module, pymod.module.TclModule):
+        pymod.mc.execmodule(module, pymod.modes.show)
+    else:
+        # Now load it
+        pymod.mc.execmodule(module, pymod.modes.load)
