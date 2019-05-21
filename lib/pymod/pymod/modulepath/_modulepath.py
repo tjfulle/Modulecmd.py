@@ -16,8 +16,6 @@ class Path:
     def __init__(self, dirname):
         self.path = dirname
         self.modules = find_modules(dirname)
-        if not self.modules: # pragma: no cover
-            tty.verbose('Path: no modules found in {0}'.format(dirname))
 
 
 class Modulepath:
@@ -102,8 +100,6 @@ class Modulepath:
         self._modified = True
 
     def append_path(self, dirname):
-        if not os.path.isdir(dirname):  # pragma: no cover
-            tty.warn('Modulepath: {0!r} is not a directory'.format(dirname))
         if dirname in self:
             return
         path = Path(dirname)
@@ -114,9 +110,6 @@ class Modulepath:
         return path.modules
 
     def prepend_path(self, dirname):
-        if not os.path.isdir(dirname):  # pragma: no cover
-            tty.warn('Modulepath: {0!r} is not a directory'.format(dirname))
-            return []
         if dirname in self:
             path = self.path.pop(self.index(dirname))
         else:
@@ -157,14 +150,8 @@ class Modulepath:
         if not directories:  # pragma: no cover
             return
         for directory in directories:
-            if not os.path.isdir(directory):  # pragma: no cover
-                tty.verbose(
-                    'Modulepath: nonexistent directory {0!r}'.format(directory))
-                continue
             path = Path(directory)
             if not path.modules:
-                tty.verbose(
-                    'Modulepath: no modules found in {0}'.format(directory))
                 continue
             self.path.append(path)
         self._path_modified()

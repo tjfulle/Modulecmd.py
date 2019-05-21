@@ -21,9 +21,12 @@ def find_modules(dirname):
         raise ValueError('Requesting to find modules in root directory')
 
     if not os.access(dirname, os.R_OK):  # pragma: no cover
+        tty.verbose('Insufficient privileges to read modules in {0!r}'
+                    .format(dirname))
         return None
 
     if not os.path.isdir(dirname):  # pragma: no cover
+        tty.verbose('{0!r} is not a directory'.format(dirname))
         return None
 
     first_level_files, first_level_dirs = listdir(dirname)
@@ -61,6 +64,10 @@ def find_modules(dirname):
                 break
         else:
             module.opts = None
+
+    if not modules:  # pragma: no cover
+        tty.verbose('Modulepath: no modules found in {0}'.format(directory))
+        return None
 
     return modules
 
