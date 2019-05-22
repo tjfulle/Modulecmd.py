@@ -206,3 +206,31 @@ def test_mc_load_inserted_with_opts(tmpdir, mock_modulepath):
     b = pymod.mc.load('b', insert_at=1)
     assert a.is_loaded
     assert a.opts == ['+x=baz']
+
+
+def test_mc_load_inserted_acqby(tmpdir, mock_modulepath):
+    core = tmpdir.mkdir('core')
+    a = core.mkdir('a')
+    a.join('1.0.py').write('')
+    a.join('2.0.py').write('')
+    core.join('b.py').write('')
+
+    mock_modulepath(core.strpath)
+
+    a = pymod.mc.load('a')
+    assert a.version == '2.0'
+
+    b = pymod.mc.load('b', insert_at=1)
+
+    ma = pymod.modulepath.get(core.join('a/2.0.py').strpath)
+    assert ma.is_loaded
+
+    pymod.mc.purge()
+
+    a = pymod.mc.load('a/1.0')
+    assert a.version == '1.0'
+
+    b = pymod.mc.load('b', insert_at=1)
+
+    ma = pymod.modulepath.get(core.join('a/1.0.py').strpath)
+    assert ma.is_loaded
