@@ -29,8 +29,8 @@ def show(name, opts=None, insert_at=None):
     if opts:
         module.opts = opts
 
-    mode = (pymod.modes.show if isinstance(module, pymod.module.TclModule) else
-            pymod.modes.load)
-
-    # Now load it
-    pymod.mc.execmodule(module, pymod.modes.load)
+    # Now execute it
+    if isinstance(module, pymod.module.TclModule):
+        pymod.mc.execmodule(module, pymod.modes.show)
+    else:
+        pymod.mc.execmodule(module, pymod.modes.load)
