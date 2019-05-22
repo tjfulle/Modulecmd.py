@@ -314,3 +314,12 @@ def test_modulepath_walk(modules_path, mock_modulepath):
             i += 1
         else:
             assert False, 'Should never get here'
+
+
+def test_modulepath_dirname_does_not_exist(tmpdir, mock_modulepath):
+    tmpdir.join('a.py').write('')
+    mock_modulepath(tmpdir.strpath)
+    modules = pymod.modulepath.append_path('A/FAKE/PATH')
+    assert modules is None
+    bumped = pymod.modulepath.prepend_path('A/FAKE/PATH')
+    assert bumped is None

@@ -47,3 +47,10 @@ def test_module_version_major_minor_patch_variant():
 def test_module_version_bool():
     v = Version()
     assert not v
+    assert not v.__nonzero__()
+    assert not v.__bool__()
+
+def test_module_version_different():
+    v1 = Version('1.68')
+    v2 = Version('1.68b')
+    assert v2 > v1

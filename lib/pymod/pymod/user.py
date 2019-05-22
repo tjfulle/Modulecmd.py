@@ -45,7 +45,7 @@ def set_user_env(user_env):
     env = user_env
 
 
-def reset():
+def reset():  # pragma: no cover
     global env
     if env._modulename in sys.modules:
         del sys.modules[env._modulename]

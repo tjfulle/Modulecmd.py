@@ -43,9 +43,9 @@ def load_first(mode, module, *names):
             if mode == pymod.modes.unload:
                 # We are in unload mode and the module was requested to be
                 # loaded. So, we reverse the action and unload it
-                return pymod.mc.unload(name, caller='modulefile')
+                return pymod.mc.unload(name, caller='load_first')
             elif mode == pymod.modes.load:
-                return pymod.mc.load(name, caller='modulefile')
+                return pymod.mc.load(name, caller='load_first')
         except ModuleNotFoundError:
             continue
     if name is None:
@@ -60,7 +60,10 @@ def load(mode, module, name, **kwds):
     if mode == pymod.modes.unload:
         # We are in unload mode and the module was requested to be loaded.
         # So, we reverse the action and unload it
-        pymod.mc.unload(name, caller='modulefile')
+        try:
+            pymod.mc.unload(name, caller='modulefile')
+        except ModuleNotFoundError:
+            return
     else:
         pymod.mc.load(name, opts=opts, caller='modulefile')
 
@@ -233,3 +236,9 @@ def execute(arg_mode, module, command, mode=None):
     if mode is not None and mode != pymod.modes.as_string(arg_mode):
         return
     pymod.mc.execute(command)
+
+
+def get_family_info(mode, module, name, **kwargs):
+    name_envar = pymod.names.family_name(name)
+    version_envar = pymod.names.family_version(name)
+    return pymod.environ.get(name_envar), pymod.environ.get(version_envar)

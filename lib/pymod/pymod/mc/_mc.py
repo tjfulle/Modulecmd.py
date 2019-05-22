@@ -61,11 +61,12 @@ def get_loaded_modules():
     if _loaded_modules is None:
         _loaded_modules = []
         lm_cellar = pymod.environ.get_list(pymod.names.loaded_module_cellar)
-        for (fullname, filename, opts, his) in lm_cellar:
+        for (fullname, filename, family, opts, his) in lm_cellar:
             module = pymod.modulepath.get(filename)
             assert module.fullname == fullname
-            module.his = his
+            module.family = family
             module.opts = opts
+            module.his = his
             _loaded_modules.append(module)
     # return copy so that no one else can modify the loaded modules
     return list(_loaded_modules)
@@ -77,7 +78,7 @@ def set_loaded_modules(modules):
     _loaded_modules = modules
 
     assert all([m.his is not None for m in _loaded_modules])
-    lm = [(m.fullname, m.filename, m.opts, m.his) for m in _loaded_modules]
+    lm = [(m.fullname, m.filename, m.family, m.opts, m.his) for m in _loaded_modules]
     pymod.environ.set_list(pymod.names.loaded_module_cellar, lm)
 
     # The following are for compatibility with other module programs

@@ -6,25 +6,26 @@ import llnl.util.tty as tty
 
 def use(dirname, append=False, delete=False):
     """Add dirname to MODULEPATH"""
-    dirname = os.path.expanduser(dirname)
+    dirname = os.path.abspath(os.path.expanduser(dirname))
     if delete:
         pymod.mc.unuse(dirname)
         return
     elif append:
-        pymod.modulepath.append_path(dirname)
+        return pymod.modulepath.append_path(dirname)
     else:
         prepended_modules = pymod.modulepath.prepend_path(dirname)
         if prepended_modules is None:
             tty.warn('No modules were found in {0}.  '
                      'This path will not be added to MODULEPATH'
                      .format(dirname))
-            return
+            return None
         bumped = determine_swaps_due_to_prepend(prepended_modules)
         for (old, new) in bumped:
             assert old.is_loaded
             new.his = old.his
             pymod.mc.swap_impl(old, new)
             pymod.mc.swapped_on_mp_change(old, new)
+        return bumped
 
 
 def determine_swaps_due_to_prepend(prepended_modules):

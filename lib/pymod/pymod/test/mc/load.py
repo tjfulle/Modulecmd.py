@@ -234,3 +234,22 @@ def test_mc_load_inserted_acqby(tmpdir, mock_modulepath):
 
     ma = pymod.modulepath.get(core.join('a/1.0.py').strpath)
     assert ma.is_loaded
+
+
+def test_mc_load_bad_callback(tmpdir, mock_modulepath):
+    tmpdir.join('a.py').write('load("FAKE")')
+    mock_modulepath(tmpdir.strpath)
+
+    with pytest.raises(pymod.error.ModuleNotFoundError):
+        pymod.mc.load('a')
+
+    # Now hack the thing
+    a = pymod.modulepath.get('a')
+    a.his = pymod.module.acqby_name
+    lm_cellar = [(a.fullname, a.filename, a.family, a.opts, a.his)]
+    pymod.environ.set_list(pymod.names.loaded_module_cellar, lm_cellar)
+    pymod.mc._mc._loaded_modules = [a]
+
+    # This should not error out, even though 'FAKE' does not exist.  This is by
+    # design when unloading from a module
+    pymod.mc.unload('a')

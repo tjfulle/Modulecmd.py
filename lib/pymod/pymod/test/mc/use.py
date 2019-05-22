@@ -136,3 +136,12 @@ def test_mc_use_prepend_bumped(tmpdir, mock_modulepath):
     assert new == a2
 
     old, new = pymod.mc._mc._swapped_on_mp_change[1]
+
+
+def test_mc_use_dirname_does_not_exist(tmpdir, mock_modulepath):
+    tmpdir.join('a.py').write('')
+    mock_modulepath(tmpdir.strpath)
+    modules = pymod.mc.use('A/FAKE/PATH', append=True)
+    assert modules is None
+    bumped = pymod.mc.use('A/FAKE/PATH')
+    assert bumped is None

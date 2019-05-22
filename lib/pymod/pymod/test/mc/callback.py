@@ -63,12 +63,18 @@ def test_mc_callback_prereq(tmpdir, mock_modulepath):
 
     pymod.mc.load('b')
     prereq(pymod.modes.load, None, 'b')
+    prereq(pymod.modes.load, None, 'name:b')
     prereq_any(pymod.modes.load, None, 'x', 'y', 'b')
+    prereq_any(pymod.modes.load, None, 'x', 'y', 'name:b')
     with pytest.raises(pymod.error.PrereqMissingError):
         prereq_any(pymod.modes.load, None, 'x', 'y', 'z')
 
+    with pytest.raises(Exception):
+        # Foo is not a recognized prefix
+        prereq(pymod.modes.load, None, 'foo:b')
 
-def test_mc_callback_set_alias():
+
+def test_mc_callback_seGt_alias():
     set_alias = pymod.mc.callback.set_alias
     unset_alias = pymod.mc.callback.unset_alias
 
@@ -365,3 +371,18 @@ def test_mc_callback_use(tmpdir, mock_modulepath):
     assert a.modulepath == one.strpath
     b = pymod.modulepath.get('b')
     assert b.modulepath == one.strpath
+
+
+def test_mc_callback_get_family_info(tmpdir, mock_modulepath):
+    load = pymod.mc.callback.load
+
+    a = tmpdir.mkdir('a')
+    a.join('1.0.py').write('family("spam")')
+    tmpdir.join('b.py').write(
+        'x, v = get_family_info("spam")\n'
+        'assert x == "a"\n'
+        'assert v == "1.0"')
+    mock_modulepath(tmpdir.strpath)
+    a = pymod.mc.load('a')
+    assert a.version == "1.0"
+    pymod.mc.load('b')

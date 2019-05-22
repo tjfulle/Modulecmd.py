@@ -11,17 +11,18 @@ def unload(name, tolerant=False, caller='command_line'):
     if module is None:
         raise ModuleNotFoundError(name)
 
-    modules = pymod.mc.get_loaded_modules()
-    for module in modules:
-        if module.name == name:
+    loaded_modules = pymod.mc.get_loaded_modules()
+    for loaded in loaded_modules:
+        if loaded.name == name:
             break
-        elif module.fullname == name:
+        elif loaded.fullname == name:
             break
     else:
         tty.warn('Module {0} is not loaded'.format(name))
         return
-    unload_impl(module, caller)
-    return module
+    unload_impl(loaded, caller)
+    return loaded
+
 
 def unload_impl(module, caller='command_line'):
     """Implementation of unload

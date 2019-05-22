@@ -72,7 +72,7 @@ def module_exec_sandbox(module, mode):
         'IS_DARWIN': 'darwin' in sys.platform,
         'get_hostname': socket.gethostname,
         'listdir': lambda dirname, key=None: listdir(dirname, key=key),
-        'mode': lambda: mode,
+        'mode': lambda: pymod.modes.as_string(mode),
         'self': module,
         'colorize': colorize,
         #
@@ -107,6 +107,7 @@ def module_exec_sandbox(module, mode):
         'is_loaded': callback(cb.is_loaded, mode, module),
         #
         'family': callback(cb.family, mode, module),
+        'get_family_info': callback(cb.get_family_info, mode, module),
         #
         'prepend_path': callback(cb.prepend_path, mode, module),
         'append_path': callback(cb.append_path, mode, module),

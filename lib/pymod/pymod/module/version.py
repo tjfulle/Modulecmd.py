@@ -35,7 +35,10 @@ class Version:
         return self.string
 
     def __gt__(self, other):
-        return self.tuple > other.tuple
+        try:
+            return self.tuple > other.tuple
+        except TypeError:
+            return self.string > other.string
 
     def __lt__(self, other):
         return not self > other
