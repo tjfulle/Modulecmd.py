@@ -32,6 +32,7 @@ def restore_impl(collection):
             if module is None:
                 raise pymod.error.CollectionModuleNotFoundError(fullname, filename)
             module.opts = opts
+            module.his = pymod.module.acqby_fullname
             pymod.mc.load_impl(module)
             assert module.is_loaded
     return None

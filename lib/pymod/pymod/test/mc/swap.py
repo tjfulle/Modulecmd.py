@@ -139,7 +139,91 @@ def test_mc_swap_use_2(tmpdir, mock_modulepath):
     foo_a = pymod.mc.load('a')
 
     baz_module = pymod.modulepath.get('baz')
+    # Since maintain_state is requested, the module a will not be reloaded
     pymod.mc.swap_impl(foo_module, baz_module, maintain_state=True)
+    assert len(pymod.mc._mc._unloaded_on_mp_change) == 1
+    baz_a = pymod.modulepath.get('a')
+    assert baz_a.modulepath == baz.strpath
+
+
+def test_mc_swap_use_3(tmpdir, mock_modulepath):
+    foo = tmpdir.mkdir('foo')
+    a = foo.mkdir('a')
+    a.join('2.0.py').write('')
+
+    baz = tmpdir.mkdir('baz')
+    a = baz.mkdir('a')
+    a.join('1.0.py').write('')
+
+    core = tmpdir.mkdir('core')
+    core.join('foo.py').write('use({0!r})'.format(foo.strpath))
+    core.join('baz.py').write('use({0!r})'.format(baz.strpath))
+
+    mock_modulepath(core.strpath)
+
+    foo_module = pymod.mc.load('foo')
+    foo_a = pymod.mc.load('a')
+
+    baz_module = pymod.modulepath.get('baz')
+    # Since maintain_state is not requested, the module a will be reloaded, but from baz
+    pymod.mc.swap_impl(foo_module, baz_module)
     assert len(pymod.mc._mc._unloaded_on_mp_change) == 0
     baz_a = pymod.modulepath.get('a')
     assert baz_a.modulepath == baz.strpath
+
+
+def test_mc_swap_use_4(tmpdir, mock_modulepath):
+    foo = tmpdir.mkdir('foo')
+    a = foo.mkdir('a')
+    a.join('2.0.py').write('')
+
+    baz = tmpdir.mkdir('baz')
+    a = baz.mkdir('a')
+    a.join('1.0.py').write('')
+
+    core = tmpdir.mkdir('core')
+    core.join('foo.py').write('use({0!r})'.format(foo.strpath))
+    core.join('baz.py').write('use({0!r})'.format(baz.strpath))
+
+    mock_modulepath(core.strpath)
+
+    foo_module = pymod.mc.load('foo')
+    foo_a = pymod.mc.load('a/2.0')
+
+    baz_module = pymod.modulepath.get('baz')
+    # Since a's name+version was used to load it, the module a will not be
+    # reloaded since the a/2.0 does not exist in baz
+    pymod.mc.swap_impl(foo_module, baz_module)
+    assert len(pymod.mc._mc._unloaded_on_mp_change) == 1
+    baz_a = pymod.modulepath.get('a')
+    assert baz_a.modulepath == baz.strpath
+
+
+def test_mc_swap_use_5(tmpdir, mock_modulepath):
+    foo = tmpdir.mkdir('foo')
+    a = foo.mkdir('a')
+    a.join('1.0.py').write('')
+
+    baz = tmpdir.mkdir('baz')
+    a = baz.mkdir('a')
+    a.join('1.0.py').write('')
+    a.join('2.0.py').write('')
+
+    core = tmpdir.mkdir('core')
+    core.join('foo.py').write('use({0!r})'.format(foo.strpath))
+    core.join('baz.py').write('use({0!r})'.format(baz.strpath))
+
+    mock_modulepath(core.strpath)
+
+    foo_module = pymod.mc.load('foo')
+    foo_a = pymod.mc.load('a/1.0')
+    assert foo_a.his == pymod.module.acqby_fullname
+
+    baz_module = pymod.modulepath.get('baz')
+    # Since a's name+version was used to load it, the module a will be
+    # reloaded since the a/1.0 does not exist in baz
+    pymod.mc.swap_impl(foo_module, baz_module)
+    assert len(pymod.mc._mc._unloaded_on_mp_change) == 0
+    baz_a = pymod.modulepath.get('a/1.0')
+    assert baz_a.modulepath == baz.strpath
+    assert baz_a.is_loaded

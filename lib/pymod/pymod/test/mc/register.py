@@ -1,12 +1,13 @@
 import pytest
 import pymod.mc
 import pymod.error
+import pymod.modulepath
 from pymod.module import module
 
 def test_mc_register_1(tmpdir, mock_modulepath):
     tmpdir.join('a.py').write('')
-    a = module(tmpdir.strpath, 'a.py')
     mock_modulepath(tmpdir.strpath)
+    a = pymod.modulepath.get('a')
     pymod.mc.register_module(a)
     assert a.filename in pymod.mc._mc.get_lm_files()
 
@@ -17,9 +18,6 @@ def test_mc_register_2(tmpdir, mock_modulepath):
     tmpdir.join('devpack.py').write('')
     mock_modulepath(tmpdir.strpath)
     m = module(tmpdir.strpath, 'devpack.py')
-    print(m.modulepath)
-    print(tmpdir.strpath)
-    print(pymod.modulepath.path())
     pymod.mc.register_module(m)
     assert m.filename not in pymod.mc._mc.get_lm_files()
     pymod.config.set('skip_add_devpack', value)

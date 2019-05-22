@@ -65,21 +65,30 @@ class Modulepath:
 
         """
         if isinstance(key, pymod.module.Module):
+            key.his = pymod.module.acqby_self
             return key
         elif os.path.isdir(key) and key in self:
             return self.getby_dirname(key)
         if os.path.isfile(key):
-            return self.getby_filename(key)
+            module = self.getby_filename(key)
+            if module is not None:
+                module.his = pymod.module.acqby_filename
+            return module
         parts = key.split(os.path.sep)
         if len(parts) == 1:
             # with length of 1, it must be a name
-            return self.defaults.get(key)
+            module = self.defaults.get(key)
+            if module is not None:
+                module.his = pymod.module.acqby_name
+            return module
         else:
             for path in self.path:
                 for module in path.modules:
                     if module.fullname == key:
+                        module.his = pymod.module.acqby_fullname
                         return module
                     elif module.endswith(key):
+                        module.his = pymod.module.acqby_path
                         return module
         return None
 

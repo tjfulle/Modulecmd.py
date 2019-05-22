@@ -16,9 +16,11 @@ from llnl.util.tty import terminal_size
 from pymod.module.argument_parser import ModuleArgumentParser
 
 
-setby_name = 1
-setby_fullname = 2
-setby_filename = 3
+acqby_name = 1
+acqby_fullname = 2
+acqby_filename = 3
+acqby_path = 4
+acqby_self = 5
 
 
 # --------------------------------------------------------------------------- #
@@ -85,7 +87,8 @@ class Module(object):
 
     @his.setter
     def his(self, arg):
-        assert arg in (setby_name, setby_fullname, setby_filename)
+        assert arg in (acqby_name, acqby_fullname,
+                       acqby_filename, acqby_path, acqby_self)
         self._his = arg
 
     def endswith(self, string):

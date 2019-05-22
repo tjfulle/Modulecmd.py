@@ -184,9 +184,25 @@ def test_mc_load_inserted_4(tmpdir, mock_modulepath):
 
     m = pymod.mc.load('foo', insert_at=1)
     a2 = pymod.modulepath.get('a')
-    print(pymod.modulepath.path())
     assert a2.modulepath == foo.strpath
 
     assert not a.is_loaded
     assert a2.is_loaded
     assert a2.name == a.name
+
+
+def test_mc_load_inserted_with_opts(tmpdir, mock_modulepath):
+
+    one = tmpdir.mkdir('1')
+    a = one.mkdir('a')
+    a.join('2.0.py').write('add_option("+x")\nopts = parse_opts()\n')
+    one.join('b.py').write('')
+
+    mock_modulepath(one.strpath)
+
+    a = pymod.mc.load('a', opts=['+x=baz'])
+    assert a.opts == ['+x=baz']
+
+    b = pymod.mc.load('b', insert_at=1)
+    assert a.is_loaded
+    assert a.opts == ['+x=baz']

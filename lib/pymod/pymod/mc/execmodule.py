@@ -19,6 +19,7 @@ from pymod.error import FamilyLoadedError
 # ----------------------------- MODULE EXECUTION FUNCTIONS
 def execmodule(module, mode):
     """Execute the module in a sandbox"""
+    assert module.his is not None
     pymod.modes.assert_known_mode(mode)
 
     try:

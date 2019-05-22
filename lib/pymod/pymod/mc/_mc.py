@@ -58,8 +58,9 @@ def get_lm_names():
 
 def get_loaded_modules():
     loaded_modules = []
-    for (fullname, filename, opts) in get_lm_cellar():
+    for (fullname, filename, opts, his) in get_lm_cellar():
         module = pymod.modulepath.get(filename)
+        module.his = his
         assert module.fullname == fullname
         if opts and not module.opts:
             module.opts = opts
@@ -84,7 +85,8 @@ def get_lm_cellar():
 
 
 def set_lm_cellar(modules):
-    lm = [(m.fullname, m.filename, m.opts) for m in modules]
+    assert all([m.his is not None for m in modules])
+    lm = [(m.fullname, m.filename, m.opts, m.his) for m in modules]
     pymod.environ.set_list(pymod.names.loaded_module_cellar, lm)
 
 
@@ -93,7 +95,7 @@ def get_cellar():
     class Namespace: pass
     for item in get_lm_cellar():
         ns = Namespace()
-        ns.fullname, ns.filnae, ns.opts = item
+        ns.fullname, ns.filnae, ns.opts, ns.his = item
         lm_cellar.append(ns)
     return lm_cellar
 
@@ -169,15 +171,16 @@ def unregister_module(module):
     # "unusing" a directory on the MODULEPATH which has loaded modules.
     # Those modules are automaically unloaded since they are no longer
     # available.
-    lm_files = get_lm_files()
-    if module.filename in lm_files:
-        i = lm_files.index(module.filename)
-        lm_files.pop(i)
-        loaded_modules = [pymod.modulepath.get(f) for f in lm_files]
-        set_loaded_modules(loaded_modules)
-        pop_refcount(module)
-    elif pymod.config.get('debug'):  # pragma: no cover
-        tty.die('unregister_module called for a module that is not loaded!')
+    loaded_modules = []
+    for (fullname, filename, opts, his) in get_lm_cellar():
+        if module.filename == filename:
+            continue
+        other = pymod.modulepath.get(filename)
+        other.his = his
+        other.opts = opts
+        loaded_modules.append(other)
+    set_loaded_modules(loaded_modules)
+    pop_refcount(module)
 
 
 def swapped_explicitly(old, new):
