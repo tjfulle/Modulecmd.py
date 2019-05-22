@@ -124,7 +124,7 @@ class Modulepath:
         else:
             path = Path(dirname)
             if not path.modules:
-                return []
+                return None
         self.path.insert(0, path)
         self._path_modified()
         return path.modules

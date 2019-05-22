@@ -278,7 +278,7 @@ def test_modulepath_prepend_path(modules_path, mock_modulepath):
 
     modules_path.mkdir('FOO')
     a = pymod.modulepath.prepend_path(modules_path.join('FOO').strpath)
-    assert len(a) == 0
+    assert a is None
 
 
 def test_modulepath_auto_bump(modules_path, mock_modulepath):

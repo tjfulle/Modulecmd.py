@@ -1,6 +1,7 @@
 import os
 import pymod.mc
 import pymod.modulepath
+import llnl.util.tty as tty
 
 
 def use(dirname, append=False, delete=False):
@@ -13,6 +14,11 @@ def use(dirname, append=False, delete=False):
         pymod.modulepath.append_path(dirname)
     else:
         prepended_modules = pymod.modulepath.prepend_path(dirname)
+        if prepended_modules is None:
+            tty.warn('No modules were found in {0}.  '
+                     'This path will not be added to MODULEPATH'
+                     .format(dirname))
+            return
         bumped = determine_swaps_due_to_prepend(prepended_modules)
         for (old, new) in bumped:
             assert old.is_loaded
