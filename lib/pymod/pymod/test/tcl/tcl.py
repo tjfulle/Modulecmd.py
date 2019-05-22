@@ -84,7 +84,7 @@ set-alias foo SPAM""")
 def test_tcl_tcl2py_1(tcl_module_path, mock_modulepath):
     mock_modulepath(tcl_module_path)
     module = pymod.modulepath.get('tcl2')
-    assert module.type == pymod.module.tcl
+    assert isinstance(module, pymod.module.TclModule)
     assert module.version.string == '1.0'
     stdout = tcl2py(module, pymod.modes.load)
     assert stdout == py_content
@@ -96,7 +96,7 @@ def test_tcl_tcl2py_2(tcl_module_path, mock_modulepath):
     pymod.environ.set(pymod.names.ld_library_path, 'path_a')
     pymod.environ.set(pymod.names.ld_preload, 'path_c')
     module = pymod.modulepath.get('tcl2')
-    assert module.type == pymod.module.tcl
+    assert isinstance(module, pymod.module.TclModule)
     assert module.version.string == '1.0'
     stdout = tcl2py(module, pymod.modes.load)
     assert stdout == py_content
@@ -111,20 +111,20 @@ def test_tcl_unit(tcl_module_path, mock_modulepath):
     assert tcl is not None
     assert tcl.name == 'tcl'
     assert tcl.fullname == 'tcl/1.0'
-    assert tcl.type == pymod.module.tcl
+    assert isinstance(tcl, pymod.module.TclModule)
 
     # version 1.0 should be the default
     a1 = pymod.modulepath.get('a')
     assert a1 is not None
     assert a1.name == 'a'
     assert a1.fullname == 'a/1.0'
-    assert a1.type == pymod.module.tcl
+    assert isinstance(a1, pymod.module.TclModule)
 
     a2 = pymod.modulepath.get('a/2.0')
     assert a2 is not None
     assert a2.name == 'a'
     assert a2.fullname == 'a/2.0'
-    assert a2.type == pymod.module.tcl
+    assert isinstance(a2, pymod.module.TclModule)
 
     pymod.mc.load(tcl)
     assert pymod.environ.environ['path'] == '/a/path:/b/path'

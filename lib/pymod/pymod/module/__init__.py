@@ -1,6 +1,7 @@
 import os
-from textwrap import fill
 from six import StringIO
+from textwrap import fill
+from enum_backport import Enum
 
 import pymod.environ
 import pymod.config
@@ -15,16 +16,15 @@ from llnl.util.tty import terminal_size
 from pymod.module.argument_parser import ModuleArgumentParser
 
 
-python = 'PYTHON'
-tcl = 'TCL'
-
+setby_name = 1
+setby_fullname = 2
+setby_filename = 3
 
 
 # --------------------------------------------------------------------------- #
 # --------------------------- MODULE CLASS ---------------------------------- #
 # --------------------------------------------------------------------------- #
 class Module(object):
-    type = None
     ext = None
     def __init__(self, modulepath, *parts):
         self.filename = os.path.join(modulepath, *parts)
@@ -53,6 +53,7 @@ class Module(object):
         self._opts = None
         self._unlocks = []
         self.marked_as_default = False
+        self._his = None  # How the module was initially loaded
 
     def __str__(self):
         return 'Module(name={0})'.format(self.fullname)
@@ -78,6 +79,15 @@ class Module(object):
     def do_not_register(self):
         return False
 
+    @property
+    def his(self):
+        return self._his
+
+    @his.setter
+    def his(self, arg):
+        assert arg in (setby_name, setby_fullname, setby_filename)
+        self._his = arg
+
     def endswith(self, string):
         return self.filename.endswith(string)
 
@@ -99,7 +109,7 @@ class Module(object):
         return unlocked_by[::-1]
 
     def read(self, mode):
-        if self.type == tcl:
+        if isinstance(self, TclModule):
             if not pymod.config.has_tclsh:  # pragma: no cover
                 raise TCLSHNotFoundError
             try:
@@ -160,11 +170,10 @@ class Module(object):
         if version:
             sio.write('Version: {0}\n'.format(version))
         sio.write(
-            'Type: {0}\n'
-            'Family: {1}\n'
-            'Full Name: {2}\n'
-            'Filename: {3}\n'
-            .format(self.type, self.family, self.fullname, self.filename))
+            'Family: {0}\n'
+            'Full Name: {1}\n'
+            'Filename: {2}\n'
+            .format(self.family, self.fullname, self.filename))
 
         short_description = self._whatis.get('short description')
         if short_description is not None:
@@ -195,7 +204,7 @@ class Module(object):
         return sio.getvalue()
 
     def set_whatis(self, *args, **kwargs):
-        if self.type == tcl:
+        if isinstance(self, TclModule):
             if len(args) != 1:
                 raise ValueError('unknown whatis args length for tcl module')
             self._whatis['short description'] = args[0]
@@ -225,7 +234,6 @@ class Module(object):
 
 class PyModule(Module):
     ext = '.py'
-    type = python
     def __init__(self, modulepath, *parts):
         # strip the file extension off the last part and call class initializer
         parts = list(parts)
@@ -248,7 +256,7 @@ class PyModule(Module):
 
 
 class TclModule(Module):
-    type = tcl
+    pass
 
 
 def module(dirname, *parts):

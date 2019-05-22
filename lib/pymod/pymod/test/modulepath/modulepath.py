@@ -107,30 +107,30 @@ def test_modulepath_available_1(modules_path, mock_modulepath):
     a = grouped.pop('a')
     assert len(a) == 1
     assert not a[0].is_default
-    assert a[0].type == pymod.module.python
+    assert isinstance(a[0], pymod.module.PyModule)
 
     b = grouped.pop('b')
     assert len(b) == 1
     assert not b[0].is_default
-    assert b[0].type == pymod.module.python
+    assert isinstance(b[0], pymod.module.PyModule)
 
     py = grouped.pop('py')
     assert len(py) == 3
     for m in py:
         assert m.is_default if m.fullname == 'py/2.0.0' else not m.is_default
-        assert m.type == pymod.module.python
+        assert isinstance(m, pymod.module.PyModule)
 
     tcl = grouped.pop('tcl')
     assert len(tcl) == 3
     for m in tcl:
         assert m.is_default if m.fullname == 'tcl/1.0.0' else not m.is_default
-        assert m.type == pymod.module.tcl
+        assert isinstance(m, pymod.module.TclModule)
 
     ucc = grouped.pop('ucc')
     assert len(ucc) == 2
     for m in ucc:
         assert m.is_default if m.fullname == 'ucc/2.0.0' else not m.is_default
-        assert m.type == pymod.module.python
+        assert isinstance(m, pymod.module.PyModule)
 
 
 def test_modulepath_get(modules_path, mock_modulepath):
@@ -139,32 +139,32 @@ def test_modulepath_get(modules_path, mock_modulepath):
 
     module = pymod.modulepath.get('a')
     assert module.fullname == 'a'
-    assert module.type == pymod.module.python
+    assert isinstance(module, pymod.module.PyModule)
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
     module = pymod.modulepath.get('b')
     assert module.fullname == 'b'
-    assert module.type == pymod.module.python
+    assert isinstance(module, pymod.module.PyModule)
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
     module = pymod.modulepath.get('py')
     assert module.fullname == 'py/2.0.0'
-    assert module.type == pymod.module.python
+    assert isinstance(module, pymod.module.PyModule)
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
     module = pymod.modulepath.get('tcl')
     assert module.fullname == 'tcl/1.0.0'
-    assert module.type == pymod.module.tcl
+    assert isinstance(module, pymod.module.TclModule)
     assert module.filename == os.path.join(d1, module.fullname)
 
     module = pymod.modulepath.get('ucc')
     assert module.fullname == 'ucc/2.0.0'
-    assert module.type == pymod.module.python
+    assert isinstance(module, pymod.module.PyModule)
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
     module = pymod.modulepath.get('ucc/1.0.0')
     assert module.fullname == 'ucc/1.0.0'
-    assert module.type == pymod.module.python
+    assert isinstance(module, pymod.module.PyModule)
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
     modules = pymod.modulepath.get(d1)
@@ -176,14 +176,14 @@ def test_modulepath_get(modules_path, mock_modulepath):
     # should grab d2, since it is higher in priority
     module = pymod.modulepath.get('ucc/1.0.0')
     assert module.fullname == 'ucc/1.0.0'
-    assert module.type == pymod.module.python
+    assert isinstance(module, pymod.module.PyModule)
     assert module.filename == os.path.join(d2, module.fullname + '.py')
 
     # use more of d1, to get its module
     f = os.path.join(d1, 'ucc/1.0.0')[-15:]
     module = pymod.modulepath.get(f)
     assert module.fullname == 'ucc/1.0.0'
-    assert module.type == pymod.module.python
+    assert isinstance(module, pymod.module.PyModule)
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
 
