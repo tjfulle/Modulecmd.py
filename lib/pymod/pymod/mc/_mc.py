@@ -10,6 +10,7 @@ import pymod.modulepath
 import llnl.util.tty as tty
 
 
+_loaded_modules = None
 _swapped_explicitly = []
 _swapped_on_version_change = []
 _swapped_on_family_update = []
@@ -22,7 +23,6 @@ __all__ = [
     'set_loaded_modules',
     'get_refcount',
     'set_refcount',
-    'get_cellar',
     'increment_refcount',
     'decrement_refcount',
     'swapped_explicitly',
@@ -57,47 +57,35 @@ def get_lm_names():
 
 
 def get_loaded_modules():
-    loaded_modules = []
-    for (fullname, filename, opts, his) in get_lm_cellar():
-        module = pymod.modulepath.get(filename)
-        module.his = his
-        assert module.fullname == fullname
-        if opts and not module.opts:
+    global _loaded_modules
+    if _loaded_modules is None:
+        _loaded_modules = []
+        lm_cellar = pymod.environ.get_list(pymod.names.loaded_module_cellar)
+        for (fullname, filename, opts, his) in lm_cellar:
+            module = pymod.modulepath.get(filename)
+            assert module.fullname == fullname
+            module.his = his
             module.opts = opts
-        loaded_modules.append(module)
-    return loaded_modules
+            _loaded_modules.append(module)
+    # return copy so that no one else can modify the loaded modules
+    return list(_loaded_modules)
 
 
 def set_loaded_modules(modules):
     """Set environment variables for loaded module names and files"""
-    set_lm_cellar(modules)
+    global _loaded_modules
+    _loaded_modules = modules
 
-    # The following are for compatibility with other module programs
-    lm_names = [m.fullname for m in modules]
-    pymod.environ.set_path(pymod.names.loaded_modules, lm_names)
-
-    lm_files = [m.filename for m in modules]
-    pymod.environ.set_path(pymod.names.loaded_module_files, lm_files)
-
-
-def get_lm_cellar():
-    return pymod.environ.get_list(pymod.names.loaded_module_cellar)
-
-
-def set_lm_cellar(modules):
-    assert all([m.his is not None for m in modules])
-    lm = [(m.fullname, m.filename, m.opts, m.his) for m in modules]
+    assert all([m.his is not None for m in _loaded_modules])
+    lm = [(m.fullname, m.filename, m.opts, m.his) for m in _loaded_modules]
     pymod.environ.set_list(pymod.names.loaded_module_cellar, lm)
 
+    # The following are for compatibility with other module programs
+    lm_names = [m.fullname for m in _loaded_modules]
+    pymod.environ.set_path(pymod.names.loaded_modules, lm_names)
 
-def get_cellar():
-    lm_cellar = []
-    class Namespace: pass
-    for item in get_lm_cellar():
-        ns = Namespace()
-        ns.fullname, ns.filnae, ns.opts, ns.his = item
-        lm_cellar.append(ns)
-    return lm_cellar
+    lm_files = [m.filename for m in _loaded_modules]
+    pymod.environ.set_path(pymod.names.loaded_module_files, lm_files)
 
 
 def get_lm_refcount():
@@ -160,7 +148,8 @@ def register_module(module):
         set_loaded_modules(loaded_modules)
         increment_refcount(module)
     elif pymod.config.get('debug'):  # pragma: no cover
-        tty.die('register_module called for a module that is already loaded!')
+        tty.die('Attempting to register {0} which is already loaded!'
+                .format(module))
 
 
 def unregister_module(module):
@@ -171,14 +160,14 @@ def unregister_module(module):
     # "unusing" a directory on the MODULEPATH which has loaded modules.
     # Those modules are automaically unloaded since they are no longer
     # available.
-    loaded_modules = []
-    for (fullname, filename, opts, his) in get_lm_cellar():
-        if module.filename == filename:
-            continue
-        other = pymod.modulepath.get(filename)
-        other.his = his
-        other.opts = opts
-        loaded_modules.append(other)
+    loaded_modules = get_loaded_modules()
+    for (i, loaded) in enumerate(loaded_modules):
+        if loaded.filename == module.filename:
+            break
+    else:  # pragma: no cover
+        tty.die('Attempting to unregister {0} which is not loaded!'
+                .format(module))
+    loaded_modules.pop(i)
     set_loaded_modules(loaded_modules)
     pop_refcount(module)
 

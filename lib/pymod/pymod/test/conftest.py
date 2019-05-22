@@ -19,12 +19,15 @@ def os_environ():
     os.environ.pop(pymod.names.loaded_module_files, None)
     os.environ.pop(pymod.names.loaded_module_refcount, None)
     os.environ.pop(pymod.names.loaded_module_cellar, None)
+    os.environ.pop(pymod.names.loaded_module_refcount, None)
     os.environ.pop(pymod.names.config_file_envar, None)
+    os.environ.pop(pymod.names.sourced_files, None)
     to_pop = []
+    keys_to_pop = (pymod.names.loaded_module_meta(''), pymod.names.family_name(''))
     for (key, val) in os.environ.items():
         if 'pymod' in key.lower():
             to_pop.append(key)
-        elif key.startswith(('MODULE_FAMILY_', '_LMMETA_')):
+        elif key.startswith(keys_to_pop):
             to_pop.append(key)
     for key in to_pop:
         os.environ.pop(key, None)
@@ -43,7 +46,8 @@ def pymod_environ():
 
 
 @pytest.fixture(scope='function', autouse=True)
-def pymod_swapped_state_reset():
+def pymod_global_state_reset():
+    pymod.mc._mc._loaded_modules = None
     pymod.mc._mc._swapped_explicitly = []
     pymod.mc._mc._swapped_on_version_change = []
     pymod.mc._mc._swapped_on_family_update = []

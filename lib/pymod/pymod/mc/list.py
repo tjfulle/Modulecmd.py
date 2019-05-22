@@ -6,26 +6,27 @@ from llnl.util.tty.colify import colified
 
 
 def list(terse=False, show_command=False, regex=None):
-    lm_cellar = pymod.mc.get_cellar()
-    if not lm_cellar:
+    loaded_modules = pymod.mc.get_loaded_modules()
+    if not loaded_modules:
         return 'No loaded modules\n'
 
     sio = StringIO()
-    loaded_modules = []
-    for item in lm_cellar:
-        fullname = item.fullname
-        if item.opts:
-            fullname += ' ' + ' '.join(item.opts)
-        loaded_modules.append(fullname)
+    loaded_module_names = []
+    for loaded in loaded_modules:
+        fullname = loaded.fullname
+        if loaded.opts:
+            fullname += ' ' + ' '.join(loaded.opts)
+        loaded_module_names.append(fullname)
 
     if terse:
-        sio.write('\n'.join(loaded_modules))
+        sio.write('\n'.join(loaded_module_names))
     elif show_command:
-        for module in loaded_modules:
+        for module in loaded_module_names:
             sio.write('module load {0}\n'.format(module))
     else:
         sio.write('Currently loaded modules\n')
-        loaded = ['{0}) {1}'.format(i+1, m) for i, m in enumerate(loaded_modules)]
+        loaded = ['{0}) {1}'.format(i+1, m)
+                  for (i, m) in enumerate(loaded_module_names)]
         _, width = terminal_size()
         sio.write(colified(loaded, indent=4, width=max(100, width)))
 
