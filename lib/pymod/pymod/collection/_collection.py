@@ -26,7 +26,7 @@ class Collections:
             obj = dict(json.load(open(filename)))
             version = obj.get('Version')
             version = version if version is None else tuple(version)
-            if version != Collections.version:
+            if version != Collections.version: # pragma: no cover
                 return self.upgrade(version, obj)
             else:
                 return dict(obj['Collections'])
@@ -115,21 +115,52 @@ class Collections:
 
         return sio.getvalue()
 
-    def upgrade(self, version, old_collections):  # pragma: no cover
+    def upgrade(self, version, old_collections, depth=[0]):  # pragma: no cover
         import pymod.modulepath
+        depth[0] += 1
+        if depth[0] > 1:
+            raise ValueError('Recursion!')
         if version is None:
             new_collections = {}
             mp = pymod.modulepath.Modulepath([])
             for (name, old_collection) in old_collections.items():
                 new_collection = OrderedDict()
                 for (path, m_descs) in old_collection:
-                    mp.append_path(path)
+                    if new_collection is None:
+                        break
+                    if not os.path.isdir(path):
+                        tty.warn(
+                            'Collection {0} contains directory {1} which '
+                            'does not exist!  This collection will be skipped'
+                            .format(name, path))
+                        new_collection = None
+                        break
+                    avail = mp.append_path(path)
+                    if avail is None:
+                        tty.warn(
+                            'Collection {0} contains directory {1} which '
+                            'does not have any available modules!  '
+                            'This collection will be skipped'
+                            .format(name, path))
+                        new_collection = None
+                        break
                     for (fullname, filename, opts) in m_descs:
-                        module = mp.get(filename)
-                        module.opts = opts
-                        module.acquired_as = module.fullname
-                        ar = pymod.mc.archive_module(module)
-                        new_collection.setdefault(module.modulepath, []).append(ar)
+                        m = mp.get(filename)
+                        if m is None:
+                            tty.warn(
+                                'Collection {0} requests module {1} which '
+                                'can not be found! This collection will be skipped'
+                                .format(name, fullname))
+                            new_collection = None
+                            break
+                        m.opts = opts
+                        m.acquired_as = m.fullname
+                        ar = pymod.mc.archive_module(m)
+                        new_collection.setdefault(m.modulepath, []).append(ar)
+
+                if new_collection is None:
+                    continue
+
                 new_collections[name] = list(new_collection.items())
 
             bak = self.filename + '.bak'

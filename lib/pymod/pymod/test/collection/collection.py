@@ -109,14 +109,19 @@ def test_collection_bad(tmpdir):
     f = tmpdir.join('collections.json')
     collections = pymod.collection.Collections(f.strpath)
 
-    # existing file: okay
+    # empty file: okay
     f = tmpdir.join('collections.json')
     f.write('{}')
     collections = pymod.collection.Collections(f.strpath)
 
+    # existing file: okay
+    f = tmpdir.join('collections.json')
+    f.write('{"Version": [1,0], "Collections": []}')
+    collections = pymod.collection.Collections(f.strpath)
+
     # badly formatted file: not okay
     f = tmpdir.join('f.json')
-    f.write('{"default": ')
+    f.write('{"Version": [1,0], "Collections": ["default":]}')
     try:
         from json.decoder import JSONDecodeError as error_type
     except ImportError:
