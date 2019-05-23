@@ -55,6 +55,7 @@ def test_environ_prepend_path():
     pymod.environ.prepend_path(name, 'bar')
     pymod.environ.prepend_path(name, 'baz')
     assert pymod.environ.environ[name] == 'baz:bar:foo'
+    assert pymod.environ.get_path(name) == ['baz', 'bar', 'foo']
 
 
 def test_environ_modulepath_ops():
@@ -110,3 +111,25 @@ def test_environ_set_env():
     env.set('A', '1')
     pymod.environ.set_env(env)
     assert pymod.environ.get('A') == '1'
+
+
+def test_environ_set_dict():
+    pymod.environ.set_dict('A', {0: 1})
+    assert pymod.environ.get_dict('A') == {0: 1}
+
+
+def test_environ_set_list():
+    pymod.environ.set_list('A', [0, 1])
+    assert pymod.environ.get_list('A') == [0, 1]
+
+
+def test_environ_set_get_path():
+    assert pymod.environ.is_empty()
+    path = ['baz', 'bar']
+    pymod.environ.set_path('A', path)
+    assert pymod.environ.get('A') == 'baz:bar'
+    assert pymod.environ.get_path('A') == ['baz', 'bar']
+
+    pymod.environ.set_path('A', path, sep='@')
+    assert pymod.environ.get('A') == 'baz@bar'
+    assert pymod.environ.get_path('A', sep='@') == ['baz', 'bar']
