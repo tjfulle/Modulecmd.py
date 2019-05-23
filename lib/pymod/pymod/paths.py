@@ -49,6 +49,12 @@ user_config_path          = os.getenv('PYMOD_CONFIG_DIR', os.path.expanduser('~/
 user_config_platform_path = os.getenv('PYMOD_CONFIG_PLATFORM_DIR',
                                       os.path.join(user_config_path, sys.platform.lower()))
 
+if not os.path.isdir(user_config_path):  # pragma: no cover
+    os.makedirs(user_config_path)
+
+if not os.path.isdir(user_config_platform_path):  # pragma: no cover
+    os.makedirs(user_config_platform_path)
+
 
 del os
 del sys
