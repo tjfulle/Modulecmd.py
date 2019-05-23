@@ -22,7 +22,6 @@ __all__ = [
     'get_loaded_modules',
     'set_loaded_modules',
     'get_refcount',
-    'set_refcount',
     'increment_refcount',
     'decrement_refcount',
     'swapped_explicitly',
@@ -61,15 +60,32 @@ def get_loaded_modules():
     if _loaded_modules is None:
         _loaded_modules = []
         lm_cellar = pymod.environ.get_list(pymod.names.loaded_module_cellar)
-        for item in lm_cellar:
-            module = pymod.modulepath.get(item['filename'])
-            assert module.fullname == item['fullname']
-            module.family = item['family']
-            module.opts = item['opts']
-            module.acquired_as = item['acquired_as']
+        for ar in lm_cellar:
+            module = unarchive_module(ar)
             _loaded_modules.append(module)
     # return copy so that no one else can modify the loaded modules
     return list(_loaded_modules)
+
+
+def archive_module(module):
+    return dict(fullname=module.fullname,
+                filename=module.filename,
+                family=module.family,
+                opts=module.opts,
+                acquired_as=module.acquired_as,
+                ref_count=module.ref_count)
+
+
+def unarchive_module(ar):
+    module = pymod.modulepath.get(ar['filename'])
+    if module is None:
+        raise pymod.error.ModuleNotFoundError(ar['fullname'])
+    assert module.fullname == ar['fullname']
+    module.family = ar['family']
+    module.opts = ar['opts']
+    module.acquired_as = ar['acquired_as']
+    module.ref_count = ar['ref_count']
+    return module
 
 
 def set_loaded_modules(modules):
@@ -78,9 +94,7 @@ def set_loaded_modules(modules):
     _loaded_modules = modules
 
     assert all([m.acquired_as is not None for m in _loaded_modules])
-    lm = [dict(fullname=m.fullname, filename=m.filename,
-               family=m.family, opts=m.opts, acquired_as=m.acquired_as)
-          for m in _loaded_modules]
+    lm = [archive_module(m) for m in _loaded_modules]
     pymod.environ.set_list(pymod.names.loaded_module_cellar, lm)
 
     # The following are for compatibility with other module programs
@@ -112,15 +126,6 @@ def pop_refcount(module):
     set_lm_refcount(lm_refcount)
 
 
-def set_refcount(module, count):  # pragma: no cover
-    name = module.fullname
-    lm_refcount = get_lm_refcount()
-    lm_refcount[name] = count
-    if not lm_refcount[name]:
-        lm_refcount.pop(name)
-    set_lm_refcount(lm_refcount)
-
-
 def increment_refcount(module):
     name = module.fullname
     lm_refcount = get_lm_refcount()
@@ -128,7 +133,7 @@ def increment_refcount(module):
     set_lm_refcount(lm_refcount)
 
 
-def decrement_refcount(module, count=None):
+def decrement_refcount(module):
     name = module.fullname
     lm_refcount = get_lm_refcount()
     lm_refcount[name] = lm_refcount.pop(name, 1) - 1

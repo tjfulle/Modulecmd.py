@@ -51,7 +51,7 @@ def test_mc_decrement_refcount(tmpdir, mock_modulepath):
 def test_mc_refcount(tmpdir, mock_modulepath):
     tmpdir.join('a.py').write('')
     a = module(tmpdir.strpath, 'a.py')
-    pymod.mc.set_refcount(a, 1)
+    pymod.mc.increment_refcount(a)
     count = pymod.mc.get_refcount(a)
     assert count == 1
 

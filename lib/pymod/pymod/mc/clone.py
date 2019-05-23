@@ -70,14 +70,12 @@ def restore_clone(name):
     # Load modules to make sure aliases/functions are restored
     loaded_modules = []
     lm_cellar = str_to_list(the_clone[pymod.names.loaded_module_cellar])
-    for item in lm_cellar:
-        module = pymod.modulepath.get(item['filename'])
-        if module is None:
+    for ar in lm_cellar:
+        try:
+            module = pymod.mc._mc.unarchive_module(ar)
+        except ModuleNotFoundError:
             raise pymod.error.ModuleNotFoundError(
-                item['filename'], mp=pymod.modulepath)
-        module.family = item['family']
-        module.opts = item['opts']
-        module.acquired_as = item['acquired_as']
+                ar['filename'], mp=pymod.modulepath)
         loaded_modules.append(module)
     pymod.mc.set_loaded_modules(loaded_modules)
 

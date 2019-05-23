@@ -49,6 +49,7 @@ class Module(object):
         self._unlocks = []
         self.marked_as_default = False
         self._acquired_as = None  # How the module was initially loaded
+        self.ref_count = 0
 
     def __str__(self):
         return 'Module(name={0})'.format(self.fullname)
