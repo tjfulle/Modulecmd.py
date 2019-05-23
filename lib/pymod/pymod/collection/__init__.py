@@ -46,3 +46,7 @@ def is_collection(name):
 
 def contains(name):
     return is_collection(name)
+
+
+def version():
+    return Collections.version

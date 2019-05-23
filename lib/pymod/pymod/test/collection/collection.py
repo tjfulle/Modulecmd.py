@@ -9,6 +9,7 @@ import pymod.collection
 
 @pytest.fixture(scope='function', autouse=True)
 def collection(tmpdir):
+    assert pymod.collection.version() == (1, 0), 'Wrong collection version!'
     real_collection = pymod.collection.collections
     filename = os.path.join(tmpdir.strpath, 'collections.json')
     pymod.collection.collections = pymod.collection.Collections(filename)
@@ -32,7 +33,6 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 def test_collection_default(modules_path, mock_modulepath):
-
     mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
