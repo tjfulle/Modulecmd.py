@@ -71,11 +71,7 @@ def restore_clone(name):
     loaded_modules = []
     lm_cellar = str_to_list(the_clone[pymod.names.loaded_module_cellar])
     for ar in lm_cellar:
-        try:
-            module = pymod.mc._mc.unarchive_module(ar)
-        except ModuleNotFoundError:
-            raise pymod.error.ModuleNotFoundError(
-                ar['filename'], mp=pymod.modulepath)
+        module = pymod.mc._mc.unarchive_module(ar)
         loaded_modules.append(module)
     pymod.mc.set_loaded_modules(loaded_modules)
 
