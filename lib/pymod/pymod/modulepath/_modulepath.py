@@ -204,9 +204,9 @@ class Modulepath:
 
     def colorize(self, string):
         """Colorize item for output to console"""
-        D = '(' + colorize('@g{D}') + ')'
-        L = '(' + colorize('@m{L}') + ')'
-        DL = '(' + colorize('@g{D}') + ',' + colorize('@m{L}') + ')'
+        D = '(%s)' % colorize('@R{D}')
+        L = '(%s)' % colorize('@G{L}')
+        DL = '(%s,%s)' % (colorize('@R{D}'), colorize('@G{L}'))
         colorized = string.replace('(D)', D)
         colorized = colorized.replace('(L)', L)
         colorized = colorized.replace('(D,L)', DL)

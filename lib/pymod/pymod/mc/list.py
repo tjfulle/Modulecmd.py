@@ -32,6 +32,6 @@ def list(terse=False, show_command=False, regex=None):
 
     s = sio.getvalue()
     if regex:
-        s = grep_pat_in_string(s, regex)
+        s = grep_pat_in_string(s, regex, color='G')
 
     return s
