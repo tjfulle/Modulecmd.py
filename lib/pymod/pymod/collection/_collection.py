@@ -121,10 +121,13 @@ class Collections:
         if depth[0] > 1:
             raise ValueError('Recursion!')
         if version is None:
+            version_string = '.'.join(str(_) for _ in self.version)
+            tty.info('Converting Modulecmd.py collections version 0.0 to '
+                     'version {0}'.format(version_string))
             new_collections = {}
-            mp = pymod.modulepath.Modulepath([])
             for (name, old_collection) in old_collections.items():
                 new_collection = OrderedDict()
+                mp = pymod.modulepath.Modulepath([])
                 for (path, m_descs) in old_collection:
                     if new_collection is None:
                         break
@@ -159,6 +162,9 @@ class Collections:
                         new_collection.setdefault(m.modulepath, []).append(ar)
 
                 if new_collection is None:
+                    tty.warn(
+                        'Skipping collection {0} because of previous '
+                        'errors'.format(name))
                     continue
 
                 new_collections[name] = list(new_collection.items())
