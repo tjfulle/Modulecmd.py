@@ -71,13 +71,13 @@ def restore_clone(name):
     loaded_modules = []
     lm_cellar = str_to_list(the_clone[pymod.names.loaded_module_cellar])
     for item in lm_cellar:
-        fullname, filename, family, opts, his = item
-        module = pymod.modulepath.get(filename)
+        module = pymod.modulepath.get(item['filename'])
         if module is None:
-            raise pymod.error.ModuleNotFoundError(filename, mp=pymod.modulepath)
-        module.family = family
-        module.opts = opts
-        module.his = his
+            raise pymod.error.ModuleNotFoundError(
+                item['filename'], mp=pymod.modulepath)
+        module.family = item['family']
+        module.opts = item['opts']
+        module.acquired_as = item['acquired_as']
         loaded_modules.append(module)
     pymod.mc.set_loaded_modules(loaded_modules)
 

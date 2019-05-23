@@ -64,31 +64,28 @@ class Modulepath:
                filename ends with `key`.
 
         """
-        if isinstance(key, pymod.module.Module):
-            key.his = pymod.module.acqby_self
-            return key
-        elif os.path.isdir(key) and key in self:
+        if os.path.isdir(key) and key in self:
             return self.getby_dirname(key)
         if os.path.isfile(key):
             module = self.getby_filename(key)
             if module is not None:
-                module.his = pymod.module.acqby_filename
+                module.acquired_as = module.filename
             return module
         parts = key.split(os.path.sep)
         if len(parts) == 1:
             # with length of 1, it must be a name
             module = self.defaults.get(key)
             if module is not None:
-                module.his = pymod.module.acqby_name
+                module.acquired_as = module.name
             return module
         else:
             for path in self.path:
                 for module in path.modules:
                     if module.fullname == key:
-                        module.his = pymod.module.acqby_fullname
+                        module.acquired_as = key
                         return module
                     elif module.endswith(key):
-                        module.his = pymod.module.acqby_path
+                        module.acquired_as = key
                         return module
         return None
 

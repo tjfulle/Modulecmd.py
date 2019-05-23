@@ -177,7 +177,7 @@ def test_mc_hierarchy_2(modules_path, mock_modulepath):
     mpi_module_name = os.path.sep.join((mpi_vendor, mpi_ver))
     mpi = pymod.mc.load(mpi_module_name)
     assert mpi is not None
-    assert mpi.his == pymod.module.acqby_fullname
+    assert mpi.acquired_as == mpi.fullname
 
     mpi_unlocks_dir = _mpi_unlocks_dir(
         compiler_vendor, compiler_ver, mpi_vendor, mpi_ver)
@@ -193,7 +193,7 @@ def test_mc_hierarchy_2(modules_path, mock_modulepath):
     # updated automatically
     compiler_ver = compiler_versions[1]
     compiler_module_name = os.path.sep.join((compiler_vendor, compiler_ver))
-    assert mpi.his == pymod.module.acqby_fullname
+    assert mpi.acquired_as == mpi.fullname
     compiler = pymod.mc.load(compiler_module_name)
     assert compiler is not None
     compiler_unlocks_dir = _compiler_unlocks_dir(compiler_vendor, compiler_ver)

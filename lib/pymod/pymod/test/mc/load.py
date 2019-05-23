@@ -245,8 +245,9 @@ def test_mc_load_bad_callback(tmpdir, mock_modulepath):
 
     # Now hack the thing
     a = pymod.modulepath.get('a')
-    a.his = pymod.module.acqby_name
-    lm_cellar = [(a.fullname, a.filename, a.family, a.opts, a.his)]
+    a.acquired_as = a.name
+    lm_cellar = [dict(fullname=a.fullname, filename=a.filename,
+                      family=a.family, opts=a.opts, acquired_as=a.acquired_as)]
     pymod.environ.set_list(pymod.names.loaded_module_cellar, lm_cellar)
     pymod.mc._mc._loaded_modules = [a]
 

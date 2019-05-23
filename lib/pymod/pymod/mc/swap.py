@@ -17,7 +17,7 @@ def swap(module_a_name, module_b_name, caller='command_line'):
         tty.warn('{0} is already loaded!'.format(module_b.fullname))
         return module_b
     if not module_a.is_loaded:
-        return pymod.mc.load(module_b)
+        return pymod.mc.load_impl(module_b)
 
     assert module_a.is_loaded
 
@@ -74,10 +74,8 @@ def swap_impl(module_a, module_b, maintain_state=False, caller='command_line'):
     for other in to_unload_and_reload[1:]:
         if maintain_state:
             this_module = pymod.modulepath.get(other.filename)
-        elif other.his == pymod.module.acqby_fullname:
-            this_module = pymod.modulepath.get(other.fullname)
         else:
-            this_module = pymod.modulepath.get(other.name)
+            this_module = pymod.modulepath.get(other.acquired_as)
         if this_module is None:
             # The only way this_module is None is if a swap of modules
             # caused a change to MODULEPATH making this module

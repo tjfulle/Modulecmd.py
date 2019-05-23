@@ -16,13 +16,6 @@ from llnl.util.tty import terminal_size
 from pymod.module.argument_parser import ModuleArgumentParser
 
 
-acqby_name = 1
-acqby_fullname = 2
-acqby_filename = 3
-acqby_path = 4
-acqby_self = 5
-
-
 # --------------------------------------------------------------------------- #
 # --------------------------- MODULE CLASS ---------------------------------- #
 # --------------------------------------------------------------------------- #
@@ -55,7 +48,7 @@ class Module(object):
         self._opts = None
         self._unlocks = []
         self.marked_as_default = False
-        self._his = None  # How the module was initially loaded
+        self._acquired_as = None  # How the module was initially loaded
 
     def __str__(self):
         return 'Module(name={0})'.format(self.fullname)
@@ -81,14 +74,16 @@ class Module(object):
         return False
 
     @property
-    def his(self):
-        return self._his
+    def acquired_as(self):
+        return self._acquired_as
 
-    @his.setter
-    def his(self, arg):
-        assert arg in (acqby_name, acqby_fullname,
-                       acqby_filename, acqby_path, acqby_self)
-        self._his = arg
+    @acquired_as.setter
+    def acquired_as(self, arg):
+        assert (arg == self.filename or
+                arg == self.name or
+                arg == self.fullname or
+                arg.endswith(self.fullname))
+        self._acquired_as = arg
 
     def endswith(self, string):
         return self.filename.endswith(string)

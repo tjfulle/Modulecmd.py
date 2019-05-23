@@ -217,7 +217,7 @@ def test_mc_swap_use_5(tmpdir, mock_modulepath):
 
     foo_module = pymod.mc.load('foo')
     foo_a = pymod.mc.load('a/1.0')
-    assert foo_a.his == pymod.module.acqby_fullname
+    assert foo_a.acquired_as == foo_a.fullname
 
     baz_module = pymod.modulepath.get('baz')
     # Since a's name+version was used to load it, the module a will be

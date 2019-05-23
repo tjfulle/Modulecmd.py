@@ -126,17 +126,17 @@ def test_tcl_unit(tcl_module_path, mock_modulepath):
     assert a2.fullname == 'a/2.0'
     assert isinstance(a2, pymod.module.TclModule)
 
-    pymod.mc.load(tcl)
+    pymod.mc.load_impl(tcl)
     assert pymod.environ.environ['path'] == '/a/path:/b/path'
     assert pymod.environ.environ['ENVAR'] == 'tcl/1.0'
     assert pymod.environ.environ.aliases['foo'] == 'BAR'
 
-    pymod.mc.load(a1)
+    pymod.mc.load_impl(a1)
     assert pymod.environ.environ['path'] == '/a/path:/b/path:/c/path'
     assert pymod.environ.environ['ENVAR'] == 'a/1.0'
     assert pymod.environ.environ.aliases['foo'] == 'BAZ'
 
-    pymod.mc.load(a2)
+    pymod.mc.load_impl(a2)
     assert pymod.environ.environ['path'] == '/a/path:/b/path:/d/path'
     assert pymod.environ.environ['ENVAR'] == 'a/2.0'
     assert pymod.environ.environ.aliases['foo'] == 'SPAM'

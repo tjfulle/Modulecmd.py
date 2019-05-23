@@ -117,10 +117,7 @@ def load_inserted_impl(module, insert_at):
     # Reload any that need to be unloaded first
     for (i, other) in enumerate(to_unload_and_reload):
         assert not other.is_loaded
-        if other.his == pymod.module.acqby_fullname:
-            other_module = pymod.modulepath.get(other.fullname)
-        else:
-            other_module = pymod.modulepath.get(other.name)
+        other_module = pymod.modulepath.get(other.acquired_as)
         if other_module is None:
             # The only way this_module is None is if inserting caused a change
             # to MODULEPATH making this module unavailable.

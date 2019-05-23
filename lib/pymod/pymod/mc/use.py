@@ -22,7 +22,7 @@ def use(dirname, append=False, delete=False):
         bumped = determine_swaps_due_to_prepend(prepended_modules)
         for (old, new) in bumped:
             assert old.is_loaded
-            new.his = old.his
+            new.acquired_as = old.acquired_as
             pymod.mc.swap_impl(old, new)
             pymod.mc.swapped_on_mp_change(old, new)
         return bumped

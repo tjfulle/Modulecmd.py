@@ -64,12 +64,12 @@ def test_mc_family_xyz(modules_path, mock_modulepath, get_loaded_modules):
 
     a1 = pymod.modulepath.get('A/1.0')
     assert a1 is not None
-    pymod.mc.load(a1)
+    pymod.mc.load_impl(a1)
     standard_assertions(a1)
 
     a2 = pymod.modulepath.get('A/2.0')
     assert a2 is not None
-    pymod.mc.load(a2)
+    pymod.mc.load_impl(a2)
     standard_assertions(a2)
 
     old, new = pymod.mc._mc._swapped_on_version_change[0]
@@ -78,7 +78,7 @@ def test_mc_family_xyz(modules_path, mock_modulepath, get_loaded_modules):
 
     b1 = pymod.modulepath.get('B/1.0')
     assert b1 is not None
-    pymod.mc.load(b1)
+    pymod.mc.load_impl(b1)
     standard_assertions(b1)
 
     old, new = pymod.mc._mc._swapped_on_family_update[0]
@@ -87,7 +87,7 @@ def test_mc_family_xyz(modules_path, mock_modulepath, get_loaded_modules):
 
     b2 = pymod.modulepath.get('B/2.0')
     assert b2 is not None
-    pymod.mc.load(b2)
+    pymod.mc.load_impl(b2)
     standard_assertions(b2)
 
     old, new = pymod.mc._mc._swapped_on_version_change[1]
