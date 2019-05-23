@@ -13,55 +13,51 @@ from llnl.util.tty.colify import colified
 """Manages a collection of modules"""
 
 class Collections:
-
+    version = (1, 0)
     def __init__(self, filename):
         self.filename = filename
-        self.collections = self.read(filename)
+        self.data = self.read(filename)
 
     def __contains__(self, collection_name):
-        return collection_name in self.collections
+        return collection_name in self.data
 
-    @staticmethod
-    def read(filename):
+    def read(self, filename):
         if os.path.isfile(filename):
-            return OrderedDict(json.load(open(filename)))
-        return OrderedDict()
+            obj = dict(json.load(open(filename)))
+            version = obj.get('Version')
+            version = version if version is None else tuple(version)
+            if version != Collections.version:
+                return self.upgrade(version, obj)
+            else:
+                return dict(obj['Collections'])
+        return dict()
 
-    def write(self, obj, filename):
+    def write(self, collections, filename):
         if pymod.config.get('dryrun'):  # pragma: no cover
             sys.stderr.write(json.dumps(obj))
         else:
+            obj = {'Version': self.version, 'Collections': collections}
             with open(filename, 'w') as fh:
                 json.dump(obj, fh, indent=2)
         return
 
-    def save(self, name, modules, local=False):
+    def save(self, name, modules):
         collection = OrderedDict()
         for module in modules:
-            m_desc = [module.fullname, module.filename, module.opts]
-            collection.setdefault(module.modulepath, []).append(m_desc)
+            ar = pymod.mc.archive_module(module)
+            ar['refcount'] = 0
+            collection.setdefault(module.modulepath, []).append(ar)
         collection = list(collection.items())
-        if local:  # pragma: no cover
-            self.write({'collection': collection},
-                       filename=name+'.collection')
-        else:
-            self.collections.update({name: collection})
-            self.write(self.collections, self.filename)
+        self.data.update({name: collection})
+        self.write(self.data, self.filename)
         return None
 
     def get(self, name):
-        collection = None
-        if os.path.isfile(name): # pragma: no cover
-            collection = self.read(name).get('collection')
-        elif os.path.isfile(name+'.collection'): # pragma: no cover
-            collection = self.read(name+'.collection').get('collection')
-        else:
-            collection = self.collections.get(name)
-        return collection
+        return self.data.get(name)
 
     def remove(self, name):
-        self.collections.pop(name, None)
-        self.write(self.collections, self.filename)
+        self.data.pop(name, None)
+        self.write(self.data, self.filename)
 
     def filter_collections_by_regex(self, collections, regex):
         if regex:
@@ -70,7 +66,7 @@ class Collections:
 
     def format_available(self, terse=False, regex=None):
         skip = (pymod.names.default_user_collection,)
-        names = sorted([x for x in self.collections if x not in skip])
+        names = sorted([x for x in self.data if x not in skip])
 
         if regex:
             names = self.filter_collections_by_regex(names, regex)
@@ -102,13 +98,15 @@ class Collections:
             return
 
         sio = StringIO()
-        loaded_modules = pymod.environ.get_path(pymod.names.loaded_modules)
+        loaded_modules = pymod.mc.get_loaded_modules()
         for m in loaded_modules[::-1]:
-            sio.write('unload({0!r})\n'.format(m))
+            sio.write('unload({0!r})\n'.format(m.fullname))
 
-        for (directory, modules) in collection:
+        for (directory, archives) in collection:
             sio.write('use({0!r})\n'.format(directory))
-            for (name, _, opts) in modules:
+            for ar in archives:
+                name = ar['fullname']
+                opts = ar['opts']
                 if opts:
                     s = 'load({0!r}, options={1!r})'.format(name, opts)
                 else:
@@ -116,3 +114,31 @@ class Collections:
                 sio.write(s + '\n')
 
         return sio.getvalue()
+
+    def upgrade(self, version, old_collections):  # pragma: no cover
+        import pymod.modulepath
+        if version is None:
+            new_collections = {}
+            mp = pymod.modulepath.Modulepath([])
+            for (name, old_collection) in old_collections.items():
+                new_collection = OrderedDict()
+                for (path, m_descs) in old_collection:
+                    mp.append_path(path)
+                    for (fullname, filename, opts) in m_descs:
+                        module = mp.get(filename)
+                        module.opts = opts
+                        module.acquired_as = module.fullname
+                        ar = pymod.mc.archive_module(module)
+                        new_collection.setdefault(module.modulepath, []).append(ar)
+                new_collections[name] = list(new_collection.items())
+
+            bak = self.filename + '.bak'
+            with open(bak, 'w') as fh:
+                json.dump(old_collections, fh, indent=2)
+
+            self.write(list(new_collections.items()), self.filename)
+            return new_collections
+
+        elif version != self.version:
+            raise ValueError('No known conversion from Collections version '
+                             '{0} to {1}'.format(version, self.version))

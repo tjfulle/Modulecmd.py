@@ -43,8 +43,9 @@ def test_collection_default(modules_path, mock_modulepath):
     assert len(x[0]) == 2
     assert len(x[0][1]) == 2
     assert x[0][0] == pymod.modulepath._path.path[0].path
-    assert x[0][1][0][0] == 'a'
-    assert x[0][1][1][0] == 'b'
+    coll = x[0][1]
+    assert coll[0]['fullname'] == 'a'
+    assert coll[1]['fullname'] == 'b'
     s = pymod.collection.format_available().split('\n')[1].strip()
     assert s == '(None)'
 
@@ -65,14 +66,18 @@ def test_collection_named(modules_path, mock_modulepath):
     assert len(x[0]) == 2
     assert len(x[0][1]) == 2
     assert x[0][0] == pymod.modulepath._path.path[0].path
-    assert x[0][1][0][0] == 'a'
-    assert x[0][1][1][0] == 'b'
+
+    coll = x[0][1]
+    assert coll[0]['fullname'] == 'a'
+    assert coll[1]['fullname'] == 'b'
 
     assert len(x[1]) == 2
     assert len(x[1][1]) == 2
     assert x[1][0] == pymod.modulepath._path.path[1].path
-    assert x[1][1][0][0] == 'c'
-    assert x[1][1][1][0] == 'd'
+
+    coll = x[1][1]
+    assert coll[0]['fullname'] == 'c'
+    assert coll[1]['fullname'] == 'd'
 
     s = pymod.collection.format_available().split('\n')[1].strip()
     assert s == 'foo'

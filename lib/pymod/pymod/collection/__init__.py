@@ -20,8 +20,8 @@ def _collections():
 collections = Singleton(_collections)
 
 
-def save(name, loaded_modules, local=False):
-    return collections.save(name, loaded_modules, local)
+def save(name, loaded_modules):
+    return collections.save(name, loaded_modules)
 
 
 def remove(name):

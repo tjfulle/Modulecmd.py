@@ -12,10 +12,10 @@ def setup_parser(subparser):
         'name', nargs='?',
         default=pymod.names.default_user_collection,
         help='Name of collection to save')
-    subparser.add_argument(
-        '--local', action='store_true', default=False,
-        help='Save the collection locally')
+#    subparser.add_argument(
+#        '--local', action='store_true', default=False,
+#        help='Save the collection locally')
 
 
 def save(parser, args):
-    pymod.mc.save(args.name, local=args.local)
+    pymod.mc.save(args.name) #, local=args.local)
