@@ -16,7 +16,7 @@ def test_mc_cellar(tmpdir, mock_modulepath):
     lm_cellar = []
     for name in names:
         m = pymod.modulepath.get(name)
-        ar = pymod.mc._mc.archive_module(m)
+        ar = pymod.mc.archive_module(m)
         lm_cellar.append(ar)
     pymod.environ.set_list(pymod.names.loaded_module_cellar, lm_cellar)
     loaded_modules = pymod.mc.get_loaded_modules()

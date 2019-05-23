@@ -25,7 +25,7 @@ def test_mc_reload_1(modules_path, mock_modulepath):
     pymod.mc.reload('a')
     assert pymod.environ.get('a') == 'a'
     # Reference count should not change
-    assert pymod.mc.get_refcount(a) == 1
+    assert a.refcount == 1
 
 
 def test_mc_reload_2(modules_path, mock_modulepath):
@@ -41,8 +41,8 @@ def test_mc_reload_2(modules_path, mock_modulepath):
     pymod.mc.reload('a')
     assert pymod.environ.get('a') == 'a'
     # Reference count should not change
-    assert pymod.mc.get_refcount(a) == 1
-    assert pymod.mc.get_refcount(b) == 1
+    assert a.refcount == 1
+    assert a.refcount == 1
 
 
 def test_mc_reload_3(modules_path, mock_modulepath):

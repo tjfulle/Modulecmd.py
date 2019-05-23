@@ -29,7 +29,7 @@ def test_command_reload_1(modules_path, mock_modulepath):
     assert pymod.environ.get('a') == 'a'
     # Reference count should not change
     a = pymod.modulepath.get('a')
-    assert pymod.mc.get_refcount(a) == 1
+    assert a.refcount == 1
 
 
 @pytest.mark.unit
@@ -48,5 +48,5 @@ def test_command_reload_2(modules_path, mock_modulepath):
     # Reference count should not change
     a = pymod.modulepath.get('a')
     b = pymod.modulepath.get('b')
-    assert pymod.mc.get_refcount(a) == 1
-    assert pymod.mc.get_refcount(b) == 1
+    assert a.refcount == 1
+    assert b.refcount == 1

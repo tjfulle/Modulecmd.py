@@ -49,7 +49,7 @@ class Module(object):
         self._unlocks = []
         self.marked_as_default = False
         self._acquired_as = None  # How the module was initially loaded
-        self.ref_count = 0
+        self._refcount = 0
 
     def __str__(self):
         return 'Module(name={0})'.format(self.fullname)
@@ -85,6 +85,18 @@ class Module(object):
                 arg == self.fullname or
                 arg.endswith(self.fullname))
         self._acquired_as = arg
+
+    @property
+    def refcount(self):
+        return self._refcount
+
+    @refcount.setter
+    def refcount(self, count):
+        if count < 0:
+            raise ValueError('Negative reference count for {0}.  This should '
+                             'never happen.  Please report this failure to '
+                             'the Modulecmd.py developers'.format(self))
+        self._refcount = count
 
     def endswith(self, string):
         return self.filename.endswith(string)

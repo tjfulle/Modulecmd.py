@@ -36,9 +36,8 @@ def unload_impl(module, caller='command_line'):
         if caller == 'command_line':
             raise ModuleNotLoadedError(module)
         return
-    refcount = pymod.mc.get_refcount(module)
 
-    if refcount == 1 or caller == 'command_line':
+    if module.refcount == 1 or caller == 'command_line':
         pymod.mc.execmodule(module, pymod.modes.unload)
         pymod.mc.unregister_module(module)
     else:

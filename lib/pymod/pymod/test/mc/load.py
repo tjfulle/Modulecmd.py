@@ -5,17 +5,16 @@ import pymod.environ
 from pymod.error import ModuleNotFoundError
 
 
-@pytest.fixture()
 def test_mc_load_1(tmpdir, mock_modulepath):
     """Just load and then unload a"""
     tmpdir.join('a.py').write('setenv("__AA__", "AA")')
     mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a')
-    assert pymod.mc.get_refcount(a) == 1
-    assert pymod.mc.get_refcount().get(a.fullname) == 1
+    assert a.refcount == 1
     assert pymod.environ.get('__AA__') == 'AA'
     pymod.mc.unload('a')
     assert pymod.environ.get('__AA__') is None
+    assert a.refcount == 0
 
 
 def test_mc_load_2(tmpdir, mock_modulepath):

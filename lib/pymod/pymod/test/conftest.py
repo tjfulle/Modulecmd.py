@@ -17,9 +17,7 @@ def os_environ():
     os.environ.pop(pymod.names.modulepath, None)
     os.environ.pop(pymod.names.loaded_modules, None)
     os.environ.pop(pymod.names.loaded_module_files, None)
-    os.environ.pop(pymod.names.loaded_module_refcount, None)
     os.environ.pop(pymod.names.loaded_module_cellar, None)
-    os.environ.pop(pymod.names.loaded_module_refcount, None)
     os.environ.pop(pymod.names.config_file_envar, None)
     os.environ.pop(pymod.names.sourced_files, None)
     to_pop = []

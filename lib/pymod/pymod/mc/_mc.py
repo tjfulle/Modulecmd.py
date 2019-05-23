@@ -21,7 +21,6 @@ _unloaded_on_mp_change = []
 __all__ = [
     'get_loaded_modules',
     'set_loaded_modules',
-    'get_refcount',
     'increment_refcount',
     'decrement_refcount',
     'swapped_explicitly',
@@ -32,6 +31,8 @@ __all__ = [
     'register_module',
     'unregister_module',
     'module_is_loaded',
+    'archive_module',
+    'unarchive_module',
 ]
 
 
@@ -65,7 +66,7 @@ def archive_module(module):
                 family=module.family,
                 opts=module.opts,
                 acquired_as=module.acquired_as,
-                ref_count=module.ref_count)
+                refcount=module.refcount)
 
 
 def unarchive_module(ar):
@@ -76,7 +77,7 @@ def unarchive_module(ar):
     module.family = ar['family']
     module.opts = ar['opts']
     module.acquired_as = ar['acquired_as']
-    module.ref_count = ar['ref_count']
+    module.refcount = ar['refcount']
     return module
 
 
@@ -97,41 +98,12 @@ def set_loaded_modules(modules):
     pymod.environ.set_path(pymod.names.loaded_module_files, lm_files)
 
 
-def get_lm_refcount():
-    return pymod.environ.get_dict(pymod.names.loaded_module_refcount)
-
-
-def set_lm_refcount(lm_refcount):
-    pymod.environ.set_dict(pymod.names.loaded_module_refcount, lm_refcount)
-
-
-def get_refcount(module=None):
-    refcount = get_lm_refcount()
-    if module is None:
-        return refcount
-    return refcount.get(module.fullname, 0)
-
-
-def pop_refcount(module):
-    lm_refcount = get_lm_refcount()
-    lm_refcount.pop(module.fullname, None)
-    set_lm_refcount(lm_refcount)
-
-
 def increment_refcount(module):
-    name = module.fullname
-    lm_refcount = get_lm_refcount()
-    lm_refcount[name] = lm_refcount.pop(name, 0) + 1
-    set_lm_refcount(lm_refcount)
+    module.refcount += 1
 
 
 def decrement_refcount(module):
-    name = module.fullname
-    lm_refcount = get_lm_refcount()
-    lm_refcount[name] = lm_refcount.pop(name, 1) - 1
-    if not lm_refcount[name]:
-        lm_refcount.pop(name)
-    set_lm_refcount(lm_refcount)
+    module.refcount -= 1
 
 
 def register_module(module):
@@ -168,8 +140,8 @@ def unregister_module(module):
         tty.die('Attempting to unregister {0} which is not loaded!'
                 .format(module))
     loaded_modules.pop(i)
+    module.refcount = 0
     set_loaded_modules(loaded_modules)
-    pop_refcount(module)
 
 
 def swapped_explicitly(old, new):
