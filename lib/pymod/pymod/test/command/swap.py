@@ -21,8 +21,8 @@ def test_command_swap(modules_path, mock_modulepath):
     swap = PymodCommand('swap')
     mock_modulepath(modules_path.one)
     load('a')
-    loaded = ''.join(pymod.mc._mc.get_lm_names())
+    loaded = ''.join(_.fullname for _ in pymod.mc.get_loaded_modules())
     assert loaded == 'a'
     swap('a', 'b')
-    loaded = ''.join(pymod.mc._mc.get_lm_names())
+    loaded = ''.join(_.fullname for _ in pymod.mc.get_loaded_modules())
     assert loaded == 'b'

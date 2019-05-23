@@ -31,7 +31,7 @@ def test_mc_clone(tmpdir, mock_modulepath):
     pymod.environ.environ['foo'] = None
     pymod.environ.environ['spam'] = None
     pymod.mc.restore_clone('the-clone')
-    modules = ''.join(sorted(pymod.mc._mc.get_lm_names()))
+    modules = ''.join(sorted([_.fullname for _ in pymod.mc.get_loaded_modules()]))
     assert modules == 'abc'
     assert pymod.environ.environ['foo'] == 'baz'
     assert pymod.environ.environ['spam'] == 'ham:bar'

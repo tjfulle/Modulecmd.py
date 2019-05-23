@@ -39,20 +39,12 @@ def module_is_loaded(key):
     if isinstance(key, pymod.module.Module):
         return key in get_loaded_modules()
     elif os.path.isfile(key):
-        return key in get_lm_files()
+        return key in [m.filename for m in get_loaded_modules()]
     else:
         for module in get_loaded_modules():
             if module.name == key or module.fullname == key:
                 return True
     return False
-
-
-def get_lm_files():
-    return pymod.environ.get_path(pymod.names.loaded_module_files)
-
-
-def get_lm_names():
-    return pymod.environ.get_path(pymod.names.loaded_modules)
 
 
 def get_loaded_modules():
@@ -227,9 +219,9 @@ def format_changed_module_state():
 
     # Report changes due to to change in modulepath
     if _unloaded_on_mp_change:  # pragma: no cover
-        lm_files = get_lm_files()
-        unloaded = [m for m in _unloaded_on_mp_change
-                    if m.filename not in lm_files]
+        lm_files = [_.filename for _ in get_loaded_modules()]
+        unloaded = [_ for _ in _unloaded_on_mp_change
+                    if _.filename not in lm_files]
         sio.write('\nThe following modules have been unloaded '
                   'with a MODULEPATH change:\n')
         for (i, m) in enumerate(unloaded):

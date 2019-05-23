@@ -24,5 +24,5 @@ def test_command_refresh(modules_path, mock_modulepath):
     mock_modulepath(modules_path.one)
     load('a', 'b', 'c', 'd')
     refresh()
-    loaded = ''.join(pymod.mc._mc.get_lm_names())
+    loaded = ''.join(_.fullname for _ in pymod.mc.get_loaded_modules())
     assert loaded == 'abcd'

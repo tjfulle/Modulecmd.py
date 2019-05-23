@@ -9,7 +9,7 @@ def test_mc_register_1(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     a = pymod.modulepath.get('a')
     pymod.mc.register_module(a)
-    assert a.filename in pymod.mc._mc.get_lm_files()
+    assert a.filename in [_.filename for _ in pymod.mc.get_loaded_modules()]
 
 
 def test_mc_register_2(tmpdir, mock_modulepath):
@@ -19,7 +19,7 @@ def test_mc_register_2(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     m = module(tmpdir.strpath, 'devpack.py')
     pymod.mc.register_module(m)
-    assert m.filename not in pymod.mc._mc.get_lm_files()
+    assert m.filename not in [_.filename for _ in pymod.mc.get_loaded_modules()]
     pymod.config.set('skip_add_devpack', value)
 
 
