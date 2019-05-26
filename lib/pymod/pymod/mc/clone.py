@@ -38,9 +38,13 @@ def clone(name):
     """Clone current environment"""
     filename = _clone_file()
     clones = read(filename)
-    clones[name] = pymod.environ.filtered(include_os=True)
+    clones[name] = cloned_env()
     write(clones, filename)
-    return 0
+    return clones[name]
+
+
+def cloned_env():
+    return pymod.environ.filtered(include_os=True)
 
 
 def remove_clone(name):
@@ -56,7 +60,10 @@ def restore_clone(name):
     if name not in clones:
         raise pymod.error.CloneDoesNotExistError(name)
     the_clone = dict(clones[name])
+    restore_clone_impl(the_clone)
 
+
+def restore_clone_impl(the_clone):
     # Purge current environment
     pymod.mc.purge(load_after_purge=False)
     dirnames = split(the_clone.pop(pymod.names.modulepath, None), os.pathsep)
@@ -69,11 +76,13 @@ def restore_clone(name):
 
     # Load modules to make sure aliases/functions are restored
     loaded_modules = []
-    lm_cellar = str_to_list(the_clone[pymod.names.loaded_module_cellar])
-    for ar in lm_cellar:
-        module = pymod.mc.unarchive_module(ar)
-        loaded_modules.append(module)
-    pymod.mc.set_loaded_modules(loaded_modules)
+    lm_cellar = the_clone.get(pymod.names.loaded_module_cellar)
+    if lm_cellar:
+        lm_cellar = str_to_list(lm_cellar)
+        for ar in lm_cellar:
+            module = pymod.mc.unarchive_module(ar)
+            loaded_modules.append(module)
+        pymod.mc.set_loaded_modules(loaded_modules)
 
-    for module in loaded_modules:
-        pymod.mc.load_partial(module)
+        for module in loaded_modules:
+            pymod.mc.load_partial(module)

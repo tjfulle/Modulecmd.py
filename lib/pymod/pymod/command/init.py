@@ -22,10 +22,5 @@ def setup_parser(subparser):
 def init(parser, args):
 
     modulepath = split(args.modulepath, os.pathsep)
-    for dirname in modulepath:
-        pymod.mc.use(dirname, append=True)
-
-    if pymod.collection.is_collection(pymod.names.default_user_collection): # pragma: no cover
-        pymod.mc.restore(pymod.names.default_user_collection)
-
+    pymod.mc.init(modulepath)
     pymod.mc.dump()

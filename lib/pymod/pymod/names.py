@@ -4,7 +4,8 @@ modulepath = 'MODULEPATH'
 
 loaded_modules = 'LOADEDMODULES'
 loaded_module_files = '_LMFILES_'
-loaded_module_cellar = '_LMX0_'
+initial_env = '_LMX0_'
+loaded_module_cellar = '_LMX1_'
 loaded_module_meta = lambda key: '_LMX2_{0}'.format(key)
 
 sourced_files = 'PYMOD_SOURCED_FILES'

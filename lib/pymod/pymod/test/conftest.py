@@ -10,11 +10,12 @@ import pymod.environ
 import pymod.modulepath
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def os_environ():
     """Cleans out os.environ"""
     real_env = os.environ.copy()
     os.environ.pop(pymod.names.modulepath, None)
+    os.environ.pop(pymod.names.initial_env, None)
     os.environ.pop(pymod.names.loaded_modules, None)
     os.environ.pop(pymod.names.loaded_module_files, None)
     os.environ.pop(pymod.names.loaded_module_cellar, None)
