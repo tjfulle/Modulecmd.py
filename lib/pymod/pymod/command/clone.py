@@ -2,15 +2,38 @@ import pymod.mc
 
 description = 'Clone current environment'
 level = 'short'
-section = 'collections'
+section = 'clones'
+
+
+_subcommands = {}
+
+
+def add_save_command(parser):
+    p = parser.add_parser('save', help='Save the current environment')
+    p.add_argument('name', help='Name of clone')
+    _subcommands['save'] = lambda args: pymod.mc.clone(args.name)
+
+
+def add_remove_command(parser):
+    p = parser.add_parser('remove', help='Remove clone')
+    p.add_argument('name', help='Name of clone to remove')
+    _subcommands['remove'] = lambda args: pymod.mc.remove_clone(args.name)
+
+
+def add_restore_command(parser):
+    p = parser.add_parser('restore', help='Restore cloned environment')
+    p.add_argument('name', help='Name of clone to restore')
+    _subcommands['restore'] = lambda args: pymod.mc.restore_clone(args.name)
 
 
 def setup_parser(subparser):
     """Parser is only constructed so that this prints a nice help
        message with -h. """
-    subparser.add_argument(
-        'name', help='Name to which current environment will be cloned')
+    sp = subparser.add_subparsers(metavar='SUBCOMMAND', dest='subcommand')
+    add_save_command(sp)
+    add_remove_command(sp)
+    add_restore_command(sp)
 
 
 def clone(parser, args):
-    pymod.mc.clone(args.name)
+    _subcommands[args.subcommand](args)

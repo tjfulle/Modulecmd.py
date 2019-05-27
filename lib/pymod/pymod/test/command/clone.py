@@ -28,13 +28,12 @@ def test_command_clone(modules_path, mock_modulepath):
 
     mock_modulepath(modules_path.path)
     clone = PymodCommand('clone')
-    restore = PymodCommand('restore')
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     c = pymod.mc.load('c')
     d = pymod.mc.load('d')
 
-    clone('foo')
+    clone('save', 'foo')
 
     pymod.mc.purge()
     assert not a.is_loaded
@@ -42,29 +41,28 @@ def test_command_clone(modules_path, mock_modulepath):
     assert not c.is_loaded
     assert not d.is_loaded
 
-    restore('foo', '-c')
+    clone('restore', 'foo')
     for x in 'abcd':
         m = pymod.modulepath.get(x)
         assert m.is_loaded
 
 
 def test_command_restore_clone_bad(modules_path, mock_modulepath):
-    restore = PymodCommand('restore')
+    clone = PymodCommand('clone')
     with pytest.raises(CloneDoesNotExistError):
-        restore('fake', '-c')
+        clone('restore', 'fake')
 
 
 def test_command_clone2(modules_path, mock_modulepath):
 
     mock_modulepath(modules_path.path)
     clone = PymodCommand('clone')
-    restore = PymodCommand('restore')
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     c = pymod.mc.load('c')
     d = pymod.mc.load('d')
 
-    clone('foo')
+    clone('save', 'foo')
 
     pymod.mc.purge()
     assert not a.is_loaded
@@ -72,7 +70,7 @@ def test_command_clone2(modules_path, mock_modulepath):
     assert not c.is_loaded
     assert not d.is_loaded
 
-    restore('foo', '-c')
+    clone('restore', 'foo')
     for x in 'abcd':
         m = pymod.modulepath.get(x)
         assert m.is_loaded

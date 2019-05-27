@@ -61,6 +61,7 @@ section_descriptions = {
     'developer':   'developer',
     'modulepath':  'modulepath',
     'collections': 'collections',
+    'clones':      'clones',
     'help':        'more help',
 }
 
@@ -70,7 +71,8 @@ section_order = {
     'info': ['avail', 'list', 'whatis', 'show', 'cat', 'more', 'find'],
     'basic': ['load', 'unload', 'reload', 'swap', 'purge', 'refresh'],
     'modulepath': ['path', 'use', 'unuse'],
-    'collections': ['save', 'clone', 'restore'],
+    'collections': ['save', 'restore'],
+    'clones': ['save', 'restore', 'remove',],
 }
 
 #: Properties that commands are required to set.
