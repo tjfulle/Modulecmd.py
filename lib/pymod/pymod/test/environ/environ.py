@@ -68,6 +68,8 @@ def test_environ_modulepath_ops():
         pymod.environ.remove_path(pymod.names.modulepath, 'FAKE')
     with pytest.raises(ValueError):
         pymod.environ.set(pymod.names.modulepath, 'FAKE')
+    with pytest.raises(ValueError):
+        pymod.environ.unset(pymod.names.modulepath)
 
 
 def test_environ_remove_path():

@@ -20,13 +20,14 @@ class Path:
 
 class Modulepath:
     def __init__(self, directories):
-        self.clear()
-        self.set_path(directories)
-
-    def clear(self):
         self.path = []
+        for directory in directories:
+            path = Path(directory)
+            if not path.modules:
+                continue
+            self.path.append(path)
         self.defaults = {}
-        self._modified = False
+        self.assign_defaults()
 
     def __contains__(self, dirname):
         return dirname in [p.path for p in self.path]
@@ -47,6 +48,12 @@ class Modulepath:
             if path.path == dirname:
                 return i
         raise ValueError('{0} not in Modulepath'.format(dirname))  # pragma: no cover
+
+    @property
+    def value(self):
+        if not self.path:
+            return None
+        return join([p.path for p in self.path], os.pathsep)
 
     def get(self, key):
         """Get a module from the available modules using the following rules:
@@ -101,9 +108,8 @@ class Modulepath:
                     return module
         return None
 
-    def _path_modified(self):
+    def path_modified(self):
         self.assign_defaults()
-        self._modified = True
 
     def append_path(self, dirname):
         if dirname in self:
@@ -112,7 +118,7 @@ class Modulepath:
         if not path.modules:
             return
         self.path.append(path)
-        self._path_modified()
+        self.path_modified()
         return path.modules
 
     def prepend_path(self, dirname):
@@ -123,7 +129,7 @@ class Modulepath:
             if not path.modules:
                 return None
         self.path.insert(0, path)
-        self._path_modified()
+        self.path_modified()
         return path.modules
 
     def remove_path(self, dirname):
@@ -147,20 +153,9 @@ class Modulepath:
 
         modules_in_dir = self.getby_dirname(dirname)
         self.path.pop(self.index(dirname))
-        self._path_modified()
+        self.path_modified()
 
         return modules_in_dir
-
-    def set_path(self, directories):
-        self.path = []
-        if not directories:  # pragma: no cover
-            return
-        for directory in directories:
-            path = Path(directory)
-            if not path.modules:
-                continue
-            self.path.append(path)
-        self._path_modified()
 
     def assign_defaults(self):
         """Assign defaults to modules.
@@ -215,14 +210,6 @@ class Modulepath:
     @staticmethod
     def sort_key(module):
         return (module.name, module.version)
-
-    def export_env(self):
-        env = dict()
-        if self._modified:
-            key = pymod.names.modulepath
-            value = join([p.path for p in self.path], os.pathsep)
-            env.update({key: value})
-        return env
 
     def format_available(self, terse=False, regex=None, fulloutput=False):
 

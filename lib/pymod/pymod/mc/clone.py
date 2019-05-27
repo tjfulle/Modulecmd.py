@@ -44,7 +44,7 @@ def clone(name):
 
 
 def cloned_env():
-    return pymod.environ.filtered(include_os=True)
+    return pymod.environ.copy(include_os=True)
 
 
 def remove_clone(name):
@@ -66,8 +66,15 @@ def restore_clone(name):
 def restore_clone_impl(the_clone):
     # Purge current environment
     pymod.mc.purge(load_after_purge=False)
-    dirnames = split(the_clone.pop(pymod.names.modulepath, None), os.pathsep)
-    path = pymod.modulepath.Modulepath(dirnames)
+
+    mp = the_clone.pop(pymod.names.modulepath, None)
+    current_env = pymod.environ.copy(include_os=True)
+    for (key, val) in current_env.items():
+        if key == pymod.names.modulepath:
+            continue
+        pymod.environ.unset(key)
+
+    path = pymod.modulepath.Modulepath(split(mp, os.pathsep))
     pymod.modulepath.set_path(path)
 
     # Make sure environment matches clone

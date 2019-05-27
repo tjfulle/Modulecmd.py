@@ -66,17 +66,25 @@ class Environ(dict):
         return self.copy(include_os=include_os, filter_None=True)
 
     def copy(self, include_os=False, filter_None=False):
-        env = dict() if not include_os else dict(os.environ)
+        env = dict(os.environ) if include_os else dict()
         if filter_None:
             env.update(dict([item for item in self.items() if item[1] is not None]))
         else:
             env.update(self)
-        env.update(pymod.modulepath.export_env())
+
+        # Modulepath is a special case
+        mp = pymod.modulepath._path.value
+        if include_os:
+            env[pymod.names.modulepath] = mp
+        elif mp != os.getenv(pymod.names.modulepath):
+            env[pymod.names.modulepath] = mp
+
         pymod_env = dict()
         for (key, val) in env.items():
             if pymod.shell.filter_key(key):
                 continue
             pymod_env[key] = val
+
         return pymod_env
 
     @staticmethod
@@ -100,6 +108,10 @@ class Environ(dict):
         self.save_ld_library_path(key)
 
     def unset(self, key):
+        if key == pymod.names.modulepath:
+            raise ValueError(
+                'Do not set MODULEPATH directly in Environ object.  '
+                'Unset it in the Modulepath instead')
         key = self.fix_ld_library_path(key)
         self[key] = None
         self.save_ld_library_path(key)

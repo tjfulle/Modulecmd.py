@@ -21,7 +21,8 @@ def restore_impl(collection):
     pymod.mc.purge(load_after_purge=False)
 
     # clear the modulepath
-    pymod.modulepath.clear()
+    path = pymod.modulepath.Modulepath([])
+    pymod.modulepath.set_path(path)
 
     # Now load the collection, one module at a time
     for (directory, archives) in collection:

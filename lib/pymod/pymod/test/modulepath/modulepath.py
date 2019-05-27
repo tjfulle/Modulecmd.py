@@ -20,7 +20,7 @@ append-path APPEND {1}
 """
 
 @pytest.fixture()
-def modules_path(tmpdir):
+def dirtrees(tmpdir):
     one = tmpdir.mkdir('1')
     one.join('a.py').write(basic_py_module)
     one.join('b.py').write(basic_py_module)
@@ -96,8 +96,8 @@ def test_modulepath_bad_default(tmpdir, mock_modulepath):
     assert isinstance(ma, pymod.module.TclModule)
 
 
-def test_modulepath_available_1(modules_path, mock_modulepath):
-    dirname = modules_path.join('1').strpath
+def test_modulepath_available_1(dirtrees, mock_modulepath):
+    dirname = dirtrees.join('1').strpath
     mock_modulepath(dirname)
     assert pymod.modulepath.size() == 1
     modules = pymod.modulepath.get(dirname)
@@ -133,8 +133,8 @@ def test_modulepath_available_1(modules_path, mock_modulepath):
         assert isinstance(m, pymod.module.PyModule)
 
 
-def test_modulepath_get(modules_path, mock_modulepath):
-    d1 = modules_path.join('1').strpath
+def test_modulepath_get(dirtrees, mock_modulepath):
+    d1 = dirtrees.join('1').strpath
     mock_modulepath(d1)
 
     module = pymod.modulepath.get('a')
@@ -170,7 +170,7 @@ def test_modulepath_get(modules_path, mock_modulepath):
     modules = pymod.modulepath.get(d1)
     assert len(modules) == 12
 
-    d2 = modules_path.join('2').strpath
+    d2 = dirtrees.join('2').strpath
     pymod.modulepath.prepend_path(d2)
 
     # should grab d2, since it is higher in priority
@@ -187,9 +187,9 @@ def test_modulepath_get(modules_path, mock_modulepath):
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
 
-def test_modulepath_append_path(modules_path, mock_modulepath):
+def test_modulepath_append_path(dirtrees, mock_modulepath):
 
-    d1 = modules_path.join('1').strpath
+    d1 = dirtrees.join('1').strpath
     mock_modulepath(d1)
 
     module = pymod.modulepath.get('ucc/1.0.0')
@@ -200,7 +200,7 @@ def test_modulepath_append_path(modules_path, mock_modulepath):
     assert module.fullname == 'ucc/2.0.0'
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
-    d2 = modules_path.join('2').strpath
+    d2 = dirtrees.join('2').strpath
     d2_modules = pymod.modulepath.append_path(d2)
     assert len(d2_modules) != 0
     x = pymod.modulepath.append_path(d2)
@@ -228,13 +228,13 @@ def test_modulepath_append_path(modules_path, mock_modulepath):
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
     # No modules
-    modules_path.mkdir('FOO')
-    x = pymod.modulepath.append_path(modules_path.join('FOO').strpath)
+    dirtrees.mkdir('FOO')
+    x = pymod.modulepath.append_path(dirtrees.join('FOO').strpath)
     assert x is None
 
 
-def test_modulepath_prepend_path(modules_path, mock_modulepath):
-    d1 = modules_path.join('1').strpath
+def test_modulepath_prepend_path(dirtrees, mock_modulepath):
+    d1 = dirtrees.join('1').strpath
     mock_modulepath(d1)
 
     module = pymod.modulepath.get('ucc/1.0.0')
@@ -245,7 +245,7 @@ def test_modulepath_prepend_path(modules_path, mock_modulepath):
     assert module.fullname == 'ucc/2.0.0'
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
-    d2 = modules_path.join('2').strpath
+    d2 = dirtrees.join('2').strpath
     pymod.modulepath.prepend_path(d2)
 
     module = pymod.modulepath.get('ucc/1.0.0')
@@ -276,15 +276,15 @@ def test_modulepath_prepend_path(modules_path, mock_modulepath):
     assert module.fullname == 'ucc/1.0.0'
     assert module.filename == os.path.join(d1, module.fullname + '.py')
 
-    modules_path.mkdir('FOO')
-    a = pymod.modulepath.prepend_path(modules_path.join('FOO').strpath)
+    dirtrees.mkdir('FOO')
+    a = pymod.modulepath.prepend_path(dirtrees.join('FOO').strpath)
     assert a is None
 
 
-def test_modulepath_auto_bump(modules_path, mock_modulepath):
+def test_modulepath_auto_bump(dirtrees, mock_modulepath):
 
-    d1 = modules_path.join('1').strpath
-    d2 = modules_path.join('2').strpath
+    d1 = dirtrees.join('1').strpath
+    d2 = dirtrees.join('2').strpath
     mock_modulepath(d1)
 
     m1 = pymod.modulepath.get('ucc')
@@ -299,10 +299,10 @@ def test_modulepath_auto_bump(modules_path, mock_modulepath):
         assert path.path is not None
 
 
-def test_modulepath_walk(modules_path, mock_modulepath):
+def test_modulepath_walk(dirtrees, mock_modulepath):
 
-    d1 = modules_path.join('1').strpath
-    d2 = modules_path.join('2').strpath
+    d1 = dirtrees.join('1').strpath
+    d2 = dirtrees.join('2').strpath
     mock_modulepath([d1, d2])
     i = 0
     for path in pymod.modulepath.walk():
@@ -323,3 +323,30 @@ def test_modulepath_dirname_does_not_exist(tmpdir, mock_modulepath):
     assert modules is None
     bumped = pymod.modulepath.prepend_path('A/FAKE/PATH')
     assert bumped is None
+
+
+def test_modulepath_no_value(tmpdir, mock_modulepath):
+    is_in = pymod.names.modulepath in os.environ
+    mock_modulepath([])
+    assert pymod.modulepath._path.value is None
+
+    a = tmpdir.mkdir('a')
+    a.join('a.py').write('')
+    b = tmpdir.mkdir('b')
+    b.join('b.py').write('')
+
+    pymod.modulepath.append_path(a.strpath)
+    assert pymod.modulepath._path.value == a.strpath
+
+    pymod.modulepath.prepend_path(b.strpath)
+    assert pymod.modulepath._path.value == os.pathsep.join([b.strpath, a.strpath])
+
+    pymod.modulepath.remove_path(a.strpath)
+    assert pymod.modulepath._path.value == b.strpath
+
+    pymod.modulepath.remove_path(b.strpath)
+    assert pymod.modulepath._path.value is None
+
+    env = pymod.environ.copy()
+    if is_in:
+        assert env[pymod.names.modulepath] is None

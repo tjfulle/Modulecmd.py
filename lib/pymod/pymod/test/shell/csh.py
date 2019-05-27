@@ -48,7 +48,6 @@ def test_shell_csh_source_command(shell):
     assert s.strip() == 'source foo'
 
 
-@pytest.mark.skipif(sys.version_info[0]==2, reason='dicts not ordered in 2.7')
 def test_shell_csh_format_output(shell):
     environ = Environ()
     environ.update(
@@ -58,10 +57,11 @@ def test_shell_csh_format_output(shell):
     environ.shell_functions.update(
         {'VAR_0': 'VAL_0', 'VAR_None': None})
     s = pymod.shell.format_output(environ, environ.aliases, environ.shell_functions)
-    s_expected = """setenv VAR_0 "VAL_0";\n""" \
-                    """unsetenv VAR_None;\n""" \
-                    """alias VAR_0 'VAL_0';\n""" \
-                    """unalias VAR_None 2> /dev/null || true;\n""" \
-                    """alias VAR_0 'VAL_0';\n""" \
-                    """unalias VAR_None 2> /dev/null || true;\n"""
-    assert s.strip() == s_expected.strip()
+    s = [_ for _ in s.split('\n') if _.split()]
+    s_expected = ['setenv VAR_0 "VAL_0";',
+                  'unsetenv VAR_None;',
+                  "alias VAR_0 'VAL_0';",
+                  'unalias VAR_None 2> /dev/null || true;',
+                  "alias VAR_0 'VAL_0';",
+                  'unalias VAR_None 2> /dev/null || true;',]
+    assert sorted(s) == sorted(s_expected)

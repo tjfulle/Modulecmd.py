@@ -14,10 +14,6 @@ def _modulepath():  # pragma: no cover
 _path = Singleton(_modulepath)
 
 
-def export_env():
-    return _path.export_env()
-
-
 def path():
     return [p.path for p in _path.path]
 
@@ -61,7 +57,3 @@ def walk(start=0):
 
 def size():
     return len(_path)
-
-
-def clear():
-    _path.clear()

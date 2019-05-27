@@ -44,7 +44,6 @@ def test_shell_bash_source_command(shell):
     assert s.strip() == 'source foo'
 
 
-@pytest.mark.skipif(sys.version_info[0]==2, reason='dicts not ordered in 2.7')
 def test_shell_bash_format_output(shell):
     environ = Environ()
     environ.update(
@@ -55,14 +54,15 @@ def test_shell_bash_format_output(shell):
         {'VAR_0': 'VAL_0', 'VAR_None': None})
     s = pymod.shell.format_output(environ, aliases=environ.aliases,
                                   shell_functions=environ.shell_functions)
-    s_expected = """VAR_0="VAL_0";\n""" \
-                    """export VAR_0;\n""" \
-                    """unset VAR_None;\n""" \
-                    """alias VAR_0='VAL_0';\n""" \
-                    """unalias VAR_None 2> /dev/null || true;\n""" \
-                    """VAR_0() { VAL_0; };\n""" \
-                    """unset -f VAR_None 2> /dev/null || true;\n"""
-    assert s.strip() == s_expected.strip()
+    s = [_ for _ in s.split('\n') if _.split()]
+    s_expected = ['VAR_0="VAL_0";',
+                  'export VAR_0;',
+                  'unset VAR_None;',
+                  "alias VAR_0='VAL_0';",
+                  'unalias VAR_None 2> /dev/null || true;',
+                  'VAR_0() { VAL_0; };',
+                  'unset -f VAR_None 2> /dev/null || true;',]
+    assert sorted(s) == sorted(s_expected)
 
 
 def test_shell_bash_filter_env(shell):
