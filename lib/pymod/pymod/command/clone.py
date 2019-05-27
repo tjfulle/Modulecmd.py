@@ -1,3 +1,4 @@
+import sys
 import pymod.mc
 
 description = 'Clone current environment'
@@ -12,6 +13,11 @@ def add_save_command(parser):
     p = parser.add_parser('save', help='Save the current environment')
     p.add_argument('name', help='Name of clone')
     _subcommands['save'] = lambda args: pymod.mc.clone(args.name)
+
+
+def add_list_command(parser):
+    p = parser.add_parser('list', help='List clones')
+    _subcommands['list'] = lambda _: sys.stderr.write(pymod.mc.list_clones()+'\n')
 
 
 def add_remove_command(parser):
@@ -33,6 +39,7 @@ def setup_parser(subparser):
     add_save_command(sp)
     add_remove_command(sp)
     add_restore_command(sp)
+    add_list_command(sp)
 
 
 def clone(parser, args):

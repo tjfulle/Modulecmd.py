@@ -2,7 +2,7 @@ from pymod.mc._mc import *
 
 from pymod.mc.avail import avail
 from pymod.mc.conflict import conflict
-from pymod.mc.clone import clone, cloned_env
+from pymod.mc.clone import clone, cloned_env, list_clones
 from pymod.mc.clone import restore_clone, remove_clone, restore_clone_impl
 from pymod.mc.disp import cat, more
 from pymod.mc.dump import dump

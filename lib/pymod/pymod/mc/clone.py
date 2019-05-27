@@ -1,11 +1,15 @@
 import os
 import json
+from six import StringIO
+
 import pymod.mc
 import pymod.error
 import pymod.names
 import pymod.paths
 import pymod.environ
 from contrib.util import str_to_list, split
+from llnl.util.tty import terminal_size
+from llnl.util.tty.colify import colified
 
 
 def read(filename):
@@ -93,3 +97,23 @@ def restore_clone_impl(the_clone):
 
         for module in loaded_modules:
             pymod.mc.load_partial(module)
+
+
+def list_clones(terse=False):
+    filename = _clone_file()
+    clones = read(filename)
+    names = sorted([x for x in clones.keys()])
+
+    sio = StringIO()
+    if not terse:
+        _, width = terminal_size()
+        if not names:
+            s = '(None)'.center(width)
+        else:
+            s = colified(names, width=width)
+        sio.write('{0}\n{1}\n'
+                    .format(' Saved clones '.center(width, '-'), s))
+    elif names:
+        sio.write('\n'.join(c for c in names))
+    string = sio.getvalue()
+    return string

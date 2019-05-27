@@ -74,3 +74,5 @@ def test_command_clone2(modules_path, mock_modulepath):
     for x in 'abcd':
         m = pymod.modulepath.get(x)
         assert m.is_loaded
+
+    clone('list')
