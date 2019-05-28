@@ -61,12 +61,13 @@ def get_loaded_modules():
 
 
 def archive_module(module):
-    return dict(fullname=module.fullname,
-                filename=module.filename,
-                family=module.family,
-                opts=module.opts,
-                acquired_as=module.acquired_as,
-                refcount=module.refcount)
+    ar = dict(fullname=module.fullname,
+              filename=module.filename,
+              family=module.family,
+              opts=module.opts,
+              acquired_as=module.acquired_as,
+              refcount=module.refcount)
+    return ar
 
 
 def unarchive_module(ar):
@@ -116,9 +117,9 @@ def register_module(module):
         return
     loaded_modules = get_loaded_modules()
     if module not in loaded_modules:
+        increment_refcount(module)
         loaded_modules.append(module)
         set_loaded_modules(loaded_modules)
-        increment_refcount(module)
     elif pymod.config.get('debug'):  # pragma: no cover
         tty.die('Attempting to register {0} which is already loaded!'
                 .format(module))
