@@ -211,7 +211,7 @@ class Modulepath:
     def sort_key(module):
         return (module.name, module.version)
 
-    def format_available(self, terse=False, regex=None, fulloutput=False):
+    def avail(self, terse=False, regex=None):
 
         sio = StringIO()
         if not terse:
@@ -223,12 +223,8 @@ class Modulepath:
                 modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
                 modules = self.filter_modules_by_regex(modules, regex)
                 if not os.path.isdir(directory):  # pragma: no cover
-                    if not fulloutput:
-                        continue
-                    s = colorize('@r{(Directory does not exist)}'.center(width))
+                    s = colorize('@r{(Directory not readable)}'.center(width))
                 elif not modules:  # pragma: no cover
-                    if not fulloutput:  # pragma: no cover
-                        continue
                     s = colorize('@r{(None)}'.center(width))
                 else:
                     s = colified([m.format_info() for m in modules], width=width)

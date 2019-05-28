@@ -36,7 +36,7 @@ def test_collection_default(modules_path, mock_modulepath):
     mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
-    pymod.mc.save(pymod.names.default_user_collection)
+    pymod.mc.collection.save(pymod.names.default_user_collection)
     assert pymod.collection.contains(pymod.names.default_user_collection)
     x = pymod.collection.get(pymod.names.default_user_collection)
     assert len(x) == 1
@@ -46,7 +46,7 @@ def test_collection_default(modules_path, mock_modulepath):
     coll = x[0][1]
     assert coll[0]['fullname'] == 'a'
     assert coll[1]['fullname'] == 'b'
-    s = pymod.collection.format_available().split('\n')[1].strip()
+    s = pymod.collection.avail().split('\n')[1].strip()
     assert s == '(None)'
 
 
@@ -58,7 +58,7 @@ def test_collection_named(modules_path, mock_modulepath):
     c = pymod.mc.load('c')
     d = pymod.mc.load('d', opts=['+x'])
 
-    pymod.mc.save('foo')
+    pymod.mc.collection.save('foo')
     assert pymod.collection.contains('foo')
     x = pymod.collection.get('foo')
     assert len(x) == 2
@@ -79,13 +79,13 @@ def test_collection_named(modules_path, mock_modulepath):
     assert coll[0]['fullname'] == 'c'
     assert coll[1]['fullname'] == 'd'
 
-    s = pymod.collection.format_available().split('\n')[1].strip()
+    s = pymod.collection.avail().split('\n')[1].strip()
     assert s == 'foo'
 
-    s = pymod.collection.format_show('foo')
+    s = pymod.collection.show('foo')
 
     pymod.mc.purge()
-    pymod.mc.restore('foo')
+    pymod.mc.collection.restore('foo')
     for x in 'abcd':
         assert pymod.modulepath.get(x) is not None
 
@@ -95,13 +95,13 @@ def test_collection_named(modules_path, mock_modulepath):
     f = os.path.join(pymod.modulepath._path.path[0].path, 'a.py')
     os.remove(f)
     with pytest.raises(pymod.error.CollectionModuleNotFoundError):
-        pymod.mc.restore('foo')
+        pymod.mc.collection.restore('foo')
 
     pymod.collection.remove('foo')
     assert not pymod.collection.contains('foo')
 
     with pytest.raises(pymod.error.CollectionNotFoundError):
-        pymod.mc.restore('foo')
+        pymod.mc.collection.restore('foo')
 
 
 def test_collection_bad(tmpdir):

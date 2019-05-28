@@ -1,73 +1,27 @@
 import os
-import json
-from six import StringIO
-
 import pymod.mc
+import pymod.clone
 import pymod.error
-import pymod.names
-import pymod.paths
-import pymod.environ
-from contrib.util import str_to_list, split
-from llnl.util.tty import terminal_size
-from llnl.util.tty.colify import colified
+
+from contrib.util import split, str_to_list
 
 
-def read(filename):
-    if os.path.isfile(filename):
-        return dict(json.load(open(filename)))
-    return dict()
+def save(name):
+    return pymod.clone.save(name)
 
 
-def write(clones, filename):
-    with open(filename, 'w') as fh:
-        json.dump(clones, fh, indent=2)
-
-
-def _clone_file():
-    basename = pymod.names.clones_file_basename
-    for dirname in (pymod.paths.user_config_platform_path,
-                    pymod.paths.user_config_path):
-        filename = os.path.join(dirname, basename)
-        if os.path.exists(filename):
-            return filename
-    else:
-        if os.path.exists(pymod.paths.user_config_platform_path):
-            dirname = pymod.paths.user_config_platform_path
-        else:  # pragma: no cover
-            dirname = pymod.paths.user_config_path
-        return os.path.join(dirname, basename)
-
-
-def clone(name):
-    """Clone current environment"""
-    filename = _clone_file()
-    clones = read(filename)
-    clones[name] = cloned_env()
-    write(clones, filename)
-    return clones[name]
-
-
-def cloned_env():
-    return pymod.environ.copy(include_os=True)
-
-
-def remove_clone(name):
-    filename = _clone_file()
-    clones = read(filename)
-    clones.pop(name, None)
-    write(clones, filename)
-
-
-def restore_clone(name):
-    filename = _clone_file()
-    clones = read(filename)
-    if name not in clones:
+def restore(name):
+    the_clone = pymod.clone.get(name)
+    if the_clone is None:
         raise pymod.error.CloneDoesNotExistError(name)
-    the_clone = dict(clones[name])
-    restore_clone_impl(the_clone)
+    restore_impl(the_clone)
 
 
-def restore_clone_impl(the_clone):
+def remove(name):
+    return pymod.clone.remove(name)
+
+
+def restore_impl(the_clone):
     # Purge current environment
     pymod.mc.purge(load_after_purge=False)
 
@@ -91,29 +45,13 @@ def restore_clone_impl(the_clone):
     if lm_cellar:
         lm_cellar = str_to_list(lm_cellar)
         for ar in lm_cellar:
-            module = pymod.mc.unarchive_module(ar)
+            try:
+                module = pymod.mc.unarchive_module(ar)
+            except pymod.error.ModuleNotFoundError:
+                raise pymod.error.CloneModuleNotFoundError(ar['fullname'],
+                                                           ar['filename'])
             loaded_modules.append(module)
         pymod.mc.set_loaded_modules(loaded_modules)
 
         for module in loaded_modules:
             pymod.mc.load_partial(module)
-
-
-def list_clones(terse=False):
-    filename = _clone_file()
-    clones = read(filename)
-    names = sorted([x for x in clones.keys()])
-
-    sio = StringIO()
-    if not terse:
-        _, width = terminal_size()
-        if not names:
-            s = '(None)'.center(width)
-        else:
-            s = colified(names, width=width)
-        sio.write('{0}\n{1}\n'
-                    .format(' Saved clones '.center(width, '-'), s))
-    elif names:
-        sio.write('\n'.join(c for c in names))
-    string = sio.getvalue()
-    return string

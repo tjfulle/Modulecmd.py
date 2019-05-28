@@ -1,6 +1,6 @@
 import os
+import pymod.names
 import pymod.paths
-import pymod.config
 from llnl.util.lang import Singleton
 from pymod.collection._collection import Collections
 
@@ -37,12 +37,12 @@ def get(name):
     return collections.get(name)
 
 
-def format_available(terse=False, regex=None):
-    return collections.format_available(terse=terse, regex=regex)
+def avail(terse=False, regex=None):
+    return collections.avail(terse=terse, regex=regex)
 
 
-def format_show(name):
-    return collections.format_show(name)
+def show(name):
+    return collections.show(name)
 
 
 def is_collection(name):

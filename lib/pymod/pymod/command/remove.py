@@ -13,4 +13,4 @@ def setup_parser(subparser):
 
 
 def remove(parser, args):
-    pymod.mc.remove(args.name)
+    pymod.mc.collection.remove(args.name)

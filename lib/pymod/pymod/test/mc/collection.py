@@ -41,7 +41,7 @@ def test_mc_restore_goo(modules_path, mock_modulepath):
     c = pymod.mc.load('c')
     d = pymod.mc.load('d')
 
-    pymod.mc.save('foo')
+    pymod.mc.collection.save('foo')
     assert pymod.collection.contains('foo')
     x = pymod.collection.get('foo')
     assert len(x) == 2
@@ -52,7 +52,7 @@ def test_mc_restore_goo(modules_path, mock_modulepath):
     assert not c.is_loaded
     assert not d.is_loaded
 
-    pymod.mc.restore('foo')
+    pymod.mc.collection.restore('foo')
     assert a.is_loaded
     assert b.is_loaded
     assert c.is_loaded
@@ -62,4 +62,4 @@ def test_mc_restore_goo(modules_path, mock_modulepath):
 @pytest.mark.unit
 def test_mc_restore_bad(modules_path, mock_modulepath):
     with pytest.raises(CollectionNotFoundError):
-        pymod.mc.restore('fake')
+        pymod.mc.collection.restore('fake')

@@ -101,6 +101,7 @@ def test_command_load_collection(tmpdir, mock_modulepath):
     load = PymodCommand('load')
     purge = PymodCommand('purge')
     restore = PymodCommand('restore')
+
     tmpdir.join('a.py').write('')
     tmpdir.join('b.py').write('')
     tmpdir.join('c.py').write('')
@@ -113,6 +114,7 @@ def test_command_load_collection(tmpdir, mock_modulepath):
     save('foo')
     purge()
     restore('foo')
+
     for x in 'abcd':
         m = pymod.modulepath.get(x)
         assert m.is_loaded

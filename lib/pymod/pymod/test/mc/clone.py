@@ -23,19 +23,19 @@ def test_mc_clone(tmpdir, mock_modulepath):
     pymod.environ.prepend_path('spam', 'ham')
     assert pymod.environ.environ['foo'] == 'baz'
     assert pymod.environ.environ['spam'] == 'ham:bar'
-    pymod.mc.clone('the-clone')
+    pymod.mc.clone.save('the-clone')
     pymod.mc.purge()
     assert not a.is_loaded
     assert not b.is_loaded
     assert not c.is_loaded
     pymod.environ.environ['foo'] = None
     pymod.environ.environ['spam'] = None
-    pymod.mc.restore_clone('the-clone')
+    pymod.mc.clone.restore('the-clone')
     modules = ''.join(sorted([_.fullname for _ in pymod.mc.get_loaded_modules()]))
     assert modules == 'abc'
     assert pymod.environ.environ['foo'] == 'baz'
     assert pymod.environ.environ['spam'] == 'ham:bar'
-    pymod.mc.remove_clone('the-clone')
+    pymod.mc.clone.remove('the-clone')
 
 
 def test_mc_clone_bad(tmpdir, mock_modulepath):
@@ -54,7 +54,7 @@ def test_mc_clone_bad(tmpdir, mock_modulepath):
     pymod.environ.prepend_path('spam', 'ham')
     assert pymod.environ.environ['foo'] == 'baz'
     assert pymod.environ.environ['spam'] == 'ham:bar'
-    pymod.mc.clone('the-clone')
+    pymod.mc.clone.save('the-clone')
     pymod.mc.purge()
     assert not a.is_loaded
     assert not b.is_loaded
@@ -62,5 +62,5 @@ def test_mc_clone_bad(tmpdir, mock_modulepath):
     pymod.environ.environ['foo'] = None
     pymod.environ.environ['spam'] = None
     os.remove(tmpdir.join('a.py').strpath)
-    with pytest.raises(pymod.error.ModuleNotFoundError):
-        pymod.mc.restore_clone('the-clone')
+    with pytest.raises(pymod.error.CloneModuleNotFoundError):
+        pymod.mc.clone.restore('the-clone')

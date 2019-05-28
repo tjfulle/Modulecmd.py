@@ -64,7 +64,7 @@ class Collections:
             collections = [c for c in collections if re.search(regex, c)]
         return collections
 
-    def format_available(self, terse=False, regex=None):
+    def avail(self, terse=False, regex=None):
         skip = (pymod.names.default_user_collection,)
         names = sorted([x for x in self.data if x not in skip])
 
@@ -87,7 +87,7 @@ class Collections:
         string = sio.getvalue()
         return string
 
-    def format_show(self, name):
+    def show(self, name):
         """Show the high-level commands executed by
 
             module show <collection>

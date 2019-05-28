@@ -17,11 +17,11 @@ def setup_parser(subparser):
         '-t', '--terse', default=False, action='store_true',
         help='Display output in terse format [default: %(default)s]')
     subparser.add_argument(
-        '-F', default=False, action='store_true',
-        help='Display full output [default: %(default)s]')
+        '-a', default=False, action='store_true',
+        help='Include available clones and collections [default: %(default)s]')
 
 
 def avail(parser, args):
     avail = pymod.mc.avail(terse=args.terse, regex=args.regex,
-                           fulloutput=args.F)
+                           show_all=args.a)
     sys.stderr.write(avail)

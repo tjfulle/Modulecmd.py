@@ -67,7 +67,7 @@ def test_command_save(modules_path, mock_modulepath):
 
 def test_command_restore_bad(modules_path, mock_modulepath):
     with pytest.raises(CollectionNotFoundError):
-        pymod.mc.restore('fake')
+        pymod.mc.collection.restore('fake')
 
 
 def test_command_remove(modules_path, mock_modulepath):
@@ -85,9 +85,3 @@ def test_command_remove(modules_path, mock_modulepath):
 
     remove('foo')
     assert not pymod.collection.contains('foo')
-
-
-
-def test_command_restore_bad(modules_path, mock_modulepath):
-    with pytest.raises(CollectionNotFoundError):
-        pymod.mc.restore('fake')

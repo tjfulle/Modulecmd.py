@@ -18,4 +18,4 @@ def setup_parser(subparser):
 
 
 def save(parser, args):
-    pymod.mc.save(args.name) #, local=args.local)
+    pymod.mc.collection.save(args.name) #, local=args.local)

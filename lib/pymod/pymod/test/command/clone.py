@@ -46,6 +46,11 @@ def test_command_clone(modules_path, mock_modulepath):
         m = pymod.modulepath.get(x)
         assert m.is_loaded
 
+    pymod.mc.purge()
+
+    clone('remove', 'foo')
+    assert pymod.clone.get('foo') is None
+
 
 def test_command_restore_clone_bad(modules_path, mock_modulepath):
     clone = PymodCommand('clone')
@@ -75,4 +80,6 @@ def test_command_clone2(modules_path, mock_modulepath):
         m = pymod.modulepath.get(x)
         assert m.is_loaded
 
-    clone('list')
+    clone('avail')
+    clone('avail', '-t')
+    clone('avail', '--terse')

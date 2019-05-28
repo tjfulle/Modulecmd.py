@@ -39,8 +39,8 @@ def prepend_path(dirname):
     return _path.prepend_path(dirname)
 
 
-def format_available(**kwargs):
-    return _path.format_available(**kwargs)
+def avail(**kwargs):
+    return _path.avail(**kwargs)
 
 
 def candidates(name):

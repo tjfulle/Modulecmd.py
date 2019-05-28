@@ -32,3 +32,7 @@ def test_command_avail(tmpdir, mock_modulepath):
     avail('--terse')
     avail('a') # regular expression
     avail('--terse', 'a') # regular expression
+
+    avail('-a')
+    avail('--terse', '-a')
+    avail('--terse', '-a', 'a')

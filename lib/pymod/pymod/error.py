@@ -69,13 +69,21 @@ class ModuleLoadError(Exception):
     pass
 
 
+class EntityNotFoundError(Exception):
+    def __init__(self, name):
+        msg = 'Unknown named entity {0!r}'.format(name)
+        super(EntityNotFoundError, self).__init__(msg)
+
+
 class CloneDoesNotExistError(Exception):
     def __init__(self, name):
         msg = '{0!r} is not a cloned environment'.format(name)
         super(CloneDoesNotExistError, self).__init__(msg)
 
 
-class EntityNotFoundError(Exception):
-    def __init__(self, name):
-        msg = 'Unknown named entity {0!r}'.format(name)
-        super(EntityNotFoundError, self).__init__(msg)
+class CloneModuleNotFoundError(Exception):
+    def __init__(self, name, filename):
+        msg = 'Saved module {0!r} does not exist ({1})'.format(name, filename)
+        super(CloneModuleNotFoundError, self).__init__(msg)
+
+

@@ -4,7 +4,7 @@ import pymod.names
 
 
 def test_mc_reset(tmpdir, mock_modulepath):
-    initial_env = pymod.mc.cloned_env()
+    initial_env = pymod.environ.copy(include_os=True)
     assert pymod.names.modulepath in initial_env
     pymod.environ.set_dict(pymod.names.initial_env, initial_env)
     env = pymod.mc.reset()
