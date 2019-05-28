@@ -41,6 +41,8 @@ class Clones(object):
 
     def avail(self, terse=False):
         names = sorted([x for x in self.data.keys()])
+        if not names: # pragma: no cover
+            return ''
         sio = StringIO()
         if not terse:
             _, width = terminal_size()

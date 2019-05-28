@@ -46,8 +46,9 @@ def test_collection_default(modules_path, mock_modulepath):
     coll = x[0][1]
     assert coll[0]['fullname'] == 'a'
     assert coll[1]['fullname'] == 'b'
-    s = pymod.collection.avail().split('\n')[1].strip()
-    assert s == '(None)'
+    s = pymod.collection.avail()
+    # None show up available since the default does not show avail
+    assert not s.split()
 
 
 def test_collection_named(modules_path, mock_modulepath):

@@ -70,16 +70,14 @@ class Collections:
 
         if regex:
             names = self.filter_collections_by_regex(names, regex)
-            if not names:
-                return ''
+
+        if not names:  # pragma: no cover
+            return ''
 
         sio = StringIO()
         if not terse:
             _, width = terminal_size()
-            if not names:
-                s = '(None)'.center(width)
-            else:
-                s = colified(names, width=width)
+            s = colified(names, width=width)
             sio.write('{0}\n{1}\n'
                       .format(' Saved collections '.center(width, '-'), s))
         elif names:
