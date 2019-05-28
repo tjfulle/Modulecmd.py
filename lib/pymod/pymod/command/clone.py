@@ -2,7 +2,7 @@ import sys
 import pymod.mc
 import pymod.clone
 
-description = 'Clone current environment'
+description = 'Manipulate cloned environments'
 level = 'short'
 section = 'clones'
 
