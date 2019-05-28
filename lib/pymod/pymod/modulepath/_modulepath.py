@@ -225,6 +225,8 @@ class Modulepath:
                 if not os.path.isdir(directory):  # pragma: no cover
                     s = colorize('@r{(Directory not readable)}'.center(width))
                 elif not modules:  # pragma: no cover
+                    if regex:
+                        continue
                     s = colorize('@r{(None)}'.center(width))
                 else:
                     s = colified([m.format_info() for m in modules], width=width)
