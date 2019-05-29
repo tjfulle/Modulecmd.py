@@ -126,8 +126,8 @@ def test_mc_execmodule_source(tmpdir, modulecmds, mock_modulepath, capsys):
 def test_mc_execmodule_load_first(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     with pytest.raises(pymod.error.ModuleNotFoundError):
-        pymod.mc.callback.load_first(pymod.modes.load, 'x', 'y', 'z')
-    pymod.mc.callback.load_first(pymod.modes.load, 'x', 'y', 'z', None)
+        pymod.mc.callback.load_first(None, pymod.modes.load, 'x', 'y', 'z')
+    pymod.mc.callback.load_first(None, pymod.modes.load, 'x', 'y', 'z', None)
 
 
 def test_mc_execmodule_is_loaded(tmpdir, mock_modulepath):

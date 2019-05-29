@@ -46,13 +46,10 @@ class Clones(object):
         sio = StringIO()
         if not terse:
             _, width = terminal_size()
-            if not names:
-                s = '(None)'.center(width)
-            else:
-                s = colified(names, width=width)
+            s = colified(names, width=width)
             sio.write('{0}\n{1}\n'
                         .format(' Saved clones '.center(width, '-'), s))
-        elif names:
+        else:
             sio.write('\n'.join(c for c in names))
         return sio.getvalue()
 

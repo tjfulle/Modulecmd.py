@@ -25,7 +25,7 @@ setenv('ENVAR_2', self.version.string)"""
 def test_mc_family_load_1(mock_module):
     family = 'compiler'
     module = mock_module('ucc', '1.2', 'ucc/1.2.py')
-    pymod.mc.family(pymod.modes.load, module, 'compiler')
+    pymod.mc.family(module, pymod.modes.load, 'compiler')
     assert pymod.environ.environ['MODULE_FAMILY_COMPILER'] == 'ucc'
     assert pymod.environ.environ['MODULE_FAMILY_COMPILER_VERSION'] == '1.2'
 
@@ -36,7 +36,7 @@ def test_mc_family_unload_1(mock_module):
     module = mock_module('ucc', '2.0', 'ucc/2.0.py')
     pymod.environ.set('MODULE_FAMILY_COMPILER', 'ucc')
     pymod.environ.set('MODULE_FAMILY_UCC_VERSION', '2.0')
-    pymod.mc.family(pymod.modes.unload, module, 'compiler')
+    pymod.mc.family(module, pymod.modes.unload, 'compiler')
     assert pymod.environ.environ['MODULE_FAMILY_COMPILER'] is None
     assert pymod.environ.environ['MODULE_FAMILY_COMPILER_VERSION'] is None
 

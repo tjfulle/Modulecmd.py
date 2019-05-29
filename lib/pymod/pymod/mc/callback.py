@@ -7,7 +7,7 @@ from pymod.error import ModuleNotFoundError
 
 """Module defines callback functions between modules and pymod.
 
-Every function has for the first two arguments: mode, module
+Every function has for the first two arguments: module, mode
 
 
 """
@@ -15,7 +15,7 @@ Every function has for the first two arguments: mode, module
 __all__ = ['callback']
 
 
-def callback(func, mode, module, when=None, **kwds):
+def callback(func, module, mode, when=None, **kwds):
     if when is None:
         when = (mode != pymod.modes.load_partial and
                 mode not in pymod.modes.informational)
@@ -23,18 +23,18 @@ def callback(func, mode, module, when=None, **kwds):
         func = lambda *args, **kwargs: None
     def wrapper(*args, **kwargs):
         kwargs.update(kwds)
-        return func(mode, module, *args, **kwargs)
+        return func(module, mode, *args, **kwargs)
     return wrapper
 
 
-def swap(mode, module, name_a, name_b, **kwargs):
+def swap(module, mode, name_a, name_b, **kwargs):
     pymod.modes.assert_known_mode(mode)
     if mode != pymod.modes.unload:
         # We don't swap modules in unload mode
         return pymod.mc.swap(name_a, name_b, caller='modulefile')
 
 
-def load_first(mode, module, *names):
+def load_first(module, mode, *names):
     pymod.modes.assert_known_mode(mode)
     for name in names:
         if name is None:
@@ -53,7 +53,7 @@ def load_first(mode, module, *names):
     raise ModuleNotFoundError(','.join(names))
 
 
-def load(mode, module, name, **kwds):
+def load(module, mode, name, **kwds):
     pymod.modes.assert_known_mode(mode)
     opts = kwds.get('opts', None)
     pymod.modes.assert_known_mode(mode)
@@ -68,7 +68,7 @@ def load(mode, module, name, **kwds):
         pymod.mc.load(name, opts=opts, caller='modulefile')
 
 
-def unload(mode, module, name):
+def unload(module, mode, name):
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.unload:
         # We are in unload mode and the module was requested to be
@@ -82,7 +82,7 @@ def unload(mode, module, name):
             return None
 
 
-def is_loaded(mode, module, name):
+def is_loaded(module, mode, name):
     pymod.modes.assert_known_mode(mode)
     other = pymod.modulepath.get(name)
     if other is None:
@@ -90,7 +90,7 @@ def is_loaded(mode, module, name):
     return other.is_loaded
 
 
-def use(mode, module, dirname, append=False):
+def use(module, mode, dirname, append=False):
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.unload:
         pymod.mc.unuse(dirname)
@@ -99,30 +99,30 @@ def use(mode, module, dirname, append=False):
         module.unlocks_dir(dirname)
 
 
-def unuse(mode, module, dirname):
+def unuse(module, mode, dirname):
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.load:
         pymod.mc.unuse(dirname)
 
 
-def source(mode, module, filename):
+def source(module, mode, filename):
     """Source a script"""
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.load:
         pymod.mc.source(filename)
 
 
-def whatis(mode, module, *args, **kwargs):
+def whatis(module, mode, *args, **kwargs):
     pymod.modes.assert_known_mode(mode)
     return module.set_whatis(*args, **kwargs)
 
 
-def help(mode, module, help_string, **kwargs):
+def help(module, mode, help_string, **kwargs):
     pymod.modes.assert_known_mode(mode)
     module.set_help_string(help_string)
 
 
-def setenv(mode, module, name, value):
+def setenv(module, mode, name, value):
     """Set value of environment variable `name`"""
     pymod.modes.assert_known_mode(mode)
     if mode in (pymod.modes.load,):
@@ -130,13 +130,13 @@ def setenv(mode, module, name, value):
     elif mode in (pymod.modes.unload,):
         return pymod.environ.unset(name)
 
-def unsetenv(mode, module, name):
+def unsetenv(module, mode, name):
     """Set value of environment variable `name`"""
     pymod.modes.assert_known_mode(mode)
     if mode != pymod.modes.unload:
         return pymod.environ.unset(name)
 
-def set_alias(mode, module, name, value):
+def set_alias(module, mode, name, value):
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.unload:
         pymod.environ.unset_alias(name)
@@ -144,13 +144,13 @@ def set_alias(mode, module, name, value):
         pymod.environ.set_alias(name, value)
 
 
-def unset_alias(mode, module, name):
+def unset_alias(module, mode, name):
     pymod.modes.assert_known_mode(mode)
     if mode != pymod.modes.unload:
         pymod.environ.unset_alias(name)
 
 
-def set_shell_function(mode, module, name, value):
+def set_shell_function(module, mode, name, value):
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.unload:
         pymod.environ.unset_shell_function(name)
@@ -158,36 +158,36 @@ def set_shell_function(mode, module, name, value):
         pymod.environ.set_shell_function(name, value)
 
 
-def unset_shell_function(mode, module, name):
+def unset_shell_function(module, mode, name):
     pymod.modes.assert_known_mode(mode)
     if mode != pymod.modes.unload:
         pymod.environ.unset_shell_function(name)
 
 
-def prereq_any(mode, module, *names):
+def prereq_any(module, mode, *names):
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.load:
         pymod.mc.prereq_any(*names)
 
 
-def prereq(mode, module, *names):
+def prereq(module, mode, *names):
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.load:
         pymod.mc.prereq(*names)
 
 
-def conflict(mode, module, *conflicting, **kwargs):
+def conflict(module, mode, *conflicting, **kwargs):
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.load:
         pymod.mc.conflict(module, *conflicting)
 
 
-def append_path(mode, module, name, *values, **kwds):
+def append_path(module, mode, name, *values, **kwds):
     """Append `value` to path-like variable `name`"""
     pymod.modes.assert_known_mode(mode)
     if name == pymod.names.modulepath:
         for value in values:
-            use(mode, module, value, append=True)
+            use(module, mode, value, append=True)
         return
     sep = kwds.get('sep', os.pathsep)
     if mode == pymod.modes.unload:
@@ -198,11 +198,11 @@ def append_path(mode, module, name, *values, **kwds):
             pymod.environ.append_path(name, value, sep)
 
 
-def prepend_path(mode, module, name, *values, **kwds):
+def prepend_path(module, mode, name, *values, **kwds):
     pymod.modes.assert_known_mode(mode)
     if name == pymod.names.modulepath:
         for value in values:
-            use(mode, module, value)
+            use(module, mode, value)
         return
     sep = kwds.get('sep', os.pathsep)
     if mode == pymod.modes.unload:
@@ -213,11 +213,11 @@ def prepend_path(mode, module, name, *values, **kwds):
             pymod.environ.prepend_path(name, value, sep)
 
 
-def remove_path(mode, module, name, *values, **kwds):
+def remove_path(module, mode, name, *values, **kwds):
     pymod.modes.assert_known_mode(mode)
     if name == pymod.names.modulepath:
         for value in values:
-            unuse(mode, module, value)
+            unuse(module, mode, value)
         return
     sep = kwds.get('sep', os.pathsep)
     if mode == pymod.modes.load:
@@ -225,20 +225,21 @@ def remove_path(mode, module, name, *values, **kwds):
             pymod.environ.remove_path(name, value, sep)
 
 
-def family(mode, module, family_name, **kwargs):
+def family(module, mode, family_name, **kwargs):
     """Assign a family"""
     pymod.modes.assert_known_mode(mode)
-    pymod.mc.family(mode, module, family_name)
+    pymod.mc.family(module, mode, family_name)
 
 
-def execute(arg_mode, module, command, mode=None):
-    pymod.modes.assert_known_mode(arg_mode)
-    if mode is not None and mode != pymod.modes.as_string(arg_mode):
+def execute(module, mode, command, when=None):
+    pymod.modes.assert_known_mode(mode)
+    if when is not None and not when:
         return
     pymod.mc.execute(command)
 
 
-def get_family_info(mode, module, name, **kwargs):
+def get_family_info(module, mode, name, **kwargs):
+    pymod.modes.assert_known_mode(mode)
     name_envar = pymod.names.family_name(name)
     version_envar = pymod.names.family_version(name)
     return pymod.environ.get(name_envar), pymod.environ.get(version_envar)

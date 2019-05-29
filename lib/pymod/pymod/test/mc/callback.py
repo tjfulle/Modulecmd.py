@@ -14,18 +14,18 @@ def test_mc_callback_path_ops():
     prepend_path = pymod.mc.callback.prepend_path
     remove_path = pymod.mc.callback.remove_path
 
-    append_path(pymod.modes.load, None, 'foo', 'bar', sep=';')
-    prepend_path(pymod.modes.load, None, 'foo', 'baz', sep=';')
+    append_path(None, pymod.modes.load, 'foo', 'bar', sep=';')
+    prepend_path(None, pymod.modes.load, 'foo', 'baz', sep=';')
     assert pymod.environ.get('foo') == 'baz;bar'
-    remove_path(pymod.modes.load, None, 'foo', 'bar', sep=';')
-    remove_path(pymod.modes.load, None, 'foo', 'baz', sep=';')
+    remove_path(None, pymod.modes.load, 'foo', 'bar', sep=';')
+    remove_path(None, pymod.modes.load, 'foo', 'baz', sep=';')
     assert pymod.environ.get('foo') is None
 
-    append_path(pymod.modes.load, None, 'foo', 'bar', sep=';')
-    prepend_path(pymod.modes.load, None, 'foo', 'baz', sep=';')
+    append_path(None, pymod.modes.load, 'foo', 'bar', sep=';')
+    prepend_path(None, pymod.modes.load, 'foo', 'baz', sep=';')
     assert pymod.environ.get('foo') == 'baz;bar'
-    append_path(pymod.modes.unload, None, 'foo', 'bar', sep=';')
-    prepend_path(pymod.modes.unload, None, 'foo', 'baz', sep=';')
+    append_path(None, pymod.modes.unload, 'foo', 'bar', sep=';')
+    prepend_path(None, pymod.modes.unload, 'foo', 'baz', sep=';')
     assert pymod.environ.get('foo') is None
 
 
@@ -40,15 +40,15 @@ def test_mc_callback_conflict(tmpdir, mock_modulepath):
     x = pymod.config.get('resolve_conflicts')
     pymod.config.set('resolve_conflicts', False)
     with pytest.raises(pymod.error.ModuleConflictError):
-        conflict(pymod.modes.load, a, 'b')
+        conflict(a, pymod.modes.load, 'b')
 
     pymod.config.set('resolve_conflicts', True)
-    conflict(pymod.modes.load, a, 'b')
+    conflict(a, pymod.modes.load, 'b')
 
     pymod.config.set('resolve_conflicts', x)
 
     b = pymod.mc.unload('b')
-    conflict(pymod.modes.load, a, 'b')
+    conflict(a, pymod.modes.load, 'b')
 
 
 def test_mc_callback_prereq(tmpdir, mock_modulepath):
@@ -59,38 +59,38 @@ def test_mc_callback_prereq(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
 
     with pytest.raises(pymod.error.PrereqMissingError):
-        prereq(pymod.modes.load, None, 'b')
+        prereq(None, pymod.modes.load, 'b')
 
     pymod.mc.load('b')
-    prereq(pymod.modes.load, None, 'b')
-    prereq(pymod.modes.load, None, 'name:b')
-    prereq_any(pymod.modes.load, None, 'x', 'y', 'b')
-    prereq_any(pymod.modes.load, None, 'x', 'y', 'name:b')
+    prereq(None, pymod.modes.load, 'b')
+    prereq(None, pymod.modes.load, 'name:b')
+    prereq_any(None, pymod.modes.load, 'x', 'y', 'b')
+    prereq_any(None, pymod.modes.load, 'x', 'y', 'name:b')
     with pytest.raises(pymod.error.PrereqMissingError):
-        prereq_any(pymod.modes.load, None, 'x', 'y', 'z')
+        prereq_any(None, pymod.modes.load, 'x', 'y', 'z')
 
     with pytest.raises(Exception):
         # Foo is not a recognized prefix
-        prereq(pymod.modes.load, None, 'foo:b')
+        prereq(None, pymod.modes.load, 'foo:b')
 
 
 def test_mc_callback_seGt_alias():
     set_alias = pymod.mc.callback.set_alias
     unset_alias = pymod.mc.callback.unset_alias
 
-    set_alias(pymod.modes.load, None, 'foo', 'bar')
+    set_alias(None, pymod.modes.load, 'foo', 'bar')
     assert pymod.environ.environ.aliases['foo'] == 'bar'
-    set_alias(pymod.modes.unload, None, 'foo', 'bar')
+    set_alias(None, pymod.modes.unload, 'foo', 'bar')
     assert pymod.environ.environ.aliases['foo'] is None
 
-    set_alias(pymod.modes.load, None, 'foo', 'bar')
+    set_alias(None, pymod.modes.load, 'foo', 'bar')
     assert pymod.environ.environ.aliases['foo'] == 'bar'
-    unset_alias(pymod.modes.load, None, 'foo')
+    unset_alias(None, pymod.modes.load, 'foo')
     assert pymod.environ.environ.aliases['foo'] is None
 
-    set_alias(pymod.modes.load, None, 'foo', 'bar')
+    set_alias(None, pymod.modes.load, 'foo', 'bar')
     assert pymod.environ.environ.aliases['foo'] == 'bar'
-    unset_alias(pymod.modes.unload, None, 'foo')
+    unset_alias(None, pymod.modes.unload, 'foo')
     assert pymod.environ.environ.aliases['foo'] == 'bar'
 
 
@@ -98,32 +98,32 @@ def test_mc_callback_set_shell_function():
     set_shell_function = pymod.mc.callback.set_shell_function
     unset_shell_function = pymod.mc.callback.unset_shell_function
 
-    set_shell_function(pymod.modes.load, None, 'foo', 'bar')
+    set_shell_function(None, pymod.modes.load, 'foo', 'bar')
     assert pymod.environ.environ.shell_functions['foo'] == 'bar'
-    set_shell_function(pymod.modes.unload, None, 'foo', 'bar')
+    set_shell_function(None, pymod.modes.unload, 'foo', 'bar')
     assert pymod.environ.environ.shell_functions['foo'] is None
 
-    set_shell_function(pymod.modes.load, None, 'foo', 'bar')
+    set_shell_function(None, pymod.modes.load, 'foo', 'bar')
     assert pymod.environ.environ.shell_functions['foo'] == 'bar'
-    unset_shell_function(pymod.modes.load, None, 'foo')
+    unset_shell_function(None, pymod.modes.load, 'foo')
     assert pymod.environ.environ.shell_functions['foo'] is None
 
-    set_shell_function(pymod.modes.load, None, 'foo', 'bar')
+    set_shell_function(None, pymod.modes.load, 'foo', 'bar')
     assert pymod.environ.environ.shell_functions['foo'] == 'bar'
-    unset_shell_function(pymod.modes.unload, None, 'foo')
+    unset_shell_function(None, pymod.modes.unload, 'foo')
     assert pymod.environ.environ.shell_functions['foo'] == 'bar'
 
 
 def test_mc_callback_source(tmpdir, capsys):
     baz = tmpdir.join('baz')
     baz.write('echo BAZ')
-    pymod.mc.callback.source(pymod.modes.load, None, baz.strpath)
+    pymod.mc.callback.source(None, pymod.modes.load, baz.strpath)
     captured = capsys.readouterr()
     command = r'source {0};'.format(baz.strpath)
     assert captured[0].strip() == command.strip()
 
     with pytest.raises(ValueError):
-        pymod.mc.callback.source(pymod.modes.load, None, 'fake.txt')
+        pymod.mc.callback.source(None, pymod.modes.load, 'fake.txt')
 
 
 def test_mc_callback_load(tmpdir, mock_modulepath):
@@ -136,34 +136,34 @@ def test_mc_callback_load(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
 
     with pytest.raises(pymod.error.ModuleNotFoundError):
-        load(pymod.modes.load, None, 'x')
+        load(None, pymod.modes.load, 'x')
 
     with pytest.raises(pymod.error.ModuleNotFoundError):
-        load(pymod.modes.load, None, 'x')
+        load(None, pymod.modes.load, 'x')
 
     # Even though `x` is not a module, unloading does not throw
-    unload(pymod.modes.load, None, 'x')
+    unload(None, pymod.modes.load, 'x')
 
-    load(pymod.modes.load, None, 'a')
+    load(None, pymod.modes.load, 'a')
     a = pymod.modulepath.get('a')
     assert a.is_loaded
 
-    unload(pymod.modes.load, None, 'a')
+    unload(None, pymod.modes.load, 'a')
     assert not a.is_loaded
 
-    load(pymod.modes.unload, None, 'a')
+    load(None, pymod.modes.unload, 'a')
     assert not a.is_loaded
 
-    load(pymod.modes.load, None, 'a')
+    load(None, pymod.modes.load, 'a')
     assert a.is_loaded
 
-    unload(pymod.modes.unload, None, 'a')
+    unload(None, pymod.modes.unload, 'a')
     assert a.is_loaded
 
     with pytest.raises(pymod.error.ModuleNotFoundError):
-        load_first(pymod.modes.load, None, 'x', 'y', 'z')
-    load_first(pymod.modes.load, None, 'x', 'y', 'z', None)
-    load_first(pymod.modes.load, None, 'x', 'y', 'a')
+        load_first(None, pymod.modes.load, 'x', 'y', 'z')
+    load_first(None, pymod.modes.load, 'x', 'y', 'z', None)
+    load_first(None, pymod.modes.load, 'x', 'y', 'a')
     a = pymod.modulepath.get('a')
     assert a.is_loaded
 
@@ -180,11 +180,11 @@ def test_mc_callback_swap(tmpdir, mock_modulepath):
     b = pymod.modulepath.get('b')
     assert not b.is_loaded
 
-    swap(pymod.modes.unload, None, 'a', 'b')
+    swap(None, pymod.modes.unload, 'a', 'b')
     assert a.is_loaded
     assert not b.is_loaded
 
-    swap(pymod.modes.load, None, 'a', 'b')
+    swap(None, pymod.modes.load, 'a', 'b')
     assert not a.is_loaded
     assert b.is_loaded
 
@@ -215,24 +215,18 @@ def test_mc_callback_modulepath_ops(tmpdir, mock_modulepath):
     assert a.filename == os.path.join(one.strpath, 'a.py')
 
     pymod.mc.callback.append_path(
-        pymod.modes.load, x,
-        pymod.names.modulepath,
-        two.strpath)
+        x, pymod.modes.load, pymod.names.modulepath, two.strpath)
     a = pymod.modulepath.get('a')
     assert a.filename == os.path.join(one.strpath, 'a.py')
     assert x.unlocks(two.strpath)
 
     pymod.mc.callback.remove_path(
-        pymod.modes.load, x,
-        pymod.names.modulepath,
-        two.strpath)
+        x, pymod.modes.load, pymod.names.modulepath, two.strpath)
     a = pymod.modulepath.get('a')
     assert a.filename == os.path.join(one.strpath, 'a.py')
 
     pymod.mc.callback.prepend_path(
-        pymod.modes.load, x,
-        pymod.names.modulepath,
-        two.strpath)
+        x, pymod.modes.load, pymod.names.modulepath, two.strpath)
     a = pymod.modulepath.get('a')
     assert a.filename == os.path.join(two.strpath, 'a.py')
     assert x.unlocks(two.strpath)
@@ -253,19 +247,19 @@ def test_mc_callback_setenv():
     setenv = pymod.mc.callback.setenv
     unsetenv = pymod.mc.callback.unsetenv
 
-    setenv(pymod.modes.load, None, 'foo', 'bar')
+    setenv(None, pymod.modes.load, 'foo', 'bar')
     assert pymod.environ.environ['foo'] == 'bar'
-    setenv(pymod.modes.unload, None, 'foo', 'bar')
+    setenv(None, pymod.modes.unload, 'foo', 'bar')
     assert pymod.environ.environ['foo'] is None
 
-    setenv(pymod.modes.load, None, 'foo', 'bar')
+    setenv(None, pymod.modes.load, 'foo', 'bar')
     assert pymod.environ.environ['foo'] == 'bar'
-    unsetenv(pymod.modes.load, None, 'foo')
+    unsetenv(None, pymod.modes.load, 'foo')
     assert pymod.environ.environ['foo'] is None
 
-    setenv(pymod.modes.load, None, 'foo', 'bar')
+    setenv(None, pymod.modes.load, 'foo', 'bar')
     assert pymod.environ.environ['foo'] == 'bar'
-    unsetenv(pymod.modes.unload, None, 'foo')
+    unsetenv(None, pymod.modes.unload, 'foo')
     assert pymod.environ.environ['foo'] == 'bar'
 
 
@@ -275,18 +269,18 @@ def test_mc_callback_family(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     module = pymod.modulepath.get('ucc')
     family_name = 'compiler'
-    family(pymod.modes.load, module, family_name)
+    family(module, pymod.modes.load, family_name)
     assert pymod.environ.environ['MODULE_FAMILY_COMPILER'] == 'ucc'
     assert pymod.environ.environ['MODULE_FAMILY_COMPILER_VERSION'] == '1.2'
 
-    family(pymod.modes.unload, module, family_name)
+    family(module, pymod.modes.unload, family_name)
     assert pymod.environ.environ['MODULE_FAMILY_COMPILER'] is None
     assert pymod.environ.environ['MODULE_FAMILY_COMPILER_VERSION'] is None
 
     pymod.environ.environ['MODULE_FAMILY_COMPILER'] = 'ucc'
     pymod.environ.environ['MODULE_FAMILY_COMPILER_VERSION'] = '2.0'
     with pytest.raises(pymod.error.FamilyLoadedError):
-        family(pymod.modes.load, module, family_name)
+        family(module, pymod.modes.load, family_name)
 
 
 def test_mc_callback_help(tmpdir, mock_modulepath):
@@ -295,7 +289,7 @@ def test_mc_callback_help(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     a = pymod.modulepath.get('a')
     helpstr = 'a help string'
-    help(pymod.modes.load, a, helpstr)
+    help(a, pymod.modes.load, helpstr)
     assert a._helpstr == helpstr
 
 
@@ -306,9 +300,9 @@ def test_mc_callback_whatis(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     a = pymod.modulepath.get('a')
     whatis_str = 'a whatis string'
-    whatis(pymod.modes.load, a, whatis_str)
+    whatis(a, pymod.modes.load, whatis_str)
     assert a._whatis['direct set'][0] == whatis_str
-    whatis(pymod.modes.load, a, name='foo', version='x',
+    whatis(a, pymod.modes.load, name='foo', version='x',
            short_description='a short description',
            foo_bar='baz')
     assert a._whatis['name'] == 'foo'
@@ -317,10 +311,10 @@ def test_mc_callback_whatis(tmpdir, mock_modulepath):
     assert a._whatis['short description'] == 'a short description'
 
     b = pymod.modulepath.get('b')
-    whatis(pymod.modes.load, b, whatis_str)
+    whatis(b, pymod.modes.load, whatis_str)
     assert b._whatis['short description'] == whatis_str
     with pytest.raises(ValueError):
-        whatis(pymod.modes.load, b, whatis_str, whatis_str, whatis_str)
+        whatis(b, pymod.modes.load, whatis_str, whatis_str, whatis_str)
 
 
 def test_mc_callback_use(tmpdir, mock_modulepath):
@@ -341,7 +335,7 @@ def test_mc_callback_use(tmpdir, mock_modulepath):
     b = pymod.modulepath.get('b')
     assert b.modulepath == one.strpath
 
-    use(pymod.modes.load, x, two.strpath, append=True)
+    use(x, pymod.modes.load, two.strpath, append=True)
     assert x.unlocks(two.strpath)
     assert pymod.modulepath.contains(two.strpath)
     a = pymod.modulepath.get('a')
@@ -349,7 +343,7 @@ def test_mc_callback_use(tmpdir, mock_modulepath):
     b = pymod.modulepath.get('b')
     assert b.modulepath == one.strpath
 
-    use(pymod.modes.unload, x, two.strpath, append=True)
+    use(x, pymod.modes.unload, two.strpath, append=True)
     assert x.unlocks(two.strpath)
     assert not pymod.modulepath.contains(two.strpath)
     a = pymod.modulepath.get('a')
@@ -357,7 +351,7 @@ def test_mc_callback_use(tmpdir, mock_modulepath):
     b = pymod.modulepath.get('b')
     assert b.modulepath == one.strpath
 
-    use(pymod.modes.load, x, two.strpath)
+    use(x, pymod.modes.load, two.strpath)
     assert x.unlocks(two.strpath)
     assert pymod.modulepath.contains(two.strpath)
     a = pymod.modulepath.get('a')
@@ -365,7 +359,7 @@ def test_mc_callback_use(tmpdir, mock_modulepath):
     b = pymod.modulepath.get('b')
     assert b.modulepath == two.strpath
 
-    unuse(pymod.modes.load, x, two.strpath)
+    unuse(x, pymod.modes.load, two.strpath)
     assert not pymod.modulepath.contains(two.strpath)
     a = pymod.modulepath.get('a')
     assert a.modulepath == one.strpath

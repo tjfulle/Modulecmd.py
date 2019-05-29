@@ -4,15 +4,19 @@ import sys
 import json
 from six import StringIO
 from ordereddict_backport import OrderedDict
+
 import pymod.names
+import pymod.paths
 import pymod.environ
+
 import llnl.util.tty as tty
 from llnl.util.tty import terminal_size
 from llnl.util.tty.colify import colified
+from llnl.util.lang import Singleton
 
-"""Manages a collection of modules"""
 
 class Collections:
+    """Manages a collection of modules"""
     version = (1, 0)
     def __init__(self, filename):
         self.filename = filename
@@ -80,7 +84,7 @@ class Collections:
             s = colified(names, width=width)
             sio.write('{0}\n{1}\n'
                       .format(' Saved collections '.center(width, '-'), s))
-        elif names:
+        else:
             sio.write('\n'.join(c for c in names))
         string = sio.getvalue()
         return string
@@ -177,3 +181,51 @@ class Collections:
         elif version != self.version:
             raise ValueError('No known conversion from Collections version '
                              '{0} to {1}'.format(version, self.version))
+
+
+def _collections():
+    basename = pymod.names.collections_file_basename
+    for dirname in (pymod.paths.user_config_platform_path,
+                    pymod.paths.user_config_path):
+        filename = os.path.join(dirname, basename)
+        if os.path.exists(filename):  # pragma: no cover
+            break
+    else:
+        filename = os.path.join(
+            pymod.paths.user_config_platform_path,
+            basename)
+
+    # it is okay that we may not have found a config file, if it doesn't
+    # exist, Collections will create it
+    return Collections(filename)
+
+
+collections = Singleton(_collections)
+
+
+def save(name, loaded_modules):
+    return collections.save(name, loaded_modules)
+
+
+def remove(name):
+    return collections.remove(name)
+
+
+def get(name):
+    return collections.get(name)
+
+
+def avail(terse=False, regex=None):
+    return collections.avail(terse=terse, regex=regex)
+
+
+def show(name):
+    return collections.show(name)
+
+
+def contains(name):
+    return name in collections
+
+
+def version():
+    return Collections.version

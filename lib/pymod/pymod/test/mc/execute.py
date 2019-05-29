@@ -13,7 +13,7 @@ def test_mc_execute(tmpdir):
 
 def test_mc_execute_2(tmpdir, mock_modulepath):
     f = os.path.join(tmpdir.strpath, 'foobar')
-    tmpdir.join('a.py').write("execute('touch {0}', mode='load')".format(f))
+    tmpdir.join('a.py').write("execute('touch {0}', when=mode()=='load')".format(f))
     mock_modulepath(tmpdir.strpath)
     pymod.mc.load('a')
     assert os.path.isfile(f)

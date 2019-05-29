@@ -5,7 +5,7 @@ import pymod.module
 import pymod.environ
 from pymod.error import FamilyLoadedError
 
-def family(mode, module, family_name):
+def family(module, mode, family_name):
     """Assign a family"""
 
     name = module.name
