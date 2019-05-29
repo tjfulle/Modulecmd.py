@@ -5,7 +5,7 @@ import pymod.modes
 import pymod.modulepath
 from pymod.error import ModuleNotFoundError
 
-"""Module defines callback functions between modules and pymod.
+"""Defines callback functions between modules and pymod.
 
 Every function has for the first two arguments: module, mode
 
@@ -16,6 +16,35 @@ __all__ = ['callback']
 
 
 def callback(func, module, mode, when=None, **kwds):
+    """Create a callback function by wrapping `func`
+
+    Parameters
+    ----------
+    func : function
+        The function object to wrap
+    module : Module
+        The module being executed
+    mode : Mode
+        The mode of execution
+    when : bool
+        Conditional defining when to evaluate the callback.  If None (unset) or
+        True, the function `func` is wrapped.  Otherwise, an empty lambda is
+        wrapped.
+    kwds : dict
+        Extra keyword arguments to be sent to `func`
+
+    Notes
+    -----
+    This function is intended to be used by pymod.mc.execmodule to wrap
+    functions to be sent to modules being executed.  The functions allow modules
+    to interact with and modify pymod.environ, which in turn modifies the
+    user's shell environment.
+
+    The `module` and `mode` arguments are the first two arguments to any
+    function wrapped.  `module` is the Module object of the module being
+    executed and `mode` is the execution mode (i.e., 'load', 'unload', etc.)
+
+    """
     if when is None:
         when = (mode != pymod.modes.load_partial and
                 mode not in pymod.modes.informational)
@@ -27,11 +56,36 @@ def callback(func, module, mode, when=None, **kwds):
     return wrapper
 
 
-def swap(module, mode, name_a, name_b, **kwargs):
+def swap(module, mode, cur, new, **kwargs):
+    """Swap module `cur` for module `new`
+
+    Parameters
+    ----------
+    module : Module
+        The module being executed
+    mode : Mode
+        The mode of execution
+    cur : str
+        The name of the module to unload
+    new : str
+        The name of the module to load in place of `cur`
+
+    Notes
+    -----
+    `swap` essentially performs an unload of `cur` followed by a load of `new`.
+    However, when unloading `cur`, all modules loaded after `cur` are also
+    unloaded in reverse order.  After loading `new`, the unloaded modules are
+    reloaded in the order they were originally loaded.  If the MODULEPATH
+    changes as a result of the swap, it is possible that some of these modules
+    will be swapped themselves, or not reloaded at all.
+
+    The swap is not performed if `mode` == 'unload'.
+
+    """
     pymod.modes.assert_known_mode(mode)
     if mode != pymod.modes.unload:
         # We don't swap modules in unload mode
-        return pymod.mc.swap(name_a, name_b, caller='modulefile')
+        return pymod.mc.swap(cur, new, caller='modulefile')
 
 
 def load_first(module, mode, *names):
