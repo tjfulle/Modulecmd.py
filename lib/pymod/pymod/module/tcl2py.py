@@ -1,5 +1,6 @@
 import os
 
+import pymod.mc
 import pymod.modes
 import pymod.paths
 import pymod.names
@@ -17,7 +18,10 @@ def tcl2py(module, mode):
     mode = {'show': 'display'}.get(mode, mode)
 
     args = []
-    args.extend(('-l', env.get(pymod.names.loaded_modules, '')))
+    # loaded modules
+    loaded_modules = pymod.mc.get_loaded_modules()
+    lm_names = list(set([x for m in loaded_modules for x in [m.name, m.fullname]]))
+    args.extend(('-l', ':'.join(lm_names)))
     args.extend(('-f', module.fullname))
     args.extend(('-m', mode))
     args.extend(('-u', module.name))
