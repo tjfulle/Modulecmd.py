@@ -61,14 +61,6 @@ def dirtrees(tmpdir):
     return tmpdir
 
 
-def test_modulepath_discover_root(mock_modulepath):
-    with pytest.raises(ValueError):
-        modules = pymod.modulepath.discover.find_modules('/')
-    with pytest.raises(ValueError):
-        mock_modulepath('/')
-    assert pymod.modulepath.discover.find_modules('fake') is None
-
-
 def test_modulepath_two_defaults(tmpdir, mock_modulepath):
     one = tmpdir.mkdir('1')
     X = one.mkdir('X')
