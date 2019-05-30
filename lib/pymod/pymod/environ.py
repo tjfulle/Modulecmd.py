@@ -5,8 +5,14 @@ import pymod.names
 import pymod.shell
 import pymod.modulepath
 
+from contrib.util import boolean
+from contrib.util import join, split, pop
+from contrib.util import dict_to_str, str_to_dict
+from contrib.util import list_to_str, str_to_list
+
 import llnl.util.tty as tty
-from contrib.util import str_to_dict, dict_to_str, boolean, split, join, pop
+from llnl.util.lang import Singleton
+
 
 class Environ(dict):
 
@@ -183,3 +189,98 @@ class Environ(dict):
         if count > 0:
             current_path.meta[value] = (count, priority)
         self.set_path(current_path)
+
+
+environ = Singleton(Environ)
+
+
+def set_env(env):
+    global environ
+    environ = env
+
+
+def is_empty():
+    return environ.is_empty()
+
+
+def format_output():
+    return environ.format_output()
+
+
+def get(key, default=None):
+    return environ.get(key, default)
+
+
+def get_bool(key):
+    return environ.get_bool(key)
+
+
+def set(key, value):
+    return environ.set(key, value)
+
+
+def unset(key):
+    return environ.unset(key)
+
+
+def set_alias(key, value):
+    return environ.set_alias(key, value)
+
+
+def unset_alias(key):
+    return environ.unset_alias(key)
+
+
+def set_shell_function(key, value):
+    return environ.set_shell_function(key, value)
+
+
+def unset_shell_function(key):
+    return environ.unset_shell_function(key)
+
+
+def append_path(key, value, sep=os.pathsep):
+    return environ.append_path(key, value, sep)
+
+
+def prepend_path(key, value, sep=os.pathsep):
+    return environ.prepend_path(key, value, sep)
+
+
+def remove_path(key, value, sep=os.pathsep):
+    return environ.remove_path(key, value, sep)
+
+
+def get_path(key, sep=os.pathsep):
+    return split(environ.get(key), sep=sep)
+
+
+def set_path(key, path, sep=os.pathsep):
+    value = join(path, sep=sep)
+    return environ.set(key, value)
+
+
+def get_dict(key):
+    return str_to_dict(environ.get(key))
+
+
+def set_dict(key, arg):
+    value = dict_to_str(arg)
+    return environ.set(key, value)
+
+
+def get_list(key):
+    return str_to_list(environ.get(key))
+
+
+def set_list(key, arg):
+    value = list_to_str(arg)
+    return environ.set(key, value)
+
+
+def filtered(include_os=False):
+    return environ.filtered(include_os=include_os)
+
+
+def copy(include_os=False):
+    return environ.copy(include_os=include_os)
