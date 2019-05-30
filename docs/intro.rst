@@ -6,11 +6,13 @@ Introduction
 
 ``Modulecmd.py`` provides a framework for processing module files written in Python.  Additionally, ``Modulecmd.py`` processes TCL modules by wrapping the TCL module command.  TCL compatibility requires that ``tclsh`` be found on the user's ``PATH`` (the TCL module command is provided by ``Modulecmd.py``).  Likewise, ``lmod`` can process most TCL modules.
 
-## Why another module system?
+Why another module system?
+--------------------------
 
 TCL modules and the associated TCL module command are ubiquitous on most HPC systems I work on, but I don't work in/write TCL; ``lmod`` adds unique capabilities to the TCL module command and is actively developed, but is not available on most of the machines I work on and requires an extra build step; but mostly, I prefer to write python and every system on which I work has a Python installation.
 
-# What Are Environment Modules?
+What Are Environment Modules?
+-----------------------------
 
 Environment modules, or just modules, are files containing commands that, when processed by the module framework, modify the current shell's environment.  Modules allow users to dynamically modify their environment.  For example, a module file (call it ``foo.py``) containing the following command, sets the environment variable ``FOO`` to the value ``BAR``
 
@@ -26,7 +28,8 @@ The module is loaded in to the environment with the following command
 
 (note the absence of the extension ``.py``).  With modules, environment variables, path-like variables, aliases, and shell functions can be set/unset/modified.
 
-## Why Environment Modules?
+Why Environment Modules?
+------------------------
 
 Consider the workflow of a developer working on two projects requiring compilers ``ucc-1.0`` and ``ucc-2.0``, respectively.  Binaries created by each compiler are incompatible with the other.  The developer creates two ``Modulecmd.py`` modules containing the following instructions
 
@@ -66,82 +69,48 @@ Clone or download ``Modulecmd.py``.  In your ``.bashrc``, execute the following:
 where ``${MODULECMD_PY_DIR}`` is the path to the directory where ``Modulecmd.py`` is
 cloned.
 
-# The module Command
+The module Command
+------------------
 
 The ``Modulecmd.py`` initialization defines the ``module`` shell function that executes ``Modulecmd.py`` modules.  Valid subcommands of ``module`` are:
 
 .. code-block:: console
 
-    reset               Reset environment to initial environment
-    setenv              Set environment variables
-    avail               Display available modules
-    list                Display loaded modules
-    edit                Edit module files
-    show                Show module[s]
-    cat                 cat module[s] to screen
-    load                Load module[s]
-    unload              Unload module[s]
-    reload              Reload module[s]
-    use                 Add directory[s] to MODULEPATH
-    unuse               Remove directory[s] from MODULEPATH
-    purge               Unload all modules
-    swap                Swap modules
-    whatis              Display module whatis string
+   modify environment:
+     load (add)            Load modules into environment
+     unload (rm)           Unload modules from environment
+     reload                Reload a loaded module
+     swap                  Swaps two modules, effectively unloading the first then loading the second
+     purge                 Remove all loaded modules
+     refresh               Unload and reload all loaded modules
+     avail (av)            Displays available modules
+     info                  Provides information on a particular loaded module
+     reset                 Reset environment to initial state
 
-Modulecmd.py Module Files
-=========================
+   clones:
+     clone                 Manipulate cloned environments
 
-``Modulecmd.py`` module files are executed by the ``Modulecmd.py`` framework.  ``Modulecmd.py`` executes module files in an environment providing the following commands:
+   collections:
+     save                  Save loaded modules
+     restore               Restore saved modules or, optionally, a clone
+     remove                Remove saved collection of modules
 
-- ``getenv(name)``: Get the value of environment variable given by ``name``.  Returns ``None`` if ``name`` is not defined.
-- ``get_hostname()``: Get the value of the host name of the sytem.
-- ``mode()``: Return the active mode.  One of ``"load"`` or ``"unload"``
+   informational:
+     list (ls)             Display loaded modules
+     whatis                Display module whatis string.  The whatis string is a short informational
+                           message a module can provide.  If not defined by the module, a default is
+                           displayed.
+     show                  Show the commands that would be issued by module load
+     cat                   Print contents of a module or collection to the console output.
+     more                  Print contents of a module or collection to the console output one
+                           page at a time.  Allows movement through files similar to shell's `less`
+                           program.
+     find (which)          Show path to module file
 
-## Message logging
-
-- ``log_info(message)``: Log an informational message to the console.
-- ``log_warning(message)``: Log a warning message to the console.
-- ``log_error(message)``: Log an error message to the console and quit.
-
-## Environment Modification
-
-- ``setenv(variable, value)``: Set the environment variable ``variable`` to ``value``.
-- ``unsetenv(variable)``: Unset the environment variable ``variable``.
-
-- ``set_alias(name, value)``: Set the alias ``name`` to ``value``.
-- ``unset_alias(name)``: Unset the alias given by ``name``.
-
-- ``set_shell_function(name, value)``: Set the shell function ``name`` to ``value``.
-- ``unset_shell_function(name, value)``: Unset the shell function ``name``
-
-- ``prepend_path(pathname, value)``: Prepend ``value`` to path-like variable ``pathname``.
-- ``append_path(pathname, value)``: Append ``value`` to path-like variable ``pathname``.
-- ``remove_path(pathname, value)``: Remove ``value`` from path-like variable ``pathname``.
-
-## Interaction with Other Modules
-
-- ``prereq(name)``: Module ``name`` is a prerequisite of this module.  If ``name`` is not loaded, ``Modulecmd.py`` will quit.
-- ``prereq_any(*names)``: Any one of ``names`` is a prerequisite of this module.  If none of ``names`` is not loaded, ``Modulecmd.py`` will quit.
-
-- ``load(name)``: Load the module ``name``.
-- ``load_first(*names)``: Load the first module in ``names``.
-- ``unload(name)``: Unload the module ``name``.
-
-## Other Commands
-
-- ``family(name)``: Set the name of the module's family.
-- ``execute(command)``: Execute ``command`` in the current shell.
-- ``whatis(string)``: Store ``string`` as an informational message describing this module.
-
-# Other Objects/Constants
-
-- ``self``: Reference to this modules object.
-- ``HOME``: The path to ``${HOME}``
-- ``USER``: The name of ``${USER}``
-- ``IS_DARWIN``: Boolean.  ``True`` if the system is Darwin.  ``False`` otherwise.
-- ``user_env``: Reference to a user defined Python module containing custom commands.
-- ``args``: List of commands passed from command line to this module.
-
+   modulepath:
+     path                  Show MODULEPATH
+     use                   Add (use) directory[s] to MODULEPATH
+     unuse                 Remove (unuse) directory[s] from MODULEPATH
 
 .. _Environment Modules: http://modules.sourceforge.net
 .. _lmod: https://lmod.readthedocs.io/en/latest
