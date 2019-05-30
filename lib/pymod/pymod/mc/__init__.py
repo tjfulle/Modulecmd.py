@@ -10,6 +10,7 @@ from pymod.mc.dump import dump
 from pymod.mc.execmodule import execmodule
 from pymod.mc.execute import execute
 from pymod.mc.family import family
+from pymod.mc.find import find
 from pymod.mc.help import help
 from pymod.mc.init import init
 from pymod.mc.list import list

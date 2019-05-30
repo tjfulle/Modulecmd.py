@@ -1,6 +1,4 @@
-import sys
-import pymod.modulepath
-from pymod.error import ModuleNotFoundError
+import pymod.mc
 
 description = 'Show path to module file'
 level = 'short'
@@ -14,8 +12,4 @@ def setup_parser(subparser):
 
 
 def find(parser, args):
-    for name in args.names:
-        module = pymod.modulepath.get(name)
-        if module is None:
-            raise ModuleNotFoundError(name)
-        sys.stderr.write(module.filename + '\n')
+    pymod.mc.find(args.names)
