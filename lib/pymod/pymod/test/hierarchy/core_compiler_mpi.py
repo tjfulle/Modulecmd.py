@@ -46,7 +46,7 @@ mpi/
 
 
 @pytest.fixture()
-def modules_path(tmpdir, namespace, modulecmds):
+def hierarchy(tmpdir, namespace, modulecmds):
     m = modulecmds
 
     # Build the mpi dependent modules
@@ -88,11 +88,11 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-def test_mc_hierarchy_1(modules_path, mock_modulepath):
+def test_hierarchy_fixture_layout(hierarchy, mock_modulepath):
     """Loop through the module hierarchy to make sure it is laid out
     correctly"""
-    core_path = modules_path.core
-    mock_modulepath(modules_path.core)
+    core_path = hierarchy.core
+    mock_modulepath(hierarchy.core)
 
     is_module = lambda x: pymod.modulepath.get(x) is not None
 
@@ -132,7 +132,7 @@ def test_mc_hierarchy_1(modules_path, mock_modulepath):
     return
 
 
-def test_mc_hierarchy_2(modules_path, mock_modulepath):
+def test_hierarchy_core_compiler_mpi(hierarchy, mock_modulepath):
     """Tests the basic functionality of module hierarchy.
 
     Steps:
@@ -149,8 +149,8 @@ def test_mc_hierarchy_2(modules_path, mock_modulepath):
     accordingly
 
     """
-    core_path = modules_path.core
-    mock_modulepath(modules_path.core)
+    core_path = hierarchy.core
+    mock_modulepath(hierarchy.core)
 
     _compiler_unlocks_dir = lambda cc, cv: os.path.normpath(
         os.path.join(core_path, '..', 'compiler', cc, cv))

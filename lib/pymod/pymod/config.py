@@ -85,14 +85,23 @@ def _config():
     cfg = Configuration()
 
     config_basename = pymod.names.config_file_basename
-    default_config_file = os.path.join(pymod.paths.etc_path, config_basename)
+
+    default_config_file = os.path.join(
+        pymod.paths.etc_path, 'defaults', config_basename)
     defaults = load_config(default_config_file)
     cfg.push_scope('defaults', defaults)
+
+    admin_config_file = os.path.join(
+        pymod.paths.etc_path, config_basename)
+    if os.path.isfile(admin_config_file):  # pragma: no cover
+        admin = load_config(admin_config_file)
+        cfg.push_scope('user', admin)
 
     user_config_file = os.getenv(pymod.names.config_file_envar)
     if user_config_file is not None:  # pragma: no cover
         user = load_config(user_config_file)
         cfg.push_scope('user', user)
+
     else:  # pragma: no cover
         for dirname in (pymod.paths.user_config_path,
                         pymod.paths.user_config_platform_path):

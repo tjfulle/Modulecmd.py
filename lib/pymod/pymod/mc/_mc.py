@@ -120,9 +120,8 @@ def register_module(module):
         increment_refcount(module)
         loaded_modules.append(module)
         set_loaded_modules(loaded_modules)
-    elif pymod.config.get('debug'):  # pragma: no cover
-        tty.die('Attempting to register {0} which is already loaded!'
-                .format(module))
+    else:
+        raise ModuleRegisteredError(module)
 
 
 def unregister_module(module):
@@ -137,11 +136,10 @@ def unregister_module(module):
     for (i, loaded) in enumerate(loaded_modules):
         if loaded.filename == module.filename:
             break
-    else:  # pragma: no cover
-        tty.die('Attempting to unregister {0} which is not loaded!'
-                .format(module))
-    loaded_modules.pop(i)
+    else:
+        raise ModuleNotRegisteredError(module)
     module.refcount = 0
+    loaded_modules.pop(i)
     set_loaded_modules(loaded_modules)
 
 
@@ -208,3 +206,17 @@ def format_changed_module_state():
             sio.write('  {0}) {1} => {2}\n'.format(i+1, a, b))
 
     return sio.getvalue()
+
+
+class ModuleRegisteredError(Exception):
+    def __init__(self, module):
+        msg = 'Attempting to register {0} which is already registered!'
+        superini = super(ModuleRegisteredError, self).__init__
+        superini(msg.format(module))
+
+
+class ModuleNotRegisteredError(Exception):
+    def __init__(self, module):
+        msg = 'Attempting to unregister {0} which is not registered!'
+        superini = super(ModuleNotRegisteredError, self).__init__
+        superini(msg.format(module))

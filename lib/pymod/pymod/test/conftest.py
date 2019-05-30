@@ -99,7 +99,7 @@ def mock_config():
     real_configuration = pymod.config.config
     cfg = pymod.config.Configuration()
     basename = pymod.names.config_file_basename
-    default_config_file = os.path.join(pymod.paths.etc_path, basename)
+    default_config_file = os.path.join(pymod.paths.etc_path, 'defaults', basename)
     defaults = pymod.config.load_config(default_config_file)
     cfg.push_scope('defaults', defaults)
 
