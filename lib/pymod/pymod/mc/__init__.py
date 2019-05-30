@@ -12,6 +12,7 @@ from pymod.mc.execute import execute
 from pymod.mc.family import family
 from pymod.mc.find import find
 from pymod.mc.help import help
+from pymod.mc.info import info
 from pymod.mc.init import init
 from pymod.mc.list import list
 from pymod.mc.load import load, load_impl, load_partial
