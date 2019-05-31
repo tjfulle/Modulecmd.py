@@ -1,9 +1,12 @@
 from __future__ import print_function
 
-import sys
+import os
 import re
+import sys
 import argparse
 
+import llnl.util.tty as tty
+from llnl.util.tty.colify import colify
 from llnl.util.argparsewriter import ArgparseWriter, ArgparseRstWriter
 
 import pymod.main
@@ -30,8 +33,14 @@ def setup_parser(subparser):
         '--format', default='names', choices=formatters,
         help='format to be used to print the output (default: names)')
     subparser.add_argument(
-        'documented_commands', nargs=argparse.REMAINDER,
-        help='list of documented commands to cross-references')
+        '--header', metavar='FILE', default=None, action='store',
+        help='prepend contents of FILE to the output (useful for rst format)')
+    subparser.add_argument(
+        '--update', metavar='FILE', default=None, action='store',
+        help='write output to the specified file, if any command is newer')
+    subparser.add_argument(
+        'rst_files', nargs=argparse.REMAINDER,
+        help='list of rst files to search for `_cmd-module-<cmd>` cross-refs')
 
 
 class PymodArgparseRstWriter(ArgparseRstWriter):
@@ -51,14 +60,15 @@ class PymodArgparseRstWriter(ArgparseRstWriter):
 
 class SubcommandWriter(ArgparseWriter):
     def begin_command(self, prog):
-        sys.stderr.write('    ' * self.level + prog + '\n')
+        self.out.write('    ' * self.level + prog)
+        self.out.write('\n')
 
 
 @formatter
-def subcommands(args):
+def subcommands(args, out):
     parser = pymod.main.make_argument_parser()
     pymod.main.add_all_commands(parser)
-    SubcommandWriter().write(parser)
+    SubcommandWriter(out).write(parser)
 
 
 def rst_index(out=sys.stderr):
@@ -89,30 +99,67 @@ def rst_index(out=sys.stderr):
 
 
 @formatter
-def rst(args):
-    # print an index to each command
-    rst_index()
-    sys.stderr.write('\n')
-
+def rst(args, out):
     # create a parser with all commands
     parser = pymod.main.make_argument_parser()
     pymod.main.add_all_commands(parser)
 
-    # get documented commands from the command line
-    documented_commands = set(args.documented_commands)
+    # extract cross-refs of the form `_cmd-pymod-<cmd>:` from rst files
+    documented_commands = set()
+    for filename in args.rst_files:  # pragma: no cover
+        with open(filename) as f:
+            for line in f:
+                match = re.match(r'\.\. _cmd-(pymod-.*):', line)
+                if match:
+                    documented_commands.add(match.group(1).strip())
+
+    # print an index to each command
+    rst_index(out)
+    out.write('\n')
 
     # print sections for each command and subcommand
-    PymodArgparseRstWriter(documented_commands).write(parser, root=1)
+    PymodArgparseRstWriter(documented_commands, out).write(parser, root=1)
 
 
 @formatter
-def names(args):
-    for command in pymod.command.all_commands():
-        sys.stderr.write(command + '\n')
+def names(args, out):
+    colify(pymod.command.all_commands(), output=out)
+
+
+def prepend_header(args, out):  # pragma: no cover
+    if not args.header:
+        return
+
+    with open(args.header) as header:
+        out.write(header.read())
 
 
 def commands(parser, args):
 
-    # Print to stdout
-    formatters[args.format](args)
-    return
+    # Print to stderr
+    formatter = formatters[args.format]
+
+     # check header first so we don't open out files unnecessarily
+    if args.header and not os.path.exists(args.header):  # pragma: no cover
+        tty.die("No such file: '%s'" % args.header)
+
+    # if we're updating an existing file, only write output if a command
+    # is newer than the file.
+    if args.update:  # pragma: no cover
+        if os.path.exists(args.update):
+            files = [
+                pymod.command.get_module(command).__file__.rstrip('c')  # pyc -> py
+                for command in pymod.command.all_commands()]
+            last_update = os.path.getmtime(args.update)
+            if not any(os.path.getmtime(f) > last_update for f in files):
+                tty.msg('File is up to date: %s' % args.update)
+                return
+
+        tty.msg('Updating file: %s' % args.update)
+        with open(args.update, 'w') as f:
+            prepend_header(args, f)
+            formatter(args, f)
+
+    else:
+        prepend_header(args, sys.stderr)
+        formatter(args, sys.stderr)

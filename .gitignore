@@ -6,3 +6,4 @@ htmlcov
 __pycache__
 *.pyc
 .#*
+commands.rst

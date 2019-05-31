@@ -12,8 +12,9 @@ import sys
 
 class ArgparseWriter(object):
     """Analyzes an argparse ArgumentParser for easy generation of help."""
-    def __init__(self):
+    def __init__(self, out=sys.stderr):
         self.level = 0
+        self.out = out
 
     def _write(self, parser, root=True, level=0):
         self.parser = parser
@@ -137,7 +138,7 @@ _rst_levels = ['=', '-', '^', '~', ':', '`']
 class ArgparseRstWriter(ArgparseWriter):
     """Write argparse output as rst sections."""
 
-    def __init__(self, out=sys.stdout, rst_levels=_rst_levels,
+    def __init__(self, out=sys.stderr, rst_levels=_rst_levels,
                  strip_root_prog=True):
         """Create a new ArgparseRstWriter.
 

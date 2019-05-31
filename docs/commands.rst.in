@@ -1,0 +1,5 @@
+==================
+The module Command
+==================
+
+The ``Modulecmd.py`` initialization defines the ``module`` shell function that executes ``Modulecmd.py`` modules.  Valid subcommands of ``module`` are:

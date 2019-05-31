@@ -1,7 +1,13 @@
 Installation
 ============
 
-Clone or download ``Modulecmd.py``.  In your ``.bashrc``, add the following:
+Clone or download ``Modulecmd.py`` and source the appropriate setup script in your shell's initialization script. The ``Modulecmd.py`` initialization defines the ``module`` shell function that executes ``Modulecmd.py`` modules.
+
+----
+Bash
+----
+
+In your ``.bashrc``, add the following:
 
 .. code-block:: shell
 
@@ -10,4 +16,3 @@ Clone or download ``Modulecmd.py``.  In your ``.bashrc``, add the following:
 
 where ``${MODULECMD_PY_DIR}`` is the path to the directory where ``Modulecmd.py`` is cloned.
 
-The ``Modulecmd.py`` initialization defines the ``module`` shell function that executes ``Modulecmd.py`` modules.
