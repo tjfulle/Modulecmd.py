@@ -2,6 +2,7 @@ from pymod.mc._mc import *
 
 from . import clone
 from . import collection
+from . import tutorial
 
 from pymod.mc.avail import avail
 from pymod.mc.conflict import conflict

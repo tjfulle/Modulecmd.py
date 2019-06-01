@@ -290,6 +290,8 @@ def test_modulepath_auto_bump(dirtrees, mock_modulepath):
     for path in pymod.modulepath.walk():
         assert path.path is not None
 
+    pymod.modulepath.clear()
+
 
 def test_modulepath_walk(dirtrees, mock_modulepath):
 

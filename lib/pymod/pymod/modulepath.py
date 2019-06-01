@@ -51,6 +51,10 @@ class Modulepath:
                 return i
         raise ValueError('{0} not in Modulepath'.format(dirname))  # pragma: no cover
 
+    def clear(self):
+        for path in self.path[::-1]:
+            self.remove_path(path.path)
+
     @property
     def value(self):
         if not self.path:
@@ -323,3 +327,7 @@ def walk(start=0):
 
 def size():
     return len(_path)
+
+
+def clear():
+    return _path.clear()

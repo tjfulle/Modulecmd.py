@@ -8,6 +8,7 @@ import pymod.modes
 import pymod.environ
 import pymod.mc.callback
 import llnl.util.tty as tty
+from llnl.util.filesystem import working_dir
 from contrib.util import which, check_output, listdir
 
 from llnl.util.tty.color import colorize
@@ -49,10 +50,11 @@ def execmodule_in_sandbox(module, mode):
     module.prepare()
     ns = module_exec_sandbox(module, mode)
     code = compile(module.read(mode), module.filename, 'exec')
-    try:
-        exec_(code, ns, {})
-    except StopLoadingModuleError:
-        pass
+    with working_dir(os.path.dirname(module.filename)):
+        try:
+            exec_(code, ns, {})
+        except StopLoadingModuleError:
+            pass
 
 
 def module_exec_sandbox(module, mode):
