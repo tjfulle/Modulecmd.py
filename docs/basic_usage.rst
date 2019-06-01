@@ -13,7 +13,7 @@ The ``MODULEPATH``
 
 Modulecmd.py searches for modules in the user's ``MODULEPATH``.  ``MODULEPATH``
 is a colon separated list of directories containing modules.  ``MODULEPATH`` is
-to modules what ``PATH`` is to executables.  
+to modules what ``PATH`` is to executables.
 
 In the following examples, a mock ``MODULEPATH`` is used.  You can set an
 identical mock ``MODULEPATH`` and follow along in your shell by executing
@@ -182,7 +182,7 @@ Loading and unloading modules
 -----------------------------
 
 The subcommand ``load`` loads a module.  When a module is loaded, its commands
-are translated and sent to the shell.  To load the module A do:
+are translated and sent to the shell.  To load the module ``A`` do:
 
 .. code-block:: console
 
@@ -230,6 +230,7 @@ The previously loaded version of module ``C`` was unloaded and version ``1.0``
 loaded in its place.
 
 .. code-block:: console
+
   $ module ls
   Currently loaded modules
       1) A  2) C/1.0
@@ -239,6 +240,7 @@ Two modules ``C/1.0`` exist on ``MODULEPATH``.  Which one was loaded?  The
 subcommand ``info`` gives basic information about a loaded module
 
 .. code-block:: console
+
   $ module info C
 
   Module: C/1.0
@@ -252,6 +254,7 @@ As expected, the module loaded was the first on ``MODULEPATH``.
 To unload a module, issue the ``unload`` subcommand
 
 .. code-block:: console
+
   $ module unload C
   $ module ls
   Currently loaded modules
@@ -292,10 +295,17 @@ Two modules are swapped with the ``swap`` subcommand:
     1) A => B
 
 .. code-block:: console
+
   $ module ls
 
   Currently loaded modules
       1) B
+
+----------------------------
+Adding to the ``MODULEPATH``
+----------------------------
+
+The ``use`` subcommand adds paths to ``MODULEPATH``.
 
 ------------
 Getting help
