@@ -162,6 +162,7 @@ def gen_basic_modules(base_dir):
 
     with open(join_path(d1, 'A.py'), 'w') as fh:
         fh.write("setenv('A', 'A-1')\n")
+        fh.write("set_alias('ls-a', 'ls -a')\n")
 
     with open(join_path(d1, 'B.py'), 'w') as fh:
         fh.write("setenv('B', 'B-1')\n")

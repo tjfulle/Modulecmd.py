@@ -1,3 +1,4 @@
+import os
 import sys
 import pymod.modulepath
 
@@ -11,6 +12,10 @@ def setup_parser(subparser):
 
 
 def path(parser, args):
+    home = os.path.expanduser('~')
+    paths = []
+    for path in pymod.modulepath.path():
+        paths.append(path.replace(home, '~'))
     s = '\n'.join('{0}) {1}'.format(i, dirname) for i, dirname
-                  in enumerate(pymod.modulepath.path(), start=1))
+                  in enumerate(paths, start=1))
     sys.stderr.write(s + '\n')
