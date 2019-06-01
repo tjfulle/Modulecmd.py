@@ -53,7 +53,7 @@ def basic():
     basic_base_dir = mkdirp(root, 'basic')
     basic_dirs = gen_basic_modules(basic_base_dir)
 
-    for basic_dir in basic_dirs:
+    for basic_dir in basic_dirs[:2]:
         pymod.modulepath.append_path(basic_dir)
 
     if not pymod.environ.get_dict(pymod.names.tutorial_save_env):
@@ -182,5 +182,13 @@ def gen_basic_modules(base_dir):
     for version in ('1.0', '3.0'):
         with open(join_path(C, version+'.py'), 'w') as fh:
             fh.write("setenv('C', 'C-2-{0}')\n".format(version))
+
+    # Third
+    d3 = mkdirp(base_dir, '3')
+
+    C = mkdirp(d3, 'C')
+    for version in ('1.0', '4.0'):
+        with open(join_path(C, version+'.py'), 'w') as fh:
+            fh.write("setenv('C', 'C-3-{0}')\n".format(version))
 
     return d1, d2

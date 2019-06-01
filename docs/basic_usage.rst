@@ -167,12 +167,12 @@ The subcommand ``whatis`` displays more detailed information about the module
 .. code-block:: console
 
   $ module whatis A
-  ====================================== A =====================================
+  =================================== A ===================================
   Name: A
   Family: None
   Full Name: A
   Filename: ~/Library/Application Support/Modulecmd.py/basic/1/A.py
-  ==============================================================================
+  =========================================================================
 
 
 .. _basic-usage-load:
@@ -250,6 +250,18 @@ subcommand ``info`` gives basic information about a loaded module
 
 As expected, the module loaded was the first on ``MODULEPATH``.
 
+The same information can be obtained from the ``avail`` subcommand
+
+.. code-block:: console
+
+  $ module avail
+  --- ~/Library/Application Support/Modulecmd.py/basic/1 ---
+  A  B (D,L)  C/1.0 (L)  C/2.0
+
+  --- ~/Library/Application Support/Modulecmd.py/basic/2 ---
+  B  C/1.0  C/3.0 (D)
+
+The loaded modules are marked with ``(L)``.
 
 To unload a module, issue the ``unload`` subcommand
 
@@ -301,11 +313,74 @@ Two modules are swapped with the ``swap`` subcommand:
   Currently loaded modules
       1) B
 
+.. _basic-usage-use:
+
 ----------------------------
 Adding to the ``MODULEPATH``
 ----------------------------
 
-The ``use`` subcommand adds paths to ``MODULEPATH``.
+The ``use`` subcommand modifies ``MODULEPATH`` by either prepending or appending
+directories to it.  By default, directories are prepended.  Let's add a new
+directory to ``MODULEPATH``
+
+
+.. code-block:: console
+
+  $ module use "~/Library/Application Support/Modulecmd.py/basic/3"
+
+.. note::
+
+  The path may be slightly different dependent on your operating system.
+  Whatever the operating system, the directory you will ``use`` ends in
+  ``Modulecmd.py/basic/3``.
+
+.. code-block:: console
+
+  $ module avail
+  --- ~/Library/Application Support/Modulecmd.py/basic/3 ---
+  C/1.0  C/4.0 (D)
+
+  --- ~/Library/Application Support/Modulecmd.py/basic/1 ---
+  A  B (D,L)  C/1.0  C/2.0
+
+  --- ~/Library/Application Support/Modulecmd.py/basic/2 ---
+  B  C/1.0  C/3.0
+
+Since the new directory contained a logically higher version of module ``C``,
+its default changed and is now ``C/4.0``.
+
+
+The ``unuse`` subcommand removes a directory from ``MODULEPATH``
+
+.. code-block:: console
+
+  $ module unuse "~/Library/Application Support/Modulecmd.py/basic/1"
+
+
+  The following modules have been updated with a MODULEPATH change:
+    1) B => B
+
+Loaded module ``B`` on the path we just unused was updated to the next available
+version of ``B``, as seen below
+
+.. code-block:: console
+
+
+  module avail
+  --- ~/Library/Application Support/Modulecmd.py/basic/3 ---
+  C/1.0  C/4.0 (D)
+
+  --- ~/Library/Application Support/Modulecmd.py/basic/2 ---
+  B (L)  C/1.0  C/3.0
+
+
+.. warning::
+
+  Do not modify ``MODULEPATH`` outside of ``Modulecmd.py`` (eg, by
+  setting/unsetting the environment variable directly).  Doing so will lead to
+  unexpected behavior in Modulecmd.py.
+
+.. _basic-usage-help:
 
 ------------
 Getting help

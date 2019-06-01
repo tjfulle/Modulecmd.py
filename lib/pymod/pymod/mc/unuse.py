@@ -1,4 +1,5 @@
 import os
+import pymod.mc
 import pymod.modes
 import pymod.modulepath
 
@@ -10,6 +11,9 @@ def unuse(dirname):
     if not pymod.modulepath.contains(dirname):
         # Nothing to do!
         return
+
+    # load them to initialize list of loaded modules
+    _ = pymod.mc.get_loaded_modules()
 
     # Now remove dirname from MODULEPATH
     popped_modules = pymod.modulepath.remove_path(dirname)
