@@ -353,15 +353,10 @@ Module ``B`` on the newly added path had higher precedent then the loaded module
   B (D,L) C/3.0 (D)
 
   - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1 -
-  A  B  C/1.0 (L)
+  A  B  C/1.0
 
   - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/2 -
   B  C/2.0
-
-Since the new directory contained a logically higher version of module ``C``,
-its default changed and is now ``C/3.0``.  Note, however, unlike module ``B``,
-Modulecmd.py did not automatically swap module ``C/1.0`` and ``C/3.0`` because
-``C/1.0`` was loaded using ``C/1.0``\ 's name and version.
 
 The ``unuse`` subcommand removes a directory from ``MODULEPATH``
 
@@ -369,18 +364,12 @@ The ``unuse`` subcommand removes a directory from ``MODULEPATH``
 
   $ module unuse /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1
 
-  The following modules have been updated with a MODULEPATH change:
-    1) C/1.0 => C/3.0
-
-Loaded module ``C/1.0`` on the path we just unused was updated to the next available
-version of ``C/3.0``, as seen below
-
 .. code-block:: console
 
 
   module avail
   - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/3 -
-  B (D,L) C/3.0 (D,L)
+  B (D,L) C/3.0 (D)
 
   - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/2 -
   B  C/2.0
