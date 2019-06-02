@@ -83,7 +83,7 @@ class Module(object):
         assert (arg == self.filename or
                 arg == self.name or
                 arg == self.fullname or
-                arg.endswith(self.fullname))
+                arg.endswith(self.fullname)), 'Bad arg: {0} (fullname: {1})'.format(arg, self.fullname)
         self._acquired_as = arg
 
     @property
@@ -179,11 +179,11 @@ class Module(object):
         version = self._whatis.get('version', self.version.string)
         if version:
             sio.write('Version: {0}\n'.format(version))
-        sio.write(
-            'Family: {0}\n'
-            'Full Name: {1}\n'
-            'Filename: {2}\n'
-            .format(self.family, self.fullname, self.filename))
+        if self.family:  # pragma: no cover
+            sio.write('Family: {0}\n'.format(self.family))
+        if self.fullname != name:  # pragma: no cover
+            sio.write('Full Name: {0}\n'.format(self.fullname))
+        sio.write('Filename: {0}\n'.format(self.filename))
 
         short_description = self._whatis.get('short description')
         if short_description is not None:

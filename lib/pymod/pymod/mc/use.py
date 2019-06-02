@@ -22,7 +22,10 @@ def use(dirname, append=False, delete=False):
         bumped = determine_swaps_due_to_prepend(prepended_modules)
         for (old, new) in bumped:
             assert old.is_loaded
-            new.acquired_as = old.acquired_as
+            if new.fullname == old.acquired_as:
+                new.acquired_as = old.acquired_as
+            else:
+                new.acquired_as = new.fullname
             pymod.mc.swap_impl(old, new)
             pymod.mc.swapped_on_mp_change(old, new)
         return bumped
@@ -65,6 +68,8 @@ def determine_swaps_due_to_prepend(prepended_modules):
     names = [m.name for m in prepended_modules]
     for (i, module) in enumerate(loaded_modules):
         if module is None or module.name not in names:
+            continue
+        if module.acquired_as == module.fullname:  # pragma: no cover
             continue
         prepended_module = prepended_modules[names.index(module.name)]
         if prepended_module.filename != module.filename:

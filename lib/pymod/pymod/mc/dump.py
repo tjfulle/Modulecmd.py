@@ -3,13 +3,13 @@ import pymod.config
 import pymod.environ
 
 
-def format_output():
+def format_output():  # pragma: no cover
     """Format the final output for the shell to be evaluated"""
     output = pymod.environ.format_output()
     return output
 
 
-def dump(stream=sys.stdout):
+def dump(stream=sys.stdout):  # pragma: no cover
     """Dump the final results to the shell to be evaluated"""
     output = format_output()
     stream.write(output)

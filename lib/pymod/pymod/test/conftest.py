@@ -10,6 +10,19 @@ import pymod.environ
 import pymod.modulepath
 
 
+@pytest.fixture(autouse=True)
+def no_dump(monkeypatch):
+    def mock_dump(stream=None):
+        with open(os.devnull, 'a') as stream:
+            output = pymod.environ.format_output()
+            stream.write(output)
+            output = pymod.mc._mc.format_changed_module_state()
+            if output.split():
+                stream.write(output)
+    monkeypatch.delattr(pymod.mc, 'dump')
+    pymod.mc.dump = mock_dump
+
+
 @pytest.fixture(scope='function', autouse=True)
 def os_environ():
     """Cleans out os.environ"""

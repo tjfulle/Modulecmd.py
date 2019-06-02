@@ -5,8 +5,6 @@ import getpass
 import tempfile
 import pymod.mc
 
-from appdirs import AppDirs
-
 
 def destination_root():
     username = getpass.getuser()
@@ -120,7 +118,6 @@ def write_basic_module_and_script(name, version, modulepath, scriptpath):
     mkdirp(os.path.dirname(scriptfile))
 
     with open(modulefile, 'w') as fh:
-        fh.write('whatis("Module {0}")\n'.format(name))
         fh.write('\n# Prepend the PATH environment variable with my bin directory\n')
         fh.write("prepend_path('PATH', {0!r})\n".format(sanitize(scriptpath)))
         fh.write('\n# Set an alias to my script\n')

@@ -30,15 +30,15 @@ value of ``MODULEPATH`` with the ``path`` subcommand:
 .. code-block:: console
 
   $ module path
-  1) ~/Library/Application Support/Modulecmd.py/basic/1
-  2) ~/Library/Application Support/Modulecmd.py/basic/2
+  1) /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1
+  2) /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/2
 
 .. note::
 
-  The exact path displayed may differ from the paths shown depending on
-  your operating system.  The final two directories (``basic/1`` and
-  ``basic/2``) should be present.
-
+  The exact path displayed will differ from the paths shown depending on
+  your operating system.  The last four directories in each path
+  (``Modulecmd.py/basic/modules/1`` and ``Modulecmd.py/basic/modules/2``) should
+  be present.
 
 .. _basic-usage-avail:
 
@@ -51,16 +51,15 @@ The subcommand ``avail`` lists available modules:
 .. code-block:: console
 
   $ module avail
-  --- ~/Library/Application Support/Modulecmd.py/basic/1 ---
-  A  B (D)  C/1.0  C/2.0
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1 -
+  A  B (D)  C/1.0
 
-  --- ~/Library/Application Support/Modulecmd.py/basic/2 ---
-  B  C/1.0  C/3.0 (D)
-
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/2 -
+  B  C/2.0 (D)
 
 Several modules are shown as available.  The unversioned modules ``A`` and
-``B``, and the versioned module ``C`` with versions ``1.0``, ``2.0``, and
-``3.0``, spread across the two directories on ``MODULEPATH``.
+``B``, and the versioned module ``C`` with versions ``1.0`` and ``2.0``
+spread across the two directories on ``MODULEPATH``.
 
 Where an unversioned module exists in more than one directory, or a module has
 multiple versions, the suffix ``(D)`` indicates its default version.  The
@@ -74,7 +73,7 @@ default version is chosen by the following rules:
 
 - If a module is versioned (such as module ``C`` above), the highest logical
   version across all directories is chosen as the default.  Accordingly, version
-  ``3.0`` of module ``C`` is its default.
+  ``2.0`` of module ``C`` is its default.
 
 .. note::
 
@@ -93,15 +92,14 @@ avail <regex>``:
 .. code-block:: console
 
   $ module avail C
-  --- ~/Library/Application Support/Modulecmd.py/basic/1 ---
-  C/1.0  C/2.0
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1 -
+  C/1.0
 
-  --- ~/Library/Application Support/Modulecmd.py/basic/2 ---
-  C/1.0  C/3.0 (D)
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/2 -
+  C/2.0 (D)
 
 Now, only modules matching the regular expression (``C`` in this case) are
 shown.
-
 
 .. _basic-usage-info:
 
@@ -116,33 +114,33 @@ A modules file path is displayed using the ``find`` subcommand:
 
   $ module find C
   C/1.0
-    ~/Library/Application Support/Modulecmd.py/basic/1/C/1.0.py
+    /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1/C/1.0.py
   C/2.0
-    ~/Library/Application Support/Modulecmd.py/basic/1/C/2.0.py
-  C/1.0
-    ~/Library/Application Support/Modulecmd.py/basic/2/C/1.0.py
-  C/3.0
-    ~/Library/Application Support/Modulecmd.py/basic/2/C/3.0.py
+    /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/2/C/2.0.py
 
 Note that the file paths for all of module ``C``\ s versions were displayed.  To
 display the file path of a single version, give ``find`` a more qualified name:
 
 .. code-block:: console
 
-  $ module find C/3.0
-  C/3.0
-    ~/Library/Application Support/Modulecmd.py/basic/2/C/3.0.py
+  $ module find C/2.0
+  C/2.0
+    /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/2/C/2.0.py
 
 The contents of the module shown with the ``cat`` subcommand:
 
 .. code-block:: console
 
   $ module cat A
-  setenv('A', 'A-1')
-  set_alias('ls-a', 'ls -a')
+  whatis("Module A")
 
-We see that the module ``A`` sets the environment variable ``A`` to the value
-``A-1`` and alias ``ls-a`` to ``ls -a``.
+  # Prepend the PATH environment variable with my bin directory
+  prepend_path('PATH', '/var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/sw/1/A/bin')
+
+  # Set an alias to my script
+  set_alias('s-A', '/var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/sw/1/A/bin/A')
+
+We see that the module ``A`` modifies the ``PATH`` and sets an alias.
 
 The subcommand ``more`` also shows the contents of a module, but pages through
 the output, similar to the Linux ``less`` command.
@@ -153,9 +151,9 @@ when the module is loaded:
 .. code-block:: console
 
   $ module show A
-  A="A-1";
-  export A;
-  alias ls-a='ls -a';
+  PATH="/var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/sw/1/A/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+  export PATH;
+  alias s-A='/var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/sw/1/A/bin/A';
 
 .. note::
 
@@ -167,13 +165,10 @@ The subcommand ``whatis`` displays more detailed information about the module
 .. code-block:: console
 
   $ module whatis A
-  =================================== A ===================================
+  =========================================== A ===========================================
   Name: A
-  Family: None
-  Full Name: A
-  Filename: ~/Library/Application Support/Modulecmd.py/basic/1/A.py
-  =========================================================================
-
+  Filename: /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1/A.py
+  =========================================================================================
 
 .. _basic-usage-load:
 
@@ -199,13 +194,13 @@ The ``list`` subcommand lists the loaded modules
 Note, the module ``A`` is shown as loaded.
 
 Let’s verify that loading ``A`` had an effect on the shell.  We previously
-displayed the contents of ``A`` and saw it set the environment variable ``A`` to
-``A-1``.  Let's verify this variable was set
+displayed the contents of ``A`` and saw it prepended the ``PATH`` environment
+variable:
 
 .. code-block:: console
 
-  $ echo $A
-  A-1
+  $ echo $PATH
+  /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/sw/1/A/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 Loading the module ``C`` loads the default version
 
@@ -214,20 +209,26 @@ Loading the module ``C`` loads the default version
   $ module load C
   $ module ls
   Currently loaded modules
-      1) A  2) C/3.0
+      1) A  2) C/2.0
 
-(``ls`` is alias for ``list``).  As expected, version ``3.0`` of ``C`` was
-loaded.  To Load a specific version, specify the name and version:
+(``ls`` is alias for ``list``).  As expected, version ``2.0`` of ``C`` was
+loaded.
+
+The module ``C`` also modifies the ``PATH``
+
+.. code-block:: console
+
+  $ echo $PATH
+  /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/sw/2/C/2.0/bin:/var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/sw/1/A/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+To Load a specific version, specify the name and version:
 
 .. code-block:: console
 
   $ module load C/1.0
 
   The following modules have been updated with a version change:
-    1) C/3.0 => C/1.0
-
-The previously loaded version of module ``C`` was unloaded and version ``1.0``
-loaded in its place.
+    1) C/2.0 => C/1.0
 
 .. code-block:: console
 
@@ -235,31 +236,35 @@ loaded in its place.
   Currently loaded modules
       1) A  2) C/1.0
 
+The previously loaded version of module ``C`` was unloaded and version ``1.0``
+loaded in its place.  The modifications to the environment by ``C/2.0`` were
+undone and modifications by ``C/1.0`` applied:
 
-Two modules ``C/1.0`` exist on ``MODULEPATH``.  Which one was loaded?  The
-subcommand ``info`` gives basic information about a loaded module
+.. code-block:: console
+
+  $ echo $PATH
+  /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/sw/1/C/1.0/bin:/var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/sw/1/A/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+To get information about a loaded module, use the subcommand ``info``:
 
 .. code-block:: console
 
   $ module info C
-
   Module: C/1.0
     Name:         C
     Version:      1.0
-    Modulepath:   ~/Library/Application Support/Modulecmd.py/basic/1
+    Modulepath:   /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1
 
-As expected, the module loaded was the first on ``MODULEPATH``.
-
-The same information can be obtained from the ``avail`` subcommand
+The subcommand ``avail`` also reports loaded modules:
 
 .. code-block:: console
 
   $ module avail
-  --- ~/Library/Application Support/Modulecmd.py/basic/1 ---
-  A  B (D,L)  C/1.0 (L)  C/2.0
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1 -
+  A  B (D,L)  C/1.0 (L)
 
-  --- ~/Library/Application Support/Modulecmd.py/basic/2 ---
-  B  C/1.0  C/3.0 (D)
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/2 -
+  B  C/2.0 (D)
 
 The loaded modules are marked with ``(L)``.
 
@@ -271,6 +276,8 @@ To unload a module, issue the ``unload`` subcommand
   $ module ls
   Currently loaded modules
       1) A
+
+Unloading a module undoes modifications to the environment specified by it.
 
 .. _basic-usage-reload:
 
@@ -326,53 +333,57 @@ directory to ``MODULEPATH``
 
 .. code-block:: console
 
-  $ module use "~/Library/Application Support/Modulecmd.py/basic/3"
+  $ module use /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/3
+
+  The following modules have been updated with a MODULEPATH change:
+    1) B => B
+
+Module ``B`` on the newly added path had higher precedent then the loaded module ``B``, so Modulecmd.py automatically swapped them.
 
 .. note::
 
   The path may be slightly different dependent on your operating system.
   Whatever the operating system, the directory you will ``use`` ends in
-  ``Modulecmd.py/basic/3``.
+  ``Modulecmd.py/basic/modules/3``.
 
 .. code-block:: console
 
   $ module avail
-  --- ~/Library/Application Support/Modulecmd.py/basic/3 ---
-  C/1.0  C/4.0 (D)
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/3 -
+  B (D,L) C/3.0 (D)
 
-  --- ~/Library/Application Support/Modulecmd.py/basic/1 ---
-  A  B (D,L)  C/1.0  C/2.0
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1 -
+  A  B  C/1.0 (L)
 
-  --- ~/Library/Application Support/Modulecmd.py/basic/2 ---
-  B  C/1.0  C/3.0
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/2 -
+  B  C/2.0
 
 Since the new directory contained a logically higher version of module ``C``,
-its default changed and is now ``C/4.0``.
-
+its default changed and is now ``C/3.0``.  Note, however, unlike module ``B``,
+Modulecmd.py did not automatically swap module ``C/1.0`` and ``C/3.0`` because
+``C/1.0`` was loaded using ``C/1.0``\ 's name and version.
 
 The ``unuse`` subcommand removes a directory from ``MODULEPATH``
 
 .. code-block:: console
 
-  $ module unuse "~/Library/Application Support/Modulecmd.py/basic/1"
-
+  $ module unuse /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/1
 
   The following modules have been updated with a MODULEPATH change:
-    1) B => B
+    1) C/1.0 => C/3.0
 
-Loaded module ``B`` on the path we just unused was updated to the next available
-version of ``B``, as seen below
+Loaded module ``C/1.0`` on the path we just unused was updated to the next available
+version of ``C/3.0``, as seen below
 
 .. code-block:: console
 
 
   module avail
-  --- ~/Library/Application Support/Modulecmd.py/basic/3 ---
-  C/1.0  C/4.0 (D)
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/3 -
+  B (D,L) C/3.0 (D,L)
 
-  --- ~/Library/Application Support/Modulecmd.py/basic/2 ---
-  B (L)  C/1.0  C/3.0
-
+  - /var/folders/9t/4fqtb2vs73jd1lbtjb5m4v1m002336/T/tjfulle/Modulecmd.py/basic/modules/2 -
+  B  C/2.0
 
 .. warning::
 
