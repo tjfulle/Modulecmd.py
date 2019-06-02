@@ -1,13 +1,17 @@
 import os
+import stat
 import shutil
+import getpass
+import tempfile
 import pymod.mc
 
 from appdirs import AppDirs
 
 
 def destination_root():
-    appdirs = AppDirs('Modulecmd.py')
-    return appdirs.user_data_dir
+    username = getpass.getuser()
+    d = os.path.join(tempfile.gettempdir(), username, 'Modulecmd.py')
+    return d
 
 
 def intermediate():
@@ -50,8 +54,7 @@ def basic():
     rmdir(root)
     mkdirp(root)
 
-    basic_base_dir = mkdirp(root, 'basic')
-    basic_dirs = gen_basic_modules(basic_base_dir)
+    basic_dirs = gen_basic_modules(root)
 
     for basic_dir in basic_dirs[:2]:
         pymod.modulepath.append_path(basic_dir)
@@ -59,16 +62,19 @@ def basic():
     if not pymod.environ.get_dict(pymod.names.tutorial_save_env):
         pymod.environ.set_dict(pymod.names.tutorial_save_env, env)
 
+    pymod.environ.set('PYMOD_TUTORIAL_ROOT_PATH', root)
+
     return
 
 
 def teardown():
     env = pymod.environ.get_dict(pymod.names.tutorial_save_env)
     if env:
+        root = pymod.environ.get('PYMOD_TUTORIAL_ROOT_PATH')
         pymod.mc.purge(load_after_purge=False)
         pymod.mc.clone.restore_impl(env)
-        root = destination_root()
-        rmdir(root)
+        if root:
+            rmdir(root)
 
 
 def join_path(*paths):
@@ -85,6 +91,47 @@ def mkdirp(*paths):
 def rmdir(d):
     if os.path.isdir(d):
         shutil.rmtree(d)
+
+
+def sanitize(filename):
+    home = os.path.expanduser('~/')
+    return filename.replace(home, '~/')
+
+
+def make_executable(filename):
+    st = os.stat(filename)
+    os.chmod(filename, st.st_mode | stat.S_IEXEC)
+
+
+def write_basic_module_and_script(name, version, modulepath, scriptpath):
+
+    fullname = name
+    if version is not None:
+        fullname = os.path.join(name, version)
+
+    if version is None:
+        modulefile = join_path(modulepath, name + '.py')
+        scriptfile = join_path(scriptpath, name)
+    else:
+        modulefile = join_path(modulepath, name, version + '.py')
+        scriptfile = join_path(scriptpath, name + '-' + version)
+
+    mkdirp(os.path.dirname(modulefile))
+    mkdirp(os.path.dirname(scriptfile))
+
+    with open(modulefile, 'w') as fh:
+        fh.write('whatis("Module {0}")\n'.format(name))
+        fh.write('\n# Prepend the PATH environment variable with my bin directory\n')
+        fh.write("prepend_path('PATH', {0!r})\n".format(sanitize(scriptpath)))
+        fh.write('\n# Set an alias to my script\n')
+        fh.write("set_alias('s-{0}', {1!r})\n".format(name, sanitize(scriptfile)))
+
+    with open(scriptfile, 'w') as fh:
+        fh.write('#!/usr/bin/env sh\n')
+        fh.write('echo "This is a script associated with module {0} in {1}"\n'
+                 .format(fullname, modulepath))
+
+    make_executable(scriptfile)
 
 
 def gen_mpi_dep_modules(mpi_base_dir, compilers, mpis):
@@ -157,38 +204,37 @@ def gen_core_modules(core_base_dir, compiler_base_dir, compilers):
 
 
 def gen_basic_modules(base_dir):
+    """
+    modules/basic/1
+      A.py
+      B.py
+      C/1.0.py
 
-    d1 = mkdirp(base_dir, '1')
+    """
 
-    with open(join_path(d1, 'A.py'), 'w') as fh:
-        fh.write("setenv('A', 'A-1')\n")
-        fh.write("set_alias('ls-a', 'ls -a')\n")
+    basic_sw_dir = mkdirp(base_dir, 'basic', 'sw')
+    basic_modules_dir = mkdirp(base_dir, 'basic', 'modules')
 
-    with open(join_path(d1, 'B.py'), 'w') as fh:
-        fh.write("setenv('B', 'B-1')\n")
+    dirs = []
+    for i in range(3):
+        modulepath = mkdirp(basic_modules_dir, str(i + 1))
+        sw_dir = mkdirp(basic_sw_dir, str(i + 1))
 
-    C = mkdirp(d1, 'C')
-    for version in ('1.0', '2.0'):
-        with open(join_path(C, version+'.py'), 'w') as fh:
-            fh.write("setenv('C', 'C-1-{0}')\n".format(version))
+        if i == 0:
+            # A exists only in one directory
+            name = 'A'
+            scriptpath = mkdirp(sw_dir, name, 'bin')
+            write_basic_module_and_script(name, None, modulepath, scriptpath)
 
-    # Second
-    d2 = mkdirp(base_dir, '2')
+        name = 'B'
+        scriptpath = mkdirp(sw_dir, name, 'bin')
+        write_basic_module_and_script(name, None, modulepath, scriptpath)
 
-    with open(join_path(d2, 'B.py'), 'w') as fh:
-        fh.write("setenv('B', 'B-2')\n")
+        name = 'C'
+        version = '{0}.0'.format(i + 1)
+        scriptpath = mkdirp(sw_dir, name, version, 'bin')
+        write_basic_module_and_script(name, version, modulepath, scriptpath)
 
-    C = mkdirp(d2, 'C')
-    for version in ('1.0', '3.0'):
-        with open(join_path(C, version+'.py'), 'w') as fh:
-            fh.write("setenv('C', 'C-2-{0}')\n".format(version))
+        dirs.append(modulepath)
 
-    # Third
-    d3 = mkdirp(base_dir, '3')
-
-    C = mkdirp(d3, 'C')
-    for version in ('1.0', '4.0'):
-        with open(join_path(C, version+'.py'), 'w') as fh:
-            fh.write("setenv('C', 'C-3-{0}')\n".format(version))
-
-    return d1, d2
+    return dirs
