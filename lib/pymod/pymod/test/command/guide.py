@@ -3,7 +3,7 @@ import pytest
 from pymod.main import PymodCommand
 
 
-def test_command_guide():
+def test_command_guide_basic():
     guide = PymodCommand('guide')
     guide('basic_usage')
 

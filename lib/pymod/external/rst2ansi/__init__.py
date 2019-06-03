@@ -35,7 +35,7 @@ from .ansi import COLORS, STYLES
 def decode_str(input_string):
     try:
         return input_string.decode('utf-8')
-    except ValueError:
+    except AttributeError:
         return input_string
 
 def rst2ansi(input_string, output_encoding='utf-8'):
