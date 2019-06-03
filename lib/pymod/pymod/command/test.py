@@ -68,8 +68,9 @@ def do_list(args, unknown_args):
 def test(parser, args, unknown_args):
     if args.pytest_help:
         # make the pytest.main help output more accurate
-        sys.argv[0] = 'pymod test'
-        pytest.main(['-h'])
+        with redirect_stdout():
+            sys.argv[0] = 'pymod test'
+            pytest.main(['-h'])
         return
 
     pytest_root = pymod.paths.test_path

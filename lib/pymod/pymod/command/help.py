@@ -3,8 +3,6 @@ import sys
 import pymod.mc
 import pymod.command
 import pymod.modulepath
-from contrib.util.tty.pager import pager
-from llnl.util.tty.color import colorize
 from contrib.util.tty import redirect_stdout
 
 description = "get help on pymod and its commands"
@@ -22,20 +20,10 @@ def setup_parser(subparser):
         '-a', '--all', action='store_const', const='long', default='short',
         help='print all available commands')
 
-    help_spec_group = subparser.add_mutually_exclusive_group()
-    help_spec_group.add_argument(
-        '--guide', action='store_const', dest='guide', const='modulefile',
-        default=None, help='print guide')
-
 
 def help(parser, args):
 
-    if args.guide:
-        dirname = os.path.dirname(__file__)
-        filename = os.path.join(dirname, 'guides', args.guide + '.txt')
-        pager(colorize(open(filename, 'r').read()))
-
-    elif args.help_command:
+    if args.help_command:
         if args.help_command in pymod.command.all_commands():  # pragma: no cover
             parser.add_command(args.help_command)
             with redirect_stdout():

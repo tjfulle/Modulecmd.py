@@ -36,6 +36,7 @@ test_path             = os.path.join(module_path, "test")
 modulepath_path       = os.path.join(module_path, "modulepath")
 var_path              = os.path.join(prefix, "var", "pymod")
 share_path            = os.path.join(prefix, "share", "pymod")
+docs_path             = os.path.join(prefix, "docs", "pymod")
 
 # Paths to built-in Spack repositories.
 mock_modulepath_path = os.path.join(var_path, "modulepath.mock")

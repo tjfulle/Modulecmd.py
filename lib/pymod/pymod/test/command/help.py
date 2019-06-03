@@ -20,8 +20,3 @@ def test_command_help_h():
 def test_command_help_2():
     help = PymodCommand('help')
     help()
-
-
-def test_command_help_guide():
-    help = PymodCommand('help')
-    help('--guide')
