@@ -108,11 +108,12 @@ def write_basic_module_and_script(name, version, modulepath, scriptpath):
         fullname = os.path.join(name, version)
 
     if version is None:
-        modulefile = join_path(modulepath, name + '.py')
-        scriptfile = join_path(scriptpath, name)
+        scriptname = 'script-{0}'.format(name).lower()
     else:
-        modulefile = join_path(modulepath, name, version + '.py')
-        scriptfile = join_path(scriptpath, name + '-' + version)
+        scriptname = 'script-{0}-{1}'.format(name, version).lower()
+
+    modulefile = join_path(modulepath, fullname + '.py')
+    scriptfile = join_path(scriptpath, scriptname)
 
     mkdirp(os.path.dirname(modulefile))
     mkdirp(os.path.dirname(scriptfile))
@@ -120,8 +121,6 @@ def write_basic_module_and_script(name, version, modulepath, scriptpath):
     with open(modulefile, 'w') as fh:
         fh.write('\n# Prepend the PATH environment variable with my bin directory\n')
         fh.write("prepend_path('PATH', {0!r})\n".format(sanitize(scriptpath)))
-        fh.write('\n# Set an alias to my script\n')
-        fh.write("set_alias('s-{0}', {1!r})\n".format(name, sanitize(scriptfile)))
 
     with open(scriptfile, 'w') as fh:
         fh.write('#!/usr/bin/env sh\n')
@@ -206,6 +205,10 @@ def gen_basic_modules(base_dir):
       A.py
       B.py
       C/1.0.py
+    modules/basic/2
+      A.py
+      B.py
+      C/2.0.py
 
     """
 

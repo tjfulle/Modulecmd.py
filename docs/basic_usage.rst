@@ -4,6 +4,15 @@
 Basic Usage
 ===========
 
+Basic concepts of modules and Modulecmd.py are described by way of example in this tutorial.  You can follow along with the examples by loading this tutorial's environment by executing
+
+.. code-block:: console
+
+  $ module tutorial basic
+  ==> Setting up Modulecmd.py's basic mock tutorial MODULEPATH
+
+in your shell.
+
 .. _basic-usage-modulepath:
 
 ------------------
@@ -12,14 +21,7 @@ The ``MODULEPATH``
 
 Modulecmd.py searches for modules on the user's ``MODULEPATH``.  The ``MODULEPATH`` environment variable is a colon separated list of directories containing modules.  ``MODULEPATH`` is to modules what ``PATH`` is to executables.
 
-In the following examples, a mock ``MODULEPATH`` is used.  You can set an identical mock ``MODULEPATH`` and follow along in your shell by executing
-
-.. code-block:: console
-
-  $ module tutorial basic
-  ==> Setting up Modulecmd.py's basic mock tutorial MODULEPATH
-
-This command purges any loaded module and resets the ``MODULEPATH`` to the mock directories used in this tutorial.  Modulecmd.py can report to you the current value of ``MODULEPATH`` with the ``path`` subcommand:
+In the following examples, a mock ``MODULEPATH`` is used.  Executing the command ``module tutorial basic`` set a the mock ``MODULEPATH`` in your shell so that you can follow along. This command purged any loaded modules and reset the ``MODULEPATH`` to the mock directories used in this tutorial.  Modulecmd.py can report to you the current value of ``MODULEPATH`` with the ``path`` subcommand:
 
 .. code-block:: console
 
@@ -29,7 +31,7 @@ This command purges any loaded module and resets the ``MODULEPATH`` to the mock 
 
 .. note::
 
-  The exact path is not displayed as the temporary directory <tmp-prefix> is operating system dependent.
+  The paths displayed in your shell will from those above because the temporary directory <tmp-prefix> is operating system dependent.  <user> is your user name as reported by Python.
 
 .. _basic-usage-avail:
 
@@ -121,6 +123,7 @@ The subcommand ``show`` shows the commands that would be executed by the shell w
 
   $ module show A
   PATH="<tmp-prefix>/<user>/Modulecmd.py/basic/sw/1/A/bin:/usr/local/bin:...";
+  export PATH;
 
 .. note::
 
