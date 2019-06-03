@@ -5,9 +5,11 @@ modulepath = 'MODULEPATH'
 loaded_modules = 'LOADEDMODULES'
 loaded_module_files = '_LMFILES_'
 initial_env = '_LMX0_'
-tutorial_save_env = '_LMT0_'
 loaded_module_cellar = '_LMX1_'
 loaded_module_meta = lambda key: '_LMX2_{0}'.format(key)
+
+tutorial_save_env = '_LMT0_'
+tutorial_root_path = 'PYMOD_TUTORIAL_ROOT_PATH'
 
 sourced_files = 'PYMOD_SOURCED_FILES'
 allow_dup_entries = 'PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES'

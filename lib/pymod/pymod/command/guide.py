@@ -7,7 +7,7 @@ from rst2ansi import rst2ansi
 
 try:
     import docutils
-except ImportError:
+except ImportError:  # pragma: no cover
     docutils = None
 
 
@@ -28,7 +28,7 @@ def setup_parser(subparser):
 
 
 def guide(parser, args):
-    if docutils is None:
+    if docutils is None:  # pragma: no cover
         sys.exit('Guides require docutils module')
     filename = available_guides[args.guide]
     with redirect_stdout():

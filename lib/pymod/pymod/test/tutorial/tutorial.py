@@ -1,16 +1,16 @@
-import pymod.mc
+import pymod.tutorial
 import pymod.modulepath
 
 
 def test_tutorial_basic():
-    pymod.mc.tutorial.basic()
+    pymod.tutorial.basic_usage()
     a = pymod.modulepath.get('A')
     assert a is not None
-    pymod.mc.tutorial.teardown()
+    pymod.tutorial.teardown()
 
 
-def test_tutorial_intermediate():
-    pymod.mc.tutorial.intermediate()
+def test_tutorial_hierarchy():
+    pymod.tutorial.hierarchy()
     occ = pymod.modulepath.get('occ')
     assert occ is not None
     pymod.mc.load_impl(occ)
@@ -22,4 +22,4 @@ def test_tutorial_intermediate():
     z = pymod.modulepath.get('Z')
     assert z is not None
 
-    pymod.mc.tutorial.teardown()
+    pymod.tutorial.teardown()
