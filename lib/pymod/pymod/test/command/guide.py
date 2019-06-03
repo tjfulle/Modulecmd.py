@@ -1,13 +1,19 @@
 import pytest
+try:
+    import docutils
+except ImportError:
+    docutils = None
 
 from pymod.main import PymodCommand
 
 
+@pytest.mark.skipif(docutils is None, reason='Test requires docutils')
 def test_command_guide_basic():
     guide = PymodCommand('guide')
     guide('basic_usage')
 
 
+@pytest.mark.skipif(docutils is None, reason='Test requires docutils')
 def test_command_guide_bad():
     guide = PymodCommand('guide')
     try:

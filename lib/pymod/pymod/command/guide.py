@@ -1,8 +1,14 @@
 import os
+import sys
 import pymod.paths
 from contrib.util.tty.pager import pager
 from contrib.util.tty import redirect_stdout
 from rst2ansi import rst2ansi
+
+try:
+    import docutils
+except ImportError:
+    docutils = None
 
 
 description = "Display Modulecmd.py guides in the console"
@@ -22,7 +28,8 @@ def setup_parser(subparser):
 
 
 def guide(parser, args):
-
+    if docutils is None:
+        sys.exit('Guides require docutils module')
     filename = available_guides[args.guide]
     with redirect_stdout():
         pager(rst2ansi(open(filename, 'r').read()))
