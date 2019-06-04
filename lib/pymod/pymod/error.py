@@ -7,9 +7,10 @@ class ModuleNotFoundError(Exception):
             modulename, 'module avail')
         if mp:
             candidates = mp.candidates(modulename)
-            if candidates:
+            if candidates:  # pragma: no cover
+                candidate_names = sorted(list(set([m.fullname for m in candidates])))
                 msg += '\n\nDid you mean one of these?'
-                msg += '\n\t{0}'.format('\t'.join(candidates))
+                msg += '\n\t{0}'.format('\t'.join(candidate_names))
         super(ModuleNotFoundError, self).__init__(msg)
 
 

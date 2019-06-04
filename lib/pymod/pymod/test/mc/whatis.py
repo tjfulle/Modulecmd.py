@@ -9,6 +9,5 @@ def test_mc_whatis(tmpdir, modulecmds, mock_modulepath):
     tmpdir.join('a.py').write(m.whatis('WHATIS A'))
     mock_modulepath(tmpdir.strpath)
     pymod.mc.whatis('a')
-
     with pytest.raises(ModuleNotFoundError):
         pymod.mc.whatis('b')

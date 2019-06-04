@@ -260,20 +260,22 @@ class Modulepath:
 
     def candidates(self, key):
         # Return a list of modules that might by given by key
-        the_candidates = set()
-        regex = re.compile(key)
+        the_candidates = []
         for path in self:
-            modules = path.modules
-            if not modules:  # pragma: no cover
+            if not path.modules:  # pragma: no cover
                 continue
-            for module in modules:
-                if regex.search(module.filename):
-                    the_candidates.add(module.fullname)
-                elif regex.search(module.name) and module.is_default:  # pragma: no cover
-                    the_candidates.add(module.fullname)
-                elif regex.search(module.fullname):  # pragma: no cover
-                    the_candidates.add(module.fullname)
-        return sorted(list(the_candidates))
+            for module in path.modules:
+                if module.name.endswith(key):
+                    the_candidates.append(module)  # pragma: no cover
+                elif module.fullname.endswith(key):
+                    the_candidates.append(module)  # pragma: no cover
+                else:
+                    f = module.filename
+                    if not isinstance(module, pymod.module.TclModule):
+                        f = os.path.splitext(f)[0]
+                    if f.endswith(key):  # pragma: no cover
+                        the_candidates.append(module)
+        return the_candidates
 
 
 def _modulepath():  # pragma: no cover

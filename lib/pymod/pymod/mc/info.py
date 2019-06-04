@@ -1,20 +1,25 @@
 import sys
-import pymod.mc
+import pymod.modulepath
 from llnl.util.tty.color import colorize
+from pymod.error import ModuleNotFoundError
 
 def info(names):
-    loaded_modules = pymod.mc.get_loaded_modules()
     for name in names:
-        for module in loaded_modules:
-            if module.name == name or module.fullname == name:
-                s = ('@B{Module:} @*{%s}\n'
-                     '  @C{Name:}         %s\n'
-                     '  @C{Version:}      %s\n'
-                     '  @C{Modulepath:}   %s' % (
-                         module.fullname, module.name, module.version,
-                         module.modulepath)
-                     )
-                sys.stderr.write(colorize(s) + '\n')
-                break
-        else:
-            raise ValueError('Module {0} is not loaded'.format(name))
+        modules = pymod.modulepath.candidates(name)
+        if not modules:
+            raise ModuleNotFoundError(name)
+
+        for module in modules:
+            s  = '@B{Module:} @*{%s}\n' % module.fullname
+            s += '  @C{Name:}         %s\n' % module.name
+
+            if module.version:  # pragma: no cover
+                s += '  @C{Version:}      %s\n' % module.version
+
+            if module.family:  # pragma: no cover
+                s += '  @C{Family:}      %s\n' % module.family
+
+            s += '  @C{Loaded:}       %s\n' % module.is_loaded
+            s += '  @C{Modulepath:}   %s' % module.modulepath
+
+            sys.stderr.write(colorize(s) + '\n')

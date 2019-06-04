@@ -290,7 +290,7 @@ def test_mc_callback_help(tmpdir, mock_modulepath):
     a = pymod.modulepath.get('a')
     helpstr = 'a help string'
     help(a, pymod.modes.load, helpstr)
-    assert a._helpstr == helpstr
+    assert a.helpstr == helpstr
 
 
 def test_mc_callback_whatis(tmpdir, mock_modulepath):
@@ -301,18 +301,20 @@ def test_mc_callback_whatis(tmpdir, mock_modulepath):
     a = pymod.modulepath.get('a')
     whatis_str = 'a whatis string'
     whatis(a, pymod.modes.load, whatis_str)
-    assert a._whatis['direct set'][0] == whatis_str
+    assert a.whatisstr.strip() == whatis_str.strip()
     whatis(a, pymod.modes.load, name='foo', version='x',
            short_description='a short description',
            foo_bar='baz')
-    assert a._whatis['name'] == 'foo'
-    assert a._whatis['version'] == 'x'
-    assert a._whatis['foo bar'] == 'baz'
-    assert a._whatis['short description'] == 'a short description'
+    expected = sorted([
+        'name:', 'foo',
+        'version:', 'x',
+        'foo bar:', 'baz',
+        'short description:', 'a short description'])
+    actual = [x.strip() for x in a.whatisstr.split('\n') if x.split()]
 
     b = pymod.modulepath.get('b')
     whatis(b, pymod.modes.load, whatis_str)
-    assert b._whatis['short description'] == whatis_str
+    assert b.whatisstr.strip() == whatis_str.strip()
     with pytest.raises(ValueError):
         whatis(b, pymod.modes.load, whatis_str, whatis_str, whatis_str)
 

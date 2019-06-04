@@ -122,7 +122,7 @@ The subcommand ``show`` shows the commands that would be executed by the shell w
 .. code-block:: console
 
   $ module show A
-  PATH="<tmp-prefix>/<user>/Modulecmd.py/basic/sw/1/A/bin:/usr/local/bin:...";
+  PATH="<tmp-prefix>/<user>/Modulecmd.py/basic/sw/1/A/bin:...";
   export PATH;
 
 .. note::
@@ -133,15 +133,15 @@ The subcommand ``show`` shows the commands that would be executed by the shell w
 
   The commands shown above are the commands that would be executed by the ``bash`` shell.  For other shells, the commands will be different.
 
-The subcommand ``whatis`` displays more detailed information about the module
+The subcommand ``info`` displays more detailed information about the module
 
 .. code-block:: console
 
-  $ module whatis A
-  ================================= A =================================
-  Name: A
-  Filename: <tmp-prefix>/<user>/Modulecmd.py/basic/modules/1/A.py
-  =====================================================================
+  $ module info A
+  Module: A
+    Name:         A
+    Loaded:       False
+    Modulepath:   <tmp-prefix>/<user>/Modulecmd.py/basic/modules/1
 
 .. _basic-usage-load:
 
@@ -207,17 +207,7 @@ To Load a specific version, specify the name and version:
 
   Only one module of a name can be loaded at a time.  Thus, the previously loaded version of module ``C`` was unloaded and version ``1.0`` loaded in its place.  The modifications to the environment by ``C/2.0`` were undone and modifications by ``C/1.0`` applied.
 
-To get information about a loaded module, use the subcommand ``info``:
-
-.. code-block:: console
-
-  $ module info C
-  Module: C/1.0
-    Name:         C
-    Version:      1.0
-    Modulepath:   <tmp-prefix>/<user>/Modulecmd.py/basic/modules/1
-
-The subcommand ``avail`` also reports loaded modules:
+The subcommand ``avail`` also reports which modules are loaded:
 
 .. code-block:: console
 

@@ -8,11 +8,9 @@ def find(names):
     all_modules = [m for p in pymod.modulepath.walk() for m in p.modules]
     for name in names:
         s = None
-        for module in all_modules:
-            if module.name == name or module.fullname == name:
-                s = ('@*{%s}\n'
-                     '  @C{%s}' % (module.fullname, module.filename)
-                     )
-                sys.stderr.write(colorize(s) + '\n')
-        if s is None:
+        candidates = pymod.modulepath.candidates(name)
+        if not candidates:
             raise ModuleNotFoundError(name)
+        for module in candidates:
+            s = '@*{%s}\n  @C{%s}' % (module.fullname, module.filename)
+            sys.stderr.write(colorize(s) + '\n')
