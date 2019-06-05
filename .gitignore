@@ -2,6 +2,7 @@
 .coverage
 .testing
 coverage.xml
+.DS_Store
 htmlcov
 __pycache__
 *.pyc

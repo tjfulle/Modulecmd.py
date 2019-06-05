@@ -3,7 +3,6 @@ import sys
 import pymod.paths
 from contrib.util.tty.pager import pager
 from contrib.util.tty import redirect_stdout
-from rst2ansi import rst2ansi
 
 try:
     import docutils
@@ -29,7 +28,8 @@ def setup_parser(subparser):
 
 def guide(parser, args):
     if docutils is None:  # pragma: no cover
-        sys.exit('Guides require docutils module')
+        raise ImportError('Guides require docutils module')
+    import rst2ansi
     filename = available_guides[args.guide]
     with redirect_stdout():
-        pager(rst2ansi(open(filename, 'r').read()))
+        pager(rst2ansi.rst2ansi(open(filename, 'r').read()))
