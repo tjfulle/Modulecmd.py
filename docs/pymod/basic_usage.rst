@@ -15,9 +15,9 @@ in your shell.
 
 .. _basic-usage-modulepath:
 
-------------------
-The ``MODULEPATH``
-------------------
+--------------
+``MODULEPATH``
+--------------
 
 Modulecmd.py searches for modules on the user's ``MODULEPATH``.  The ``MODULEPATH`` environment variable is a colon separated list of directories containing modules.  ``MODULEPATH`` is to modules what ``PATH`` is to executables.
 
@@ -322,7 +322,7 @@ The ``unuse`` subcommand removes a directory from ``MODULEPATH``
 
 .. warning::
 
-  Do not modify ``MODULEPATH`` outside of ``Modulecmd.py`` (eg, by setting/unsetting the environment variable directly).  Doing so will lead to unexpected behavior in Modulecmd.py.
+  Do not modify ``MODULEPATH`` outside of `Modulecmd.py`_ (eg, by setting/unsetting the environment variable directly).  Doing so will lead to unexpected behavior in Modulecmd.py.
 
 .. _basic-usage-help:
 
@@ -362,3 +362,5 @@ To reset your shell to the state before starting the tutorial, execute:
 .. code-block:: console
 
   module tutorial teardown
+
+.. _Modulecmd.py: https://www.github.com/tjfulle/Modulecmd.py

@@ -7,15 +7,21 @@ from pymod.error import ModuleNotFoundError
 
 """Defines callback functions between modules and pymod.
 
-Every function has for the first two arguments: module, mode
+Every function has for the first two arguments: module, mode:
 
+module : Module
+    The module being executed
+mode : Mode
+    The mode of execution
+
+These arguments are not included in each function's docstring.
 
 """
 
 __all__ = ['callback']
 
 
-def callback(func, module, mode, when=None, **kwds):
+def callback(func, module, mode, when=None, **kwargs):
     """Create a callback function by wrapping `func`
 
     Parameters
@@ -49,22 +55,18 @@ def callback(func, module, mode, when=None, **kwds):
         when = (mode != pymod.modes.load_partial and
                 mode not in pymod.modes.informational)
     if not when:
-        func = lambda *args, **kwargs: None
-    def wrapper(*args, **kwargs):
-        kwargs.update(kwds)
-        return func(module, mode, *args, **kwargs)
+        func = lambda *args, **kwds: None
+    def wrapper(*args, **kwds):
+        kwds.update(kwargs)
+        return func(module, mode, *args, **kwds)
     return wrapper
 
 
-def swap(module, mode, cur, new, **kwargs):
+def swap(module, mode, cur, new):
     """Swap module `cur` for module `new`
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     cur : str
         The name of the module to unload
     new : str
@@ -98,10 +100,6 @@ def load_first(module, mode, *names):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     names : tuple
         Names of modules to load
 
@@ -147,10 +145,6 @@ def load(module, mode, name, **kwds):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of the module to load
 
@@ -192,10 +186,6 @@ def unload(module, mode, name):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of the module to unload
 
@@ -232,10 +222,6 @@ def is_loaded(module, mode, name):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of the module to report
 
@@ -257,10 +243,6 @@ def use(module, mode, dirname, append=False):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     dirname : str
         Name of the directory to add to MODULEPATH
     append : bool {False}
@@ -290,10 +272,6 @@ def unuse(module, mode, dirname):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     dirname : str
         Name of the directory to remove from MODULEPATH
 
@@ -317,10 +295,6 @@ def source(module, mode, filename):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     filename : str
         Name of the filename to source
 
@@ -342,10 +316,6 @@ def whatis(module, mode, *args, **kwargs):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     args : tuple of str
         Information about the module
 
@@ -354,15 +324,11 @@ def whatis(module, mode, *args, **kwargs):
     return module.set_whatis(*args, **kwargs)
 
 
-def help(module, mode, help_string, **kwargs):
+def help(module, mode, help_string):
     """Sets a help message for `module`
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     help_str : str
         Help message for the module
 
@@ -376,10 +342,6 @@ def setenv(module, mode, name, value):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of the environment variable
     value : str
@@ -402,10 +364,6 @@ def unsetenv(module, mode, name):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of the environment variable
 
@@ -423,10 +381,6 @@ def set_alias(module, mode, name, value):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of the alias
     value : str
@@ -449,10 +403,6 @@ def unset_alias(module, mode, name):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of the alias
 
@@ -472,10 +422,6 @@ def set_shell_function(module, mode, name, value):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of the function
     value : str
@@ -498,10 +444,6 @@ def unset_shell_function(module, mode, name):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of the function
 
@@ -521,10 +463,6 @@ def prereq_any(module, mode, *names):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     names : tuple of str
         Names of prerequisite modules
 
@@ -548,10 +486,6 @@ def prereq(module, mode, *names):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of the prerequisite module
 
@@ -569,15 +503,11 @@ def prereq(module, mode, *names):
         pymod.mc.prereq(*names)
 
 
-def conflict(module, mode, *names, **kwargs):
+def conflict(module, mode, *names):
     """Defines conflicts (modules that conflict with `module`)
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     names : tuple of str
         Names of conflicting modules
 
@@ -601,10 +531,6 @@ def append_path(module, mode, name, *values, **kwds):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of path-like variable
     values : tuple of str
@@ -649,10 +575,6 @@ def prepend_path(module, mode, name, *values, **kwds):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of path-like variable
     values : tuple of str
@@ -697,10 +619,6 @@ def remove_path(module, mode, name, *values, **kwds):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         Name of path-like variable
     values : tuple of str
@@ -737,15 +655,11 @@ def remove_path(module, mode, name, *values, **kwds):
             pymod.environ.remove_path(name, value, sep)
 
 
-def family(module, mode, family_name, **kwargs):
+def family(module, mode, family_name):
     """Defines the "family" of the module
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     family_name : str
         Name of the family
 
@@ -765,15 +679,11 @@ def family(module, mode, family_name, **kwargs):
     pymod.mc.family(module, mode, family_name)
 
 
-def get_family_info(module, mode, name, **kwargs):
+def get_family_info(module, mode, name):
     """Returns information about family `name`
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     name : str
         The name of the family to get information about
 
@@ -801,10 +711,6 @@ def execute(module, mode, command, when=None):
 
     Parameters
     ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
     command : str
         The command to execute in a shell subprocess
     when : bool

@@ -1,13 +1,49 @@
+.. _modulefiles:
+
 ===========
 Modulefiles
 ===========
 
-``Modulecmd.py`` module files are python files that are executed by the ``Modulecmd.py`` Framework.  Modulefiles must have a ``.py`` file extension and must be on the ``MODULEPATH`` to be recognized.  ``Modulecmd.py`` executes module files in an environment providing the following commands:
+Module files are python scripts that are executed by the `Modulecmd.py`_ framework.  Modulefiles must have a ``.py`` file extension and must be found on the :ref:`basic-usage-modulepath` to be found.
+
+------------------
+Naming conventions
+------------------
+
+Several naming conventions are supported: name only, name/version, name/version/variant.
+
+^^^^^^^^^
+Name only
+^^^^^^^^^
+
+In the name only naming convention, a module's name, version, and other information is embedded directly in the module's name.  For instance, a module ``baz``, version ``1.0`` would be named: ``<prefix>/baz-1.0.py``, where ``prefix`` is a path on the ``MODULEPATH``.  This naming convention is common with TCL modules.
+
+^^^^^^^^^^^^
+Name/version
+^^^^^^^^^^^^
+
+In the name/version convention, a module ``baz``, version ``1.0`` would be named: ``<prefix>/baz/1.0.py``, where ``prefix`` is a path on the ``MODULEPATH``.
+
+.. note::
+
+  This name/version convention is the preferred naming convention for `Modulecmd.py`_.
+
+^^^^^^^^^^^^^^^^^^^^
+Name/version/variant
+^^^^^^^^^^^^^^^^^^^^
+
+In the name/version/variant convention, a module ``baz``, version ``1.0``, and variant ``a`` would be named: ``<prefix>/baz/1.0/a.py``, where ``prefix`` is a path on the ``MODULEPATH``.
 
 
----------------
+--------
+Commands
+--------
+
+`Modulecmd.py`_ executes module files in an environment providing the following commands:
+
+^^^^^^^^^^^^^^^
 General Purpose
----------------
+^^^^^^^^^^^^^^^
 
 ``getenv(name)``
     Get the value of environment variable given by name.  Returns ``None`` if ``name`` is not defined.
@@ -37,9 +73,9 @@ General Purpose
     List of commands passed from command line to this module.
 
 
----------------
+^^^^^^^^^^^^^^^
 Message Logging
----------------
+^^^^^^^^^^^^^^^
 
 ``log_info(message)``
     Log an informational message to the console.
@@ -51,9 +87,9 @@ Message Logging
     Log an error message to the console and quit.
 
 
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 Environment Modification
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``setenv(name, value)``
     Set the environment variable ``name`` to ``value``.
@@ -83,18 +119,18 @@ Environment Modification
     Remove ``value`` from path-like variable ``name``.
 
 
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Interaction with Other Modules
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``prereq(name)``
-    Module ``name`` is a prerequisite of this module.  If ``name`` is not loaded, ``Modulecmd.py`` will quit.
+    Module ``name`` is a prerequisite of this module.  If ``name`` is not loaded, `Modulecmd.py`_ will quit.
 
 ``prereq_any(*names)``
-    Any one of ``names`` is a prerequisite of this module.  If none of ``names`` is not loaded, ``Modulecmd.py`` will quit.
+    Any one of ``names`` is a prerequisite of this module.  If none of ``names`` is not loaded, `Modulecmd.py`_ will quit.
 
 ``conflict(*names)``
-    Any of ``names`` conflicts with this module.  If any of ``names`` is loaded, ``Modulecmd.py`` will quit.
+    Any of ``names`` conflicts with this module.  If any of ``names`` is loaded, `Modulecmd.py`_ will quit.
 
 ``load(name)``
     Load the module ``name``.
@@ -106,9 +142,9 @@ Interaction with Other Modules
     Unload the module ``name``.
 
 
-==============
+--------------
 Module Options
-==============
+--------------
 A module can support command line options.  Options are specified on the command line as
 
 .. code-block:: console
@@ -124,9 +160,9 @@ The following modulefile functions register options
     Parse module options.  Only options added before calling ``parse_opts`` will be parsed.
 
 
---------
+^^^^^^^^
 Examples
---------
+^^^^^^^^
 
 To specify two options for module 'spam', in modulefile spam.py do
 
@@ -147,9 +183,9 @@ On the commandline, the module spam can be loaded as
 
   module load spam +b +x=baz
 
-==============
+--------------
 Other Commands
-==============
+--------------
 
 ``family(name)``
     Set the name of the module's family.
@@ -161,9 +197,9 @@ Other Commands
     Store string as an informational message describing this module.
 
 
-========
+^^^^^^^^
 Examples
-========
+^^^^^^^^
 
 The following commands, when put in a module file on ``MODULEPATH``, prepends the user's bin directory to the ``PATH`` and aliases the ``ls`` command.
 
@@ -171,3 +207,5 @@ The following commands, when put in a module file on ``MODULEPATH``, prepends th
 
   prepend_path('PATH', '~/bin')
   set_alias('ls', 'ls -lF')
+
+.. _Modulecmd.py: https://www.github.com/tjfulle/Modulecmd.py
