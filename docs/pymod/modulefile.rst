@@ -34,12 +34,11 @@ Name/version/variant
 
 In the name/version/variant convention, a module ``baz``, version ``1.0``, and variant ``a`` would be named: ``<prefix>/baz/1.0/a.py``, where ``prefix`` is a path on the ``MODULEPATH``.
 
+---------------
+Module commands
+---------------
 
---------
-Commands
---------
-
-`Modulecmd.py`_ executes module files in an environment providing the following commands:
+`Modulecmd.py`_ executes module files in an environment providing the following commands.
 
 ^^^^^^^^^^^^^^^
 General Purpose
