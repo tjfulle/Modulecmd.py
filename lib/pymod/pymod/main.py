@@ -37,6 +37,7 @@ aliases = {
     'ls': 'list',
     'rm': 'unload',
     'which': 'find',
+    'cn': 'collection',
 }
 
 #: help levels in order of detail (i.e., number of commands shown)

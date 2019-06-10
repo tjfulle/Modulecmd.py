@@ -62,105 +62,238 @@ Module commands
 `Modulecmd.py`_ executes module files in an environment providing many commands
 for interacting with the shell's environment.
 
-^^^^^^^^^^^^^^^
-General Purpose
-^^^^^^^^^^^^^^^
+.. <INSERT HERE>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for modifying path-like variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``getenv(name)``
-    Get the value of environment variable given by name.  Returns ``None`` if ``name`` is not defined.
+**append_path**\ *(name, \*values, \*\*kwds)*
+    Append `values` to path-like variable `name`
 
-``get_hostname()``
-    Get the value of the host name of the system.
+    In unload mode, `values` are removed from path-like variable `name`,
+    otherwise, they are appended.
 
-``mode()``
-    Return the active mode.  One of ``"load"`` or ``"unload"``
+    If `name==MODULEPATH`, this function calls `use(value, append=True)` for
+    each `value` in `values`.
 
-``self``
-    Reference to this modules object.
+    A path-like variable stores a list as a `sep` separated string.  eg, the
+    PATH environment variable is a `sep` separated list of directories:
 
-``HOME``
-    The path to HOME
-
-``USER``
-    The name of USER
-
-``IS_DARWIN``
-    Boolean.  ``True`` if the system is Darwin.  ``False`` otherwise.
-
-``user_env``
-    Reference to a user defined Python module containing custom commands.
-
-``args``
-    List of commands passed from command line to this module.
+        echo $PATH     dirname1:dirname2:...
 
 
-^^^^^^^^^^^^^^^
-Message Logging
-^^^^^^^^^^^^^^^
+**prepend_path**\ *(name, \*values, \*\*kwds)*
+    Prepend `values` to path-like variable `name`
 
-``log_info(message)``
-    Log an informational message to the console.
+    In unload mode, `values` are removed from path-like variable `name`,
+    otherwise, they are prepended.
 
-``log_warning(message)``
-    Log a warning message to the console.
+    If `name==MODULEPATH`, this function calls `use(value)` for each `value` in
+    `values`.
 
-``log_error(message)``
-    Log an error message to the console and quit.
+    A path-like variable stores a list as a `sep` separated string.  eg, the
+    PATH environment variable is a `sep` separated list of directories:
+
+        echo $PATH     dirname1:dirname2:...
+
+
+**remove_path**\ *(name, \*values, \*\*kwds)*
+    Removes `values` from path-like variable `name`
+
+    In unload mode, nothing is done.  Otherwise, `values` are removed from path-
+    like variable `name`.
+
+    If `name==MODULEPATH`, this function calls `unuse(value)` for each `value`
+    in `values`.
+
+    A path-like variable stores a list as a `sep` separated string.  eg, the
+    PATH environment variable is a `sep` separated list of directories:
+
+        echo $PATH     dirname1:dirname2:...
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^
+General purpose utilities
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**check_output**\ *(command)*
+    Run command with arguments and return its output as a string.
+
+
+**colorize**\ *(string, \*\*kwargs)*
+    Replace all color expressions in a string with ANSI control codes.
+
+
+**execute**\ *(command, when=None)*
+    Executes the command `command` in a subprocess
+
+
+**listdir**\ *(dirname, key=None)*
+    List contents of directory `dirname`
+
+
+**mkdirp**\ *(\*paths, \*\*kwargs)*
+    Make directory `dir` and all intermediate directories, if necessary.
+
+
+**source**\ *(filename)*
+    Sources a shell script given by filename
+
+    Warning: this function sources a shell script unconditionally.  Environment
+    modifications made by the script are not tracked by Modulecmd.py.
+
+
+**stop**\ *()*
+    Stop loading this module
+
+
+**which**\ *(exename)*
+    Return the path to an executable, if found on PATH
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for interacting with other modules
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**conflict**\ *(\*names, \*\*kwargs)*
+    Defines conflicts (modules that conflict with `module`)
+
+    In load mode, asserts that none of `names` is loaded.   Otherwise, nothing
+    is done.
+
+
+**prereq**\ *(\*names)*
+    Defines a prerequisite (module that must be loaded) for this module
+
+    In load mode, asserts that `name` is loaded.  Otherwise, nothing is done.
+
+
+**prereq_any**\ *(\*names)*
+    Defines prerequisites (modules that must be loaded) for this module
+
+    In load mode, asserts that at least one of the modules given by `names` is
+    loaded.  In unload mode, nothing is done.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for interacting with module families
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**family**\ *(family_name, \*\*kwargs)*
+    Defines the "family" of the module
+
+    Only one module in a family can be loaded at a time.  For instance, GCC and
+    Intel compiler modules can define their family as "compiler".  This prevents
+    GCC and Intel compilers being loaded simultaneously.
+
+
+**get_family_info**\ *(name, \*\*kwargs)*
+    Returns information about family `name`
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for relaying information
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**help**\ *(help_string, \*\*kwargs)*
+    Sets a help message for `module`
+
+
+**is_loaded**\ *(name)*
+    Report whether the module `name` is loaded
+
+
+**whatis**\ *(\*args, \*\*kwargs)*
+    Sets the "whatis" informational string for `module`
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Environment Modification
+General module functions
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-``setenv(name, value)``
-    Set the environment variable ``name`` to ``value``.
+**load**\ *(name, \*\*kwds)*
+    Load the module `name`
 
-``unsetenv(name)``
-    Unset the environment variable ``name``.
-
-``set_alias(name, value)``
-    Set the alias name to ``value``.
-
-``unset_alias(name)``
-    Unset the alias given by name.
-
-``set_shell_function(name, value)``
-    Set the shell function name to ``value``.
-
-``unset_shell_function(name)``
-    Unset the shell function name
-
-``prepend_path(name, value)``
-    Prepend ``value`` to path-like variable ``name``.
-
-``append_path(name, value)``
-    Append ``value`` to path-like variable ``name``.
-
-``remove_path(name, value)``
-    Remove ``value`` from path-like variable ``name``.
+    In load mode, loads the module found by `name` if it is not already loaded.
+    If it is loaded, its internal reference count is incremented.
 
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Interaction with Other Modules
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**load_first**\ *(\*names)*
+    Load the first of modules in `names`
 
-``prereq(name)``
-    Module ``name`` is a prerequisite of this module.  If ``name`` is not loaded, `Modulecmd.py`_ will quit.
+    In load mode, loads the first available module in `names` and returns it. In
+    unload mode, the first loaded module in `names` is unloaded.
 
-``prereq_any(*names)``
-    Any one of ``names`` is a prerequisite of this module.  If none of ``names`` is not loaded, `Modulecmd.py`_ will quit.
 
-``conflict(*names)``
-    Any of ``names`` conflicts with this module.  If any of ``names`` is loaded, `Modulecmd.py`_ will quit.
+**swap**\ *(cur, new, \*\*kwargs)*
+    Swap module `cur` for module `new`
 
-``load(name)``
-    Load the module ``name``.
+    In load mode, perform an unload of `cur` followed by a load of `new`.
+    However, when unloading `cur`, all modules loaded after `cur` are also
+    unloaded in reverse order.  After loading `new`, the unloaded modules are
+    reloaded in the order they were originally loaded.  If MODULEPATH changes as
+    a result of the swap, it is possible that some of these modules will be
+    swapped themselves, or not reloaded at all.
 
-``load_first(*names)``
-    Load the first module in ``names``.
 
-``unload(name)``
-    Unload the module ``name``.
+**unload**\ *(name)*
+    Unload the module `name`
+
+    In load mode, decrements the reference count of the module found by `name`.
+    If the reference count drops to 0, the module is unloaded.
+
+    If the module is not found, or is not loaded, nothing is done.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for defining shell aliases and functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**set_alias**\ *(name, value)*
+    Define a shell alias
+
+
+**set_shell_function**\ *(name, value)*
+    Define a shell function
+
+
+**unset_alias**\ *(name)*
+    Undefine a shell alias
+
+
+**unset_shell_function**\ *(name)*
+    Undefine a shell function
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for modifying the environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**setenv**\ *(name, value)*
+    Set value of environment variable `name`
+
+
+**unsetenv**\ *(name)*
+    Unset value of environment variable `name`
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for interacting with the MODULEPATH
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**unuse**\ *(dirname)*
+    Remove the directory `dirname` from MODULEPATH
+
+    In load mode, removes `dirname` from MODULEPATH (it it is on MODULEPATH). In
+    unload mode, nothing is done.
+
+
+**use**\ *(dirname, append=False)*
+    Add the directory `dirname` to MODULEPATH
+
+    In load mode, add `dirname` to MODULEPATH.  In unload mode, remove `dirname`
+    from MODULEPATH (if it is on MODULEPATH).
+
 
 
 --------------

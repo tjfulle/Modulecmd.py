@@ -10,6 +10,7 @@ import os
 import re
 
 import pymod.modes
+import pymod.paths
 
 from llnl.util.lang import attr_setdefault
 import llnl.util.tty as tty

@@ -6,6 +6,7 @@ omit =
      lib/pymod/pymod/command/test.py
      lib/pymod/pymod/module/spec.py
      lib/pymod/pymod/main.py
+     lib/pymod/pymod/gendocs.py
      lib/pymod/pymod/test/*
      lib/pymod/external/*
      lib/pymod/contrib/*
