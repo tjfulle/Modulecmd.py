@@ -65,3 +65,11 @@ def test_module_version_str_v_int():
     v1 = Version('1.0')
     v2 = Version('a')
     assert v2 > v1
+
+
+def test_module_version_info():
+    v = Version('2.1.3')
+    major, minor, patch = v.info[:3]
+    assert v.major == major == 2
+    assert v.minor == minor == 1
+    assert v.patch == patch == 3

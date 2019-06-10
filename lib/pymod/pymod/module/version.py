@@ -54,6 +54,10 @@ class Version:
     def __bool__(self):
         return self.major is not None
 
+    @property
+    def info(self):
+        return self.tuple
+
 
 def try_int(item):
     try:
