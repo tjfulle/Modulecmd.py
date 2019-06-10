@@ -88,3 +88,5 @@ class CloneModuleNotFoundError(Exception):
         super(CloneModuleNotFoundError, self).__init__(msg)
 
 
+class StopLoadingModuleError(Exception):
+    pass

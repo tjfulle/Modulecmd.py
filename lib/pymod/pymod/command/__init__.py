@@ -1,7 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
-# Spack Project Developers. See the top-level COPYRIGHT file for details.
-#
-# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+# File adapted from spack/cmd/__init__.py
 
 from __future__ import print_function
 
@@ -40,7 +37,7 @@ _all_commands = None
 
 
 def all_commands():
-    """Get a sorted list of all spack commands.
+    """Get a sorted list of all pymod commands.
 
     This will list the lib/pymod/pymod/command directory and find the
     commands there to construct the list.  It does not actually import

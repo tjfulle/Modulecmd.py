@@ -6,7 +6,7 @@ import pymod.mc
 import pymod.user
 import pymod.modes
 import pymod.environ
-import pymod.mc.callback
+import pymod.callback
 import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir
 from contrib.util import which, check_output, listdir
@@ -53,19 +53,16 @@ def execmodule_in_sandbox(module, mode):
     with working_dir(os.path.dirname(module.filename)):
         try:
             exec_(code, ns, {})
-        except StopLoadingModuleError:
+        except pymod.error.StopLoadingModuleError:
             pass
 
 
 def module_exec_sandbox(module, mode):
-    def stop():
-        raise StopLoadingModuleError
-    cb = pymod.mc.callback
-    callback = pymod.mc.callback.callback
+    callback = lambda cb, **kwds: pymod.callback.callback(cb, module, mode, **kwds)
     ns = {
         'os': os,
         'sys': sys,
-        'stop': stop,
+        'stop': callback('stop'),
         'mkdirp': mkdirp,
         'env': pymod.environ.copy(include_os=True),
         'user_env': pymod.user.env,
@@ -84,46 +81,42 @@ def module_exec_sandbox(module, mode):
         'log_info': lambda s: tty.info(s, reported_by=module.fullname),
         'log_warning': lambda s: tty.warn(s, reported_by=module.fullname),
         'log_error': lambda s: tty.die(s, reported_by=module.fullname),
-        'execute': callback(cb.execute, module, mode),
+        'execute': callback('execute'),
         #
-        'setenv': callback(cb.setenv, module, mode),
-        'unsetenv': callback(cb.unsetenv, module, mode),
+        'setenv': callback('setenv'),
+        'unsetenv': callback('unsetenv'),
         #
-        'use': callback(cb.use, module, mode),
-        'unuse': callback(cb.unuse, module, mode),
+        'use': callback('use'),
+        'unuse': callback('unuse'),
         #
-        'set_alias': callback(cb.set_alias, module, mode, when='alsways'),
-        'unset_alias': callback(cb.unset_alias, module, mode, when='always'),
+        'set_alias': callback('set_alias', when='alsways'),
+        'unset_alias': callback('unset_alias', when='always'),
         #
-        'set_shell_function': callback(cb.set_shell_function, module, mode, when='always'),
-        'unset_shell_function': callback(cb.unset_shell_function, module, mode, when='always'),
+        'set_shell_function': callback('set_shell_function', when='always'),
+        'unset_shell_function': callback('unset_shell_function', when='always'),
         #
-        'prereq': callback(cb.prereq, module, mode),
-        'prereq_any': callback(cb.prereq_any, module, mode),
-        'conflict': callback(cb.conflict, module, mode),
+        'prereq': callback('prereq'),
+        'prereq_any': callback('prereq_any'),
+        'conflict': callback('conflict'),
         #
-        'load': callback(cb.load, module, mode),
-        'swap': callback(cb.swap, module, mode),
-        'load_first': callback(cb.load_first, module, mode),
-        'unload': callback(cb.unload, module, mode),
-        'is_loaded': callback(cb.is_loaded, module, mode),
+        'load': callback('load'),
+        'swap': callback('swap'),
+        'load_first': callback('load_first'),
+        'unload': callback('unload'),
+        'is_loaded': callback('is_loaded'),
         #
-        'family': callback(cb.family, module, mode),
-        'get_family_info': callback(cb.get_family_info, module, mode),
+        'family': callback('family'),
+        'get_family_info': callback('get_family_info'),
         #
-        'prepend_path': callback(cb.prepend_path, module, mode),
-        'append_path': callback(cb.append_path, module, mode),
-        'remove_path': callback(cb.remove_path, module, mode),
+        'prepend_path': callback('prepend_path'),
+        'append_path': callback('append_path'),
+        'remove_path': callback('remove_path'),
         #
-        'whatis': callback(cb.whatis, module, mode, when=mode==pymod.modes.whatis),
-        'help': callback(cb.help, module, mode, when=mode==pymod.modes.help),
+        'whatis': callback('whatis', when=mode==pymod.modes.whatis),
+        'help': callback('help', when=mode==pymod.modes.help),
         'which': which,
         'check_output': check_output,
         #
-        'source': callback(cb.source, module, mode),
+        'source': callback('source'),
     }
     return ns
-
-
-class StopLoadingModuleError(Exception):
-    pass
