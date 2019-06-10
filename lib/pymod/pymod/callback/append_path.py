@@ -29,16 +29,18 @@ def append_path(module, mode, name, *values, **kwds):
     In unload mode, `values` are removed from path-like variable `name`,
     otherwise, they are appended.
 
-    If `name==MODULEPATH`, this function calls `use(value, append=True)`
+    If ``name==MODULEPATH``, this function calls ``use(value, append=True)``
     for each `value` in `values`.
 
-    A path-like variable stores a list as a `sep` separated string.  eg, the
-    PATH environment variable is a `sep` separated list of directories:
+    A path-like variable stores a list as a ``sep`` separated string.  eg, the
+    PATH environment variable is a ``sep`` separated list of directories:
+
+    .. code-block:: console
 
         echo $PATH
         dirname1:dirname2:...
 
-    Here, ":" is the separator `sep`.
+    Here, ":" is the separator ``sep``.
 
     """
     pymod.modes.assert_known_mode(mode)

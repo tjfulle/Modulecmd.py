@@ -74,15 +74,18 @@ Functions for modifying path-like variables
     In unload mode, `values` are removed from path-like variable `name`,
     otherwise, they are appended.
 
-    If `name==MODULEPATH`, this function calls `use(value, append=True)` for
+    If ``name==MODULEPATH``, this function calls ``use(value, append=True)`` for
     each `value` in `values`.
 
-    A path-like variable stores a list as a `sep` separated string.  eg, the
-    PATH environment variable is a `sep` separated list of directories:
+    A path-like variable stores a list as a ``sep`` separated string.  eg, the
+    PATH environment variable is a ``sep`` separated list of directories:
 
-        echo $PATH     dirname1:dirname2:...
+    .. code-block:: console
 
-    Here, ":" is the separator `sep`.
+        echo $PATH
+        dirname1:dirname2:...
+
+    Here, ":" is the separator ``sep``.
 
 
 **prepend_path**\ *(name, \*values, \*\*kwds)*
@@ -91,15 +94,18 @@ Functions for modifying path-like variables
     In unload mode, `values` are removed from path-like variable `name`,
     otherwise, they are prepended.
 
-    If `name==MODULEPATH`, this function calls `use(value)` for each `value` in
-    `values`.
+    If ``name==MODULEPATH``, this function calls ``use(value)`` for each `value`
+    in `values`.
 
-    A path-like variable stores a list as a `sep` separated string.  eg, the
-    PATH environment variable is a `sep` separated list of directories:
+    A path-like variable stores a list as a ``sep`` separated string.  eg, the
+    PATH environment variable is a ``sep`` separated list of directories:
 
-        echo $PATH     dirname1:dirname2:...
+    .. code-block:: console
 
-    Here, ":" is the separator `sep`.
+        echo $PATH
+        dirname1:dirname2:...
+
+    Here, ":" is the separator ``sep``.
 
 
 **remove_path**\ *(name, \*values, \*\*kwds)*
@@ -108,13 +114,16 @@ Functions for modifying path-like variables
     In unload mode, nothing is done.  Otherwise, `values` are removed from path-
     like variable `name`.
 
-    If `name==MODULEPATH`, this function calls `unuse(value)` for each `value`
-    in `values`.
+    If ``name==MODULEPATH``, this function calls ``unuse(value)`` for each
+    `value` in `values`.
 
-    A path-like variable stores a list as a `sep` separated string.  eg, the
-    PATH environment variable is a `sep` separated list of directories:
+    A path-like variable stores a list as a ``sep`` separated string.  eg, the
+    PATH environment variable is a ``sep`` separated list of directories:
 
-        echo $PATH     dirname1:dirname2:...
+    .. code-block::
+
+        echo $PATH
+        dirname1:dirname2:...
 
     Here, ":" is the separator `sep`.
 
@@ -324,51 +333,6 @@ Functions for defining shell aliases and functions
 
     In unload mode, nothing is done.  Otherwise, the function given by `name` is
     undefined.
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for modifying the environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**setenv**\ *(name, value)*
-    Set value of environment variable `name`
-
-    In load mode, sets the environment variable.  In unload mode, unsets the
-    variable.
-
-
-**unsetenv**\ *(name)*
-    Unset value of environment variable `name`
-
-    In unload mode, nothing is done
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for interacting with the MODULEPATH
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**unuse**\ *(dirname)*
-    Remove the directory `dirname` from MODULEPATH
-
-    In load mode, removes `dirname` from MODULEPATH (it it is on MODULEPATH). In
-    unload mode, nothing is done.
-
-    This function potentially has side effects on the environment.  When a
-    directory is `unuse`\ d, modules in its path will become unavailable and, if
-    loaded, will be unloaded.
-
-
-**use**\ *(dirname, append=False)*
-    Add the directory `dirname` to MODULEPATH
-
-    In load mode, add `dirname` to MODULEPATH.  In unload mode, remove `dirname`
-    from MODULEPATH (if it is on MODULEPATH).
-
-    This function potentially has side effects on the environment.  When a
-    directory is `use`\ d, modules in its path may have higher precedence than
-    modules on the previous MODULEPATH.  Thus, defaults could change and loaded
-    modules could be swapped for newer modules with higher precedence.
-
 
 .. <END INSERT HERE>
 

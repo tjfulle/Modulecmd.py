@@ -29,11 +29,13 @@ def remove_path(module, mode, name, *values, **kwds):
     In unload mode, nothing is done.  Otherwise, `values` are removed from
     path-like variable `name`.
 
-    If `name==MODULEPATH`, this function calls `unuse(value)` for each
+    If ``name==MODULEPATH``, this function calls ``unuse(value)`` for each
     `value` in `values`.
 
-    A path-like variable stores a list as a `sep` separated string.  eg, the
-    PATH environment variable is a `sep` separated list of directories:
+    A path-like variable stores a list as a ``sep`` separated string.  eg, the
+    PATH environment variable is a ``sep`` separated list of directories:
+
+    .. code-block::
 
         echo $PATH
         dirname1:dirname2:...
