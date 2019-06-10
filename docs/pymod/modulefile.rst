@@ -4,25 +4,46 @@
 Modulefiles
 ===========
 
-Module files are python scripts that are executed by the `Modulecmd.py`_ framework.  Modulefiles must have a ``.py`` file extension and must be found on the :ref:`basic-usage-modulepath` to be found.
+----------
+References
+----------
+
+- :ref:`the-modulepath`
+
+--------
+Overview
+--------
+
+Module files are python scripts that are executed by the `Modulecmd.py`_ framework.  Modulefiles
+
+- have a ``.py`` file extension;
+- must exist on the :ref:`basic-usage-modulepath` to be found; and
+- are executed by `Modulecmd.py`_ in a sandboxed environment.
+
+For compatibility with existing systems, `Modulecmd.py`_ can execute TCL
+modulefiles, but they are not covered in this guide.
 
 ------------------
 Naming conventions
 ------------------
 
-Several naming conventions are supported: name only, name/version, name/version/variant.
+Several naming conventions are supported:
+
+- name only;
+- name/version; and
+- name/version/variant.
 
 ^^^^^^^^^
 Name only
 ^^^^^^^^^
 
-In the name only naming convention, a module's name, version, and other information is embedded directly in the module's name.  For instance, a module ``baz``, version ``1.0`` would be named: ``<prefix>/baz-1.0.py``, where ``prefix`` is a path on the ``MODULEPATH``.  This naming convention is common with TCL modules.
+In the name only naming convention, a module's name, version, and other information is embedded directly in the module's name.  For instance, a module ``baz``, version ``1.0`` might be named: ``<prefix>/baz-1.0.py``, where ``prefix`` is a path on the ``MODULEPATH``.  This naming convention is common with TCL modules but prevents some `Modulecmd.py`_ features from being effectuated, such as the :ref:`one-name-rule`.
 
 ^^^^^^^^^^^^
 Name/version
 ^^^^^^^^^^^^
 
-In the name/version convention, a module ``baz``, version ``1.0`` would be named: ``<prefix>/baz/1.0.py``, where ``prefix`` is a path on the ``MODULEPATH``.
+In the name/version convention, the name of a module is given by a directory ``<name>`` and its version by the python script ``<version>.py``.  For example, the module ``baz``, version ``1.0`` would be: ``<prefix>/baz/1.0.py``, where ``prefix`` is a path on the ``MODULEPATH``.
 
 .. note::
 
@@ -32,13 +53,14 @@ In the name/version convention, a module ``baz``, version ``1.0`` would be named
 Name/version/variant
 ^^^^^^^^^^^^^^^^^^^^
 
-In the name/version/variant convention, a module ``baz``, version ``1.0``, and variant ``a`` would be named: ``<prefix>/baz/1.0/a.py``, where ``prefix`` is a path on the ``MODULEPATH``.
+In the name/version/variant convention,  the module ``baz``, version ``1.0``, with variant ``a`` would be named: ``<prefix>/baz/1.0/a.py``, where ``prefix`` is a path on the ``MODULEPATH``.
 
 ---------------
 Module commands
 ---------------
 
-`Modulecmd.py`_ executes module files in an environment providing the following commands.
+`Modulecmd.py`_ executes module files in an environment providing many commands
+for interacting with the shell's environment.
 
 ^^^^^^^^^^^^^^^
 General Purpose
