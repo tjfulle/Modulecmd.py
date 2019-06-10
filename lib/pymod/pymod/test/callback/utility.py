@@ -2,6 +2,7 @@ import os
 import pytest
 from pymod.callback import get_callback
 
+
 def test_callback_utility_check_output():
     check_output = get_callback('check_output')
     check_output(None, None, 'ls -l')
@@ -15,11 +16,16 @@ def test_callback_utility_colorize():
 
 def test_callback_utility_listdir(tmpdir):
     listdir = get_callback('listdir')
+    check_output = get_callback('check_output')
     tmpdir.join('foo').write('')
     tmpdir.join('baz').write('')
     files = sorted(listdir(None, None, tmpdir.strpath))
     assert len(files) == 2
     assert [os.path.basename(f) for f in files] == ['baz', 'foo']
+
+    out = check_output(None, None, 'ls -l {0}'.format(tmpdir.strpath))
+    out_l = [x.split()[-1] for x in out.split('\n') if x.split() and 'rw' in x.split()[0]]
+    assert out_l == ['baz', 'foo']
 
     files = listdir(None, None, tmpdir.strpath, key=lambda x: not x.endswith('baz'))
     assert len(files) == 1
