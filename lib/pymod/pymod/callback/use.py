@@ -1,7 +1,7 @@
 import pymod.mc
 import pymod.modes
 
-category = ''
+category = 'modulepath'
 
 
 def use(module, mode, dirname, append=False):

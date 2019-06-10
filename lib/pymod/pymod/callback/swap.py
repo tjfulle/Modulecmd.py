@@ -1,7 +1,7 @@
 import pymod.mc
 import pymod.modes
 
-category = ''
+category = 'module'
 
 
 def swap(module, mode, cur, new, **kwargs):

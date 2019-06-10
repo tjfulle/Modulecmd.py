@@ -1,7 +1,7 @@
 import pymod.mc
 import pymod.modes
 
-category = ''
+category = 'utility'
 
 
 def execute(module, mode, command, when=None):

@@ -2,7 +2,7 @@ import pymod.modes
 import pymod.names
 import pymod.environ
 
-category = ''
+category = 'family'
 
 
 def get_family_info(module, mode, name, **kwargs):

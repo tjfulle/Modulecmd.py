@@ -1,7 +1,7 @@
 import pymod.modes
 import pymod.environ
 
-category = ''
+category = 'environment'
 
 
 def setenv(module, mode, name, value):

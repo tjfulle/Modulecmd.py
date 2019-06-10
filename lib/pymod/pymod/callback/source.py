@@ -1,7 +1,7 @@
 import pymod.mc
 import pymod.modes
 
-category = ''
+category = 'utility'
 
 
 def source(module, mode, filename):

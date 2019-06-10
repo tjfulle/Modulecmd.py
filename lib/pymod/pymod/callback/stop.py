@@ -1,6 +1,6 @@
 import pymod.error
 
-category = ''
+category = 'utility'
 
 
 def stop(module, mode):

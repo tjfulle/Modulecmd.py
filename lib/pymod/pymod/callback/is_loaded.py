@@ -1,7 +1,7 @@
 import pymod.modes
 import pymod.modulepath
 
-category = ''
+category = 'info'
 
 
 def is_loaded(module, mode, name):

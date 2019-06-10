@@ -1,7 +1,7 @@
 import pymod.mc
 import pymod.modes
 
-category = ''
+category = 'interaction'
 
 
 def prereq(module, mode, *names):

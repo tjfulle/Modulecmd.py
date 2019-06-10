@@ -1,6 +1,6 @@
 import pymod.modes
 
-category = ''
+category = 'info'
 
 
 def whatis(module, mode, *args, **kwargs):

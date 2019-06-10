@@ -2,7 +2,7 @@ import pymod.mc
 import pymod.modes
 from pymod.error import ModuleNotFoundError
 
-category = ''
+category = 'module'
 
 
 def unload(module, mode, name):

@@ -4,7 +4,7 @@ import pymod.names
 import pymod.environ
 import pymod.callback
 
-category = ''
+category = 'path'
 
 
 def append_path(module, mode, name, *values, **kwds):
