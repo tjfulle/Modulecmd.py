@@ -31,6 +31,14 @@ def fill_with_paragraphs(string, indent=''):
                 + '\n'
             )
             lines = []
+    if lines:
+        filled.append(
+            textwrap.fill('\n'.join(lines),
+                          width=80,
+                          initial_indent=indent,
+                          subsequent_indent=indent)
+            + '\n'
+        )
     return '\n'.join(filled)
 
 
@@ -71,8 +79,6 @@ class Callback:
         in_section = 0
         for (i, line) in enumerate(doc):
             if line.startswith('-----'):
-                if in_section:
-                    section = section[:-1]
                 this_section_name = doc[i-1].lower()
                 in_section = this_section_name == name.lower()
                 continue

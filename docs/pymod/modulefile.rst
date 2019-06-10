@@ -63,6 +63,7 @@ Module commands
 for interacting with the shell's environment.
 
 .. <INSERT HERE>
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Functions for modifying path-like variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -81,6 +82,8 @@ Functions for modifying path-like variables
 
         echo $PATH     dirname1:dirname2:...
 
+    Here, ":" is the separator `sep`.
+
 
 **prepend_path**\ *(name, \*values, \*\*kwds)*
     Prepend `values` to path-like variable `name`
@@ -95,6 +98,8 @@ Functions for modifying path-like variables
     PATH environment variable is a `sep` separated list of directories:
 
         echo $PATH     dirname1:dirname2:...
+
+    Here, ":" is the separator `sep`.
 
 
 **remove_path**\ *(name, \*values, \*\*kwds)*
@@ -111,6 +116,8 @@ Functions for modifying path-like variables
 
         echo $PATH     dirname1:dirname2:...
 
+    Here, ":" is the separator `sep`.
+
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 General purpose utilities
@@ -119,9 +126,15 @@ General purpose utilities
 **check_output**\ *(command)*
     Run command with arguments and return its output as a string.
 
+    This is a wrapper to `contrib.util.check_output`.  Where
+    `subprocess.check_output` exists, it is called.  Otherwise, an
+    implementation of `subprocess.check_output` is provided.
+
 
 **colorize**\ *(string, \*\*kwargs)*
     Replace all color expressions in a string with ANSI control codes.
+
+    This is a wrapper to `llnl.util.tty.color.colorize`.
 
 
 **execute**\ *(command, when=None)*
@@ -135,6 +148,8 @@ General purpose utilities
 **mkdirp**\ *(\*paths, \*\*kwargs)*
     Make directory `dir` and all intermediate directories, if necessary.
 
+    This is a wrapper to `llnl.util.filesystem.mkdirp`.
+
 
 **source**\ *(filename)*
     Sources a shell script given by filename
@@ -142,13 +157,19 @@ General purpose utilities
     Warning: this function sources a shell script unconditionally.  Environment
     modifications made by the script are not tracked by Modulecmd.py.
 
+    `filename` is only sourced in load mode and is only sourced once
+
 
 **stop**\ *()*
     Stop loading this module
 
+    All commands up to the call to `stop` are executed.
+
 
 **which**\ *(exename)*
     Return the path to an executable, if found on PATH
+
+    This is a wrapper to `contib.util.which`.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -161,11 +182,19 @@ Functions for interacting with other modules
     In load mode, asserts that none of `names` is loaded.   Otherwise, nothing
     is done.
 
+    FIXME: This function should execute mc.conflict in any mode other than
+    unload.  In whatis, help, show, etc. modes, it should register the conflicts
+    but not enforce them.
+
 
 **prereq**\ *(\*names)*
     Defines a prerequisite (module that must be loaded) for this module
 
     In load mode, asserts that `name` is loaded.  Otherwise, nothing is done.
+
+    FIXME: This function should execute mc.prereq in any mode other than unload.
+    In whatis, help, show, etc. modes, it should register the prereqs but not
+    enforce them.
 
 
 **prereq_any**\ *(\*names)*
@@ -173,6 +202,10 @@ Functions for interacting with other modules
 
     In load mode, asserts that at least one of the modules given by `names` is
     loaded.  In unload mode, nothing is done.
+
+    FIXME: This function should execute mc.prereq_any in any mode other than
+    unload.  In whatis, help, show, etc. modes, it should register the prereqs
+    but not enforce them.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -186,9 +219,17 @@ Functions for interacting with module families
     Intel compiler modules can define their family as "compiler".  This prevents
     GCC and Intel compilers being loaded simultaneously.
 
+    This function potentially has side effects on the environment.  When a
+    module is loaded, if a module of the same family is already loaded, they
+    will be swapped.  Swapping has the potential to change the MODULEPATH and
+    state of loaded modules.
+
 
 **get_family_info**\ *(name, \*\*kwargs)*
     Returns information about family `name`
+
+    If a module of family `name` is loaded, this function returns its name and
+    version.  Otherwise, the name and version return as `None`
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -217,12 +258,18 @@ General module functions
     In load mode, loads the module found by `name` if it is not already loaded.
     If it is loaded, its internal reference count is incremented.
 
+    In unload mode, decrements the reference count of the module found by
+    `name`.  If the reference count gets to 0, the module is unloaded.
+
 
 **load_first**\ *(\*names)*
     Load the first of modules in `names`
 
     In load mode, loads the first available module in `names` and returns it. In
     unload mode, the first loaded module in `names` is unloaded.
+
+    If the last of `names` is None, no error is thrown if no available modules
+    are found in `names`
 
 
 **swap**\ *(cur, new, \*\*kwargs)*
@@ -235,6 +282,8 @@ General module functions
     a result of the swap, it is possible that some of these modules will be
     swapped themselves, or not reloaded at all.
 
+    In unload mode, the swap is not performed.
+
 
 **unload**\ *(name)*
     Unload the module `name`
@@ -244,6 +293,8 @@ General module functions
 
     If the module is not found, or is not loaded, nothing is done.
 
+    In unload mode, nothing is done.
+
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Functions for defining shell aliases and functions
@@ -252,17 +303,27 @@ Functions for defining shell aliases and functions
 **set_alias**\ *(name, value)*
     Define a shell alias
 
+    In load mode, defines the shell alias.  In unload mode, undefines it.
+
 
 **set_shell_function**\ *(name, value)*
     Define a shell function
+
+    In load mode, defines the shell function.  In unload mode, undefines it.
 
 
 **unset_alias**\ *(name)*
     Undefine a shell alias
 
+    In unload mode, nothing is done.  Otherwise, the alias given by `name` is
+    undefined.
+
 
 **unset_shell_function**\ *(name)*
     Undefine a shell function
+
+    In unload mode, nothing is done.  Otherwise, the function given by `name` is
+    undefined.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -272,9 +333,14 @@ Functions for modifying the environment
 **setenv**\ *(name, value)*
     Set value of environment variable `name`
 
+    In load mode, sets the environment variable.  In unload mode, unsets the
+    variable.
+
 
 **unsetenv**\ *(name)*
     Unset value of environment variable `name`
+
+    In unload mode, nothing is done
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -287,6 +353,10 @@ Functions for interacting with the MODULEPATH
     In load mode, removes `dirname` from MODULEPATH (it it is on MODULEPATH). In
     unload mode, nothing is done.
 
+    This function potentially has side effects on the environment.  When a
+    directory is `unuse`\ d, modules in its path will become unavailable and, if
+    loaded, will be unloaded.
+
 
 **use**\ *(dirname, append=False)*
     Add the directory `dirname` to MODULEPATH
@@ -294,7 +364,13 @@ Functions for interacting with the MODULEPATH
     In load mode, add `dirname` to MODULEPATH.  In unload mode, remove `dirname`
     from MODULEPATH (if it is on MODULEPATH).
 
+    This function potentially has side effects on the environment.  When a
+    directory is `use`\ d, modules in its path may have higher precedence than
+    modules on the previous MODULEPATH.  Thus, defaults could change and loaded
+    modules could be swapped for newer modules with higher precedence.
 
+
+.. <END INSERT HERE>
 
 --------------
 Module Options
