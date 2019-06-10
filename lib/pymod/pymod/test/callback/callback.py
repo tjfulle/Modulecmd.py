@@ -5,9 +5,14 @@ import pymod.mc
 import pymod.error
 import pymod.modes
 import pymod.environ
+import pymod.callback
 from pymod.callback import get_callback
 
 """Test of the callback functions sent to modules"""
+
+
+def test_callback_all_callback():
+    all_callbacks = pymod.callback.all_callbacks()
 
 
 def test_callback_path_ops():

@@ -15,7 +15,36 @@ from llnl.util.lang import attr_setdefault
 import llnl.util.tty as tty
 
 
+# Patterns to ignore in the callbacks directory when looking for callbacks.
+ignore_files = r'^\.|^__init__.py$|^#|flycheck_'
+
 CATEGORY = "category"
+
+
+#: global, cached list of all callbacks -- access through all_callbacks()
+_all_callbacks = None
+
+
+def all_callbacks():
+    """Get a sorted list of all pymod callbacks.
+
+    This will list the lib/pymod/pymod/callback directory and find the
+    callbacks there to construct the list.  It does not actually import
+    the python files -- just gets the names.
+    """
+    global _all_callbacks
+    if _all_callbacks is None:
+        _all_callbacks = []
+        callback_paths = [pymod.paths.callback_path]  # Built-in callbacks
+        for path in callback_paths:
+            for file in os.listdir(path):
+                if file.endswith(".py") and not re.search(ignore_files, file):
+                    callback = re.sub(r'.py$', '', file)
+                    _all_callbacks.append(callback)
+
+        _all_callbacks.sort()
+
+    return _all_callbacks
 
 
 def callback(func_name, module, mode, when=None, **kwds):
