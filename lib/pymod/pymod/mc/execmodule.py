@@ -9,10 +9,7 @@ import pymod.environ
 import pymod.callback
 import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir
-from contrib.util import which, check_output, listdir
 
-from llnl.util.tty.color import colorize
-from llnl.util.filesystem import mkdirp
 from six import exec_
 from pymod.error import FamilyLoadedError
 
@@ -62,18 +59,14 @@ def module_exec_sandbox(module, mode):
     ns = {
         'os': os,
         'sys': sys,
-        'stop': callback('stop'),
-        'mkdirp': mkdirp,
-        'env': pymod.environ.copy(include_os=True),
+        'self': module,
         'user_env': pymod.user.env,
         'getenv': pymod.environ.get,
+        'get_hostname': socket.gethostname,
         'is_darwin': 'darwin' in sys.platform,
         'IS_DARWIN': 'darwin' in sys.platform,
-        'get_hostname': socket.gethostname,
-        'listdir': lambda dirname, key=None: listdir(dirname, key=key),
+        'env': pymod.environ.copy(include_os=True),
         'mode': lambda: pymod.modes.as_string(mode),
-        'self': module,
-        'colorize': colorize,
         #
         'add_option': module.parser.add_argument,
         'parse_opts': module.parse_args,
@@ -81,7 +74,15 @@ def module_exec_sandbox(module, mode):
         'log_info': lambda s: tty.info(s, reported_by=module.fullname),
         'log_warning': lambda s: tty.warn(s, reported_by=module.fullname),
         'log_error': lambda s: tty.die(s, reported_by=module.fullname),
+        #
+        'stop': callback('stop'),
+        'which': callback('which'),
+        'mkdirp': callback('mkdirp'),
+        'source': callback('source'),
         'execute': callback('execute'),
+        'listdir': callback('listdir'),
+        'colorize': callback('colorize'),
+        'check_output': callback('check_output'),
         #
         'setenv': callback('setenv'),
         'unsetenv': callback('unsetenv'),
@@ -114,9 +115,5 @@ def module_exec_sandbox(module, mode):
         #
         'whatis': callback('whatis', when=mode==pymod.modes.whatis),
         'help': callback('help', when=mode==pymod.modes.help),
-        'which': which,
-        'check_output': check_output,
-        #
-        'source': callback('source'),
     }
     return ns
