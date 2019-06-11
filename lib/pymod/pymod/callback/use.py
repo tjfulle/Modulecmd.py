@@ -7,21 +7,18 @@ category = 'modulepath'
 def use(module, mode, dirname, append=False):
     """Add the directory `dirname` to ``MODULEPATH``
 
-    Parameters
-    ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
-    dirname : str
-        Name of the directory to add to ``MODULEPATH``
-    append : bool {False}
-        Append `dirname` to ``MODULEPATH``, otherwise `dirname` is prepended
+    Arguments:
+        module (Module): The module being executed
+        mode (Mode): The mode of execution
+        dirname (str): Name of the directory to add to ``MODULEPATH``
 
-    Notes
-    -----
-    In load mode, add `dirname` to ``MODULEPATH``.  In unload mode, remove
-    `dirname` from ``MODULEPATH`` (if it is on ``MODULEPATH``).
+    Keyword arguments:
+        append (bool): Append `dirname` to ``MODULEPATH``, otherwise `dirname` \
+                is prepended.  The default is ``False``.
+
+    Notes:
+    In load mode, adds `dirname` to the ``MODULEPATH``.  In unload mode, remove
+    `dirname` from the ``MODULEPATH`` (if it is on ``MODULEPATH``).
 
     This function potentially has side effects on the environment.  When
     a directory is ``use``\ d, modules in its path may have higher precedence than

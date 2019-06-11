@@ -7,21 +7,16 @@ category = 'utility'
 def source(module, mode, filename):
     """Sources a shell script given by filename
 
-    Parameters
-    ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
-    filename : str
-        Name of the filename to source
+    Arguments:
+        module (Module): The module being executed
+        mode (Mode): The mode of execution
+        filename (str): Name of the filename to source
 
-    Notes
-    -----
-    Warning: this function sources a shell script unconditionally.  Environment
-    modifications made by the script are not tracked by Modulecmd.py.
+    Notes:
+    - **Warning:** This function sources a shell script unconditionally.  Environment \
+            modifications made by the script are not tracked by Modulecmd.py.
 
-    `filename` is only sourced in load mode and is only sourced once
+    - `filename` is sourced only if ``mode()=='load'`` and is only sourced once
 
     """
     pymod.modes.assert_known_mode(mode)

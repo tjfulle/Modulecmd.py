@@ -1,22 +1,25 @@
+import os
 import re
 import inspect
 import textwrap
+from six import StringIO
 from argparse import ArgumentParser
 from ordereddict_backport import OrderedDict
 
+import pymod.paths
 import pymod.callback
 
-category_descriptions = {
-    'path': 'Functions for modifying path-like variables',
-    'environment': 'Functions for modifying the environment',
-    'modulepath': 'Functions for interacting with the MODULEPATH',
-    'utility': 'General purpose utilities',
-    'interaction': 'Functions for interacting with other modules',
-    'module': 'General module functions',
-    'family': 'Functions for interacting with module families',
-    'info': 'Functions for relaying information',
-    'alias': 'Functions for defining shell aliases and functions',
-}
+category_descriptions = OrderedDict(
+    environment='Functions for modifying the environment',
+    path='Functions for modifying path-like variables',
+    alias='Functions for defining shell aliases and functions',
+    module='General module functions',
+    interaction='Functions for interacting with other modules',
+    family='Functions for interacting with module families',
+    modulepath='Functions for interacting with the MODULEPATH',
+    info='Functions for relaying information',
+    utility='General purpose utilities'
+)
 
 def fill_with_paragraphs(string, indent=''):
     filled = []
@@ -162,8 +165,8 @@ class Callback:
                 name_and_type, _, description = line.partition(':')
                 result = regex.search(name_and_type)
                 if result is None:
-                    raise ValueError('Expected parameter {0} to be of form '
-                                     '<name (type)>'.format(name_and_type))
+                    raise ValueError('{0}: expected parameter {1} to be of form '
+                                     '<name (type)>'.format(self.name, name_and_type))
                 name, type = result.groups()
                 returns.append((name, type, ' '.join(description.split())))
         if returns:
@@ -217,8 +220,6 @@ class Callback:
         return '\n'.join(s)
 
 
-
-
 def gen_callback_docs():
 
     callbacks = {}
@@ -227,17 +228,21 @@ def gen_callback_docs():
         cb = Callback(name)
         callbacks.setdefault(m.category, []).append(cb)
 
+    sio = StringIO()
     for (category, items) in callbacks.items():
-        if category != 'path':
-            continue
         description = category_descriptions[category]
-        print('^' * len(description))
-        print(description)
-        print('^' * len(description) + '\n')
+        sio.write('\n' + '^' * len(description) + '\n')
+        sio.write(description + '\n')
+        sio.write('^' * len(description) + '\n\n')
 
         for cb in items:
-            print(cb.documentation(indent='    '))
-            print('\n')
+            sio.write(cb.documentation(indent='    ') + '\n')
+            sio.write('\n')
+
+    template = open(os.path.join(pymod.paths.docs_path, 'modulefile.rst.in')).read()
+    output = template % {'commands': sio.getvalue()}
+    with open(os.path.join(pymod.paths.docs_path, 'modulefile.rst'), 'w') as fh:
+        fh.write(output)
 
 
 def main():

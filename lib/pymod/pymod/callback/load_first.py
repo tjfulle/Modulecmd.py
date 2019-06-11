@@ -8,32 +8,43 @@ category = 'module'
 def load_first(module, mode, *names):
     """Load the first of modules in `names`
 
-    Parameters
-    ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
-    names : tuple
-        Names of modules to load
+    Arguments:
+        module (Module): The module being executed
+        mode (Mode): The mode of execution
+        names (tuple of str): Names of modules to load
 
-    Returns
-    -------
-    Module
-        The loaded module
+    Returns:
+        loaded (Module): The loaded module
 
-    Raises
-    ------
-    ModuleNotFoundError
-        If no available modules are found in `names`
+    Notes:
+    - In load mode, loads the first available module in `names` and returns it. In \
+            unload mode, the first loaded module in `names` is unloaded.
 
-    Notes
-    -----
-    In load mode, loads the first available module in `names` and returns it. In
-    unload mode, the first loaded module in `names` is unloaded.
+    - If no available modules are found in `names`, an error occurs
 
-    If the last of `names` is None, no error is thrown if no available
-    modules are found in `names`
+    - If the last of `names` is None, no error is thrown if no available \
+            modules are found in `names`
+
+    Examples:
+    Consider the module ``baz``
+
+    .. code-block:: python
+
+        load_first('spam', 'eggs')
+
+    On loading module ``baz``, the first available module of ``spam`` or ``eggs`` is loaded.
+
+    .. code-block:: console
+
+        $ module ls
+        No loaded modules
+
+        $ module load baz
+        $ module ls
+        Currently loaded modules
+            1) eggs  2) baz
+
+    The module ``eggs`` was loaded because ``spam`` was not available.
 
     """
     pymod.modes.assert_known_mode(mode)

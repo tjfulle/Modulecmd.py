@@ -7,19 +7,21 @@ category = 'info'
 def is_loaded(module, mode, name):
     """Report whether the module `name` is loaded
 
-    Parameters
-    ----------
-    module : Module
-        The module being executed
-    mode : Mode
-        The mode of execution
-    name : str
-        Name of the module to report
+    Arguments:
+        module (Module): The module being executed
+        mode (Mode): The mode of execution
+        name (str): Name of the module to report
 
-    Returns
-    -------
-    bool
-        Whether the module given by `name` is loaded
+    Returns:
+        is_loaded (bool): Whether the module given by `name` is loaded
+
+    Examples:
+
+    .. code-block:: python
+
+        if is_loaded('baz'):
+            # Do something if baz is loaded
+            ...
 
     """
     pymod.modes.assert_known_mode(mode)
