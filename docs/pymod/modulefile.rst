@@ -116,6 +116,7 @@ Functions for modifying path-like variables
         spam
 
     On loading the module ``baz``, the environment variable ``BAZ`` is updated:
+
     .. code-block:: console
 
         $ module load baz
@@ -171,6 +172,7 @@ Functions for modifying path-like variables
         spam
 
     On loading the module ``baz``, the environment variable ``BAZ`` is updated:
+
     .. code-block:: console
 
         $ module load baz
@@ -226,6 +228,7 @@ Functions for modifying path-like variables
         baz:spam
 
     On loading the module ``baz``, the environment variable ``BAZ`` is updated:
+
     .. code-block:: console
 
         $ module load baz

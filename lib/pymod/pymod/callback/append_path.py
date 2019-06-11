@@ -52,6 +52,7 @@ def append_path(module, mode, name, *values, **kwargs):
         spam
 
     On loading the module ``baz``, the environment variable ``BAZ`` is updated:
+
     .. code-block:: console
 
         $ module load baz
