@@ -15,9 +15,9 @@ Bash
 
 In your ``.bashrc``, add the following:
 
-.. code-block:: shell
+.. code-block:: console
 
-  source ${MODULECMD_PY_DIR}/share/pymod/setup-env.sh
+  $ source ${MODULECMD_PY_DIR}/share/pymod/setup-env.sh
 
 ---------------------
 Test the installation
@@ -27,7 +27,7 @@ Test the installation with `Modulecmd.py`_'s subcommand ``test``:
 
 .. code-block:: console
 
-  module test
+  $ module test
 
 which will report passed and failed tests.  Failed tests are considered a bug, please report them to the `Modulecmd.py`_ developers.
 
@@ -40,7 +40,7 @@ While not necessary, adding a call to the ``init`` subcommand, just after ``sour
 
 .. code-block:: console
 
-  module init [-p=<MODULEPATH>]
+  $ module init [-p=<MODULEPATH>]
 
 The optional ``-p`` flag is used to set an initial ``MODULEPATH``.  See basic-usage_ for a description of the ``MODULEPATH``.
 
