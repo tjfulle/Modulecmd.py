@@ -1188,7 +1188,7 @@ A module can support command line options.  Options are specified on the command
 
 .. code-block:: console
 
-  module load <modulename> [+option[=value] [+option...]]
+  $ module load <modulename> [+option[=value] [+option...]]
 
 The following modulefile functions register options
 
@@ -1220,6 +1220,6 @@ On the commandline, the module spam can be loaded as
 
 .. code-block:: console
 
-  module load spam +b +x=baz
+  $ module load spam +b +x=baz
 
 .. _Modulecmd.py: https://www.github.com/tjfulle/Modulecmd.py
