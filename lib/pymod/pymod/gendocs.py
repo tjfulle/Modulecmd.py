@@ -1,6 +1,8 @@
+import re
 import inspect
 import textwrap
 from argparse import ArgumentParser
+from ordereddict_backport import OrderedDict
 
 import pymod.callback
 
@@ -43,103 +45,198 @@ def fill_with_paragraphs(string, indent=''):
 
 
 class Callback:
+    section_re = re.compile('(?i)^(argument|keyword argument|return|note|example)[s]:')
     def __init__(self, name):
         self.name = name
         self.obj = pymod.callback.get_callback(name)
         self.raw_doc = inspect.getdoc(self.obj)
-        self.doc = self._remove_module_mode_params(self.raw_doc)
-        self.sig = inspect.signature(self.obj)
-        self._doc_sections = {}
+        self._description = None
 
-    def _remove_module_mode_params(self, doc):
-        doc = doc.split('\n')
-        in_params = 0
-        for (i, line) in enumerate(doc):
-            if line.startswith('-----'):
-                preceding = doc[i-1]
-                if preceding.lower().startswith('parameters'):
-                    in_params = 1
-                    continue
-            elif in_params:
-                if in_params in (1, 2, 3, 4):
-                    # skip module and mode parameter descriptions
-                    in_params += 1
-                    doc[i] = None
-                else:
-                    continue
-        doc = '\n'.join(x for x in doc if x is not None)
-        return doc
+        self.parse_docstring()
 
-    def get_doc_section(self, name):
-        if name.lower() in self._doc_sections:
-            return self._doc_sections[name.lower()]
+    def parse_docstring(self):
+        self._description = self._parse_description()
+        self._param_names = self._parse_signature()
+        self._args = self._parse_args_description()
+        self._kwargs = self._parse_kwargs_description()
+        self._returns = self._parse_returns_description()
+        self._notes = self._get_section('note')
+        self._examples = self._get_section('example')
 
-        doc = self.doc.split('\n')
-        section = []
+    def _parse_description(self):
+        description = ''
+        for line in self.raw_doc.split('\n'):
+            if self.section_re.search(line):
+                break
+            description += line
+        if description.split():
+            return ' '.join(description.split())
+
+    def _parse_signature(self):
+        param_names = []
+        sig = inspect.signature(self.obj)
+        for (i, param) in enumerate(sig.parameters.values()):
+            param_name = str(param)
+            if i == 0:
+                if param_name != 'module':
+                    raise ValueError(
+                        "Expected first parameter of {0} to be 'module', "
+                        "got {1}".format(self.name, param))
+            elif i == 1:
+                if param_name != 'mode':
+                    raise ValueError(
+                        "Expected first parameter of {0} to be 'mode', "
+                        "got {1}".format(self.name, param))
+            else:
+                param_names.append(param_name)
+        return param_names
+
+    def _parse_args_description(self):
+        args = []
         in_section = 0
-        for (i, line) in enumerate(doc):
-            if line.startswith('-----'):
-                this_section_name = doc[i-1].lower()
-                in_section = this_section_name == name.lower()
+        regex = re.compile('(\w+)\s+\(([a-zA-Z0-9-_ ]+)\)')
+        for line in self.raw_doc.split('\n'):
+            if not line.split():
+                continue
+            if self.section_re.search(line):
+                if line.lower().startswith('argument'):
+                    in_section = 1
+                    continue
+                in_section = 0
                 continue
             if in_section:
-                section.append(line)
-        section = '\n'.join(section)
-        self._doc_sections[name.lower()] = section
-        return section
+                name_and_type, _, description = line.partition(':')
+                result = regex.search(name_and_type)
+                if result is None:
+                    raise ValueError('Expected parameter {0} to be of form '
+                                     '<name (type)>'.format(name_and_type))
+                name, type = result.groups()
+                if name in ('module', 'mode'):
+                    continue
+                if (name not in self._param_names and
+                    '*'+name not in self._param_names):
+                    raise ValueError('Parameter {0} not in {1}'
+                                     .format(name, self._param_names))
+                args.append((name, type, ' '.join(description.split())))
+        if args:
+            return args
 
-    @property
-    def description(self):
-        doc = self.doc.split('\n')
-        description = []
-        for (i, line) in enumerate(doc):
-            if line.startswith('-----'):
-                description = description[:-1]
-                break
-            description.append(line)
-        description = '\n'.join(description)
-        return description
+    def _parse_kwargs_description(self):
+        kwargs = []
+        in_section = 0
+        regex = re.compile('(\w+)\s+\(([a-zA-Z0-9-_ ]+)\)')
+        for line in self.raw_doc.split('\n'):
+            if not line.split():
+                continue
+            if self.section_re.search(line):
+                if line.lower().startswith('keyword argument'):
+                    in_section = 1
+                    continue
+                in_section = 0
+                continue
+            if in_section:
+                name_and_type, _, description = line.partition(':')
+                result = regex.search(name_and_type)
+                if result is None:
+                    raise ValueError('Expected parameter {0} to be of form '
+                                     '<name (type)>'.format(name_and_type))
+                name, type = result.groups()
+                kwargs.append((name, type, ' '.join(description.split())))
+        if kwargs:
+            return kwargs
 
-    def long_description(self, indent='    '):
-        notes = self.get_doc_section('notes')
-        long_description = indent + self.description
-        if notes.split():
-            notes = fill_with_paragraphs(notes, indent=indent)
-            long_description += '\n' + notes
-        return long_description.rstrip()
+    def _parse_returns_description(self):
+        returns = []
+        in_section = 0
+        regex = re.compile('(\w+)\s+\(([a-zA-Z0-9-_ ]+)\)')
+        for line in self.raw_doc.split('\n'):
+            if not line.split():
+                continue
+            if self.section_re.search(line):
+                if line.lower().startswith('return'):
+                    in_section = 1
+                    continue
+                in_section = 0
+                continue
+            if in_section:
+                name_and_type, _, description = line.partition(':')
+                result = regex.search(name_and_type)
+                if result is None:
+                    raise ValueError('Expected parameter {0} to be of form '
+                                     '<name (type)>'.format(name_and_type))
+                name, type = result.groups()
+                returns.append((name, type, ' '.join(description.split())))
+        if returns:
+            return returns
 
-    @property
-    def parameters(self):
-        return ['{0}'.format(x) for x in list(self.sig.parameters.values())[2:]]
+    def _get_section(self, section):
+        content = []
+        in_section = 0
+        regex = re.compile('(\w+)\s+\(([a-zA-Z0-9-_ ]+)\)')
+        for line in self.raw_doc.split('\n'):
+            if self.section_re.search(line):
+                if line.lower().startswith(section):
+                    in_section = 1
+                    continue
+                in_section = 0
+                continue
+            if in_section:
+                content.append(line)
+        if content:
+            return '\n'.join(content)
 
-    @property
-    def signature(self):
-        s = '{0}({1})'.format(self.name, ', '.join(self.parameters))
-        return s
-
-    def info(self, indent='    '):
-        params = ', '.join(x.replace('*', '\*') for x in self.parameters)
+    def documentation(self, indent='    '):
+        params = ', '.join(x.replace('*', '\*') for x in self._param_names)
         s = ['**{0}**\ *({1})*'.format(self.name, params)]
-        s.append(self.long_description(indent=indent))
+
+        s.append('\n{0}{1}'.format(indent, self._description))
+
+        if self._args:
+            s.append('\n{0}**Arguments**\n'.format(indent))
+            for (name, type, description) in self._args:
+                s.append('{0}*{1}* ({2}): {3}'.format(indent, name, type, description))
+
+        if self._kwargs:
+            s.append('\n{0}**Keyword arguments**\n'.format(indent))
+            for (name, type, description) in self._kwargs:
+                s.append('{0}*{1}* ({2}): {3}'.format(indent, name, type, description))
+
+        if self._returns:
+            s.append('\n{0}**Returns**\n'.format(indent))
+            for (name, type, description) in self._returns:
+                s.append('{0}*{1}* ({2}): {3}'.format(indent, name, type, description))
+
+        if self._notes:
+            s.append('\n{0}**Notes**\n'.format(indent))
+            s.append('\n'.join('{0}{1}'.format(indent, x) for x in self._notes.split('\n')))
+
+        if self._examples:
+            s.append('\n{0}**Examples**\n'.format(indent))
+            s.append('\n'.join('{0}{1}'.format(indent, x) for x in self._examples.split('\n')))
+
         return '\n'.join(s)
 
 
 
 
 def gen_callback_docs():
+
     callbacks = {}
     for name in pymod.callback.all_callbacks():
         m = pymod.callback.get_module(name)
         cb = Callback(name)
         callbacks.setdefault(m.category, []).append(cb)
+
     for (category, items) in callbacks.items():
         description = category_descriptions[category]
         print('^' * len(description))
         print(description)
         print('^' * len(description) + '\n')
+
         for cb in items:
-            print(cb.info())
+            print(cb.documentation(indent='    '))
             print('\n')
+            exit()
 
 
 def main():

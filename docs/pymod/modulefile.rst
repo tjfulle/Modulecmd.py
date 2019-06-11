@@ -68,271 +68,57 @@ for interacting with the shell's environment.
 Functions for modifying path-like variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**append_path**\ *(name, \*values, \*\*kwds)*
+**append_path**\ *(name, \*values, \*\*kwargs)*
+
     Append `values` to path-like variable `name`
 
-    In unload mode, `values` are removed from path-like variable `name`,
-    otherwise, they are appended.
+    **Arguments**
 
-    If ``name==MODULEPATH``, this function calls ``use(value, append=True)`` for
-    each `value` in `values`.
+    *name* (str): Name of path-like variable
+    *values* (tuple of str): The values to append to path-like variable `name`
 
-    A path-like variable stores a list as a ``sep`` separated string.  eg, the
-    PATH environment variable is a ``sep`` separated list of directories:
+    **Keyword arguments**
 
-    .. code-block:: console
+    *sep* (str): defines the separator between values in path-like variable `name` (default is os.pathsep)
 
-        echo $PATH
-        dirname1:dirname2:...
+    **Notes**
 
-    Here, ":" is the separator ``sep``.
+    - In *unload* mode, `values` are removed from path-like variable `name`,       otherwise, they are appended.
 
+    - If ``name==MODULEPATH``, this function calls ``use(value, append=True)``       for each `value` in `values`.
 
-**prepend_path**\ *(name, \*values, \*\*kwds)*
-    Prepend `values` to path-like variable `name`
+    - A path-like variable stores a list as a ``sep`` separated string.  eg, the       PATH environment variable is a ``sep`` separated list of directories:
 
-    In unload mode, `values` are removed from path-like variable `name`,
-    otherwise, they are prepended.
+      .. code-block:: console
 
-    If ``name==MODULEPATH``, this function calls ``use(value)`` for each `value`
-    in `values`.
-
-    A path-like variable stores a list as a ``sep`` separated string.  eg, the
-    PATH environment variable is a ``sep`` separated list of directories:
-
-    .. code-block:: console
-
-        echo $PATH
-        dirname1:dirname2:...
+          $ echo ${PATH}
+          dirname1:dirname2:...
 
     Here, ":" is the separator ``sep``.
 
 
-**remove_path**\ *(name, \*values, \*\*kwds)*
-    Removes `values` from path-like variable `name`
+    **Examples**
 
-    In unload mode, nothing is done.  Otherwise, `values` are removed from path-
-    like variable `name`.
+    Consider the module ``baz``
 
-    If ``name==MODULEPATH``, this function calls ``unuse(value)`` for each
-    `value` in `values`.
+    .. code-block:: python
 
-    A path-like variable stores a list as a ``sep`` separated string.  eg, the
-    PATH environment variable is a ``sep`` separated list of directories:
+        # Append `baz` to the path-like environment variable `BAZ`
+        append_path('BAZ', 'baz')
 
-    .. code-block::
+    .. code-block:: console
 
-        echo $PATH
-        dirname1:dirname2:...
+        $ echo ${BAZ}
+        spam
 
-    Here, ":" is the separator `sep`.
+    .. code-block:: console
 
+        $ module load baz
 
-^^^^^^^^^^^^^^^^^^^^^^^^^
-General purpose utilities
-^^^^^^^^^^^^^^^^^^^^^^^^^
+    .. code-block:: console
 
-**check_output**\ *(command)*
-    Run command with arguments and return its output as a string.
-
-    This is a wrapper to `contrib.util.check_output`.  Where
-    `subprocess.check_output` exists, it is called.  Otherwise, an
-    implementation of `subprocess.check_output` is provided.
-
-
-**colorize**\ *(string, \*\*kwargs)*
-    Replace all color expressions in a string with ANSI control codes.
-
-    This is a wrapper to `llnl.util.tty.color.colorize`.
-
-
-**execute**\ *(command, when=None)*
-    Executes the command `command` in a subprocess
-
-
-**listdir**\ *(dirname, key=None)*
-    List contents of directory `dirname`
-
-
-**mkdirp**\ *(\*paths, \*\*kwargs)*
-    Make directory `dir` and all intermediate directories, if necessary.
-
-    This is a wrapper to `llnl.util.filesystem.mkdirp`.
-
-
-**source**\ *(filename)*
-    Sources a shell script given by filename
-
-    Warning: this function sources a shell script unconditionally.  Environment
-    modifications made by the script are not tracked by Modulecmd.py.
-
-    `filename` is only sourced in load mode and is only sourced once
-
-
-**stop**\ *()*
-    Stop loading this module
-
-    All commands up to the call to `stop` are executed.
-
-
-**which**\ *(exename)*
-    Return the path to an executable, if found on PATH
-
-    This is a wrapper to `contib.util.which`.
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for interacting with other modules
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**conflict**\ *(\*names, \*\*kwargs)*
-    Defines conflicts (modules that conflict with `module`)
-
-    In load mode, asserts that none of `names` is loaded.   Otherwise, nothing
-    is done.
-
-    FIXME: This function should execute mc.conflict in any mode other than
-    unload.  In whatis, help, show, etc. modes, it should register the conflicts
-    but not enforce them.
-
-
-**prereq**\ *(\*names)*
-    Defines a prerequisite (module that must be loaded) for this module
-
-    In load mode, asserts that `name` is loaded.  Otherwise, nothing is done.
-
-    FIXME: This function should execute mc.prereq in any mode other than unload.
-    In whatis, help, show, etc. modes, it should register the prereqs but not
-    enforce them.
-
-
-**prereq_any**\ *(\*names)*
-    Defines prerequisites (modules that must be loaded) for this module
-
-    In load mode, asserts that at least one of the modules given by `names` is
-    loaded.  In unload mode, nothing is done.
-
-    FIXME: This function should execute mc.prereq_any in any mode other than
-    unload.  In whatis, help, show, etc. modes, it should register the prereqs
-    but not enforce them.
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for interacting with module families
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**family**\ *(family_name, \*\*kwargs)*
-    Defines the "family" of the module
-
-    Only one module in a family can be loaded at a time.  For instance, GCC and
-    Intel compiler modules can define their family as "compiler".  This prevents
-    GCC and Intel compilers being loaded simultaneously.
-
-    This function potentially has side effects on the environment.  When a
-    module is loaded, if a module of the same family is already loaded, they
-    will be swapped.  Swapping has the potential to change the MODULEPATH and
-    state of loaded modules.
-
-
-**get_family_info**\ *(name, \*\*kwargs)*
-    Returns information about family `name`
-
-    If a module of family `name` is loaded, this function returns its name and
-    version.  Otherwise, the name and version return as `None`
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for relaying information
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**help**\ *(help_string, \*\*kwargs)*
-    Sets a help message for `module`
-
-
-**is_loaded**\ *(name)*
-    Report whether the module `name` is loaded
-
-
-**whatis**\ *(\*args, \*\*kwargs)*
-    Sets the "whatis" informational string for `module`
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^
-General module functions
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-**load**\ *(name, \*\*kwds)*
-    Load the module `name`
-
-    In load mode, loads the module found by `name` if it is not already loaded.
-    If it is loaded, its internal reference count is incremented.
-
-    In unload mode, decrements the reference count of the module found by
-    `name`.  If the reference count gets to 0, the module is unloaded.
-
-
-**load_first**\ *(\*names)*
-    Load the first of modules in `names`
-
-    In load mode, loads the first available module in `names` and returns it. In
-    unload mode, the first loaded module in `names` is unloaded.
-
-    If the last of `names` is None, no error is thrown if no available modules
-    are found in `names`
-
-
-**swap**\ *(cur, new, \*\*kwargs)*
-    Swap module `cur` for module `new`
-
-    In load mode, perform an unload of `cur` followed by a load of `new`.
-    However, when unloading `cur`, all modules loaded after `cur` are also
-    unloaded in reverse order.  After loading `new`, the unloaded modules are
-    reloaded in the order they were originally loaded.  If MODULEPATH changes as
-    a result of the swap, it is possible that some of these modules will be
-    swapped themselves, or not reloaded at all.
-
-    In unload mode, the swap is not performed.
-
-
-**unload**\ *(name)*
-    Unload the module `name`
-
-    In load mode, decrements the reference count of the module found by `name`.
-    If the reference count drops to 0, the module is unloaded.
-
-    If the module is not found, or is not loaded, nothing is done.
-
-    In unload mode, nothing is done.
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for defining shell aliases and functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**set_alias**\ *(name, value)*
-    Define a shell alias
-
-    In load mode, defines the shell alias.  In unload mode, undefines it.
-
-
-**set_shell_function**\ *(name, value)*
-    Define a shell function
-
-    In load mode, defines the shell function.  In unload mode, undefines it.
-
-
-**unset_alias**\ *(name)*
-    Undefine a shell alias
-
-    In unload mode, nothing is done.  Otherwise, the alias given by `name` is
-    undefined.
-
-
-**unset_shell_function**\ *(name)*
-    Undefine a shell function
-
-    In unload mode, nothing is done.  Otherwise, the function given by `name` is
-    undefined.
+        $ echo ${BAZ}
+        spam:baz
 
 .. <END INSERT HERE>
 
