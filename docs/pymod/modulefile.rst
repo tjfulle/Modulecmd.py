@@ -63,6 +63,88 @@ Module commands
 for interacting with the shell's environment.
 
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for modifying the environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**setenv**\ *(name, value)*
+
+    Set value of environment variable `name`
+
+    **Arguments**
+
+    *name* (str): Name of the environment variable
+
+    *value* (str): Value to set for environment variable `name`
+
+
+    **Notes**
+
+    In unload mode, the environment variable is unset.  Otherwise, it is set.
+    
+
+    **Examples**
+
+    Consider the module ``baz``
+    
+    .. code-block:: python
+    
+        setenv('BAZ', 'baz')
+    
+    On loading ``baz``, the environment variable is set
+    
+    .. code-block:: console
+    
+        $ module load baz
+        $ echo ${BAZ}
+        baz
+    
+    On unloading ``baz``, the environment variable is unset
+    
+    .. code-block:: console
+    
+        $ module ls
+        Currently loaded module
+            1) baz
+    
+        $ module unload baz
+        $ echo ${BAZ}
+
+**unsetenv**\ *(name)*
+
+    Unset value of environment variable `name`
+
+    **Arguments**
+
+    *name* (str): Name of the environment variable
+
+
+    **Notes**
+
+    In unload mode, nothing is done
+    
+
+    **Examples**
+
+    Consider the module ``baz``
+    
+    .. code-block:: python
+    
+        unsetenv("BAZ")
+    
+    .. code-block:: console
+    
+        $ echo ${BAZ}
+        baz
+    
+    On loading, the environment variable ``BAZ`` is unset
+    
+    .. code-block:: console
+    
+        $ module load baz
+        $ echo ${BAZ}
+
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Functions for modifying path-like variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -233,141 +315,24 @@ Functions for modifying path-like variables
         spam
 
 
-^^^^^^^^^^^^^^^^^^^^^^^^^
-General purpose utilities
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for defining shell aliases and functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**check_output**\ *(command)*
+**set_alias**\ *(name, value)*
 
-    Run command with arguments and return its output as a string.
+    Define a shell alias
 
     **Arguments**
 
-    *command* (str): The command to run
+    *name* (str): Name of the alias
 
-
-    **Returns**
-
-    *output* (str): The output of `command`
+    *value* (str): Value of the alias
 
 
     **Notes**
 
-    This is a wrapper to `contrib.util.check_output`.  Where
-    `subprocess.check_output` exists, it is called.  Otherwise, an implementation of
-    `subprocess.check_output` is provided.
-
-**colorize**\ *(string, \*\*kwargs)*
-
-    Replace all color expressions in a string with ANSI control codes.
-
-    **Arguments**
-
-    *string* (str): The string to replace
-
-
-    **Keyword arguments**
-
-    *color* (bool): If False, output will be plain text without control codes, for output to non-console devices.
-
-
-    **Returns**
-
-    *colorized* (str): The filtered string
-
-
-    **Notes**
-
-    This is a wrapper to `llnl.util.tty.color.colorize`.
-
-**execute**\ *(command, when=None)*
-
-    Executes the command `command` in a subprocess
-
-    **Arguments**
-
-    *command* (str): The command to execute in a shell subprocess
-
-
-    **Keyword arguments**
-
-    *when* (bool): Logical describing when to execute `command`. If `None` or `True`, `command` is executed.
-
-
-    **Examples**
-
-    Consider the module ``baz``:
-    
-    .. code-block:: python
-    
-        execute(<command>, when=mode()=='load')
-    
-    The command ``<command>`` will be executed in a subprocess when the module is loaded.
-
-**listdir**\ *(dirname, key=None)*
-
-    List contents of directory `dirname`
-
-    **Arguments**
-
-    *dirname* (str): Path to directory
-
-
-    **Keyword arguments**
-
-    *key* (callable): Filter for contents in `dirname`
-
-
-    **Returns**
-
-    *contents* (list): Contents of `dirname`
-
-
-    **Notes**
-
-    - This is a wrapper to ``contrib.util.listdir``
-    - If ``key`` is given, it must be a callable object
-
-**mkdirp**\ *(\*paths, \*\*kwargs)*
-
-    Make directory and all intermediate directories, if necessary.
-
-    **Arguments**
-
-    *paths* (tuple of str): Paths to create
-
-
-    **Keyword arguments**
-
-    *mode* (permission bits): optional permissions to set on the created directory -- uses OS default if not provided
-
-
-    **Notes**
-
-    This is a wrapper to `llnl.util.filesystem.mkdirp`.
-
-**source**\ *(filename)*
-
-    Sources a shell script given by filename
-
-    **Arguments**
-
-    *filename* (str): Name of the filename to source
-
-
-    **Notes**
-
-    - **Warning:** This function sources a shell script unconditionally.  Environment             modifications made by the script are not tracked by Modulecmd.py.
-    
-    - `filename` is sourced only if ``mode()=='load'`` and is only sourced once
-
-**stop**\ *()*
-
-    Stop loading this module at this point
-
-    **Notes**
-
-    All commands up to the call to `stop` are executed.
+    In unload mode, undefines the alias.  Otherwise, defines the alias.
     
 
     **Examples**
@@ -376,96 +341,42 @@ General purpose utilities
     
     .. code-block:: python
     
-        # Actions to perform
-        ...
-        if condition:
-            stop()
+        set_alias('baz', 'ls -l')
     
-        # Actions not performed if condition is met
-
-**which**\ *(exename)*
-
-    Return the path to an executable, if found on PATH
-
-    **Arguments**
-
-    *exename* (str): The name of the executable
-
-
-    **Returns**
-
-    *which* (str): The full path to the executable
-
-
-    **Notes**
-
-    This is a wrapper to `contib.util.which`.
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for interacting with other modules
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**conflict**\ *(\*names, \*\*kwargs)*
-
-    Defines conflicts (modules that conflict with `module`)
-
-    **Arguments**
-
-    *names* (tuple of str): Names of conflicting modules
-
-
-    **Notes**
-
-    In load mode, asserts that none of `names` is loaded.   Otherwise, nothing
-    is done.
-
-**prereq**\ *(\*names)*
-
-    Defines a prerequisite (module that must be loaded) for this module
-
-    **Arguments**
-
-    *names* (tuple of str): Names of prerequisite modules
-
-
-    **Notes**
-
-    In load mode, asserts that every `name` in `names` is loaded.  Otherwise, nothing is done.
+    On loading ``baz``, the alias is defined
     
-
-    **Examples**
-
-    Consider the module ``baz``
+    .. code-block:: console
     
-    .. code-block:: python
+        $ module load baz
+        $ alias baz
+        alias baz='ls -l'
     
-        prereq('spam', 'eggs')
-    
-    If any ``spam`` or ``eggs`` is not loaded, an error occurs:
+    On unloading ``baz``, the alias is undefined
     
     .. code-block:: console
     
         $ module ls
         Currently loaded module
-            1) spam
+            1) baz
     
-        $ module load baz
-        ==> Error: Prerequisite 'eggs' must first be loaded
+        $ module unload baz
+        $ alias baz
+        -bash: alias: baz: not found
 
-**prereq_any**\ *(\*names)*
+**set_shell_function**\ *(name, value)*
 
-    Defines prerequisites (modules that must be loaded) for this module
+    Define a shell function
 
     **Arguments**
 
-    *names* (tuple of str): Names of prerequisite modules
+    *name* (str): Name of the function
+
+    *value* (str): Value of the function
 
 
     **Notes**
 
-    In load mode, asserts that at least one of the modules given by `names` is
-    loaded.  Otherwise, nothing is done.
+    In unload mode, undefines the shell function.  Otherwise, defines the shell function
     
 
     **Examples**
@@ -474,173 +385,101 @@ Functions for interacting with other modules
     
     .. code-block:: python
     
-        prereq_any('spam', 'eggs')
+        set_shell_function('baz', 'ls -l $1')
     
-    If any ``spam`` or ``eggs`` is not loaded, an error occurs:
+    On loading ``baz``, the shell function is defined
+    
+    .. code-block:: console
+    
+        $ module load baz
+        $ declare -f baz
+        baz ()
+        {
+            ls -l $1
+        }
+    
+    On unloading ``baz``, the shell function is undefined
     
     .. code-block:: console
     
         $ module ls
         Currently loaded module
-            1) ham
+            1) baz
+    
+        $ module unload baz
+        $ declare -f baz
+
+**unset_alias**\ *(name)*
+
+    Undefine a shell alias
+
+    **Arguments**
+
+    *name* (str): Name of the shell alias
+
+
+    **Notes**
+
+    In unload mode, nothing is done.  Otherwise, the alias given by `name` is undefined
+    
+
+    **Examples**
+
+    Consider the module ``baz``
+    
+    .. code-block:: python
+    
+        unset_alias("baz")
+    
+    .. code-block:: console
+    
+        $ alias baz
+        alias baz='echo "I am a baz!"'
+    
+    On loading, the alias ``baz`` is undefined
+    
+    .. code-block:: console
     
         $ module load baz
-        ==> Error: One of the prerequisites 'spam,eggs' must first be loaded
+        $ alias baz
+        -bash: alias: baz: not found
 
+**unset_shell_function**\ *(name)*
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for interacting with module families
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**family**\ *(family_name)*
-
-    Defines the "family" of the module
+    Undefine a shell function
 
     **Arguments**
 
-    *family_name* (str): Name of the family
+    *name* (str): Name of the shell function
 
 
     **Notes**
 
-    - Only one module in a family can be loaded at a time.  For instance, GCC and       Intel compiler modules can define their family as "compiler".  This prevents       GCC and Intel compilers being loaded simultaneously.
-    
-    - This function potentially has side effects on the environment.  When       a module is loaded, if a module of the same family is already loaded, they       will be swapped.  Swapping has the potential to change the ``MODULEPATH`` and       state of loaded modules.
+    In unload mode, nothing is done.  Otherwise, the function given by `name` is undefined
     
 
     **Examples**
 
-    Consider modules ``ucc`` and ``xcc`` that are both members of the ``compiler`` family.
-    The module ``ucc/1.0`` is already loaded
-    
-    .. code-block:: console
-    
-        $ module ls
-        Currently loaded modules
-            1) ucc/1.0
-    
-    On loading ``xcc/1.0``, ``ucc/1.0`` is unloaded
-    
-    .. code-block:: console
-    
-        $ module load xcc/1.0
-    
-        The following modules in the same family have been updated with a version change:
-          1) ucc/1.0 => xcc/1.0 (compiler)
-
-**get_family_info**\ *(name, \*\*kwargs)*
-
-    Returns information about family `name`
-
-    **Arguments**
-
-    *name* (str): The name of the family to get information about
-
-
-    **Returns**
-
-    *family_name* (str): The module name in family `name`
-
-    *version* (str): The version of the module in family `name`
-
-
-    **Notes**
-
-    If a module of family `name` is loaded, this function returns its name and
-    version.  Otherwise, the name and version return as `None`
-    
-
-    **Examples**
-
-    The following module performs actions if the compiler ``ucc`` is loaded
+    Consider the module ``baz``
     
     .. code-block:: python
     
-        name, version = get_family_info('compiler')
-        if name == 'ucc':
-            # Do something specific if ucc is loaded
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for relaying information
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**help**\ *(help_string, \*\*kwargs)*
-
-    Sets a help message for `module`
-
-    **Arguments**
-
-    *help_string* (str): Help message for the module
-
-
-    **Notes**
-
-    This function sets the help string displayed by
+        unset_shell_function("baz")
     
     .. code-block:: console
     
-        $ module help <name>
-
-**is_loaded**\ *(name)*
-
-    Report whether the module `name` is loaded
-
-    **Arguments**
-
-    *name* (str): Name of the module to report
-
-
-    **Returns**
-
-    *is_loaded* (bool): Whether the module given by `name` is loaded
-
-
-    **Examples**
-
+        $ declare -f baz
+        baz ()
+        {
+            echo "I am a baz!"
+        }
     
-    .. code-block:: python
-    
-        if is_loaded('baz'):
-            # Do something if baz is loaded
-            ...
-
-**whatis**\ *(\*args, \*\*kwargs)*
-
-    Sets the "whatis" informational string for `module`
-
-    **Arguments**
-
-    *args* (tuple of str): Information about the module
-
-
-    **Notes**
-
-    - This function sets the information string displayed by
+    On loading, the shell function ``baz`` is undefined
     
     .. code-block:: console
     
-        $ module whatis <name>
-    
-    - Keyword arguments are interpreted as ``{title: description}``
-    
-
-    **Examples**
-
-    Consider the module ``baz``:
-    
-    .. code-block:: python
-    
-        whatis("A description about the module",
-               a_title="A section in the whatis")
-    
-    .. code-block:: console
-    
-        $ module whatis baz
-        A description about the module
-    
-        A Title
-        A section in the whatis
+        $ module load baz
+        $ declare -f baz
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -818,24 +657,36 @@ General module functions
             1) baz
 
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for defining shell aliases and functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for interacting with other modules
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**set_alias**\ *(name, value)*
+**conflict**\ *(\*names, \*\*kwargs)*
 
-    Define a shell alias
+    Defines conflicts (modules that conflict with `module`)
 
     **Arguments**
 
-    *name* (str): Name of the alias
-
-    *value* (str): Value of the alias
+    *names* (tuple of str): Names of conflicting modules
 
 
     **Notes**
 
-    In unload mode, undefines the alias.  Otherwise, defines the alias.
+    In load mode, asserts that none of `names` is loaded.   Otherwise, nothing
+    is done.
+
+**prereq**\ *(\*names)*
+
+    Defines a prerequisite (module that must be loaded) for this module
+
+    **Arguments**
+
+    *names* (tuple of str): Names of prerequisite modules
+
+
+    **Notes**
+
+    In load mode, asserts that every `name` in `names` is loaded.  Otherwise, nothing is done.
     
 
     **Examples**
@@ -844,42 +695,32 @@ Functions for defining shell aliases and functions
     
     .. code-block:: python
     
-        set_alias('baz', 'ls -l')
+        prereq('spam', 'eggs')
     
-    On loading ``baz``, the alias is defined
-    
-    .. code-block:: console
-    
-        $ module load baz
-        $ alias baz
-        alias baz='ls -l'
-    
-    On unloading ``baz``, the alias is undefined
+    If any ``spam`` or ``eggs`` is not loaded, an error occurs:
     
     .. code-block:: console
     
         $ module ls
         Currently loaded module
-            1) baz
+            1) spam
     
-        $ module unload baz
-        $ alias baz
-        -bash: alias: baz: not found
+        $ module load baz
+        ==> Error: Prerequisite 'eggs' must first be loaded
 
-**set_shell_function**\ *(name, value)*
+**prereq_any**\ *(\*names)*
 
-    Define a shell function
+    Defines prerequisites (modules that must be loaded) for this module
 
     **Arguments**
 
-    *name* (str): Name of the function
-
-    *value* (str): Value of the function
+    *names* (tuple of str): Names of prerequisite modules
 
 
     **Notes**
 
-    In unload mode, undefines the shell function.  Otherwise, defines the shell function
+    In load mode, asserts that at least one of the modules given by `names` is
+    loaded.  Otherwise, nothing is done.
     
 
     **Examples**
@@ -888,183 +729,91 @@ Functions for defining shell aliases and functions
     
     .. code-block:: python
     
-        set_shell_function('baz', 'ls -l $1')
+        prereq_any('spam', 'eggs')
     
-    On loading ``baz``, the shell function is defined
-    
-    .. code-block:: console
-    
-        $ module load baz
-        $ declare -f baz
-        baz ()
-        {
-            ls -l $1
-        }
-    
-    On unloading ``baz``, the shell function is undefined
+    If any ``spam`` or ``eggs`` is not loaded, an error occurs:
     
     .. code-block:: console
     
         $ module ls
         Currently loaded module
-            1) baz
+            1) ham
     
-        $ module unload baz
-        $ declare -f baz
+        $ module load baz
+        ==> Error: One of the prerequisites 'spam,eggs' must first be loaded
 
-**unset_alias**\ *(name)*
 
-    Undefine a shell alias
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for interacting with module families
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**family**\ *(family_name)*
+
+    Defines the "family" of the module
 
     **Arguments**
 
-    *name* (str): Name of the shell alias
+    *family_name* (str): Name of the family
 
 
     **Notes**
 
-    In unload mode, nothing is done.  Otherwise, the alias given by `name` is undefined
+    - Only one module in a family can be loaded at a time.  For instance, GCC and       Intel compiler modules can define their family as "compiler".  This prevents       GCC and Intel compilers being loaded simultaneously.
+    
+    - This function potentially has side effects on the environment.  When       a module is loaded, if a module of the same family is already loaded, they       will be swapped.  Swapping has the potential to change the ``MODULEPATH`` and       state of loaded modules.
     
 
     **Examples**
 
-    Consider the module ``baz``
-    
-    .. code-block:: python
-    
-        unset_alias("baz")
-    
-    .. code-block:: console
-    
-        $ alias baz
-        alias baz='echo "I am a baz!"'
-    
-    On loading, the alias ``baz`` is undefined
-    
-    .. code-block:: console
-    
-        $ module load baz
-        $ alias baz
-        -bash: alias: baz: not found
-
-**unset_shell_function**\ *(name)*
-
-    Undefine a shell function
-
-    **Arguments**
-
-    *name* (str): Name of the shell function
-
-
-    **Notes**
-
-    In unload mode, nothing is done.  Otherwise, the function given by `name` is undefined
-    
-
-    **Examples**
-
-    Consider the module ``baz``
-    
-    .. code-block:: python
-    
-        unset_shell_function("baz")
-    
-    .. code-block:: console
-    
-        $ declare -f baz
-        baz ()
-        {
-            echo "I am a baz!"
-        }
-    
-    On loading, the shell function ``baz`` is undefined
-    
-    .. code-block:: console
-    
-        $ module load baz
-        $ declare -f baz
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Functions for modifying the environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**setenv**\ *(name, value)*
-
-    Set value of environment variable `name`
-
-    **Arguments**
-
-    *name* (str): Name of the environment variable
-
-    *value* (str): Value to set for environment variable `name`
-
-
-    **Notes**
-
-    In unload mode, the environment variable is unset.  Otherwise, it is set.
-    
-
-    **Examples**
-
-    Consider the module ``baz``
-    
-    .. code-block:: python
-    
-        setenv('BAZ', 'baz')
-    
-    On loading ``baz``, the environment variable is set
-    
-    .. code-block:: console
-    
-        $ module load baz
-        $ echo ${BAZ}
-        baz
-    
-    On unloading ``baz``, the environment variable is unset
+    Consider modules ``ucc`` and ``xcc`` that are both members of the ``compiler`` family.
+    The module ``ucc/1.0`` is already loaded
     
     .. code-block:: console
     
         $ module ls
-        Currently loaded module
-            1) baz
+        Currently loaded modules
+            1) ucc/1.0
     
-        $ module unload baz
-        $ echo ${BAZ}
+    On loading ``xcc/1.0``, ``ucc/1.0`` is unloaded
+    
+    .. code-block:: console
+    
+        $ module load xcc/1.0
+    
+        The following modules in the same family have been updated with a version change:
+          1) ucc/1.0 => xcc/1.0 (compiler)
 
-**unsetenv**\ *(name)*
+**get_family_info**\ *(name, \*\*kwargs)*
 
-    Unset value of environment variable `name`
+    Returns information about family `name`
 
     **Arguments**
 
-    *name* (str): Name of the environment variable
+    *name* (str): The name of the family to get information about
+
+
+    **Returns**
+
+    *family_name* (str): The module name in family `name`
+
+    *version* (str): The version of the module in family `name`
 
 
     **Notes**
 
-    In unload mode, nothing is done
+    If a module of family `name` is loaded, this function returns its name and
+    version.  Otherwise, the name and version return as `None`
     
 
     **Examples**
 
-    Consider the module ``baz``
+    The following module performs actions if the compiler ``ucc`` is loaded
     
     .. code-block:: python
     
-        unsetenv("BAZ")
-    
-    .. code-block:: console
-    
-        $ echo ${BAZ}
-        baz
-    
-    On loading, the environment variable ``BAZ`` is unset
-    
-    .. code-block:: console
-    
-        $ module load baz
-        $ echo ${BAZ}
+        name, version = get_family_info('compiler')
+        if name == 'ucc':
+            # Do something specific if ucc is loaded
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1112,6 +861,257 @@ Functions for interacting with the MODULEPATH
     a directory is ``use``\ d, modules in its path may have higher precedence than
     modules on the previous ``MODULEPATH``.  Thus, defaults could change and loaded
     modules could be swapped for newer modules with higher precedence.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Functions for relaying information
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**help**\ *(help_string, \*\*kwargs)*
+
+    Sets a help message for `module`
+
+    **Arguments**
+
+    *help_string* (str): Help message for the module
+
+
+    **Notes**
+
+    This function sets the help string displayed by
+    
+    .. code-block:: console
+    
+        $ module help <name>
+
+**is_loaded**\ *(name)*
+
+    Report whether the module `name` is loaded
+
+    **Arguments**
+
+    *name* (str): Name of the module to report
+
+
+    **Returns**
+
+    *is_loaded* (bool): Whether the module given by `name` is loaded
+
+
+    **Examples**
+
+    
+    .. code-block:: python
+    
+        if is_loaded('baz'):
+            # Do something if baz is loaded
+            ...
+
+**whatis**\ *(\*args, \*\*kwargs)*
+
+    Sets the "whatis" informational string for `module`
+
+    **Arguments**
+
+    *args* (tuple of str): Information about the module
+
+
+    **Notes**
+
+    - This function sets the information string displayed by
+    
+    .. code-block:: console
+    
+        $ module whatis <name>
+    
+    - Keyword arguments are interpreted as ``{title: description}``
+    
+
+    **Examples**
+
+    Consider the module ``baz``:
+    
+    .. code-block:: python
+    
+        whatis("A description about the module",
+               a_title="A section in the whatis")
+    
+    .. code-block:: console
+    
+        $ module whatis baz
+        A description about the module
+    
+        A Title
+        A section in the whatis
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^
+General purpose utilities
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**check_output**\ *(command)*
+
+    Run command with arguments and return its output as a string.
+
+    **Arguments**
+
+    *command* (str): The command to run
+
+
+    **Returns**
+
+    *output* (str): The output of `command`
+
+
+    **Notes**
+
+    This is a wrapper to `contrib.util.check_output`.  Where
+    `subprocess.check_output` exists, it is called.  Otherwise, an implementation of
+    `subprocess.check_output` is provided.
+
+**colorize**\ *(string, \*\*kwargs)*
+
+    Replace all color expressions in a string with ANSI control codes.
+
+    **Arguments**
+
+    *string* (str): The string to replace
+
+
+    **Keyword arguments**
+
+    *color* (bool): If False, output will be plain text without control codes, for output to non-console devices.
+
+
+    **Returns**
+
+    *colorized* (str): The filtered string
+
+
+    **Notes**
+
+    This is a wrapper to `llnl.util.tty.color.colorize`.
+
+**execute**\ *(command, when=None)*
+
+    Executes the command `command` in a subprocess
+
+    **Arguments**
+
+    *command* (str): The command to execute in a shell subprocess
+
+
+    **Keyword arguments**
+
+    *when* (bool): Logical describing when to execute `command`. If `None` or `True`, `command` is executed.
+
+
+    **Examples**
+
+    Consider the module ``baz``:
+    
+    .. code-block:: python
+    
+        execute(<command>, when=mode()=='load')
+    
+    The command ``<command>`` will be executed in a subprocess when the module is loaded.
+
+**listdir**\ *(dirname, key=None)*
+
+    List contents of directory `dirname`
+
+    **Arguments**
+
+    *dirname* (str): Path to directory
+
+
+    **Keyword arguments**
+
+    *key* (callable): Filter for contents in `dirname`
+
+
+    **Returns**
+
+    *contents* (list): Contents of `dirname`
+
+
+    **Notes**
+
+    - This is a wrapper to ``contrib.util.listdir``
+    - If ``key`` is given, it must be a callable object
+
+**mkdirp**\ *(\*paths, \*\*kwargs)*
+
+    Make directory and all intermediate directories, if necessary.
+
+    **Arguments**
+
+    *paths* (tuple of str): Paths to create
+
+
+    **Keyword arguments**
+
+    *mode* (permission bits): optional permissions to set on the created directory -- uses OS default if not provided
+
+
+    **Notes**
+
+    This is a wrapper to `llnl.util.filesystem.mkdirp`.
+
+**source**\ *(filename)*
+
+    Sources a shell script given by filename
+
+    **Arguments**
+
+    *filename* (str): Name of the filename to source
+
+
+    **Notes**
+
+    - **Warning:** This function sources a shell script unconditionally.  Environment             modifications made by the script are not tracked by Modulecmd.py.
+    
+    - `filename` is sourced only if ``mode()=='load'`` and is only sourced once
+
+**stop**\ *()*
+
+    Stop loading this module at this point
+
+    **Notes**
+
+    All commands up to the call to `stop` are executed.
+    
+
+    **Examples**
+
+    Consider the module ``baz``
+    
+    .. code-block:: python
+    
+        # Actions to perform
+        ...
+        if condition:
+            stop()
+    
+        # Actions not performed if condition is met
+
+**which**\ *(exename)*
+
+    Return the path to an executable, if found on PATH
+
+    **Arguments**
+
+    *exename* (str): The name of the executable
+
+
+    **Returns**
+
+    *which* (str): The full path to the executable
+
+
+    **Notes**
+
+    This is a wrapper to `contib.util.which`.
 
 
 

@@ -226,16 +226,17 @@ def gen_callback_docs():
     for name in pymod.callback.all_callbacks():
         m = pymod.callback.get_module(name)
         cb = Callback(name)
+        assert m.category in category_descriptions
         callbacks.setdefault(m.category, []).append(cb)
 
     sio = StringIO()
-    for (category, items) in callbacks.items():
+    for (category, description) in category_descriptions.items():
         description = category_descriptions[category]
         sio.write('\n' + '^' * len(description) + '\n')
         sio.write(description + '\n')
         sio.write('^' * len(description) + '\n\n')
 
-        for cb in items:
+        for cb in callbacks[category]:
             sio.write(cb.documentation(indent='    ') + '\n')
             sio.write('\n')
 
