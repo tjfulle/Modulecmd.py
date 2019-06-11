@@ -90,7 +90,7 @@ def module_exec_sandbox(module, mode):
         'use': callback('use'),
         'unuse': callback('unuse'),
         #
-        'set_alias': callback('set_alias', when='alsways'),
+        'set_alias': callback('set_alias', when='always'),
         'unset_alias': callback('unset_alias', when='always'),
         #
         'set_shell_function': callback('set_shell_function', when='always'),

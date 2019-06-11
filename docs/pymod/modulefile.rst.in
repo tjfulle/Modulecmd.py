@@ -64,6 +64,72 @@ for interacting with the shell's environment.
 
 %(commands)s
 
+
+-------
+Logging
+-------
+
+**log_info**\ *(message)*
+
+    Writes an informational message to the console.
+
+    **Arguments**
+
+    *message* (str): Message to write
+
+**log_warning**\ *(message)*
+
+    Writes a warning message to the console.
+
+    **Arguments**
+
+    *message* (str): Message to write
+
+**log_error**\ *(message)*
+
+    Writes an error message to the console and raises an exception
+
+    **Arguments**
+
+    *message* (str): Message to write
+
+
+---------------------
+Other defined objects
+---------------------
+
+**is_darwin**, **IS_DARWIN**
+
+    Is the OS darwin?
+
+**env**
+
+    A reference to the current environment
+
+**self**
+
+    A reference to the module itself
+
+**user_env**
+
+    A reference to the user's environment file
+
+**getenv**\ *(name)*
+
+    Get an environment variable
+
+    **Arguments**
+
+    *name* (str): The name of the desired environment variable
+
+**get_hostname**\ *()*
+
+    Get the host name
+
+**mode**\ *()*
+
+    The current mode ('load', 'unload', etc)
+
 --------------
 Module Options
 --------------
