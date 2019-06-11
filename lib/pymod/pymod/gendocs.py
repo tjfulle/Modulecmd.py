@@ -194,17 +194,17 @@ class Callback:
         if self._args:
             s.append('\n{0}**Arguments**\n'.format(indent))
             for (name, type, description) in self._args:
-                s.append('{0}*{1}* ({2}): {3}'.format(indent, name, type, description))
+                s.append('{0}*{1}* ({2}): {3}\n'.format(indent, name, type, description))
 
         if self._kwargs:
             s.append('\n{0}**Keyword arguments**\n'.format(indent))
             for (name, type, description) in self._kwargs:
-                s.append('{0}*{1}* ({2}): {3}'.format(indent, name, type, description))
+                s.append('{0}*{1}* ({2}): {3}\n'.format(indent, name, type, description))
 
         if self._returns:
             s.append('\n{0}**Returns**\n'.format(indent))
             for (name, type, description) in self._returns:
-                s.append('{0}*{1}* ({2}): {3}'.format(indent, name, type, description))
+                s.append('{0}*{1}* ({2}): {3}\n'.format(indent, name, type, description))
 
         if self._notes:
             s.append('\n{0}**Notes**\n'.format(indent))
@@ -228,6 +228,8 @@ def gen_callback_docs():
         callbacks.setdefault(m.category, []).append(cb)
 
     for (category, items) in callbacks.items():
+        if category != 'path':
+            continue
         description = category_descriptions[category]
         print('^' * len(description))
         print(description)
@@ -236,7 +238,6 @@ def gen_callback_docs():
         for cb in items:
             print(cb.documentation(indent='    '))
             print('\n')
-            exit()
 
 
 def main():

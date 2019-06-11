@@ -38,24 +38,23 @@ def append_path(module, mode, name, *values, **kwargs):
     Here, ":" is the separator ``sep``.
 
     Examples:
-    Consider the module ``baz``
+    Consider the module ``baz`` that appends `baz` to the path-like environment variable `BAZ`
 
     .. code-block:: python
 
-        # Append `baz` to the path-like environment variable `BAZ`
         append_path('BAZ', 'baz')
+
+    The environment variable ``BAZ`` is currently
 
     .. code-block:: console
 
         $ echo ${BAZ}
         spam
 
+    On loading the module ``baz``, the environment variable ``BAZ`` is updated:
     .. code-block:: console
 
         $ module load baz
-
-    .. code-block:: console
-
         $ echo ${BAZ}
         spam:baz
 

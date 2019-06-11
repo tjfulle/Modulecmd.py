@@ -75,11 +75,14 @@ Functions for modifying path-like variables
     **Arguments**
 
     *name* (str): Name of path-like variable
+
     *values* (tuple of str): The values to append to path-like variable `name`
+
 
     **Keyword arguments**
 
     *sep* (str): defines the separator between values in path-like variable `name` (default is os.pathsep)
+
 
     **Notes**
 
@@ -99,26 +102,135 @@ Functions for modifying path-like variables
 
     **Examples**
 
-    Consider the module ``baz``
+    Consider the module ``baz`` that appends `baz` to the path-like environment variable `BAZ`
 
     .. code-block:: python
 
-        # Append `baz` to the path-like environment variable `BAZ`
         append_path('BAZ', 'baz')
+
+    The environment variable ``BAZ`` is currently
 
     .. code-block:: console
 
         $ echo ${BAZ}
         spam
 
+    On loading the module ``baz``, the environment variable ``BAZ`` is updated:
     .. code-block:: console
 
         $ module load baz
+        $ echo ${BAZ}
+        spam:baz
+
+
+**prepend_path**\ *(name, \*values, \*\*kwds)*
+
+    Prepend `values` to path-like variable `name`
+
+    **Arguments**
+
+    *name* (str): Name of path-like variable
+
+    *values* (tuple of str): The values to prepend to path-like variable `name`
+
+
+    **Keyword arguments**
+
+    *sep* (str): defines the separator between values in path-like variable `name` (default is os.pathsep)
+
+
+    **Notes**
+
+    - In *unload* mode, `values` are removed from path-like variable `name`,       otherwise, they are prepended.
+
+    - If ``name==MODULEPATH``, this function calls ``use(value)``       for each `value` in `values`.
+
+    - A path-like variable stores a list as a ``sep`` separated string.  eg, the       PATH environment variable is a ``sep`` separated list of directories:
+
+      .. code-block:: console
+
+          $ echo ${PATH}
+          dirname1:dirname2:...
+
+    Here, ":" is the separator ``sep``.
+
+
+    **Examples**
+
+    Consider the module ``baz`` that prepends `baz` to the path-like environment variable `BAZ`
+
+    .. code-block:: python
+
+        prepend_path('BAZ', 'baz')
+
+    The environment variable ``BAZ`` is currently
 
     .. code-block:: console
 
         $ echo ${BAZ}
-        spam:baz
+        spam
+
+    On loading the module ``baz``, the environment variable ``BAZ`` is updated:
+    .. code-block:: console
+
+        $ module load baz
+        $ echo ${BAZ}
+        baz:spam
+
+
+**remove_path**\ *(name, \*values, \*\*kwds)*
+
+    Removes `values` from the path-like variable `name`
+
+    **Arguments**
+
+    *name* (str): Name of path-like variable
+
+    *values* (tuple of str): The values to remove from the path-like variable `name`
+
+
+    **Keyword arguments**
+
+    *sep* (str): defines the separator between values in path-like variable `name` (default is os.pathsep)
+
+
+    **Notes**
+
+    - In *unload* mode, nothing is done.  Otherwise, `values` are removed from       path-like variable `name`.
+
+    - If ``name==MODULEPATH``, this function calls ``unuse(value)``       for each `value` in `values`.
+
+    - A path-like variable stores a list as a ``sep`` separated string.  eg, the       PATH environment variable is a ``sep`` separated list of directories:
+
+      .. code-block:: console
+
+          $ echo ${PATH}
+          dirname1:dirname2:...
+
+    Here, ":" is the separator ``sep``.
+
+
+    **Examples**
+
+    Consider the module ``baz`` that removes `baz` from the path-like environment variable `BAZ`
+
+    .. code-block:: python
+
+        remove_path('BAZ', 'baz')
+
+    The environment variable ``BAZ`` is currently
+
+    .. code-block:: console
+
+        $ echo ${BAZ}
+        baz:spam
+
+    On loading the module ``baz``, the environment variable ``BAZ`` is updated:
+    .. code-block:: console
+
+        $ module load baz
+        $ echo ${BAZ}
+        spam
 
 .. <END INSERT HERE>
 
@@ -162,30 +274,5 @@ On the commandline, the module spam can be loaded as
 .. code-block:: console
 
   module load spam +b +x=baz
-
---------------
-Other Commands
---------------
-
-``family(name)``
-    Set the name of the module's family.
-
-``execute(command)``
-    Execute command in the current shell.
-
-``whatis(string)``
-    Store string as an informational message describing this module.
-
-
-^^^^^^^^
-Examples
-^^^^^^^^
-
-The following commands, when put in a module file on ``MODULEPATH``, prepends the user's bin directory to the ``PATH`` and aliases the ``ls`` command.
-
-.. code-block:: python
-
-  prepend_path('PATH', '~/bin')
-  set_alias('ls', 'ls -lF')
 
 .. _Modulecmd.py: https://www.github.com/tjfulle/Modulecmd.py
