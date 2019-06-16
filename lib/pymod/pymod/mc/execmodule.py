@@ -74,46 +74,14 @@ def module_exec_sandbox(module, mode):
         'log_info': lambda s: tty.info(s, reported_by=module.fullname),
         'log_warning': lambda s: tty.warn(s, reported_by=module.fullname),
         'log_error': lambda s: tty.die(s, reported_by=module.fullname),
-        #
-        'stop': callback('stop'),
-        'which': callback('which'),
-        'mkdirp': callback('mkdirp'),
-        'source': callback('source'),
-        'execute': callback('execute'),
-        'listdir': callback('listdir'),
-        'colorize': callback('colorize'),
-        'check_output': callback('check_output'),
-        #
-        'setenv': callback('setenv'),
-        'unsetenv': callback('unsetenv'),
-        #
-        'use': callback('use'),
-        'unuse': callback('unuse'),
-        #
-        'set_alias': callback('set_alias', when='always'),
-        'unset_alias': callback('unset_alias', when='always'),
-        #
-        'set_shell_function': callback('set_shell_function', when='always'),
-        'unset_shell_function': callback('unset_shell_function', when='always'),
-        #
-        'prereq': callback('prereq'),
-        'prereq_any': callback('prereq_any'),
-        'conflict': callback('conflict'),
-        #
-        'load': callback('load'),
-        'swap': callback('swap'),
-        'load_first': callback('load_first'),
-        'unload': callback('unload'),
-        'is_loaded': callback('is_loaded'),
-        #
-        'family': callback('family'),
-        'get_family_info': callback('get_family_info'),
-        #
-        'prepend_path': callback('prepend_path'),
-        'append_path': callback('append_path'),
-        'remove_path': callback('remove_path'),
-        #
-        'whatis': callback('whatis', when=mode==pymod.modes.whatis),
-        'help': callback('help', when=mode==pymod.modes.help),
     }
+    for fun in pymod.callback.all_callbacks():
+        kwds = {}
+        if fun.endswith(('set_alias', 'set_shell_function')):
+            kwds['when'] = 'always'
+        elif fun == 'whatis':
+            kwds['when'] = mode == pymod.modes.whatis
+        elif fun == 'help':
+            kwds['when'] = mode == pymod.modes.help
+        ns[fun] = callback(fun, **kwds)
     return ns
