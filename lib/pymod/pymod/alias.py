@@ -20,7 +20,7 @@ class Aliases(object):
         return self.data.get(name)
 
     def read(self, filename):
-        if os.path.isfile(filename):
+        if os.path.isfile(filename):  # pragma: no cover
             data = yaml.load(open(filename))
             aliases = data.pop('aliases', dict())
             if data:

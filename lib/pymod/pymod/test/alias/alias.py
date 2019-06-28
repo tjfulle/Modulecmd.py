@@ -20,3 +20,4 @@ def test_alias_save(tmpdir, mock_modulepath):
     alias = pymod.modulepath.get('a-alias')
     assert alias is not None
     assert alias.filename == target.filename
+    pymod.alias.remove('a-alias')
