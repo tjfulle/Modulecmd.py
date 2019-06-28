@@ -2,6 +2,7 @@ import os
 import pytest
 import pymod.mc
 from pymod.main import PymodCommand
+from pymod.error import ModuleNotFoundError
 
 
 def test_command_alias(tmpdir, mock_modulepath):
@@ -12,3 +13,6 @@ def test_command_alias(tmpdir, mock_modulepath):
     a = pymod.mc.load('a-alias')
     aa = pymod.modulepath.get('a')
     assert a.filename == aa.filename
+
+    with pytest.raises(ModuleNotFoundError):
+        alias('b', 'b-alias')
