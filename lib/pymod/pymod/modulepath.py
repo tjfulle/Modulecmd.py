@@ -2,6 +2,7 @@ import os
 import re
 from six import StringIO
 
+import pymod.alias
 import pymod.names
 import pymod.module
 from pymod.discover import find_modules
@@ -61,22 +62,8 @@ class Modulepath:
             return None
         return join([p.path for p in self.path], os.pathsep)
 
-    def get(self, key):
-        """Get a module from the available modules using the following rules:
-
-        If `key`:
-
-            1. is a Module, just return it;
-            2. is a directory, return all of the modules in that directory;
-            3. is a file name, return the module pointed to by the name;
-            4. is a module name (with no version info), return the default
-               version; and
-            5. meets none of the above criteria, the best match will be
-               returned. The best match is found by looking through all
-               MODULEPATH directories and returning the first module whose
-               filename ends with `key`.
-
-        """
+    def _get(self, key):
+        """Implementation of `get`"""
         if os.path.isdir(key) and key in self:
             return self.getby_dirname(key)
         if os.path.isfile(key):
@@ -101,6 +88,30 @@ class Modulepath:
                         module.acquired_as = key
                         return module
         return None
+
+    def get(self, key):
+        """Get a module from the available modules using the following rules:
+
+        If `key`:
+
+            1. is a Module, just return it;
+            2. is a directory, return all of the modules in that directory;
+            3. is a file name, return the module pointed to by the name;
+            4. is a module name (with no version info), return the default
+               version; and
+            5. meets none of the above criteria, the best match will be
+               returned. The best match is found by looking through all
+               MODULEPATH directories and returning the first module whose
+               filename ends with `key`.
+
+        """
+        module = self._get(key)
+        if module is None:
+            # Module has not been found.  Try an alias
+            target = pymod.alias.get(key)
+            if target is not None:
+                module = self.get(target)
+        return module
 
     def getby_dirname(self, dirname):
         for path in self:

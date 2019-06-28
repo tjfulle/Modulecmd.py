@@ -28,6 +28,7 @@ ld_library_path = ('DYLD_LIBRARY_PATH' if sys.platform == 'darwin'
 ld_preload = 'LD_PRELOAD'
 
 # Files to store collections and clones.  Paths relative to dot_dir.
+aliases_file_basename = 'aliases.yaml'
 collections_file_basename = 'collections.json'
 clones_file_basename      = 'clones.json'
 user_env_file_basename    = 'user.py'

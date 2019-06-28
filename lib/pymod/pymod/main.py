@@ -110,7 +110,7 @@ def index_commands():
             prop = getattr(cmd_module, p, None)
             if not prop:
                 tty.die('Command doesn\'t define a property {0!r}: {1}'
-                            .format(p, command))
+                        .format(p, command))
 
         # add commands to lists for their level and higher levels
         for level in reversed(levels):
@@ -470,8 +470,8 @@ def _invoke_command(command, parser, args, unknown_args):
         return_val = command(parser, args, unknown_args)
     else:
         if unknown_args:
-            tty.die('unrecognized arguments: {}'
-                        .format(' '.join(unknown_args)))
+            tty.die('unrecognized arguments: {0}'
+                    .format(' '.join(unknown_args)))
         return_val = command(parser, args)
 
     # Allow commands to return and error code if they want

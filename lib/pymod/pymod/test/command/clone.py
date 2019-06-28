@@ -4,7 +4,6 @@ import pytest
 import pymod.mc
 import pymod.paths
 import pymod.environ
-import pymod.collection
 from pymod.main import PymodCommand
 from pymod.error import CloneDoesNotExistError
 
