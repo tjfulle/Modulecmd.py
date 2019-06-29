@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import os
 import re
+import sys
 
 import pymod.modes
 import pymod.paths
@@ -24,6 +25,27 @@ CATEGORY = "category"
 
 #: global, cached list of all callbacks -- access through all_callbacks()
 _all_callbacks = None
+
+
+_cb_instructions = []
+def log_callback(func_name, *args, **kwargs):
+    signature = '{0}('.format(func_name)
+    if args:
+        signature += ', '.join('{0!r}'.format(_) for _ in args)
+    if kwargs:
+        if args:
+            signature += ', '
+        signature += ', '.join('{0}={1!r}'.format(*_) for _ in kwargs.items())
+    signature += ')'
+    _cb_instructions.append(signature)
+
+
+def get_current_instructions(reset=False):
+    global _cb_instructions
+    string = '\n'.join(_cb_instructions)
+    if reset:
+        _cb_instructions = []
+    return string
 
 
 def all_callbacks():
@@ -85,6 +107,9 @@ def callback(func_name, module, mode, when=None, **kwds):
     if not when:
         func = lambda *args, **kwargs: None
     def wrapper(*args, **kwargs):
+        if mode == pymod.modes.show:
+            log_callback(func_name, *args, **kwargs)
+            return
         kwargs.update(kwds)
         return func(module, mode, *args, **kwargs)
     return wrapper

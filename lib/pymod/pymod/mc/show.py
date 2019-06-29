@@ -1,11 +1,13 @@
+import sys
 import pymod.mc
 import pymod.modes
 import pymod.module
+import pymod.callback
 import pymod.modulepath
 from pymod.error import ModuleNotFoundError
 
 
-def show(name, opts=None, insert_at=None):
+def show(name, opts=None, insert_at=None, mode='load'):
     """Show the commands that would result from loading module given by `name`
 
     Parameters
@@ -30,7 +32,7 @@ def show(name, opts=None, insert_at=None):
         module.opts = opts
 
     # Now execute it
-    if isinstance(module, pymod.module.TclModule):
-        pymod.mc.execmodule(module, pymod.modes.show)
-    else:
-        pymod.mc.execmodule(module, pymod.modes.load)
+    pymod.mc.execmodule(module, pymod.modes.show)
+
+    # and show it
+    sys.stderr.write(pymod.callback.get_current_instructions(reset=True))
