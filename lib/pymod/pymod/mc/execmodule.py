@@ -73,10 +73,6 @@ def module_exec_sandbox(module, mode):
         #
         'add_option': module.parser.add_argument,
         'parse_opts': module.parse_args,
-        #
-        'log_info': lambda s: tty.info(s, reported_by=module.fullname),
-        'log_warning': lambda s: tty.warn(s, reported_by=module.fullname),
-        'log_error': lambda s: tty.die(s, reported_by=module.fullname),
     }
     for fun in pymod.callback.all_callbacks():
         kwds = {}

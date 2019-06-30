@@ -92,6 +92,10 @@ def callback(func_name, module, mode, when=None, **kwds):
 
     """
     func = get_callback(func_name)
+    return callback_impl(func, module, mode, when=when, **kwds)
+
+
+def callback_impl(func, module, mode, when=None, **kwds):
     if when is None:
         when = (mode != pymod.modes.load_partial and
                 mode not in pymod.modes.informational)
@@ -99,8 +103,9 @@ def callback(func_name, module, mode, when=None, **kwds):
         func = lambda *args, **kwargs: None
     def wrapper(*args, **kwargs):
         if mode == pymod.modes.show:
-            log_callback(func_name, *args, **kwargs)
-            return
+            log_callback(func.__name__, *args, **kwargs)
+            if not getattr(func, 'eval_on_show', False):
+                return
         kwargs.update(kwds)
         return func(module, mode, *args, **kwargs)
     return wrapper
