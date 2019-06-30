@@ -64,3 +64,9 @@ def test_callback_mode(tmpdir, mock_modulepath):
     tmpdir.join('a.py').write('assert mode() == "load"')
     mock_modulepath(tmpdir.strpath)
     pymod.mc.load('a')
+
+
+def test_callback_get_hostname(tmpdir, mock_modulepath):
+    tmpdir.join('a.py').write('host = get_hostname()')
+    mock_modulepath(tmpdir.strpath)
+    pymod.mc.load('a')

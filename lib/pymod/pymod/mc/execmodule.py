@@ -64,13 +64,13 @@ def module_exec_sandbox(module, mode):
         'sys': sys,
         'self': module,
         'user_env': pymod.user.env,
-        'get_hostname': socket.gethostname,
         'is_darwin': 'darwin' in sys.platform,
         'IS_DARWIN': 'darwin' in sys.platform,
         #
         'add_option': module.add_option,
         'parse_opts': module.parse_opts,
     }
+
     for fun in pymod.callback.all_callbacks():
         kwds = {}
         if fun.endswith(('set_alias', 'set_shell_function')):
