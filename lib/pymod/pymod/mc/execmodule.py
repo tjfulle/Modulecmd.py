@@ -64,11 +64,9 @@ def module_exec_sandbox(module, mode):
         'sys': sys,
         'self': module,
         'user_env': pymod.user.env,
-        'getenv': pymod.environ.get,
         'get_hostname': socket.gethostname,
         'is_darwin': 'darwin' in sys.platform,
         'IS_DARWIN': 'darwin' in sys.platform,
-        'env': pymod.environ.copy(include_os=True),
         'mode': lambda: pymod.modes.as_string(mode),
         #
         'add_option': module.parser.add_argument,

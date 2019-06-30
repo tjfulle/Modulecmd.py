@@ -389,3 +389,16 @@ def test_callback_get_family_info(tmpdir, mock_modulepath):
     a = pymod.mc.load('a')
     assert a.version == "1.0"
     pymod.mc.load('b')
+
+
+def test_callback_getenv(tmpdir, mock_modulepath):
+    getenv = get_callback('getenv')
+    tmpdir.join('a.py').write(
+        'setenv("spam", "foo")\n'
+        'x = getenv("spam")\n'
+        'assert x == "foo"\n'
+    )
+    mock_modulepath(tmpdir.strpath)
+    a = pymod.mc.load('a')
+    x = getenv(a, pymod.modes.load, 'spam')
+    assert x == "foo"
