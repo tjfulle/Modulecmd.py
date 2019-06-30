@@ -6,7 +6,7 @@ category = 'utility'
 
 
 def getenv(module, mode, key, default=None):
-    """Return the value of the environment variable `key` if it exists, or `default` if it doesn’t.
+    """Return the value of the environment variable `key` if it exists, or `default` if it doesn't.
 
     Arguments:
         module (Module): The module being executed
@@ -15,7 +15,7 @@ def getenv(module, mode, key, default=None):
         default (str): The default value
 
     Returns:
-        value (str): The value of the environment variable `key` if it exists, or `default` if it doesn’t.
+        value (str): The value of the environment variable `key` if it exists, or `default` if it doesn't.
 
     Notes:
     - Retrieves values of environment variables from current active
