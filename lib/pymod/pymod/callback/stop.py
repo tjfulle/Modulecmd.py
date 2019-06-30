@@ -27,3 +27,6 @@ def stop(module, mode):
 
     """
     raise pymod.error.StopLoadingModuleError
+
+
+stop.eval_on_show = True

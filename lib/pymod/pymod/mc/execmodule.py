@@ -67,7 +67,6 @@ def module_exec_sandbox(module, mode):
         'get_hostname': socket.gethostname,
         'is_darwin': 'darwin' in sys.platform,
         'IS_DARWIN': 'darwin' in sys.platform,
-        'mode': lambda: pymod.modes.as_string(mode),
         #
         'add_option': module.add_option,
         'parse_opts': module.parse_opts,

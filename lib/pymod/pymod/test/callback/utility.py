@@ -58,3 +58,9 @@ def test_callback_logging(tmpdir, mock_modulepath):
         assert False, 'Should have died'
     except:
         pass
+
+
+def test_callback_mode(tmpdir, mock_modulepath):
+    tmpdir.join('a.py').write('assert mode() == "load"')
+    mock_modulepath(tmpdir.strpath)
+    pymod.mc.load('a')
