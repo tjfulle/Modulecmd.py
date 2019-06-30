@@ -1,5 +1,6 @@
 import os
 import pytest
+import pymod.mc
 from pymod.callback import get_callback
 
 
@@ -43,3 +44,17 @@ def test_callback_utility_which():
     which = get_callback('which')
     ls = which(None, None, 'ls')
     assert os.path.exists(ls)
+
+
+def test_callback_logging(tmpdir, mock_modulepath):
+    tmpdir.join('info.py').write('log_info("spam")')
+    tmpdir.join('warning.py').write('log_warning("spam")')
+    tmpdir.join('error.py').write('log_error("spam")')
+    mock_modulepath(tmpdir.strpath)
+    pymod.mc.load('info')
+    pymod.mc.load('warning')
+    try:
+        pymod.mc.show('error')
+        assert False, 'Should have died'
+    except:
+        pass

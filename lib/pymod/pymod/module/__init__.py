@@ -40,7 +40,7 @@ class Module(object):
         self.variant = Version(variant)
 
         self.modulepath = modulepath
-        self.parser = ModuleArgumentParser()
+        self._parser = ModuleArgumentParser()
         self.family = None
         self.whatisstr = ''
         self.helpstr = None
@@ -130,10 +130,7 @@ class Module(object):
         return open(self.filename, 'r').read()
 
     def prepare(self):
-        self.parser = ModuleArgumentParser()
-
-    def parse_args(self):
-        return self.parser.parse_args(self.opts)
+        self._parser = ModuleArgumentParser()
 
     def reset_state(self):
         self._opts = None
@@ -156,6 +153,12 @@ class Module(object):
         if opts is not None:
             self._opts = list(opts)
 
+    def parse_opts(self):
+        return self._parser.parse_args(self.opts)
+
+    def add_option(self, *args, **kwargs):
+        return self._parser.add_argument(*args, **kwargs)
+
     def format_info(self):
         if self.is_default and self.is_loaded:
             return self.fullname + ' (D,L)'
@@ -174,7 +177,7 @@ class Module(object):
         head = '{0}'.format((" " + self.name + " ").center(width, '='))
         sio.write(head + '\n')
         sio.write(fill(self.whatisstr))
-        parser_help = self.parser.help_string()
+        parser_help = self._parser.help_string()
         if parser_help:  # pragma: no cover
             sio.write(parser_help + '\n')
         sio.write(rule)

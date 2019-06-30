@@ -69,8 +69,8 @@ def module_exec_sandbox(module, mode):
         'IS_DARWIN': 'darwin' in sys.platform,
         'mode': lambda: pymod.modes.as_string(mode),
         #
-        'add_option': module.parser.add_argument,
-        'parse_opts': module.parse_args,
+        'add_option': module.add_option,
+        'parse_opts': module.parse_opts,
     }
     for fun in pymod.callback.all_callbacks():
         kwds = {}
