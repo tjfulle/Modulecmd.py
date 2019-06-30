@@ -27,7 +27,6 @@ CATEGORY = "category"
 _all_callbacks = None
 
 
-_cb_instructions = []
 def log_callback(func_name, *args, **kwargs):
     signature = '{0}('.format(func_name)
     if args:
@@ -37,15 +36,7 @@ def log_callback(func_name, *args, **kwargs):
             signature += ', '
         signature += ', '.join('{0}={1!r}'.format(*_) for _ in kwargs.items())
     signature += ')'
-    _cb_instructions.append(signature)
-
-
-def get_current_instructions(reset=False):
-    global _cb_instructions
-    string = '\n'.join(_cb_instructions)
-    if reset:
-        _cb_instructions = []
-    return string
+    pymod.mc.cur_module_command_his.write(signature + '\n')
 
 
 def all_callbacks():

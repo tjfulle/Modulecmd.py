@@ -29,3 +29,5 @@ from pymod.mc.unuse import unuse
 from pymod.mc.use import use
 from pymod.mc.whatis import whatis
 
+
+cur_module_command_his = None

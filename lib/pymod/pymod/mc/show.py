@@ -35,4 +35,4 @@ def show(name, opts=None, insert_at=None, mode='load'):
     pymod.mc.execmodule(module, pymod.modes.show)
 
     # and show it
-    sys.stderr.write(pymod.callback.get_current_instructions(reset=True))
+    sys.stderr.write(pymod.mc.cur_module_command_his.getvalue())

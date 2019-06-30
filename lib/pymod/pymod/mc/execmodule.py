@@ -10,7 +10,7 @@ import pymod.callback
 import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir
 
-from six import exec_
+from six import exec_, StringIO
 from pymod.error import FamilyLoadedError
 
 
@@ -19,6 +19,9 @@ def execmodule(module, mode):
     """Execute the module in a sandbox"""
     assert module.acquired_as is not None
     pymod.modes.assert_known_mode(mode)
+
+    # Enable logging of commands in this module
+    pymod.mc.cur_module_command_his = StringIO()
 
     try:
         return execmodule_in_sandbox(module, mode)
