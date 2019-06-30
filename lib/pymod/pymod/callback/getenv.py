@@ -26,3 +26,6 @@ def getenv(module, mode, key, default=None):
     """
     pymod.modes.assert_known_mode(mode)
     return pymod.environ.get(key, default=default)
+
+
+getenv.eval_on_show = True
