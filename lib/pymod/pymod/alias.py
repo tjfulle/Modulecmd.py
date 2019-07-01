@@ -35,7 +35,11 @@ class Aliases(object):
 
     def save(self, target, name):
         """Save the alias 'name' to target"""
-        self.data[name] = target.filename
+        self.data[name] = {
+            'target': target.fullname,
+            'filename': target.filename,
+            'modulepath': target.modulepath,
+            }
         self.write(self.data, self.filename)
         return
 

@@ -110,7 +110,12 @@ class Modulepath:
             # Module has not been found.  Try an alias
             target = pymod.alias.get(key)
             if target is not None:
-                module = self.get(target)
+                if target['modulepath'] not in self.path:
+                    tty.warn('Alias {0} points to {1}, but {1} is not on the '
+                             'current MODULEPATH.  Use {2} to make {1} available'
+                             .format(key, target['target'], target['modulepath'])
+                            )
+                module = self.get(target['filename'])
         return module
 
     def getby_dirname(self, dirname):
