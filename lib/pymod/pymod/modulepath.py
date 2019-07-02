@@ -116,7 +116,7 @@ class Modulepath:
                 # prepending.
                 self.append_path(target['modulepath'])
                 module = self.getby_filename(target['filename'])
-                if module is None:
+                if module is None:  # pragma: no cover
                     tty.warn('Alias {0} points to nonexistent target {1}'
                              .format(key, target['target']))
         return module
