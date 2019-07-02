@@ -22,6 +22,12 @@ def test_alias_save(tmpdir, mock_modulepath):
     assert alias is not None
     assert alias.filename == target.filename
 
+    s = pymod.alias.avail()
+    assert 'a-alias' in s
+
+    s = pymod.alias.avail(terse=True)
+    assert 'a-alias' in s
+
     pymod.mc.unuse(tmpdir.strpath)
     alias = pymod.modulepath.get('a-alias')
     assert alias is None

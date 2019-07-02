@@ -7,6 +7,7 @@ import pymod.paths
 
 from llnl.util.lang import Singleton
 from llnl.util.tty import terminal_size
+from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
 
 
@@ -47,6 +48,28 @@ class Aliases(object):
         self.data.pop(name, None)
         self.write(self.data, self.filename)
 
+    def avail(self, terse=False):
+        if not self.data:  # pragma: no cover
+            return ''
+
+        keys = sorted(list(self.data.keys()))
+        fun = lambda key: '{0} -> {1} ({2})'.format(
+            key,
+            self.data[key]['target'],
+            colorize('@C{%s}'%self.data[key]['modulepath']))
+        names = [fun(_) for _ in keys]
+
+        sio = StringIO()
+        if not terse:
+            _, width = terminal_size()
+            s = colified(names, width=width)
+            sio.write('{0}\n{1}\n'
+                      .format(' Aliases '.center(width, '-'), s))
+        else:
+            sio.write('\n'.join(c for c in names))
+        string = sio.getvalue()
+        return string
+
 
 def _aliases():
     basename = pymod.names.aliases_file_basename
@@ -77,3 +100,7 @@ def remove(name):
 
 def get(name):
     return aliases.get(name)
+
+
+def avail(terse=False):
+    return aliases.avail(terse=terse)
