@@ -139,7 +139,7 @@ def test_mc_swap_use_2(tmpdir, mock_modulepath):
     foo_a = pymod.mc.load('a')
 
     baz_module = pymod.modulepath.get('baz')
-    # Since maintain_state is requested, the module a will not be reloaded
+    # Since maintain_state is requested, the module `a` will not be reloaded
     pymod.mc.swap_impl(foo_module, baz_module, maintain_state=True)
     assert len(pymod.mc._mc._unloaded_on_mp_change) == 1
     baz_a = pymod.modulepath.get('a')

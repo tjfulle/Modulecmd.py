@@ -110,12 +110,15 @@ class Modulepath:
             # Module has not been found.  Try an alias
             target = pymod.alias.get(key)
             if target is not None:
-                if target['modulepath'] not in self.path:
-                    tty.warn('Alias {0} points to {1}, but {1} is not on the '
-                             'current MODULEPATH.  Use {2} to make {1} available'
-                             .format(key, target['target'], target['modulepath'])
-                            )
-                module = self.get(target['filename'])
+                # It does not harm to append the alias's modulepath. If it is
+                # already used, append_path is a null op, it is not already
+                # being used, then appending has less side effects than
+                # prepending.
+                self.append_path(target['modulepath'])
+                module = self.getby_filename(target['filename'])
+                if module is None:
+                    tty.warn('Alias {0} points to nonexistent target {1}'
+                             .format(key, target['target']))
         return module
 
     def getby_dirname(self, dirname):
@@ -123,7 +126,7 @@ class Modulepath:
             if path.path == dirname:
                 return path.modules
 
-    def getby_filename(self, filename):
+    def getby_filename(self, filename, use_file_modulepath=False):
         for path in self.path:
             for module in path.modules:
                 if filename == module.filename:
