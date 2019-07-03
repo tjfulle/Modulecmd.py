@@ -62,3 +62,7 @@ def filter_env(environ):
 
 def filter_key(key):
     return _shell.filter_key(key)
+
+
+def switch():
+    return _shell.switch()

@@ -46,3 +46,32 @@ class Bash(Shell):
                 val = val[val.find('{')+1:val.rfind('}')].strip()
             env[key] = val
         return env
+
+    def switch(self):  # pragma: no cover
+        """Switch the underlying module implementation"""
+        import os
+        from six import StringIO
+        from contrib.util import which
+        for (key, val) in os.environ.items():
+            if key.startswith('BASH_FUNC_module'):
+                break
+        else:
+            raise Exception('Unable to find module bash function')
+        current_module_implementation = 'pymod' if 'PYMOD_CMD' in val else 'tcl'
+
+        s = StringIO()
+        if current_module_implementation == 'pymod':
+            modulecmd = which('modulecmd')
+            if modulecmd is None:
+                raise Exception('Unable to find modulecmd executable')
+            s.write('unset -f module;')
+            s.write('pymod() { eval $(python -E $PYMOD_CMD bash "$@"); };')
+            s.write('export -f pymod;')
+            s.write('module() { eval $(%s bash "$@"); };' % modulecmd)
+            s.write('export -f module;')
+        else:
+            s.write('unset -f module;')
+            s.write('unset -f pymod;')
+            s.write('module() { eval $(python -E $PYMOD_CMD bash "$@"); };')
+            s.write('export -f module;')
+        return s.getvalue()

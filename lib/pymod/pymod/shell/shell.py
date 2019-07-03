@@ -18,6 +18,9 @@ class Shell(object):
     def format_source_command(self, filename):  # pragma: no cover
         raise NotImplementedError
 
+    def switch(self):  # pragma: no cover
+        raise NotImplementedError
+
     def format_output(self, environ, aliases=None, shell_functions=None):
         sio = StringIO()
 
