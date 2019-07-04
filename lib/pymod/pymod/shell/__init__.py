@@ -64,5 +64,5 @@ def filter_key(key):
     return _shell.filter_key(key)
 
 
-def switch():
+def switch():  # pragma: no cover
     return _shell.switch()
