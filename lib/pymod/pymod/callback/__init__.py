@@ -32,8 +32,6 @@ mode or module.  For instance, when a module is loaded, the function
 But, when a module is unloaded, `append_path` *removes* `path` from the
 environment variable `name`.
 
-
-
 """
 
 from __future__ import print_function
@@ -41,6 +39,7 @@ from __future__ import print_function
 import os
 import re
 import sys
+from six import StringIO
 
 import pymod.modes
 import pymod.paths
@@ -60,15 +59,17 @@ _all_callbacks = None
 
 
 def log_callback(func_name, *args, **kwargs):
-    signature = '{0}('.format(func_name)
+    signature = StringIO()
+    signature.write('{0}('.format(func_name))
     if args:
-        signature += ', '.join('{0!r}'.format(_) for _ in args)
+        signature.write(', '.join('{0!r}'.format(_) for _ in args))
     if kwargs:
         if args:
-            signature += ', '
-        signature += ', '.join('{0}={1!r}'.format(*_) for _ in kwargs.items())
-    signature += ')'
-    pymod.mc.cur_module_command_his.write(signature + '\n')
+            signature.write(', ')
+        signature.write(', '.join('{0}={1!r}'.format(*_)
+                                  for _ in kwargs.items()))
+    signature.write(')\n')
+    pymod.mc.cur_module_command_his.write(signature.getvalue())
 
 
 def all_callbacks():
