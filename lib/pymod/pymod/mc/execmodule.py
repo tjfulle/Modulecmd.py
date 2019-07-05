@@ -75,10 +75,19 @@ def module_exec_sandbox(module, mode):
     for fun in pymod.callback.all_callbacks():
         kwds = {}
         if fun.endswith(('set_alias', 'set_shell_function')):
+            # when='always' because we may partially load a module just define
+            # aliases and functions.  This is used by the clone capability that
+            # can set environment variables from a clone, but cannot know what
+            # aliases and functions existed in the clone.
             kwds['when'] = 'always'
         elif fun == 'whatis':
+            # filter out this function if not in whatis mode
             kwds['when'] = mode == pymod.modes.whatis
         elif fun == 'help':
+            # filter out this function if not in help mode
             kwds['when'] = mode == pymod.modes.help
+        else:
+            # Let the function know nothing was explicitly set
+            kwds['when'] = None
         ns[fun] = callback(fun, **kwds)
     return ns
