@@ -1,6 +1,38 @@
 """Defines callback functions between modules and pymod.
 
-Every function has for the first two arguments: module, mode
+Modulecmd.py executes modulefiles in a sandbox with several functions made
+available that allow the modulefile to interact with the user's environment.
+Each of these functions is defined in this `pymod.callback` package.  The module
+`pymod.mc.execmodule` reads in each callback function and sets up a sandbox in
+which modulefiles are executed.  Adding a module to this directory, with
+a function having the same name as the module, automatically makes that function
+available to modulefiles.
+
+Each function is wrapped by the function `callback`, defined below.  It is this
+wrapped function that is sent to user's modulefiles.  Each callback function
+must have for the first two arguments: module, mode.  The callback wrapper
+strips these arguments so that they are *invisible* to user's modulefiles.  Eg,
+consider the function `baz` that takes arguments `spam` and `eggs`.  Its
+signature is
+
+```
+def baz(module, mode, spam, eggs):
+    ...
+```
+
+But, the wrapped function seen by modulefiles is
+
+```
+baz(spam, eggs)
+```
+
+This allows the function `baz` to change its implementation depending on the
+mode or module.  For instance, when a module is loaded, the function
+`append_path(name, path)` appends `path` to the environment variable `name`.
+But, when a module is unloaded, `append_path` *removes* `path` from the
+environment variable `name`.
+
+
 
 """
 
