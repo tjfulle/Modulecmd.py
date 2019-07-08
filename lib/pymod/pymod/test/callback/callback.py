@@ -402,3 +402,21 @@ def test_callback_getenv(tmpdir, mock_modulepath):
     a = pymod.mc.load('a')
     x = getenv(a, pymod.modes.load, 'spam')
     assert x == "foo"
+
+
+def test_callback_is_used(tmpdir, mock_modulepath):
+    is_used = get_callback('is_used')
+    use = get_callback('use')
+    one = tmpdir.mkdir('1')
+    one.join('a.py').write('')
+    two = tmpdir.mkdir('2')
+    two.join('b.py').write('')
+    mock_modulepath(one.strpath)
+
+    assert is_used(None, pymod.modes.load, one.strpath)
+    assert not is_used(None, pymod.modes.load, two.strpath)
+
+    a = pymod.modulepath.get('a')
+    use(a, pymod.modes.load, two.strpath)
+    assert is_used(None, pymod.modes.load, one.strpath)
+    assert is_used(None, pymod.modes.load, two.strpath)

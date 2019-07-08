@@ -329,7 +329,7 @@ def make_argument_parser(**kwargs):
         '--verbose', action='store_true', default=False,
         help='print additional output')
     parser.add_argument(
-        '--debug', action='store_true', default=False,
+        '-d', '--debug', action='store_true', default=False,
         help='run additional debug checks')
     parser.add_argument(
         '--dryrun', action='store_true', default=False,
@@ -430,7 +430,7 @@ def setup_main_options(args):
     tty.set_debug(args.debug)
 #    tty.set_trace(args.trace)
 
-    # debug must be set first so that it can even affect behvaior of
+    # debug must be set first so that it can even affect behavior of
     # errors raised by pymod.config.
     if args.debug:
         # pymod.error.debug = True

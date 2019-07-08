@@ -165,6 +165,7 @@ def swapped_on_family_update(old, new):
 
 def format_changed_module_state():
     sio = StringIO()
+    debug_mode = pymod.config.get('debug')
 
     # Report swapped
     if _swapped_explicitly:
@@ -203,6 +204,10 @@ def format_changed_module_state():
                   'with a MODULEPATH change:\n')
         for (i, (m1, m2)) in enumerate(_swapped_on_mp_change):
             a, b = m1.fullname, m2.fullname
+            if debug_mode:  # pragma: no cover
+                n = len('  {0}) '.format(i+1))
+                a += ' ({0})'.format(m1.modulepath)
+                b = '\n' + ' ' * n + b + ' ({0})'.format(m2.modulepath)
             sio.write('  {0}) {1} => {2}\n'.format(i+1, a, b))
 
     return sio.getvalue()
