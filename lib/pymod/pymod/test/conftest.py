@@ -31,9 +31,12 @@ def os_environ():
     os.environ.pop(pymod.names.initial_env, None)
     os.environ.pop(pymod.names.loaded_modules, None)
     os.environ.pop(pymod.names.loaded_module_files, None)
-    os.environ.pop(pymod.names.loaded_module_cellar, None)
     os.environ.pop(pymod.names.config_file_envar, None)
     os.environ.pop(pymod.names.sourced_files, None)
+    keys = [_ for _ in list(os.environ.keys())
+            if _.startswith(pymod.names.loaded_module_cellar)]
+    for key in keys:
+        os.environ.pop(key, None)
     to_pop = []
     keys_to_pop = (pymod.names.loaded_module_meta(''), pymod.names.family_name(''))
     for (key, val) in os.environ.items():
