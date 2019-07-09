@@ -2,8 +2,9 @@ import os
 import pymod.mc
 import pymod.clone
 import pymod.error
+import pymod.cellar
 
-from contrib.util import split, str_to_list
+from contrib.util import split
 
 
 def save(name):
@@ -40,10 +41,9 @@ def restore_impl(the_clone):
         pymod.environ.set(key, val)
 
     # Load modules to make sure aliases/functions are restored
-    loaded_modules = []
-    lm_cellar = the_clone.get(pymod.names.loaded_module_cellar)
+    lm_cellar = pymod.cellar.acquire_from_env(the_clone)
     if lm_cellar:
-        lm_cellar = str_to_list(lm_cellar)
+        loaded_modules = []
         for ar in lm_cellar:
             try:
                 module = pymod.mc.unarchive_module(ar)

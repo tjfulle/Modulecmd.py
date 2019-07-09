@@ -3,6 +3,7 @@ from argparse import Namespace
 
 import pymod.names
 import pymod.shell
+import pymod.cellar
 import pymod.modulepath
 
 from contrib.util import boolean
@@ -284,3 +285,11 @@ def filtered(include_os=False):
 
 def copy(include_os=False):
     return environ.copy(include_os=include_os)
+
+
+def get_lm_cellar(env=None):
+    return pymod.cellar.acquire_from_env(environ)
+
+
+def set_lm_cellar(cellar):
+    return pymod.cellar.put_in_env(environ, cellar)

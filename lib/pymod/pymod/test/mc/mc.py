@@ -18,7 +18,7 @@ def test_mc_cellar(tmpdir, mock_modulepath):
         m = pymod.modulepath.get(name)
         ar = pymod.mc.archive_module(m)
         lm_cellar.append(ar)
-    pymod.environ.set_list(pymod.names.loaded_module_cellar, lm_cellar)
+    pymod.environ.set_lm_cellar(lm_cellar)
     loaded_modules = pymod.mc.get_loaded_modules()
     loaded_module_names = ''.join(m.name for m in loaded_modules)
     assert loaded_module_names == names
