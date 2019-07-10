@@ -69,12 +69,12 @@ def module_exec_sandbox(module, mode):
         'IS_DARWIN': 'darwin' in sys.platform,
         #
         'add_option': module.add_option,
-        'parse_opts': module.parse_opts,
+        'opts': module.opts
     }
 
     for fun in pymod.callback.all_callbacks():
         kwds = {}
-        if fun.endswith(('set_alias', 'set_shell_function')):
+        if fun.endswith(('set_alias', 'set_shell_function', 'getenv')):
             # when='always' because we may partially load a module just define
             # aliases and functions.  This is used by the clone capability that
             # can set environment variables from a clone, but cannot know what

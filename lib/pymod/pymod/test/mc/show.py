@@ -6,12 +6,12 @@ from pymod.error import ModuleNotFoundError
 
 def test_mc_show(tmpdir, mock_modulepath):
     tmpdir.join('a.py').write(
-        'add_option("+x", action="store_true")\n'
+        'add_option("x")\n'
         'setenv("a", "a")')
     mock_modulepath(tmpdir.strpath)
 
     pymod.mc.show('a')
-    pymod.mc.show('a', opts=['+x'])
+    pymod.mc.show('a', opts={'x': True})
     with pytest.raises(ModuleNotFoundError):
         pymod.mc.show('fake')
 

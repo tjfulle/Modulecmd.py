@@ -15,7 +15,7 @@ def list(terse=False, show_command=False, regex=None):
     for loaded in loaded_modules:
         fullname = loaded.fullname
         if loaded.opts:
-            fullname += ' ' + ' '.join(loaded.opts)
+            fullname += ' ' + loaded.opts.joined(' ')
         loaded_module_names.append(fullname)
 
     if terse:

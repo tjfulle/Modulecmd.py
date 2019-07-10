@@ -35,6 +35,19 @@ def add_save_command(parser):
     _subcommands['save'] = save
 
 
+def add_show_command(parser):
+    def show(args):
+        return pymod.mc.collection.show(args.name)
+    p = parser.add_parser(
+        'show',
+        help='Show actions that would be taken by restoring the collection')
+    p.add_argument(
+        'name', nargs='?',
+        default=pymod.names.default_user_collection,
+        help='Name of collection to show')
+    _subcommands['show'] = show
+
+
 def add_remove_command(parser):
     def remove(args):
         return pymod.mc.collection.remove(args.name)
@@ -62,6 +75,7 @@ def setup_parser(subparser):
     sp = subparser.add_subparsers(metavar='SUBCOMMAND', dest='subcommand')
     add_avail_command(sp)
     add_save_command(sp)
+    add_show_command(sp)
     add_remove_command(sp)
     add_restore_command(sp)
 

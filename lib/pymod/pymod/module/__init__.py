@@ -13,7 +13,6 @@ from pymod.module.version import Version
 from contrib.util import split, textfill, encode_str
 import llnl.util.tty as tty
 from llnl.util.tty import terminal_size
-from pymod.module.argument_parser import ModuleArgumentParser
 
 
 # --------------------------------------------------------------------------- #
@@ -40,16 +39,16 @@ class Module(object):
         self.variant = Version(variant)
 
         self.modulepath = modulepath
-        self._parser = ModuleArgumentParser()
         self.family = None
         self.whatisstr = ''
         self.helpstr = None
         self.is_default = False
-        self._opts = None
+        self._opts = Namespace()
         self._unlocks = []
         self.marked_as_default = False
         self._acquired_as = None  # How the module was initially loaded
         self._refcount = 0
+        self.registered_options = {}
 
     def __str__(self):
         return 'Module(name={0})'.format(self.fullname)
@@ -130,10 +129,10 @@ class Module(object):
         return open(self.filename, 'r').read()
 
     def prepare(self):
-        self._parser = ModuleArgumentParser()
+        pass
 
     def reset_state(self):
-        self._opts = None
+        self._opts = Namespace()
 
     @property
     def fullname(self):
@@ -150,14 +149,16 @@ class Module(object):
 
     @opts.setter
     def opts(self, opts):
-        if opts is not None:
-            self._opts = list(opts)
+        if not opts:
+            self._opts = Namespace()
+        else:
+            for (key, val) in opts.items():
+                setattr(self._opts, key, val)
 
-    def parse_opts(self):
-        return self._parser.parse_args(self.opts)
-
-    def add_option(self, *args, **kwargs):
-        return self._parser.add_argument(*args, **kwargs)
+    def add_option(self, name, **kwargs):
+        self.registered_options[name] = dict(kwargs)
+        if not hasattr(self._opts, name):
+            setattr(self._opts, name, kwargs.get('default', None))
 
     def format_info(self):
         if self.is_default and self.is_loaded:
@@ -175,11 +176,12 @@ class Module(object):
         _, width = terminal_size()
         rule = '=' * width
         head = '{0}'.format((" " + self.name + " ").center(width, '='))
+        text_width = min(width, 80)
         sio.write(head + '\n')
-        sio.write(fill(self.whatisstr))
-        parser_help = self._parser.help_string()
-        if parser_help:  # pragma: no cover
-            sio.write(parser_help + '\n')
+        sio.write(fill(self.whatisstr, width=text_width)+'\n')
+        option_help = self.option_help_string()
+        if option_help:  # pragma: no cover
+            sio.write('\n' + option_help + '\n')
         sio.write(rule)
         return sio.getvalue()
 
@@ -205,12 +207,35 @@ class Module(object):
         rule = '=' * width
         head = '{0}'.format((" " + self.name + " ").center(width, '='))
         sio.write(head + '\n')
-        sio.write(fill(self.helpstr))
+        sio.write(fill(self.helpstr)+'\n')
+        option_help = self.option_help_string()
+        if option_help:  # pragma: no cover
+            sio.write('\n' + option_help + '\n')
         sio.write(rule)
         return sio.getvalue()
 
-    def set_help_string(self,helpstr):
+    def set_help_string(self, helpstr):
         self.helpstr = helpstr
+
+    def option_help_string(self):
+        if not self.registered_options:
+            return None
+        max_opt_name_length = max([len(_) for _ in self.registered_options])
+        column_start = min(20, max_opt_name_length)
+        help_string = StringIO()
+        help_string.write('Module options:\n')
+        text_width = 80 - column_start
+        subsequent_indent = ' ' * column_start
+        for (key, kwds) in self.registered_options.items():
+            pad = ' ' * max(column_start - len(key) - 2, 2)
+            line = '  {0}{1}'.format(key, pad)
+            this_help_str = kwds.get('help')
+            if this_help_str is not None:
+                this_help_str = fill(this_help_str, width=text_width,
+                                     subsequent_indent=subsequent_indent)
+                line += this_help_str
+            help_string.write(line+'\n')
+        return help_string.getvalue().rstrip()
 
 
 class PyModule(Module):
@@ -238,6 +263,22 @@ class PyModule(Module):
 
 class TclModule(Module):
     pass
+
+
+class Namespace(object):
+    def __init__(self, **kwds):
+        for (key, val) in kwds.items():
+            setattr(self, key, val)
+    def __bool__(self):
+        return any([v is not None for k,v in self.__dict__.items()])
+    def __str__(self):  # pragma: no cover
+        return 'Namespace({0})'.format(self.joined(', '))
+    def joined(self, sep):
+        return sep.join('{0}={1!r}'.format(*_) for _ in self.__dict__.items())
+    def items(self):
+        return self.__dict__.items()
+    def asdict(self):
+        return dict(self.__dict__)
 
 
 def module(dirname, *parts):

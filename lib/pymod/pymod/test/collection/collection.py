@@ -57,7 +57,7 @@ def test_collection_named(modules_path, mock_modulepath):
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     c = pymod.mc.load('c')
-    d = pymod.mc.load('d', opts=['+x'])
+    d = pymod.mc.load('d', opts={'x': True})
 
     pymod.mc.collection.save('foo')
     assert pymod.collection.contains('foo')

@@ -18,6 +18,8 @@ def load(name, opts=None, insert_at=None, caller='command_line'):
     ----------
     name : string_like
         Module name, full name, or file path
+    opts : dict
+        (Optional) options to send to module
     insert_at : int
         Load the module as the `insert_at`th module.
     caller : str

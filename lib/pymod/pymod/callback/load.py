@@ -14,7 +14,7 @@ def load(module, mode, name, **kwds):
         name (str): Name of module to load
 
     Keyword arguments:
-        opts (list): Module options
+        opts (dict): Module options
 
 
     Notes:
@@ -29,7 +29,7 @@ def load(module, mode, name, **kwds):
 
     .. code-block:: python
 
-        load('spam', opts=['+x'])
+        load('spam', opts={'x': True})
 
     On loading module ``baz``, the module ``spam``, if available, is loaded with options
     ``opts``.

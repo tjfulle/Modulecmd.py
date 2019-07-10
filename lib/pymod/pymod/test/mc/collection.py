@@ -33,7 +33,7 @@ def modules_path(tmpdir, namespace, modulecmds):
 
 
 @pytest.mark.unit
-def test_mc_restore_goo(modules_path, mock_modulepath):
+def test_mc_restore_good(modules_path, mock_modulepath):
 
     mock_modulepath(modules_path.path)
     a = pymod.mc.load('a')
@@ -57,6 +57,8 @@ def test_mc_restore_goo(modules_path, mock_modulepath):
     assert b.is_loaded
     assert c.is_loaded
     assert d.is_loaded
+
+    pymod.mc.collection.show('foo')
 
 
 @pytest.mark.unit

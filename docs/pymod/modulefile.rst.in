@@ -141,12 +141,8 @@ A module can support command line options.  Options are specified on the command
 
 The following modulefile functions register options
 
-``add_option(name, action='store_true')``
-    Register a module option.  By default, options are boolean flags.  Pass ``action='store'`` to register an option that takes a value.
-
-``parse_opts()``
-    Parse module options.  Only options added before calling ``parse_opts`` will be parsed.
-
+``add_option(name, help=None)``
+    Register a module option.
 
 ^^^^^^^^
 Examples
@@ -156,9 +152,8 @@ To specify two options for module 'spam', in modulefile spam.py do
 
 .. code-block:: python
 
-  add_option('+x', action='store')  # option with value
-  add_option('+b')  # boolean option
-  opts = parse_opts()
+  add_option('x')
+  add_option('b')
 
   if (opts.b):
       # Do something
@@ -169,6 +164,6 @@ On the commandline, the module spam can be loaded as
 
 .. code-block:: console
 
-  $ module load spam +b +x=baz
+  $ module load spam +b x=baz
 
 .. _Modulecmd.py: https://www.github.com/tjfulle/Modulecmd.py

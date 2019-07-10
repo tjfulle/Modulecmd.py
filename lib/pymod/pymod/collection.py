@@ -110,7 +110,8 @@ class Collections:
                 name = ar['fullname']
                 opts = ar['opts']
                 if opts:
-                    s = 'load({0!r}, options={1!r})'.format(name, opts)
+                    opts_string = pymod.module.Namespace(**opts).joined(' ')
+                    s = 'load({0!r}, options={1!r})'.format(name, opts_string)
                 else:
                     s = 'load({0!r})'.format(name)
                 sio.write(s + '\n')

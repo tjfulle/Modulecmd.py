@@ -48,6 +48,8 @@ def test_command_collection_basic(modules_path, mock_modulepath):
 
     pymod.mc.purge()
 
+    collection('show', 'foo')
+
     collection('remove', 'foo')
     assert pymod.collection.get('foo') is None
 

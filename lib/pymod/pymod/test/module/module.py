@@ -6,7 +6,7 @@ import pymod.module
 @pytest.fixture()
 def basic_python_module(tmpdir):
     tmpdir.join('a.py').write(
-        'add_option("+foo", action="store_true")\n'
+        'add_option("foo")\n'
         'setenv("a", "a")')
     m = pymod.module.module(tmpdir.strpath, 'a.py')
     return m
@@ -21,7 +21,7 @@ def basic_tcl_module(tmpdir):
 
 def test_module_attrs(basic_python_module):
     m = basic_python_module
-    m.opts = ['+foo']
+    m.opts = {'foo': True}
     assert not m.is_loaded
     assert not m.is_hidden
     assert not m.do_not_register
@@ -30,6 +30,8 @@ def test_module_attrs(basic_python_module):
 
 def test_module_whatis(basic_python_module):
     m = basic_python_module
+    m.add_option('foo')
+    m.add_option('bar', help='a bar')
     m.set_whatis(short_description='SHORT DESCRIPTION',
                  configure_options='BUILD CONFIG OPTIONS',
                  version='1.0',
