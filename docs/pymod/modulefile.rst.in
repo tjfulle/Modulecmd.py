@@ -114,14 +114,6 @@ Other defined objects
 
     A reference to the user's environment file
 
-**getenv**\ *(name)*
-
-    Get an environment variable
-
-    **Arguments**
-
-    *name* (str): The name of the desired environment variable
-
 **get_hostname**\ *()*
 
     Get the host name

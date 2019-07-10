@@ -118,8 +118,8 @@ class Callback:
                     continue
                 if (name not in self._param_names and
                     '*'+name not in self._param_names):
-                    raise ValueError('Parameter {0} not in {1}'
-                                     .format(name, self._param_names))
+                    raise ValueError('{2}: parameter {0} not in {1}'
+                                     .format(name, self._param_names, self.name))
                 args.append((name, type, ' '.join(description.split())))
         if args:
             return args
