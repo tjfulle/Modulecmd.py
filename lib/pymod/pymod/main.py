@@ -344,9 +344,6 @@ def make_argument_parser(**kwargs):
         '-V', '--version', action='store_true',
         help='show version number and exit')
     parser.add_argument(
-        '-m', '--mock', action='store_true',
-        help='use mock modulepath instead of real one')
-    parser.add_argument(
         '--color', action='store', default='auto',
         choices=('always', 'never', 'auto'),
         help="when to colorize output (default: auto)")
@@ -438,11 +435,6 @@ def setup_main_options(args):
 
     if args.dryrun:
         pymod.config.set('dryrun', True, scope='command_line')
-
-    if args.mock:
-        path = os.path.join(pymod.paths.mock_modulepath, 'core')
-        p = pymod.modulepath.ModulePath([path])
-        pymod.modulepath.set_path(p)
 
     if args.shell != pymod.config.get('default_shell'):
         pymod.shell.set_shell(args.shell)

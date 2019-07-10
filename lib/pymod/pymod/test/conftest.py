@@ -70,19 +70,6 @@ def pymod_global_state_reset():
     pymod.mc._mc._unloaded_on_mp_change = []
 
 
-@pytest.fixture(scope='session', autouse=True)
-def _mock_modulepath():
-    """Session scoped Modulepath object pointing to the mock directory"""
-    real_modulepath = pymod.modulepath._path
-    path = os.path.join(pymod.paths.mock_modulepath_path, 'core', '1')
-    modulepath = pymod.modulepath.Modulepath([path])
-    pymod.modulepath._path = modulepath
-
-    yield pymod.modulepath._path
-
-    pymod.modulepath._path = real_modulepath
-
-
 @pytest.fixture()
 def mock_modulepath(request):
     """Function scoped Modulepath object pointing to the mock directory"""
@@ -93,13 +80,7 @@ def mock_modulepath(request):
         elif os.path.isdir(subdir):
             path = [subdir]
         else:
-            p1 = pymod.paths.mock_modulepath_path
-            if os.path.isdir(os.path.join(p1, subdir)):
-                path = os.path.join(p1, subdir)
-            else:
-                path = os.path.join(p1, 'core', subdir)
-            assert os.path.isdir(path)
-            path = [path]
+            raise TypeError('Unknown subdir type')
         modulepath = pymod.modulepath.Modulepath(path)
         pymod.modulepath._path = modulepath
         return pymod.modulepath._path
