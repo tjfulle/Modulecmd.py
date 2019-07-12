@@ -3,13 +3,12 @@ from argparse import Namespace
 
 import pymod.names
 import pymod.shell
-import pymod.cellar
 import pymod.modulepath
 
 from contrib.util import boolean
 from contrib.util import join, split, pop
-from contrib.util import dict_to_str, str_to_dict
-from contrib.util import list_to_str, str_to_list
+from pymod.serialize import serialize, deserialize
+from pymod.serialize import serialize_to_dict, deserialize_from_dict
 
 import llnl.util.tty as tty
 from llnl.util.lang import Singleton
@@ -57,7 +56,9 @@ class Environ(dict):
         p.meta_key = pymod.names.loaded_module_meta(key)
         p.sep = sep
         p.value = split(self.get(key), sep=sep)
-        p.meta = str_to_dict(self.get(p.meta_key))
+        meta = self.get(p.meta_key)
+        serialized = self.get(p.meta_key)
+        p.meta = {} if serialized is None else deserialize(serialized)
         return p
 
     def set_path(self, path):
@@ -66,7 +67,7 @@ class Environ(dict):
             self[path.meta_key] = None
         else:
             self[path.key] = join(path.value, path.sep)
-            self[path.meta_key] = dict_to_str(path.meta)
+            self[path.meta_key] = serialize(path.meta)
         self.save_ld_library_path(path.key)
 
     def filtered(self, include_os=False):
@@ -261,22 +262,30 @@ def set_path(key, path, sep=os.pathsep):
     return environ.set(key, value)
 
 
+def serialize_and_set(key, arg, _type):
+    value = serialize(arg or _type())
+    return environ.set(key, value)
+
+
+def get_and_deserialize(key, _type):
+    serialized = environ.get(key)
+    return _type() if serialized is None else deserialize(serialized)
+
+
 def get_dict(key):
-    return str_to_dict(environ.get(key))
+    return get_and_deserialize(key, dict)
 
 
 def set_dict(key, arg):
-    value = dict_to_str(arg)
-    return environ.set(key, value)
+    serialize_and_set(key, arg, dict)
 
 
 def get_list(key):
-    return str_to_list(environ.get(key))
+    return get_and_deserialize(key, list)
 
 
 def set_list(key, arg):
-    value = list_to_str(arg)
-    return environ.set(key, value)
+    serialize_and_set(key, arg, list)
 
 
 def filtered(include_os=False):
@@ -288,8 +297,10 @@ def copy(include_os=False):
 
 
 def get_lm_cellar(env=None):
-    return pymod.cellar.acquire_from_env(environ)
+    return deserialize_from_dict(environ, pymod.names.loaded_module_cellar)
 
 
 def set_lm_cellar(cellar):
-    return pymod.cellar.put_in_env(environ, cellar)
+    serialized = serialize_to_dict(cellar, pymod.names.loaded_module_cellar)
+    for (key, chunk) in serialized.items():
+        environ.set(key, chunk)

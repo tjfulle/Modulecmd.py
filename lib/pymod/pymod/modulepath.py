@@ -46,6 +46,9 @@ class Modulepath:
     def __len__(self):
         return len(self.path)
 
+    def size(self):
+        return len(self)
+
     def index(self, dirname):
         for (i, path) in enumerate(self.path):
             if path.path == dirname:
@@ -347,7 +350,7 @@ def walk(start=0):
 
 
 def size():
-    return len(_path)
+    return _path.size()
 
 
 def clear():

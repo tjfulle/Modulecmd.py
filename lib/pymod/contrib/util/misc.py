@@ -1,16 +1,13 @@
 import os
 import re
-import ast
-import base64
 import textwrap
 import subprocess
 from llnl.util.tty import terminal_size
 
 __all__ = [
-    'split', 'join', 'join_args', 'decode_str', 'encode_str',
-    'dict_to_str', 'str_to_dict', 'encode64', 'decode64', 'boolean',
-    'pop', 'strip_quotes', 'check_output', 'which', 'is_executable',
-    'textfill', 'listdir', 'str_to_list', 'list_to_str']
+    'split', 'join', 'join_args', 'decode_str', 'encode_str', 'boolean', 'pop',
+    'strip_quotes', 'check_output', 'which', 'is_executable', 'textfill', 'listdir'
+    ]
 
 
 def listdir(dirname, key=None):
@@ -58,38 +55,6 @@ def encode_str(string):
         return string.encode('utf-8')
     except AttributeError:
         return string
-
-
-def dict_to_str(dikt):
-    if not isinstance(dikt, (dict,)):
-        raise ValueError('Expected dict')
-    return encode64(str(dikt))
-
-
-def str_to_dict(s):
-    if s is None or not s.strip():
-        return {}
-    return ast.literal_eval(decode64(s))
-
-
-def list_to_str(a):
-    if not isinstance(a, (list, tuple)):
-        raise ValueError('Expected list')
-    return encode64(str(a))
-
-
-def str_to_list(s):
-    if s is None or not s.strip():
-        return []
-    return ast.literal_eval(decode64(s))
-
-
-def encode64(item):
-    return base64.urlsafe_b64encode(str(item).encode()).decode()
-
-
-def decode64(item):
-    return base64.urlsafe_b64decode(str(item)).decode()
 
 
 def boolean(item):

@@ -53,7 +53,7 @@ def test_module_parts(tmpdir):
     for x in s:
         d = d.mkdir(x)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(IOError):
         pymod.module.Module(tmpdir.strpath, *list(s))
 
     f = d.join('f')

@@ -2,7 +2,7 @@ import os
 import pymod.mc
 import pymod.clone
 import pymod.error
-import pymod.cellar
+from pymod.serialize import deserialize_from_dict
 
 from contrib.util import split
 
@@ -41,7 +41,7 @@ def restore_impl(the_clone):
         pymod.environ.set(key, val)
 
     # Load modules to make sure aliases/functions are restored
-    lm_cellar = pymod.cellar.acquire_from_env(the_clone)
+    lm_cellar = deserialize_from_dict(the_clone, pymod.names.loaded_module_cellar)
     if lm_cellar:
         loaded_modules = []
         for ar in lm_cellar:

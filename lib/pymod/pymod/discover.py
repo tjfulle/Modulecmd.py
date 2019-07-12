@@ -1,8 +1,10 @@
 import os
+import json
 
 import pymod.module
 import pymod.environ
 import llnl.util.tty as tty
+from llnl.util.lang import Singleton
 from llnl.util.filesystem import working_dir
 from contrib.util import strip_quotes
 
@@ -14,6 +16,9 @@ marked_default_names = ('default', '.version')
 def find_modules(dirname):
 
     dirname = os.path.expanduser(dirname)
+    cached_modules = get_from_cache(dirname)
+    if cached_modules is not None:
+        return cached_modules
 
     if dirname == '/':
         raise ValueError('Requesting to find modules in root directory')
@@ -58,6 +63,7 @@ def find_modules(dirname):
         tty.verbose('Modulepath: no modules found in {0}'.format(dirname))
         return None
 
+    put_in_cache(dirname, modules)
     return modules
 
 
@@ -198,3 +204,83 @@ def listdir(dirname):
 
 def isfilelike(item):
     return os.path.exists(item) and not os.path.isdir(item)
+
+
+class Cache:
+    def __init__(self):
+        basename = pymod.names.cache_file_basename
+        for dirname in (pymod.paths.user_config_platform_path,
+                        pymod.paths.user_config_path):
+            filename = os.path.join(dirname, basename)
+            if os.path.exists(filename):  # pragma: no cover
+                break
+        else:
+            filename = os.path.join(
+                pymod.paths.user_config_platform_path,
+                basename)
+        self.filename = filename
+        self.data = self.load()
+
+    def get(self, modulepath):
+        modules_cache = self.data.get(modulepath)
+        if not modules_cache:
+            return None
+        modules = []
+        for cached_module in modules_cache:
+            module = pymod.module.from_dict(cached_module)
+            if module is None:
+                # A module was removed, this directory cache should be
+                # invalidated so it can be rebuilt
+                self.data[modulepath] = None
+                return
+            modules.append(module)
+        return modules
+
+    def load(self):
+        data = dict()
+        if os.path.isfile(self.filename):
+            data.update(dict(json.load(open(self.filename))))
+        return data
+
+    def dump(self):
+        with open(self.filename, 'w') as fh:
+            json.dump(self.data, fh, indent=2)
+
+    def set(self, modulepath, modules):
+        self.data[modulepath] = []
+        for module in modules:
+            self.data[modulepath].append(pymod.module.as_dict(module))
+        self.dump()
+
+    def refresh(self):  # pragma: no cover
+        for modulepath in self.data:
+            self.data[modulepath] = None
+            find_modules(modulepath)
+
+    def remove(self):
+        if os.path.isfile(self.filename):
+            os.remove(self.filename)
+        self.data = dict()
+
+
+_cache = Singleton(Cache)
+
+
+def remove_cache():
+    _cache.remove()
+
+
+def refresh_cache():  # pragma: no cover
+    _cache.refresh()
+
+
+def put_in_cache(modulepath, modules):
+    _cache.set(modulepath, modules)
+
+
+def get_from_cache(modulepath):
+    return _cache.get(modulepath)
+
+
+def reload_cache():
+    _cache.data = _cache.load()

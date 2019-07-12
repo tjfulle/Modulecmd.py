@@ -21,11 +21,16 @@ from llnl.util.tty import terminal_size
 class Module(object):
     ext = None
     def __init__(self, modulepath, *parts):
+        self.parts = list(parts)
         self.filename = os.path.join(modulepath, *parts)
-        if self.ext:
-            self.filename += self.ext
+
         if not os.path.isfile(self.filename):
-            raise ValueError('{0} is not a file'.format(self.filename))
+            raise IOError('{0} is not a file'.format(self.filename))
+
+        parts = list(parts)
+        if self.ext:
+            parts[-1], ext = os.path.splitext(parts[-1])
+            assert ext == self.ext, 'ext={0!r}!={1!r}'.format(ext, self.ext)
         version = variant = None
         if len(parts) == 1:
             self.name, = parts
@@ -242,9 +247,6 @@ class PyModule(Module):
     ext = '.py'
     def __init__(self, modulepath, *parts):
         # strip the file extension off the last part and call class initializer
-        parts = list(parts)
-        parts[-1], ext = os.path.splitext(parts[-1])
-        assert ext == self.ext
         super(PyModule, self).__init__(modulepath, *parts)
         self.metadata = MetaData()
         self.metadata.parse(self.filename)
@@ -304,6 +306,26 @@ def module(dirname, *parts):
             tty.debug(module.modulepath)
             tty.debug(module.filename, '\n')
 
+    return module
+
+
+def as_dict(module):
+    return {'parts': module.parts,
+            'type': type(module).__name__,
+            'file': module.filename,
+            'modulepath': module.modulepath, }
+
+
+def from_dict(dikt):
+    parts = dikt['parts']
+    filename = dikt['file']
+    modulepath = dikt['modulepath']
+    module_type = {'PyModule': PyModule, 'TclModule': TclModule}[dikt['type']]
+    try:
+        module = module_type(modulepath, *parts)
+    except IOError:
+        return None
+    assert module.filename == filename
     return module
 
 

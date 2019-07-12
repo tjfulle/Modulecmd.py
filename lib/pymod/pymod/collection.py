@@ -37,10 +37,10 @@ class Collections:
         return dict()
 
     def write(self, collections, filename):
+        obj = {'Version': self.version, 'Collections': collections}
         if pymod.config.get('dryrun'):  # pragma: no cover
             sys.stderr.write(json.dumps(obj))
         else:
-            obj = {'Version': self.version, 'Collections': collections}
             with open(filename, 'w') as fh:
                 json.dump(obj, fh, indent=2)
         return

@@ -234,6 +234,10 @@ def test_mc_load_inserted_acqby(tmpdir, mock_modulepath):
     ma = pymod.modulepath.get(core.join('a/1.0.py').strpath)
     assert ma.is_loaded
 
+    pymod.mc._mc._loaded_modules = None
+    modules = pymod.mc._mc.get_loaded_modules()
+    assert ma in modules
+
 
 def test_mc_load_bad_callback(tmpdir, mock_modulepath):
     tmpdir.join('a.py').write('load("FAKE")')
