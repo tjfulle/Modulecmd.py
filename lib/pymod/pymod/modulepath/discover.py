@@ -3,7 +3,7 @@ import json
 
 import pymod.module
 import pymod.environ
-from pymod.modulepath.cache import get_from_cache, put_in_cache
+from pymod.modulepath import get_from_cache, put_in_cache
 
 import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir

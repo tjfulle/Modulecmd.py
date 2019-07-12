@@ -10,14 +10,14 @@ _subcommands = {}
 
 def add_refresh_command(parser):
     def refresh(args):
-        pymod.modulepath.cache.refresh_cache()
+        pymod.modulepath.refresh_cache()
     p = parser.add_parser('refresh', help='Refresh the MODULEPATH cache')
     _subcommands['refresh'] = refresh
 
 
 def add_remove_command(parser):
     def remove(args):
-        pymod.modulepath.cache.remove_cache()
+        pymod.modulepath.remove_cache()
     p = parser.add_parser('remove', help='Remove the MODULEPATH cache')
     _subcommands['remove'] = remove
 

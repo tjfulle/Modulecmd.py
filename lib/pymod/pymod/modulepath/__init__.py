@@ -63,3 +63,22 @@ def size():
 
 def clear():
     return _path.clear()
+
+
+_cache = Singleton(Cache)
+
+
+def remove_cache():
+    _cache.remove()
+
+
+def refresh_cache():  # pragma: no cover
+    _cache.refresh()
+
+
+def put_in_cache(modulepath, modules):
+    _cache.set(modulepath, modules)
+
+
+def get_from_cache(modulepath):
+    return _cache.get(modulepath)

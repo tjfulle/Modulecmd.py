@@ -1,7 +1,6 @@
 import os
 import json
 import pymod.names
-from llnl.util.lang import Singleton
 
 
 class Cache:
@@ -63,21 +62,3 @@ class Cache:
         for dirname in dirs:
             find_modules(dirname)
 
-
-_cache = Singleton(Cache)
-
-
-def remove_cache():
-    _cache.remove()
-
-
-def refresh_cache():  # pragma: no cover
-    _cache.refresh()
-
-
-def put_in_cache(modulepath, modules):
-    _cache.set(modulepath, modules)
-
-
-def get_from_cache(modulepath):
-    return _cache.get(modulepath)
