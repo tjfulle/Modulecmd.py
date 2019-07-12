@@ -5,18 +5,17 @@ from six import StringIO
 import pymod.alias
 import pymod.names
 import pymod.module
-from pymod.discover import find_modules
 
-from contrib.util import groupby, join, split
+from contrib.util import groupby, join
 
 import llnl.util.tty as tty
-from llnl.util.lang import Singleton
 from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
 
 
 class Path:
     def __init__(self, dirname):
+        from pymod.modulepath.discover import find_modules
         self.path = dirname
         self.modules = find_modules(dirname)
 
@@ -298,60 +297,3 @@ class Modulepath:
                     if f.endswith(key):  # pragma: no cover
                         the_candidates.append(module)
         return the_candidates
-
-
-def _modulepath():  # pragma: no cover
-    path = split(os.getenv(pymod.names.modulepath), os.pathsep)
-    return Modulepath(path)
-
-
-_path = Singleton(_modulepath)
-
-
-def path():
-    return [p.path for p in _path.path]
-
-
-def set_path(other_path):
-    global _path
-    _path = other_path
-
-
-def get(key):
-    return _path.get(key)
-
-
-def append_path(dirname):
-    return _path.append_path(dirname)
-
-
-def remove_path(dirname):
-    return _path.remove_path(dirname)
-
-
-def prepend_path(dirname):
-    return _path.prepend_path(dirname)
-
-
-def avail(**kwargs):
-    return _path.avail(**kwargs)
-
-
-def candidates(name):
-    return _path.candidates(name)
-
-
-def contains(path):
-    return path in _path
-
-
-def walk(start=0):
-    return _path.walk(start=0)
-
-
-def size():
-    return _path.size()
-
-
-def clear():
-    return _path.clear()
