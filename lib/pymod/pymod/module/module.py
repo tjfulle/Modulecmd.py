@@ -122,15 +122,7 @@ class Module(object):
         return unlocked_by[::-1]
 
     def read(self, mode):
-        if isinstance(self, TclModule):
-            if not pymod.config.has_tclsh:  # pragma: no cover
-                raise TCLSHNotFoundError
-            try:
-                return tcl2py(self, mode)
-            except Exception as e:  # pragma: no cover
-                tty.die(e.args[0])
-                return ''
-        return open(self.filename, 'r').read()
+        raise NotImplementedError # pragma: no cover
 
     def prepare(self):
         pass
@@ -261,9 +253,19 @@ class PyModule(Module):
     def endswith(self, string):
         return os.path.splitext(self.filename)[0].endswith(string)
 
+    def read(self, mode):
+        return open(self.filename, 'r').read()
+
 
 class TclModule(Module):
-    pass
+    def read(self, mode):
+        if not pymod.config.has_tclsh:  # pragma: no cover
+            raise TCLSHNotFoundError
+        try:
+            return tcl2py(self, mode)
+        except Exception as e:  # pragma: no cover
+            tty.die(e.args[0])
+            return ''
 
 
 class Namespace(object):
