@@ -200,11 +200,11 @@ def test_mc_load_inserted_with_opts(tmpdir, mock_modulepath):
     mock_modulepath(one.strpath)
 
     a = pymod.mc.load('a', opts={'x': 'baz'})
-    assert a.opts.asdict() == {'x': 'baz'}
+    assert a.opts.as_dict() == {'x': 'baz'}
 
     b = pymod.mc.load('b', insert_at=1)
     assert a.is_loaded
-    assert a.opts.asdict() == {'x': 'baz'}
+    assert a.opts.as_dict() == {'x': 'baz'}
 
 
 def test_mc_load_inserted_acqby(tmpdir, mock_modulepath):
@@ -250,7 +250,8 @@ def test_mc_load_bad_callback(tmpdir, mock_modulepath):
     a = pymod.modulepath.get('a')
     a.acquired_as = a.name
     lm_cellar = [dict(fullname=a.fullname, filename=a.filename,
-                      family=a.family, opts=a.opts.asdict(), acquired_as=a.acquired_as)]
+                      family=a.family, opts=a.opts.as_dict(),
+                      acquired_as=a.acquired_as)]
     pymod.environ.set_lm_cellar(lm_cellar)
     pymod.mc._mc._loaded_modules = [a]
 
