@@ -3,7 +3,6 @@ import json
 
 import pymod.module
 import pymod.environ
-from pymod.modulepath import get_from_cache, put_in_cache
 
 import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir
@@ -17,9 +16,6 @@ marked_default_names = ('default', '.version')
 def find_modules(dirname):
 
     dirname = os.path.expanduser(dirname)
-    cached_modules = get_from_cache(dirname)
-    if cached_modules is not None:
-        return cached_modules
 
     if dirname == '/':
         raise ValueError('Requesting to find modules in root directory')
@@ -64,7 +60,6 @@ def find_modules(dirname):
         tty.verbose('Modulepath: no modules found in {0}'.format(dirname))
         return None
 
-    put_in_cache(dirname, modules)
     return modules
 
 

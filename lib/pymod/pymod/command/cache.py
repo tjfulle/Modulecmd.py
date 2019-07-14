@@ -1,8 +1,8 @@
-import pymod.modulepath
+import pymod.cache
 
-description = 'Cache modules on MODULEPATH'
+description = 'Cache modules'
 level = 'short'
-section = 'modulepath'
+section = 'basic'
 
 
 _subcommands = {}
@@ -10,15 +10,15 @@ _subcommands = {}
 
 def add_refresh_command(parser):
     def refresh(args):
-        pymod.modulepath.refresh_cache()
-    p = parser.add_parser('refresh', help='Refresh the MODULEPATH cache')
+        pymod.cache.refresh()
+    p = parser.add_parser('refresh', help='Refresh the module cache')
     _subcommands['refresh'] = refresh
 
 
 def add_remove_command(parser):
     def remove(args):
-        pymod.modulepath.remove_cache()
-    p = parser.add_parser('remove', help='Remove the MODULEPATH cache')
+        pymod.cache.remove()
+    p = parser.add_parser('remove', help='Remove the module cache')
     _subcommands['remove'] = remove
 
 

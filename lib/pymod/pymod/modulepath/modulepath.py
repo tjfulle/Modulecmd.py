@@ -3,8 +3,10 @@ import re
 from six import StringIO
 
 import pymod.alias
+import pymod.cache
 import pymod.names
 import pymod.module
+from pymod.modulepath.discover import find_modules
 
 from contrib.util import groupby, join
 
@@ -15,9 +17,14 @@ from llnl.util.tty.colify import colified
 
 class Path:
     def __init__(self, dirname):
-        from pymod.modulepath.discover import find_modules
         self.path = dirname
-        self.modules = find_modules(dirname)
+        cached_modules = pymod.cache.get(dirname)
+        if cached_modules is not None:
+            self.modules = cached_modules
+        else:
+            self.modules = find_modules(dirname)
+            if self.modules:
+                pymod.cache.put(dirname, self.modules)
 
 
 class Modulepath:
