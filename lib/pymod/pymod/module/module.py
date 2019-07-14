@@ -49,6 +49,7 @@ class Module(object):
         self.is_default = False
         self._opts = Namespace()
         self._unlocks = []
+        self._unlocked_by = []
         self.marked_as_default = False
         self._acquired_as = None  # How the module was initially loaded
         self._refcount = 0
@@ -113,13 +114,19 @@ class Module(object):
 
     def unlocked_by(self, loaded_modules):
         """Simple function which lets a module know about its dependents"""
-        unlocked_by = []
-        dirname = self.modulepath
-        for module in loaded_modules[::-1]:
-            if module.unlocks(dirname):
-                unlocked_by.append(module)
-                dirname = module.modulepath
-        return unlocked_by[::-1]
+        if not self._unlocked_by:
+            unlocked_by = []
+            dirname = self.modulepath
+            for module in loaded_modules[::-1]:
+                if module.unlocks(dirname):
+                    unlocked_by.append(module)
+                    dirname = module.modulepath
+            self._unlocked_by = unlocked_by[::-1]
+        return list(self._unlocked_by)
+
+    @property
+    def unlocked_by_me(self):
+        return list(self._unlocks)
 
     def read(self, mode):
         raise NotImplementedError # pragma: no cover
