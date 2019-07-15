@@ -23,8 +23,8 @@ class Cache:
         self.filename = filename
         self.data = self.load()
 
-    def get(self, modulepath):
-        modules_cache = self.data.get(modulepath)
+    def get(self, dirname):
+        modules_cache = self.data.get(dirname)
         if not modules_cache:
             return None
         modules = []
@@ -33,7 +33,7 @@ class Cache:
             if module is None:
                 # A module was removed, this directory cache should be
                 # invalidated so it can be rebuilt
-                self.data[modulepath] = None
+                self.data[dirname] = None
                 return
             modules.append(module)
         return modules
@@ -48,10 +48,10 @@ class Cache:
         with open(self.filename, 'w') as fh:
             json.dump(self.data, fh, indent=2)
 
-    def set(self, modulepath, modules):
-        self.data[modulepath] = []
+    def set(self, dirname, modules):
+        self.data[dirname] = []
         for module in modules:
-            self.data[modulepath].append(pymod.module.as_dict(module))
+            self.data[dirname].append(pymod.module.as_dict(module))
         self.dump()
 
     def remove(self):
@@ -77,9 +77,9 @@ def refresh():  # pragma: no cover
     _cache.refresh()
 
 
-def put(modulepath, modules):
-    _cache.set(modulepath, modules)
+def put(dirname, modules):
+    _cache.set(dirname, modules)
 
 
-def get(modulepath):
-    return _cache.get(modulepath)
+def get(dirname):
+    return _cache.get(dirname)
