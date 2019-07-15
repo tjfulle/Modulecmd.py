@@ -27,7 +27,6 @@ def test_module_attrs(basic_python_module):
     assert not m.do_not_register
 
 
-
 def test_module_whatis(basic_python_module):
     m = basic_python_module
     m.add_option('foo')
@@ -73,3 +72,14 @@ def test_module_basic(tmpdir):
     assert a.is_enabled
     assert not a.do_not_register
     a.format_help()
+
+
+def test_module_bad_opts(tmpdir, mock_modulepath):
+    tmpdir.join('a.py').write('add_option("x")\nassert opts.x=="foo"')
+    mp = mock_modulepath(tmpdir.strpath)
+    a = pymod.mc.load('a', opts={'x': 'foo'})
+    assert a.kwargv == {'x': 'foo'}
+    pymod.mc.unload('a')
+
+    with pytest.raises(SystemExit):
+        pymod.mc.load('a', opts={'y': True})

@@ -25,7 +25,7 @@ def modules_path(tmpdir, namespace, modulecmds):
     one.join('b.py').write(m.setenv('b'))
     two = tmpdir.mkdir('2')
     two.join('c.py').write(m.setenv('c'))
-    two.join('d.py').write(m.setenv('d'))
+    two.join('d.py').write(m.setenv('d')+'\nadd_option("x")')
 
     ns = namespace()
     ns.path = [one.strpath, two.strpath]

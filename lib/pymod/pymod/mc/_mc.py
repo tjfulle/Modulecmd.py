@@ -64,7 +64,7 @@ def archive_module(module):
     ar = dict(fullname=module.fullname,
               filename=module.filename,
               family=module.family,
-              opts=module.opts.as_dict(),
+              opts=module.opts,
               acquired_as=module.acquired_as,
               refcount=module.refcount)
     return ar

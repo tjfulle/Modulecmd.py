@@ -9,6 +9,7 @@ import pymod.environ
 import pymod.callback
 import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir
+from llnl.util.lang import Singleton
 
 from six import exec_, StringIO
 from pymod.error import FamilyLoadedError
@@ -69,7 +70,7 @@ def module_exec_sandbox(module, mode):
         'IS_DARWIN': 'darwin' in sys.platform,
         #
         'add_option': module.add_option,
-        'opts': module.opts
+        'opts': Singleton(module.parse_opts)
     }
 
     for fun in pymod.callback.all_callbacks():

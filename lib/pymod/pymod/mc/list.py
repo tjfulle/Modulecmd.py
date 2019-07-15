@@ -1,11 +1,13 @@
 from six import StringIO
 import pymod.mc
+import pymod.module
 from contrib.util.tty import grep_pat_in_string
 from llnl.util.tty import terminal_size
 from llnl.util.tty.colify import colified
 
 
 def list(terse=False, show_command=False, regex=None):
+    Namespace = pymod.module.Namespace
     loaded_modules = pymod.mc.get_loaded_modules()
     if not loaded_modules:
         return 'No loaded modules\n'
@@ -15,7 +17,7 @@ def list(terse=False, show_command=False, regex=None):
     for loaded in loaded_modules:
         fullname = loaded.fullname
         if loaded.opts:
-            fullname += ' ' + loaded.opts.joined(' ')
+            fullname += ' ' + Namespace(**(loaded.opts)).joined(' ')
         loaded_module_names.append(fullname)
 
     if terse:

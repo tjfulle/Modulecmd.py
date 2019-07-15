@@ -9,12 +9,12 @@ def test_mc_opts_preserve(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load('a', opts={'x': 'spam'})
     assert a.x == 'spam'
-    assert a.opts.as_dict() == {'x': 'spam'}
+    assert a.parse_opts().as_dict() == {'x': 'spam'}
 
     modules = pymod.mc.get_loaded_modules()
     assert len(modules) == 1
     assert modules[0].filename == a.filename
-    assert modules[0].opts.as_dict() == {'x': 'spam'}
+    assert modules[0].parse_opts().as_dict() == {'x': 'spam'}
     pymod.mc.unload('a')
     a = pymod.mc.load('a')
     assert a.x is None

@@ -46,12 +46,12 @@ class Module(object):
         self.whatisstr = ''
         self.helpstr = None
         self.is_default = False
-        self._opts = Namespace()
         self._unlocks = []
         self._unlocked_by = []
         self.marked_as_default = False
         self._acquired_as = None  # How the module was initially loaded
         self._refcount = 0
+        self.kwargv = {}
         self.registered_options = {}
 
     def __str__(self):
@@ -80,6 +80,14 @@ class Module(object):
     @property
     def acquired_as(self):
         return self._acquired_as
+
+    @property
+    def opts(self):
+        return self.kwargv
+
+    @opts.setter
+    def opts(self, opts):
+        self.kwargv = {} if not opts else dict(opts)
 
     @acquired_as.setter
     def acquired_as(self, arg):
@@ -134,7 +142,7 @@ class Module(object):
         pass
 
     def reset_state(self):
-        self._opts = Namespace()
+        self.kwargv = {}
 
     @property
     def fullname(self):
@@ -144,23 +152,6 @@ class Module(object):
         elif not self.variant:
             return os.path.sep.join((self.name, self.version.string))
         return os.path.sep.join((self.name, self.version.string, self.variant.string))
-
-    @property
-    def opts(self):
-        return self._opts
-
-    @opts.setter
-    def opts(self, opts):
-        if not opts:
-            self._opts = Namespace()
-        else:
-            for (key, val) in opts.items():
-                self._opts.set(key, val)
-
-    def add_option(self, name, **kwargs):
-        self.registered_options[name] = dict(kwargs)
-        if name not in self._opts:
-            self._opts.set(name, kwargs.get('default', None))
 
     def format_info(self):
         if self.is_default and self.is_loaded:
@@ -219,6 +210,27 @@ class Module(object):
     def set_help_string(self, helpstr):
         self.helpstr = helpstr
 
+    def add_option(self, name, default=None, help=None):
+        # Save for later parsing
+        self.registered_options[name] = dict(default=default, help=help)
+
+    def parse_opts(self):
+        opts = Namespace()
+        opts.set_defaults(**self.registered_options)
+
+        # Set passed arguments
+        unrecognized = []
+        for (key, value) in self.kwargv.items():
+            if key not in self.registered_options:
+                unrecognized.append(key)
+            else:
+                opts.set(key, value)
+        if unrecognized:
+            tty.die('{0}: unrecognized options: {1}'
+                    .format(self.fullname, ', '.join(unrecognized)))
+
+        return opts
+
     def option_help_string(self):
         if not self.registered_options:
             return None
@@ -231,7 +243,7 @@ class Module(object):
         for (key, kwds) in self.registered_options.items():
             pad = ' ' * max(column_start - len(key) - 2, 2)
             line = '  {0}{1}'.format(key, pad)
-            this_help_str = kwds.get('help')
+            this_help_str = kwds['help']
             if this_help_str is not None:
                 this_help_str = fill(this_help_str, width=text_width,
                                      subsequent_indent=subsequent_indent)
@@ -278,17 +290,14 @@ class Namespace(object):
     def __init__(self, **kwds):
         for (key, val) in kwds.items():
             self.set(key, val)
-    def __bool__(self):
-        return any([v is not None for k,v in self.__dict__.items()])
     def __str__(self):  # pragma: no cover
         return 'Namespace({0})'.format(self.joined(', '))
-    def __contains__(self, key):
-        return hasattr(self, key)
     def joined(self, sep):
         return sep.join('{0}={1!r}'.format(*_) for _ in self.__dict__.items())
-    def items(self):
-        return self.__dict__.items()
     def set(self, key, value):
         setattr(self, key, value)
     def as_dict(self):
         return dict(self.__dict__)
+    def set_defaults(self, **kwargs):
+        for (key, value) in kwargs.items():
+            self.set(key, value['default'])
