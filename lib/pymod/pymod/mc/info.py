@@ -25,13 +25,13 @@ def info(names):
             s += '  @C{Modulepath:}   %s' % module.modulepath
 
             unlocked_by = module.unlocked_by(loaded_modules)
-            if unlocked_by:
+            if unlocked_by:  # pragma: no cover
                 s += '  @C{Unlocked by:}  %s\n'
                 for m in unlocked_by:
                     s += '                    %s\n' % m.fullname
 
             unlocks = module.unlocked_by_me
-            if unlocks:
+            if unlocks:  # pragma: no cover
                 s += '  @C{Unlocks:}      %s\n'
                 for dirname in unlocks:
                     s += '                    %s\n' % dirname
