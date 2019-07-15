@@ -22,6 +22,11 @@ class Cache:
                     basename)
         self.filename = filename
         self.data = self.load()
+        self._modified = False
+
+    @property
+    def modified(self):
+        return self._modified
 
     def get(self, dirname):
         modules_cache = self.data.get(dirname)
@@ -52,21 +57,30 @@ class Cache:
         self.data[dirname] = []
         for module in modules:
             self.data[dirname].append(pymod.module.as_dict(module))
-        self.dump()
+        self._modified = True
+        #self.dump()
 
     def remove(self):
         if os.path.isfile(self.filename):
             os.remove(self.filename)
         self.data = dict()
+        self._modified = True
 
     def refresh(self):
         dirs = list(self.data.keys())
         self.data = dict()
         for dirname in dirs:
             find_modules(dirname)
+        self._modified = True
 
 
 _cache = Singleton(Cache)
+
+
+def modified():  # pragma: no cover
+    if isinstance(_cache, Singleton):
+        return False
+    return _cache.modified
 
 
 def remove():

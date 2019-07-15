@@ -8,6 +8,7 @@ from __future__ import print_function
 import re
 import os
 import sys
+import atexit
 import inspect
 import pstats
 import argparse
@@ -470,6 +471,11 @@ def _invoke_command(command, parser, args, unknown_args):
     return 0 if return_val is None else return_val
 
 
+def _run_atexit(cmd_name):
+    if pymod.cache.modified():
+        pymod.cache.dump()
+
+
 def main(argv=None):
     """This is the entry point for the pymod command.
 
@@ -542,6 +548,7 @@ def main(argv=None):
         set_working_dir()
 
         # now we can actually execute the command.
+        atexit.register(_run_atexit, cmd_name)
         if args.pdb:
             import pdb
             pdb.runctx('_invoke_command(command, parser, args, unknown)',
