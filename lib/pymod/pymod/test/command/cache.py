@@ -4,5 +4,5 @@ def test_command_cache(tmpdir, mock_modulepath):
     tmpdir.join('a.py').write('')
     mock_modulepath(tmpdir.strpath)
     cache = PymodCommand('cache')
-    cache('refresh')
+    cache('build')
     cache('remove')

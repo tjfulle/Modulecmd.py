@@ -18,13 +18,13 @@ from llnl.util.tty.colify import colified
 class Path:
     def __init__(self, dirname):
         self.path = dirname
-        cached_modules = pymod.cache.get(dirname)
+        cached_modules = pymod.cache.get(pymod.names.modulepath, dirname)
         if cached_modules is not None:
             self.modules = cached_modules
         else:
             self.modules = find_modules(dirname)
             if self.modules:
-                pymod.cache.put(dirname, self.modules)
+                pymod.cache.set(pymod.names.modulepath, dirname, self.modules)
 
 
 class Modulepath:

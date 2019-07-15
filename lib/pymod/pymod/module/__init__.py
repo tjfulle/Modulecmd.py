@@ -33,16 +33,16 @@ def module(dirname, *parts):
 
 
 def as_dict(module):
-    return {'parts': module.parts,
-            'type': type(module).__name__,
+    return {'type': type(module).__name__,
             'file': module.filename,
             'modulepath': module.modulepath, }
 
 
 def from_dict(dikt):
-    parts = dikt['parts']
     filename = dikt['file']
     modulepath = dikt['modulepath']
+    assert filename.startswith(modulepath)
+    parts = filename[(len(modulepath)+1):].split(os.path.sep)
     module_type = {'PyModule': PyModule, 'TclModule': TclModule}[dikt['type']]
     try:
         module = module_type(modulepath, *parts)

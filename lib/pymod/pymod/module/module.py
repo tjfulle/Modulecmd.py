@@ -20,7 +20,6 @@ __all__ = ['Namespace', 'Module', 'PyModule', 'TclModule']
 class Module(object):
     ext = None
     def __init__(self, modulepath, *parts):
-        self.parts = list(parts)
         self.filename = os.path.join(modulepath, *parts)
 
         if not os.path.isfile(self.filename):

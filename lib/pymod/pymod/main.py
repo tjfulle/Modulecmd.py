@@ -473,7 +473,7 @@ def _invoke_command(command, parser, args, unknown_args):
 
 def _run_atexit(cmd_name):
     if pymod.cache.modified():
-        pymod.cache.dump()
+        pymod.cache.write()
 
 
 def main(argv=None):

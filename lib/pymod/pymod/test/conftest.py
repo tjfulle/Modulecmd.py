@@ -3,12 +3,14 @@ import py
 import pytest
 import tempfile
 
+import pymod.cache
 import pymod.names
 import pymod.paths
 import pymod.config
 import pymod.environ
 import pymod.modulepath
 
+from llnl.util.lang import Singleton
 
 @pytest.fixture(autouse=True)
 def no_dump(monkeypatch):
@@ -48,6 +50,12 @@ def os_environ():
         os.environ.pop(key, None)
     yield os.environ
     os.environ = real_env
+
+
+@pytest.fixture(scope='function', autouse=True)
+def pymod_cache():
+    """Mocks up a fake pymod.cache for use by tests."""
+    pymod.cache.cache = Singleton(pymod.cache._cache)
 
 
 @pytest.fixture(scope='function', autouse=True)
