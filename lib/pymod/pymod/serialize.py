@@ -28,27 +28,6 @@ def deserialize_chunked(serialized_chunks):
     return deserialize(''.join(serialized_chunks))
 
 
-def serialize_to_dict(item, root_key, chunk_size=200):
-    serialized = {}
-    for (i, chunk) in enumerate(serialize_chunked(item, chunk_size)):
-        key = '{0}_{1}'.format(root_key, i)
-        serialized[key] = chunk
-    return serialized
-
-
-def deserialize_from_dict(dict, root_key):
-    i = 0
-    chunks = []
-    while True:
-        key = '{0}_{1}'.format(root_key, i)
-        chunk = dict.get(key)
-        if chunk is None:
-            break
-        chunks.append(chunk)
-        i += 1
-    return deserialize_chunked(chunks)
-
-
 def _encode(item):
     return base64.urlsafe_b64encode(str(item).encode()).decode()
 

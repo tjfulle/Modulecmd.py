@@ -23,8 +23,8 @@ def basic_usage():
     for basic_dir in basic_dirs[:2]:
         pymod.modulepath.append_path(basic_dir)
 
-    if not pymod.environ.get_dict(pymod.names.tutorial_save_env):
-        pymod.environ.set_dict(pymod.names.tutorial_save_env, env)
+    if not pymod.environ.get_deserialized(pymod.names.tutorial_save_env):
+        pymod.environ.set_serialized(pymod.names.tutorial_save_env, env)
 
     pymod.environ.set(pymod.names.tutorial_root_path, root)
 

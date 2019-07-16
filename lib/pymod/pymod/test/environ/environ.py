@@ -115,14 +115,9 @@ def test_environ_set_env():
     assert pymod.environ.get('A') == '1'
 
 
-def test_environ_set_dict():
-    pymod.environ.set_dict('A', {0: 1})
-    assert pymod.environ.get_dict('A') == {0: 1}
-
-
-def test_environ_set_list():
-    pymod.environ.set_list('A', [0, 1])
-    assert pymod.environ.get_list('A') == [0, 1]
+def test_environ_set_serialized():
+    pymod.environ.set_serialized('A', {0: 1})
+    assert pymod.environ.get_deserialized('A') == {0: 1}
 
 
 def test_environ_set_get_path():

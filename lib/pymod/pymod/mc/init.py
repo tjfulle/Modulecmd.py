@@ -8,5 +8,5 @@ def init(dirnames):
         pymod.mc.use(dirname, append=True)
     if pymod.collection.contains(pymod.names.default_user_collection): # pragma: no cover
         pymod.mc.collection.restore(pymod.names.default_user_collection)
-    pymod.environ.set_dict(pymod.names.initial_env, initial_env)
+    pymod.environ.set_serialized(pymod.names.initial_env, initial_env)
     return

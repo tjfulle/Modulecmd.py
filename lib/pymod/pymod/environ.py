@@ -1,5 +1,6 @@
 import os
 from argparse import Namespace
+from textwrap import wrap
 
 import pymod.names
 import pymod.shell
@@ -8,7 +9,7 @@ import pymod.modulepath
 from contrib.util import boolean
 from contrib.util import join, split, pop
 from pymod.serialize import serialize, deserialize
-from pymod.serialize import serialize_to_dict, deserialize_from_dict
+from pymod.serialize import serialize_chunked, deserialize_chunked
 
 import llnl.util.tty as tty
 from llnl.util.lang import Singleton
@@ -261,31 +262,42 @@ def set_path(key, path, sep=os.pathsep):
     value = join(path, sep=sep)
     return environ.set(key, value)
 
-
-def serialize_and_set(key, arg, _type):
-    value = serialize(arg or _type())
-    return environ.set(key, value)
+def set_serialized(label, value, chunk_size=200):
+    return set_serialized_impl(environ, label, value, chunk_size)
 
 
-def get_and_deserialize(key, _type):
-    serialized = environ.get(key)
-    return _type() if serialized is None else deserialize(serialized)
+def set_serialized_impl(container, label, value, chunk_size):
+
+    # Reset previously set values
+    for (key, item) in os.environ.items():
+        if key.startswith(label):
+            container.set(key, None)
+
+    # Serialize the
+    if value is None:
+        return
+
+    serialized = serialize_chunked(value, chunk_size=chunk_size)
+    for (i, chunk) in enumerate(serialized):
+        key = '{0}_{1}'.format(label, i)
+        container.set(key, chunk)
 
 
-def get_dict(key):
-    return get_and_deserialize(key, dict)
+def get_deserialized(label):
+    return get_deserialized_impl(environ, label)
 
 
-def set_dict(key, arg):
-    serialize_and_set(key, arg, dict)
-
-
-def get_list(key):
-    return get_and_deserialize(key, list)
-
-
-def set_list(key, arg):
-    serialize_and_set(key, arg, list)
+def get_deserialized_impl(container, label):
+    i = 0
+    chunks = []
+    while True:
+        key = '{0}_{1}'.format(label, i)
+        chunk = container.get(key)
+        if chunk is None:
+            break
+        chunks.append(chunk)
+        i += 1
+    return deserialize_chunked(chunks)
 
 
 def filtered(include_os=False):
@@ -296,11 +308,9 @@ def copy(include_os=False):
     return environ.copy(include_os=include_os)
 
 
-def get_lm_cellar(env=None):
-    return deserialize_from_dict(environ, pymod.names.loaded_module_cellar)
+def get_lm_cellar():
+    return get_deserialized(pymod.names.loaded_module_cellar)
 
 
 def set_lm_cellar(cellar):
-    serialized = serialize_to_dict(cellar, pymod.names.loaded_module_cellar)
-    for (key, chunk) in serialized.items():
-        environ.set(key, chunk)
+    return set_serialized(pymod.names.loaded_module_cellar, cellar)
