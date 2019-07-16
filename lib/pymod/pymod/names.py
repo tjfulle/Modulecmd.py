@@ -7,6 +7,7 @@ loaded_module_files = '_LMFILES_'
 initial_env = '_LMX0_'
 loaded_module_cellar = '_LMX1_'
 loaded_module_meta = lambda key: '_LMX2_{0}'.format(key)
+serialized_key = lambda key, i: '{0}_{1}'.format(key, i)
 
 tutorial_save_env = '_LMT0_'
 tutorial_root_path = 'PYMOD_TUTORIAL_ROOT_PATH'

@@ -276,12 +276,13 @@ def set_serialized_impl(container, label, value):
 
     # Serialize the
     if value is None:
-        container.set('{0}_0'.format(label), None)
+        key = pymod.names.serialized_key(label, 0)
+        container.set(key, None)
         return
 
     serialized = serialize_chunked(value)
     for (i, chunk) in enumerate(serialized):
-        key = '{0}_{1}'.format(label, i)
+        key = pymod.names.serialized_key(label, i)
         container.set(key, chunk)
 
 
@@ -293,7 +294,7 @@ def get_deserialized_impl(container, label):
     i = 0
     chunks = []
     while True:
-        key = '{0}_{1}'.format(label, i)
+        key = pymod.names.serialized_key(label, i)
         if key not in container:
             break
         chunk = container[key]
