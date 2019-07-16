@@ -1,6 +1,7 @@
 import ast
 import base64
 from textwrap import wrap
+import pymod.config
 
 
 def serialize(item):
@@ -20,7 +21,8 @@ def deserialize(serialized):
         return ast.literal_eval(obj)
 
 
-def serialize_chunked(item, chunk_size=200):
+def serialize_chunked(item):
+    chunk_size = pymod.config.get('serialize_chunk_size')
     return wrap(serialize(item), chunk_size)
 
 

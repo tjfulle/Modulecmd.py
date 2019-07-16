@@ -262,11 +262,12 @@ def set_path(key, path, sep=os.pathsep):
     value = join(path, sep=sep)
     return environ.set(key, value)
 
-def set_serialized(label, value, chunk_size=200):
-    return set_serialized_impl(environ, label, value, chunk_size)
+
+def set_serialized(label, value):
+    return set_serialized_impl(environ, label, value)
 
 
-def set_serialized_impl(container, label, value, chunk_size):
+def set_serialized_impl(container, label, value):
 
     # Reset previously set values
     for (key, item) in os.environ.items():
@@ -278,7 +279,7 @@ def set_serialized_impl(container, label, value, chunk_size):
         container.set('{0}_0'.format(label), None)
         return
 
-    serialized = serialize_chunked(value, chunk_size=chunk_size)
+    serialized = serialize_chunked(value)
     for (i, chunk) in enumerate(serialized):
         key = '{0}_{1}'.format(label, i)
         container.set(key, chunk)

@@ -28,3 +28,6 @@ config:
 
   # Wether to colorize output, or not.  One of auto, always, never
   color: auto
+
+  # Size of chunks used for environment variables that are serialized
+  serialize_chunk_size: 200
