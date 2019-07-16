@@ -2,6 +2,7 @@ import os
 from six import StringIO
 from textwrap import fill
 
+import pymod.mc
 import pymod.config
 from pymod.module.meta import MetaData
 from pymod.module.tcl2py import tcl2py
@@ -46,8 +47,7 @@ class Module(object):
         self.whatisstr = ''
         self.helpstr = None
         self.is_default = False
-        self._unlocks = []
-        self._unlocked_by = []
+        self._unlocked_by_me = []
         self.marked_as_default = False
         self._acquired_as = None  # How the module was initially loaded
         self._refcount = 0
@@ -112,28 +112,35 @@ class Module(object):
     def endswith(self, string):
         return self.filename.endswith(string)
 
-    def unlocks_dir(self, dirname):
-        if dirname not in self._unlocks:
-            self._unlocks.append(dirname)
+    def unlocks_path(self, path):
+        """Called by the callback `use` to register which paths are unlocked
+        by me.
+        """
+        if path not in self._unlocked_by_me:
+            self._unlocked_by_me.append(path)
 
-    def unlocks(self, dirname):
-        return dirname in self._unlocks
+    def unlocks(self, path=None):
+        """Return whether `path` is unlocked by this module. If `path is
+        None`, then return the list of paths that are unlocked by this
+        module.
 
-    def unlocked_by(self, loaded_modules):
-        """Simple function which lets a module know about its dependents"""
-        if not self._unlocked_by:
-            unlocked_by = []
-            dirname = self.modulepath
-            for module in loaded_modules[::-1]:
-                if module.unlocks(dirname):
-                    unlocked_by.append(module)
-                    dirname = module.modulepath
-            self._unlocked_by = unlocked_by[::-1]
-        return list(self._unlocked_by)
+        The list _unlocked_by_me is populated by the callback `use` through
+        the `unlocks_path` function.
+        """
+        if path is None:
+            return list(self._unlocked_by_me)
+        return path in self._unlocked_by_me
 
-    @property
-    def unlocked_by_me(self):
-        return list(self._unlocks)
+    def unlocked_by(self):
+        """Returns the module[s] that unlock this module, if any"""
+        unlocks_me = []
+        loaded_modules = pymod.mc.get_loaded_modules()
+        dirname = self.modulepath
+        for module in loaded_modules[::-1]:
+            if module.unlocks(path=dirname):
+                unlocks_me.append(module)
+                dirname = module.modulepath
+        return list(unlocks_me[::-1])
 
     def read(self, mode):
         raise NotImplementedError # pragma: no cover

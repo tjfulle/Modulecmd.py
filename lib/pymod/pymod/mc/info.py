@@ -5,7 +5,6 @@ from llnl.util.tty.color import colorize
 from pymod.error import ModuleNotFoundError
 
 def info(names):
-    loaded_modules = pymod.mc.get_loaded_modules()
     for name in names:
         modules = pymod.modulepath.candidates(name)
         if not modules:
@@ -24,13 +23,13 @@ def info(names):
             s += '  @C{Loaded:}       %s\n' % module.is_loaded
             s += '  @C{Modulepath:}   %s' % module.modulepath
 
-            unlocked_by = module.unlocked_by(loaded_modules)
+            unlocked_by = module.unlocked_by()
             if unlocked_by:  # pragma: no cover
                 s += '  @C{Unlocked by:}  %s\n'
                 for m in unlocked_by:
                     s += '                    %s\n' % m.fullname
 
-            unlocks = module.unlocked_by_me
+            unlocks = module.unlocks()
             if unlocks:  # pragma: no cover
                 s += '  @C{Unlocks:}      %s\n'
                 for dirname in unlocks:

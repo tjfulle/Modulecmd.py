@@ -31,4 +31,4 @@ def use(module, mode, dirname, append=False):
         pymod.mc.unuse(dirname)
     else:
         pymod.mc.use(dirname, append=append)
-        module.unlocks_dir(dirname)
+        module.unlocks_path(dirname)
