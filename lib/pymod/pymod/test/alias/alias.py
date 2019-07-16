@@ -28,6 +28,12 @@ def test_alias_save(tmpdir, mock_modulepath):
     s = pymod.alias.avail(terse=True)
     assert 'a-alias' in s
 
+    aliases = pymod.alias.get(tmpdir.strpath)
+    assert len(aliases) == 1
+    the_alias = aliases[0]
+    assert the_alias[0] == 'a-alias'
+    assert the_alias[1] == 'a'
+
     # If an alias is loaded, and its modulepath is not being used, its
     # modulepath will be appended to pymod.modulepath
     pymod.mc.unuse(tmpdir.strpath)

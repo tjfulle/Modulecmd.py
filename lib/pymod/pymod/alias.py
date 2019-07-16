@@ -18,7 +18,20 @@ class Aliases(object):
         self.filename = filename
 
     def get(self, name):
+        if os.path.isdir(name):
+            return self.getby_modulepath(name)
+        else:
+            return self.getby_name(name)
+
+    def getby_name(self, name):
         return self.data.get(name)
+
+    def getby_modulepath(self, dirname):
+        value = []
+        for (name, info) in self.data.items():
+            if info['modulepath'] == dirname:
+                value.append((name, info['target']))
+        return value
 
     def read(self, filename):
         if os.path.isfile(filename):  # pragma: no cover
@@ -66,7 +79,7 @@ class Aliases(object):
             sio.write('{0}\n{1}\n'
                       .format(' Aliases '.center(width, '-'), s))
         else:
-            sio.write('\n'.join(c for c in names))
+            sio.write('{0}\n'.format('\n'.join(c for c in names)))
         string = sio.getvalue()
         return string
 

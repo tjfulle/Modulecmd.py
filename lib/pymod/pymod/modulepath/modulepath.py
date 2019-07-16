@@ -1,5 +1,6 @@
 import os
 import re
+import bisect
 from six import StringIO
 
 import pymod.alias
@@ -246,45 +247,53 @@ class Modulepath:
         return (module.name, module.version)
 
     def avail(self, terse=False, regex=None):
-
-        sio = StringIO()
-        if not terse:
-            _, width = tty.terminal_size()
-            head = lambda x: (' ' + x + ' ').center(width, '-')
-            for path in self:
-                directory = path.path
-                modules = path.modules
-                modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
-                modules = self.filter_modules_by_regex(modules, regex)
-                if not os.path.isdir(directory):  # pragma: no cover
-                    s = colorize('@r{(Directory not readable)}'.center(width))
-                elif not modules:  # pragma: no cover
-                    if regex:
-                        continue
-                    s = colorize('@r{(None)}'.center(width))
-                else:
-                    s = colified([m.format_info() for m in modules], width=width)
-                    s = self.colorize(s)
-                directory = directory.replace(os.path.expanduser('~/'), '~/')
-                sio.write(head(directory) + '\n')
-                sio.write(s + '\n')
+        if terse:
+            return self.avail_terse(regex=regex)
         else:
-            for path in self:
-                directory = path.path
-                modules = path.modules
-                if not os.path.isdir(directory):  # pragma: no cover
-                    continue
-                modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
-                modules = self.filter_modules_by_regex(modules, regex)
-                if not modules:  # pragma: no cover
-                    continue
-                sio.write(directory + ':\n')
-                sio.write('\n'.join(m.fullname for m in modules))
-            sio.write('\n')
+            return self.avail_full(regex=regex)
 
-        description = sio.getvalue()
+    def avail_full(self, regex=None):
+        sio = StringIO()
+        _, width = tty.terminal_size()
+        head = lambda x: (' ' + x + ' ').center(width, '-')
+        for path in self:
+            directory = path.path
+            modules = sorted([m for m in path.modules if m.is_enabled], key=self.sort_key)
+            modules = self.filter_modules_by_regex(modules, regex)
+            if not os.path.isdir(directory):  # pragma: no cover
+                s = colorize('@r{(Directory not readable)}'.center(width))
+            elif not modules:  # pragma: no cover
+                if regex:
+                    continue
+                s = colorize('@r{(None)}'.center(width))
+            else:
+                modules = [self.colorize(m.format_info()) for m in modules]
+                aliases = pymod.alias.get(directory)
+                if aliases:  # pragma: no cover
+                    for (alias, target) in aliases:
+                        i = bisect.bisect_left(modules, alias)
+                        modules.insert(i, colorize('@M{%s}->%s' % (alias, target)))
+                s = colified(modules, width=width)
+            directory = directory.replace(os.path.expanduser('~/'), '~/')
+            sio.write(head(directory) + '\n')
+            sio.write(s + '\n')
+        return sio.getvalue()
 
-        return description
+    def avail_terse(self, regex=None):
+        sio = StringIO()
+        for path in self:
+            directory = path.path
+            modules = path.modules
+            if not os.path.isdir(directory):  # pragma: no cover
+                continue
+            modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
+            modules = self.filter_modules_by_regex(modules, regex)
+            if not modules:  # pragma: no cover
+                continue
+            sio.write(directory + ':\n')
+            sio.write('\n'.join(m.fullname for m in modules))
+        sio.write('\n')
+        return sio.getvalue()
 
     def candidates(self, key):
         # Return a list of modules that might by given by key
