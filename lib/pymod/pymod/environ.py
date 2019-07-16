@@ -275,6 +275,7 @@ def set_serialized_impl(container, label, value, chunk_size):
 
     # Serialize the
     if value is None:
+        container.set('{0}_0'.format(label), None)
         return
 
     serialized = serialize_chunked(value, chunk_size=chunk_size)
@@ -292,9 +293,11 @@ def get_deserialized_impl(container, label):
     chunks = []
     while True:
         key = '{0}_{1}'.format(label, i)
-        chunk = container.get(key)
-        if chunk is None:
+        if key not in container:
             break
+        chunk = container[key]
+        if chunk is None:
+            return
         chunks.append(chunk)
         i += 1
     return deserialize_chunked(chunks)

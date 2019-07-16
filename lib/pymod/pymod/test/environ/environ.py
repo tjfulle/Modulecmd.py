@@ -115,9 +115,19 @@ def test_environ_set_env():
     assert pymod.environ.get('A') == '1'
 
 
-def test_environ_set_serialized():
+def test_environ_set_serialized_dict():
     pymod.environ.set_serialized('A', {0: 1})
     assert pymod.environ.get_deserialized('A') == {0: 1}
+
+
+def test_environ_set_serialized_list():
+    pymod.environ.set_serialized('A', [0, 1])
+    assert pymod.environ.get_deserialized('A') == [0, 1]
+
+
+def test_environ_set_serialized_None():
+    pymod.environ.set_serialized('A', None)
+    assert pymod.environ.get_deserialized('A') is None
 
 
 def test_environ_set_get_path():
