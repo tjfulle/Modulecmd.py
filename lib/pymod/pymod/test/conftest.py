@@ -55,7 +55,7 @@ def os_environ():
 @pytest.fixture(scope='function', autouse=True)
 def pymod_cache():
     """Mocks up a fake pymod.cache for use by tests."""
-    pymod.cache.cache = Singleton(pymod.cache._cache)
+    pymod.cache.cache = Singleton(pymod.cache.factory)
 
 
 @pytest.fixture(scope='function', autouse=True)
