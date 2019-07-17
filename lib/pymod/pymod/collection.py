@@ -186,18 +186,7 @@ class Collections:
 
 def factory():
     basename = pymod.names.collections_file_basename
-    for dirname in (pymod.paths.user_config_platform_path,
-                    pymod.paths.user_config_path):
-        filename = os.path.join(dirname, basename)
-        if os.path.exists(filename):  # pragma: no cover
-            break
-    else:
-        filename = os.path.join(
-            pymod.paths.user_config_platform_path,
-            basename)
-
-    # it is okay that we may not have found a config file, if it doesn't
-    # exist, Collections will create it
+    filename = pymod.paths.config_file(basename)
     return Collections(filename)
 
 
