@@ -25,13 +25,19 @@ class Cache:
     def __init__(self, filename):
         self._modified = False
         self.filename = filename
-        self.data = self.load()
-        version = tuple(self.data.get('version', []))
-        if self.data and version != cache_version_info:  # pragma: no cover
-            # Old version, forget it
-            self.data = {}
-            self._modified = True
-        self.data['version'] = cache_version_info
+        self._data = None
+
+    @property
+    def data(self):
+        if self._data is None:
+            self._data = self.load()
+            version = tuple(self._data.get('version', []))
+            if self._data and version != cache_version_info:  # pragma: no cover
+                # Old version, forget it
+                self._data = {}
+                self._modified = True
+            self._data['version'] = cache_version_info
+        return self._data
 
     @property
     def modified(self):
@@ -58,7 +64,7 @@ class Cache:
     def remove(self):
         if os.path.isfile(self.filename):
             os.remove(self.filename)
-        self.data = dict()
+        self._data = dict()
 
     def get(self, section, key, default=None):
         return self.data.setdefault(section, {}).get(key, default)
@@ -76,8 +82,8 @@ class Cache:
 
     def build(self):
         """Build the cache"""
-        self.data = {}
-        self.data['version'] = cache_version_info
+        self._data = {}
+        self._data['version'] = cache_version_info
 
         # Build the modulepath cache
         for path in pymod.modulepath.walk():
