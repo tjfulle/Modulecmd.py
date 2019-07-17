@@ -184,7 +184,7 @@ class Collections:
                              '{0} to {1}'.format(version, self.version))
 
 
-def _collections():
+def factory():
     basename = pymod.names.collections_file_basename
     for dirname in (pymod.paths.user_config_platform_path,
                     pymod.paths.user_config_path):
@@ -201,7 +201,7 @@ def _collections():
     return Collections(filename)
 
 
-collections = Singleton(_collections)
+collections = Singleton(factory)
 
 
 def save(name, loaded_modules):
