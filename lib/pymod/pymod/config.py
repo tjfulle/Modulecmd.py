@@ -69,7 +69,7 @@ class Configuration(object):
             for scope_name in self.scope_names[::-1]:
                 self.scopes.setdefault(scope_name, {}).update({key: value})
 
-def _config():
+def factory():
     """Singleton Configuration instance.
 
     This constructs one instance associated with this module and returns
@@ -79,7 +79,7 @@ def _config():
     Returns
     -------
     cfg : Configuration
-        object for accessing spack configuration
+        object for accessing Modulecmd.py configuration
 
     """
     cfg = Configuration()
@@ -127,7 +127,7 @@ def _config():
     return cfg
 
 
-config = Singleton(_config)
+config = Singleton(factory)
 
 
 def get(key, default=None, scope=None):
