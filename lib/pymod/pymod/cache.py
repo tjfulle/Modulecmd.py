@@ -1,5 +1,6 @@
 import os
 import json
+import atexit
 
 import pymod.names
 import pymod.modulepath
@@ -119,3 +120,9 @@ def build():
 
 def remove():
     cache.remove()
+
+
+def dump_cache_if_modified():  # pragma: no cover
+    if cache.modified:
+        cache.write()
+atexit.register(dump_cache_if_modified)
