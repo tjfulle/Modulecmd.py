@@ -8,12 +8,12 @@ from contrib.util import split
 from llnl.util.lang import Singleton
 
 
-def _modulepath():  # pragma: no cover
+def factory():  # pragma: no cover
     path = split(os.getenv(pymod.names.modulepath), os.pathsep)
     return Modulepath(path)
 
 
-_path = Singleton(_modulepath)
+_path = Singleton(factory)
 
 
 def path():
