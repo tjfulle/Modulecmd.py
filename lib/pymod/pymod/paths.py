@@ -53,5 +53,12 @@ if not os.path.isdir(user_config_platform_path):  # pragma: no cover
     os.makedirs(user_config_platform_path)
 
 
-del os
+def config_file(basename):
+    for dirname in (user_config_platform_path, user_config_path):
+        filename = os.path.join(dirname, basename)
+        if os.path.exists(filename):  # pragma: no cover
+            return filename
+    return os.path.join(user_config_platform_path, basename)
+
+
 del sys
