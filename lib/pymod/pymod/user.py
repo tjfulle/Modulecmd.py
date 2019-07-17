@@ -25,7 +25,7 @@ class UserEnv:
         return getattr(self._module, attr)
 
 
-def _user_env():
+def factory():
     basename = pymod.names.user_env_file_basename
     for dirname in (pymod.paths.user_config_platform_path,
                     pymod.paths.user_config_path):
@@ -52,4 +52,4 @@ def reset():  # pragma: no cover
     env = _user_env()
 
 
-env = Singleton(_user_env)
+env = Singleton(factory)
