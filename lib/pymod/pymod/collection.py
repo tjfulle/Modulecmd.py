@@ -186,7 +186,7 @@ class Collections:
 
 def factory():
     basename = pymod.names.collections_file_basename
-    filename = pymod.paths.config_file(basename)
+    filename = pymod.paths.join_user(basename)
     return Collections(filename)
 
 

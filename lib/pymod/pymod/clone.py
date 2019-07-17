@@ -56,7 +56,7 @@ class Clones(object):
 
 def factory():
     basename = pymod.names.clones_file_basename
-    filename = pymod.paths.config_file(basename)
+    filename = pymod.paths.join_user(basename)
     return Clones(filename)
 
 clones = Singleton(factory)

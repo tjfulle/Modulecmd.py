@@ -88,7 +88,7 @@ class Cache:
 
 def factory():
     basename = pymod.names.cache_file_basename
-    filename = pymod.paths.config_file(basename)
+    filename = pymod.paths.join_user(basename)
     return Cache(filename)
 
 

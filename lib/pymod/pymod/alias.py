@@ -86,7 +86,7 @@ class Aliases(object):
 
 def factory():
     basename = pymod.names.aliases_file_basename
-    filename = pymod.paths.config_file(basename)
+    filename = pymod.paths.join_user(basename)
     return Aliases(filename)
 
 aliases = Singleton(factory)
