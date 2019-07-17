@@ -86,21 +86,13 @@ class Cache:
         self.write()
 
 
-def _cache():
+def factory():
     basename = pymod.names.cache_file_basename
-    for dirname in (pymod.paths.user_config_platform_path,
-                    pymod.paths.user_config_path):
-        filename = os.path.join(dirname, basename)
-        if os.path.exists(filename):  # pragma: no cover
-            break
-    else:
-        filename = os.path.join(
-            pymod.paths.user_config_platform_path,
-            basename)
+    filename = pymod.paths.config_file(basename)
     return Cache(filename)
 
 
-cache = Singleton(_cache)
+cache = Singleton(factory)
 
 
 def modified():
