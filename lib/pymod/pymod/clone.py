@@ -54,7 +54,7 @@ class Clones(object):
         return sio.getvalue()
 
 
-def _clones():
+def factory():
     basename = pymod.names.clones_file_basename
     for dirname in (pymod.paths.user_config_platform_path,
                     pymod.paths.user_config_path):
@@ -70,7 +70,7 @@ def _clones():
     # exist, Collections will create it
     return Clones(filename)
 
-clones = Singleton(_clones)
+clones = Singleton(factory)
 
 
 def save(name):
