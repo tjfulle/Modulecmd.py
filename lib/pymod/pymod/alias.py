@@ -84,7 +84,7 @@ class Aliases(object):
         return string
 
 
-def _aliases():
+def factory():
     basename = pymod.names.aliases_file_basename
     for dirname in (pymod.paths.user_config_platform_path,
                     pymod.paths.user_config_path):
@@ -100,7 +100,7 @@ def _aliases():
     # exist, Aliases will create it
     return Aliases(filename)
 
-aliases = Singleton(_aliases)
+aliases = Singleton(factory)
 
 
 def save(target, alias_name):
