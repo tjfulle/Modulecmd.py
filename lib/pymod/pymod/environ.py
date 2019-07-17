@@ -21,6 +21,12 @@ class Environ(dict):
         self.aliases = {}
         self.shell_functions = {}
 
+    def __getitem__(self, key):
+        """Overload Environ[] to first check me, then os.environ"""
+        if key in self:
+            return super(Environ, self).__getitem__(key)
+        return os.environ[key]
+
     def is_empty(self):
         return (not len(self) and
                 not len(self.aliases) and
@@ -32,11 +38,8 @@ class Environ(dict):
             env, self.aliases, self.shell_functions)
 
     def get(self, key, default=None):
-        if key in self:
-            return self[key]
-        elif key in os.environ:
-            return os.environ[key]
-        return default
+        """Overload Environ.get to first check me, then os.environ"""
+        return super(Environ, self).get(key, os.getenv(key, default))
 
     def get_bool(self, key):
         return boolean(self.get(key))
@@ -299,9 +302,10 @@ def get_deserialized_impl(container, label):
     chunks = []
     while True:
         key = pymod.names.serialized_key(label, i)
-        if key not in container:
+        try:
+            chunk = container[key]
+        except KeyError:
             break
-        chunk = container[key]
         if chunk is None:
             return
         chunks.append(chunk)

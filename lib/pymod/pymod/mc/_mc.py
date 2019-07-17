@@ -51,6 +51,7 @@ def module_is_loaded(key):
 def get_loaded_modules():
     global _loaded_modules
     if _loaded_modules is None:
+        tty.debug('Reading loaded modules')
         _loaded_modules = []
         lm_cellar = pymod.environ.get_lm_cellar()
         for ar in lm_cellar:

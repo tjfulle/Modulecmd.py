@@ -2,6 +2,7 @@ import os
 import sys
 
 import pymod.mc
+import pymod.config
 import pymod.environ
 import llnl.util.tty as tty
 
@@ -11,14 +12,12 @@ level = "long"
 
 
 def setup_parser(subparser):
-    subparser.add_argument(
-        '--dryrun', action='store_true', default=False,
-        help='Print commands rather than execute')
+    pass
 
 
 def switch(parser, args):  # pragma: no cover
     s = pymod.shell.switch()
-    if args.dryrun:
+    if pymod.config.get('dryrun'):
         sys.stderr.write(s)
     else:
         pymod.mc.purge(load_after_purge=False)

@@ -157,7 +157,6 @@ def get_module(cb_name):
     module = __import__(module_name,
                         fromlist=[cb_name, CATEGORY],
                         level=0)
-    tty.debug('Imported {0} from built-in callbacks'.format(cb_name))
 
     attr_setdefault(module, CATEGORY, "")
 

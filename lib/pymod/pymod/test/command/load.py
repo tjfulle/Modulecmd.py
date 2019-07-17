@@ -126,9 +126,3 @@ def test_command_load_collection(tmpdir, mock_modulepath):
     for x in 'abcd':
         m = pymod.modulepath.get(x)
         assert m.is_loaded
-
-
-def test_command_load_dryrun(modules_path, mock_modulepath):
-    load = PymodCommand('load')
-    mock_modulepath(modules_path.two)
-    load('--dryrun', 'a')
