@@ -4,9 +4,9 @@ import bisect
 from six import StringIO
 
 import pymod.alias
-import pymod.cache
 import pymod.names
 import pymod.module
+from pymod.modulepath.path import Path
 from pymod.modulepath.discover import find_modules
 
 from contrib.util import groupby, join
@@ -14,18 +14,6 @@ from contrib.util import groupby, join
 import llnl.util.tty as tty
 from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
-
-
-class Path:
-    def __init__(self, dirname):
-        self.path = dirname
-        cached_modules = pymod.cache.get(pymod.names.modulepath, dirname)
-        if cached_modules is not None:
-            self.modules = cached_modules
-        else:
-            self.modules = find_modules(dirname)
-            if self.modules:
-                pymod.cache.set(pymod.names.modulepath, dirname, self.modules)
 
 
 class Modulepath:

@@ -140,3 +140,8 @@ def test_environ_set_get_path():
     pymod.environ.set_path('A', path, sep='@')
     assert pymod.environ.get('A') == 'baz@bar'
     assert pymod.environ.get_path('A', sep='@') == ['baz', 'bar']
+
+
+def test_environ_factory():
+    environ = pymod.environ.factory()
+    assert isinstance(environ, pymod.environ.Environ)

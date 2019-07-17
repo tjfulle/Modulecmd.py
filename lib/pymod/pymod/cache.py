@@ -10,6 +10,16 @@ from llnl.util.lang import Singleton
 cache_version_info = (0, 1, 0)
 
 
+def modifies_cache(fun):
+    from functools import wraps
+    @wraps(fun)
+    def inner(self, *args, **kwargs):
+        returnvalue = fun(self, *args, **kwargs)
+        self.modified = True
+        return returnvalue
+    return inner
+
+
 class Cache:
     def __init__(self, filename):
         self._modified = False
@@ -30,10 +40,6 @@ class Cache:
     def modified(self, arg):
         self._modified = bool(arg)
 
-    def get(self, section, key):
-        if section == pymod.names.modulepath:
-            return self._get_mp(key)
-
     def load(self):
         data = dict()
         if os.path.isfile(self.filename):
@@ -47,33 +53,25 @@ class Cache:
         with open(self.filename, 'w') as fh:
             json.dump(self.data, fh, indent=2)
 
-    def set(self, section, key, item):
-        if section == pymod.names.modulepath:
-            return self._set_mp(key, item)
-
+    @modifies_cache
     def remove(self):
         if os.path.isfile(self.filename):
             os.remove(self.filename)
         self.data = dict()
-        self.modified = True
 
-    def _set_mp(self, dirname, modules):
-        mp_data = self.data.setdefault(pymod.names.modulepath, {})
-        mp_data[dirname] = [pymod.module.as_dict(m) for m in modules]
-        self.modified = True
+    def get(self, section, key, default=None):
+        return self.data.setdefault(section, {}).get(key, default)
 
-    def _get_mp(self, dirname):
-        modules_cache = self.data.get(pymod.names.modulepath, {}).get(dirname)
-        if modules_cache is None:
-            return None
-        modules = [pymod.module.from_dict(m) for m in modules_cache]
-        if any([m is None for m in modules]):
-            # A module was removed, this directory cache should be
-            # invalidated so it can be rebuilt
-            modules = None
-            self.data[dirname] = modules
-            self.modified = True
-        return modules
+    @modifies_cache
+    def pop(self, section, key, default=None):
+        section_data = self.data.setdefault(section, {})
+        items = section_data.pop(key, default)
+        return items
+
+    @modifies_cache
+    def set(self, section, key, item):
+        section_data = self.data.setdefault(section, {})
+        section_data[key] = item
 
     def build(self):
         """Build the cache"""
@@ -82,7 +80,7 @@ class Cache:
 
         # Build the modulepath cache
         for path in pymod.modulepath.walk():
-            self._set_mp(path.path, path.modules)
+            path.find_modules()
         self.write()
 
 
@@ -105,6 +103,10 @@ def set(section, key, item):
 
 def get(section, key):
     return cache.get(section, key)
+
+
+def pop(section, key):
+    return cache.pop(section, key)
 
 
 def write():
