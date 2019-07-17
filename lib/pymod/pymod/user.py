@@ -49,7 +49,7 @@ def reset():  # pragma: no cover
     global env
     if env._modulename in sys.modules:
         del sys.modules[env._modulename]
-    env = _user_env()
+    env = factory()
 
 
 env = Singleton(factory)
