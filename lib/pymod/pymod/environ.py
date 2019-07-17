@@ -194,7 +194,11 @@ class Environ(dict):
         self.set_path(current_path)
 
 
-environ = Singleton(Environ)
+def factory():
+    return Environ()
+
+
+environ = Singleton(factory)
 
 
 def set_env(env):
