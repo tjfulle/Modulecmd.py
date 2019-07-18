@@ -129,3 +129,21 @@ def test_collection_bad(tmpdir):
         error_type = ValueError
     with pytest.raises(error_type):
         collections = pymod.collection.Collections(f.strpath)
+        collections.data
+
+
+def test_collection_read(modules_path, mock_modulepath):
+    mock_modulepath(modules_path.path)
+    a = pymod.mc.load('a')
+    b = pymod.mc.load('b')
+    pymod.mc.collection.save(pymod.names.default_user_collection)
+    assert pymod.collection.contains(pymod.names.default_user_collection)
+    x = pymod.collection.get(pymod.names.default_user_collection)
+    filename = pymod.collection.collections.filename
+    collection = pymod.collection.Collections(filename)
+    default = collection.get(pymod.names.default_user_collection)
+    default2 = pymod.collection.get(pymod.names.default_user_collection)
+    assert len(default) == len(default2)
+    for i in range(len(default)):
+        assert default[i][0] == default2[i][0]
+        assert default[i][1] == default2[i][1]

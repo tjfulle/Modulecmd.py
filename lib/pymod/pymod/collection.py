@@ -21,10 +21,16 @@ class Collections:
     version = (1, 0)
     def __init__(self, filename):
         self.filename = filename
-        self.data = self.read(filename)
+        self._data = None
 
     def __contains__(self, collection_name):
         return collection_name in self.data
+
+    @property
+    def data(self):
+        if self._data is None:
+            self._data = self.read(self.filename)
+        return self._data
 
     def read(self, filename):
         if os.path.isfile(filename):

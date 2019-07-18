@@ -13,8 +13,14 @@ from llnl.util.tty.colify import colified
 
 class Clones(object):
     def __init__(self, filename):
-        self.data = self.read(filename)
         self.filename = filename
+        self._data = None
+
+    @property
+    def data(self):
+        if self._data is None:
+            self._data = self.read(self.filename)
+        return self._data
 
     def get(self, name):
         return self.data.get(name)

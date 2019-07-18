@@ -14,8 +14,14 @@ from llnl.util.tty.colify import colified
 class Aliases(object):
     """Provides mechanism for having aliases to other modules"""
     def __init__(self, filename):
-        self.data = self.read(filename)
         self.filename = filename
+        self._data = None
+
+    @property
+    def data(self):
+        if self._data is None:
+            self._data = self.read(self.filename)
+        return self._data
 
     def get(self, name):
         if os.path.isdir(name):

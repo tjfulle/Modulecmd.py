@@ -73,3 +73,4 @@ def test_clone_bad(tmpdir):
         error_type = ValueError
     with pytest.raises(error_type):
         clones = pymod.clone.Clones(f.strpath)
+        clones.data
