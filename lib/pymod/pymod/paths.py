@@ -42,8 +42,8 @@ etc_path              = os.path.join(prefix, "etc", "pymod")
 
 
 #: User configuration location
-user_config_path          = os.getenv('PYMOD_CONFIG_DIR', os.path.expanduser('~/.pymod'))
-user_config_platform_path = os.getenv('PYMOD_CONFIG_PLATFORM_DIR',
+user_config_path          = os.getenv('PYMOD_CONFIG_PATH', os.path.expanduser('~/.pymod'))
+user_config_platform_path = os.getenv('PYMOD_CONFIG_PLATFORM_PATH',
                                       os.path.join(user_config_path, sys.platform.lower()))
 
 if not os.path.isdir(user_config_path):  # pragma: no cover

@@ -13,8 +13,6 @@ tutorial_save_env = '_LMT0_'
 tutorial_root_path = 'PYMOD_TUTORIAL_ROOT_PATH'
 
 sourced_files = 'PYMOD_SOURCED_FILES'
-allow_dup_entries = 'PYMOD_ALLOW_DUPLICATE_PATH_ENTRIES'
-resolve_conflicts = 'PYMOD_RESOLVE_CONFLICTS'
 
 family_name = lambda key: 'MODULE_FAMILY_{0}'.format(key.upper())
 family_version = lambda key: 'MODULE_FAMILY_{0}_VERSION'.format(key.upper())
@@ -22,11 +20,11 @@ family_version = lambda key: 'MODULE_FAMILY_{0}_VERSION'.format(key.upper())
 default_user_collection = 'default'
 
 config_file_basename = 'config.yaml'
-config_file_envar = 'PYMOD_CONFIG_FILE'
 
-ld_library_path = ('DYLD_LIBRARY_PATH' if sys.platform == 'darwin'
-                   else 'LD_LIBRARY_PATH')
 ld_preload = 'LD_PRELOAD'
+ld_library_path = 'LD_LIBRARY_PATH'
+platform_ld_library_path = ('DYLD_LIBRARY_PATH' if sys.platform == 'darwin'
+                            else 'LD_LIBRARY_PATH')
 
 # Files to store collections and clones.  Paths relative to dot_dir.
 aliases_file_basename = 'aliases.yaml'

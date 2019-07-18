@@ -31,9 +31,9 @@ class InconsistentModuleStateError(Exception):  # pragma: no cover
 class ModuleConflictError(Exception):
     def __init__(self, loaded, other):
         m = 'Module {other!r} conflicts with loaded module {loaded!r}. Set\n' \
-            'environment variable {envar}=1 to let pymod resolve conflicts.'
-        msg = m.format(loaded=loaded, other=other,
-                       envar=pymod.names.resolve_conflicts)
+            'the configuration flag \'resolve_conflicts=true\' Modulecmd.py ' \
+            'resolve the conflicts.'
+        msg = m.format(loaded=loaded, other=other)
         super(ModuleConflictError, self).__init__(msg)
 
 

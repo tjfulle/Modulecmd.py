@@ -145,3 +145,13 @@ def test_environ_set_get_path():
 def test_environ_factory():
     environ = pymod.environ.factory()
     assert isinstance(environ, pymod.environ.Environ)
+
+
+def test_environ_ld_library_path():
+    key = 'LD_LIBRARY_PATH'
+    fixed = pymod.environ.environ.fix_ld_library_path(key)
+    assert fixed == pymod.names.platform_ld_library_path
+
+    key = 'CRAY_LD_LIBRARY_PATH'
+    fixed = pymod.environ.environ.fix_ld_library_path(key)
+    assert fixed == key

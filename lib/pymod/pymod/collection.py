@@ -7,6 +7,7 @@ from ordereddict_backport import OrderedDict
 
 import pymod.names
 import pymod.paths
+import pymod.compat
 import pymod.environ
 
 import llnl.util.tty as tty
@@ -31,7 +32,7 @@ class Collections:
             version = obj.get('Version')
             version = version if version is None else tuple(version)
             if version != Collections.version: # pragma: no cover
-                return self.upgrade(version, obj)
+                return pymod.compat.collection.upgrade(self, obj, version)
             else:
                 return dict(obj['Collections'])
         return dict()
@@ -117,71 +118,6 @@ class Collections:
                 sio.write(s + '\n')
 
         return sio.getvalue()
-
-    def upgrade(self, version, old_collections, depth=[0]):  # pragma: no cover
-        import pymod.modulepath
-        depth[0] += 1
-        if depth[0] > 1:
-            raise ValueError('Recursion!')
-        if version is None:
-            version_string = '.'.join(str(_) for _ in self.version)
-            tty.info('Converting Modulecmd.py collections version 0.0 to '
-                     'version {0}'.format(version_string))
-            new_collections = {}
-            for (name, old_collection) in old_collections.items():
-                new_collection = OrderedDict()
-                mp = pymod.modulepath.Modulepath([])
-                for (path, m_descs) in old_collection:
-                    if new_collection is None:
-                        break
-                    if not os.path.isdir(path):
-                        tty.warn(
-                            'Collection {0} contains directory {1} which '
-                            'does not exist!  This collection will be skipped'
-                            .format(name, path))
-                        new_collection = None
-                        break
-                    avail = mp.append_path(path)
-                    if avail is None:
-                        tty.warn(
-                            'Collection {0} contains directory {1} which '
-                            'does not have any available modules!  '
-                            'This collection will be skipped'
-                            .format(name, path))
-                        new_collection = None
-                        break
-                    for (fullname, filename, opts) in m_descs:
-                        m = mp.get(filename)
-                        if m is None:
-                            tty.warn(
-                                'Collection {0} requests module {1} which '
-                                'can not be found! This collection will be skipped'
-                                .format(name, fullname))
-                            new_collection = None
-                            break
-                        m.opts = opts
-                        m.acquired_as = m.fullname
-                        ar = pymod.mc.archive_module(m)
-                        new_collection.setdefault(m.modulepath, []).append(ar)
-
-                if new_collection is None:
-                    tty.warn(
-                        'Skipping collection {0} because of previous '
-                        'errors'.format(name))
-                    continue
-
-                new_collections[name] = list(new_collection.items())
-
-            bak = self.filename + '.bak'
-            with open(bak, 'w') as fh:
-                json.dump(old_collections, fh, indent=2)
-
-            self.write(list(new_collections.items()), self.filename)
-            return new_collections
-
-        elif version != self.version:
-            raise ValueError('No known conversion from Collections version '
-                             '{0} to {1}'.format(version, self.version))
 
 
 def factory():

@@ -27,12 +27,11 @@ def tcl2py(module, mode):
     args.extend(('-u', module.name))
     args.extend(('-s', 'bash'))
 
-    ldlibname = pymod.names.ld_library_path
-    ldlib = env.get(ldlibname)
+    ldlib = env.get(pymod.names.platform_ld_library_path)
     if ldlib:
         args.extend(('-L', ldlib))
 
-    ld_preload = env.get('LD_PRELOAD')
+    ld_preload = env.get(pymod.names.ld_preload)
     if ld_preload:
         args.extend(('-P', ld_preload))
 

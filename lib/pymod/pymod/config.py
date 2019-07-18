@@ -2,6 +2,7 @@ import os
 import ruamel.yaml as yaml
 import pymod.paths
 import pymod.names
+from contrib.util import split
 from llnl.util.lang import Singleton
 from spack.util.executable import which
 
@@ -22,17 +23,25 @@ class Configuration(object):
     def push_scope(self, scope_name, data):
         """Add a scope to the Configuration."""
         if 'defaults' in self.scopes and scope_name != 'defaults':
-            self.verify_config(data)
+            self.verify_config(data, scope_name)
         self.scopes.setdefault(scope_name, {}).update(dict(data))
 
-    def verify_config(self, data):
+    def verify_config(self, data, scope):
+        """Verify that the types match those of the default scope"""
         for (key, val) in data.items():
             try:
                 default = self.scopes['defaults'][key]
             except KeyError:
                 msg = 'Unknown user config var {0!r}'.format(key)
                 raise ValueError(msg)
-            if type(default) != type(val):
+            if scope == 'environment':  # pragma: no cover
+                # Environment variables are always strings.
+                if isinstance(type(default), list):
+                    val = split(val, sep=',')
+                else:
+                    val = type(default)(val)
+                data[key] = val
+            elif type(default) != type(val):
                 m = 'User config var {0!r} must be of type {1!r}, not {2!r}'
                 msg = m.format(key, type(default).__name__, type(val).__name__)
                 raise ValueError(msg)
@@ -97,27 +106,17 @@ def factory():
         admin = load_config(admin_config_file)
         cfg.push_scope('user', admin)
 
-    user_config_file = os.getenv(pymod.names.config_file_envar)
-    if user_config_file is not None:  # pragma: no cover
-        user = load_config(user_config_file)
-        cfg.push_scope('user', user)
-
-    else:  # pragma: no cover
-        for dirname in (pymod.paths.user_config_path,
-                        pymod.paths.user_config_platform_path):
-            user_config_file = os.path.join(dirname, config_basename)
-            if os.path.exists(user_config_file):
-                user = load_config(user_config_file)
-                cfg.push_scope('user', user)
+    for dirname in (pymod.paths.user_config_path,
+                    pymod.paths.user_config_platform_path):
+        user_config_file = os.path.join(dirname, config_basename)
+        if os.path.exists(user_config_file):
+            user = load_config(user_config_file)
+            cfg.push_scope('user', user)
 
     # Environment variable
     env = {}
     for key in defaults:  # pragma: no cover
         envar = 'PYMOD_{0}'.format(key.upper())
-        if envar in ('PYMOD_CONFIG_DIR',
-                     'PYMOD_PLATFORM_CONFIG_DIR',
-                     'PYMOD_CONFIG_FILE'):
-            continue
         if os.getenv(envar):
             env[envar] = os.environ[envar]
 

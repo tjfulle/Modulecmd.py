@@ -14,7 +14,12 @@ config:
 
   # Stop on first error encountered
   stop_on_error: true
+
+  # Resolve conflicts by first unloading conflicting module
   resolve_conflicts: false
+
+  # Allow duplicate entries in a path-like environment variable
+  allow_duplicate_path_entries: false
 
   # Editor to open for modifying files
   editor: "vi"

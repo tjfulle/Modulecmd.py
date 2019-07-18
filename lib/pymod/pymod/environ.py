@@ -101,8 +101,8 @@ class Environ(dict):
 
     @staticmethod
     def fix_ld_library_path(key):
-        if key.endswith(pymod.names.ld_library_path):
-            key = pymod.names.ld_library_path
+        if key == pymod.names.ld_library_path:
+            key = pymod.names.platform_ld_library_path
         return key
 
     def save_ld_library_path(self, key):
@@ -146,7 +146,7 @@ class Environ(dict):
                 'Do not set MODULEPATH directly in Environ object.  '
                 'Set it in the Modulepath instead')
         key = self.fix_ld_library_path(key)
-        allow_dups = self.get_bool(pymod.names.allow_dup_entries)
+        allow_dups = pymod.config.get('allow_duplicate_path_entries')
         current_path = self.get_path(key, sep=sep)
         count, priority = current_path.meta.pop(value, (0, -1))
         if count == 0 and value in current_path.value:
@@ -163,7 +163,7 @@ class Environ(dict):
                 'Do not set MODULEPATH directly in Environ object.  '
                 'Set it in the Modulepath instead')
         key = self.fix_ld_library_path(key)
-        allow_dups = self.get_bool(pymod.names.allow_dup_entries)
+        allow_dups = pymod.config.get('allow_duplicate_path_entries')
         current_path = self.get_path(key, sep=sep)
         count, priority = current_path.meta.pop(value, (0, -1))
         if count == 0 and value in current_path.value:
@@ -181,7 +181,7 @@ class Environ(dict):
                 'Do not remove MODULEPATH directly from Environ object.  '
                 'Use the Modulepath object instead')
         key = self.fix_ld_library_path(key)
-        allow_dups = self.get_bool(pymod.names.allow_dup_entries)
+        allow_dups = pymod.config.get('allow_duplicate_path_entries')
         current_path = self.get_path(key, sep=sep)
         count, priority = current_path.meta.pop(value, (0, -1))
         if count == 0 and value in current_path.value: # pragma: no cover
