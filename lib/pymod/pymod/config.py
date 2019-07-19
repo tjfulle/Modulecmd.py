@@ -34,9 +34,9 @@ class Configuration(object):
             except KeyError:
                 msg = 'Unknown user config var {0!r}'.format(key)
                 raise ValueError(msg)
-            if scope == 'environment':  # pragma: no cover
+            if scope == 'environment':
                 # Environment variables are always strings.
-                if isinstance(type(default), list):
+                if isinstance(default, list):
                     val = split(val, sep=',')
                 else:
                     val = type(default)(val)
@@ -71,7 +71,7 @@ class Configuration(object):
                 value = default
         return value
 
-    def set(self, key, value, scope=None):  # pragma: no cover
+    def set(self, key, value, scope=None):
         if scope is not None:
             self.scopes.setdefault(scope, {}).update({key: value})
         else:
@@ -102,7 +102,7 @@ def factory():
 
     admin_config_file = os.path.join(
         pymod.paths.etc_path, config_basename)
-    if os.path.isfile(admin_config_file):  # pragma: no cover
+    if os.path.isfile(admin_config_file):
         admin = load_config(admin_config_file)
         cfg.push_scope('user', admin)
 
@@ -115,12 +115,13 @@ def factory():
 
     # Environment variable
     env = {}
-    for key in defaults:  # pragma: no cover
+    for key in defaults:
         envar = 'PYMOD_{0}'.format(key.upper())
         if os.getenv(envar):
-            env[envar] = os.environ[envar]
+            key = envar[6:].lower()
+            env[key] = os.environ[envar]
 
-    if env:  # pragma: no cover
+    if env:
         cfg.push_scope('environment', env)
 
     return cfg

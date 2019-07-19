@@ -20,12 +20,12 @@ def find_modules(dirname):
     if dirname == '/':
         raise ValueError('Requesting to find modules in root directory')
 
-    if not os.access(dirname, os.R_OK):  # pragma: no cover
-        tty.verbose('Insufficient privileges to read modules in {0!r}'
-                    .format(dirname))
+    if not os.access(dirname, os.R_OK):
+        tty.verbose('{0!r} is not an accessible directory'.format(dirname))
         return None
 
     if not os.path.isdir(dirname):  # pragma: no cover
+        # This should be redundant because of the previous check
         tty.verbose('{0!r} is not a directory'.format(dirname))
         return None
 
@@ -42,7 +42,7 @@ def find_modules(dirname):
             # <dirname>/<name>/<version>/<variants>
             maybe_module_files = [f for f in second_level_files
                                   if f not in marked_default_names]
-            if maybe_module_files:  # pragma: no cover
+            if maybe_module_files:
                 tty.warn('Skipping files in directory {0} '
                          'with NVV structure'.format(first_level_dir))
             for version in second_level_dirs:
@@ -56,7 +56,7 @@ def find_modules(dirname):
             if modules_nv:
                 modules.extend(modules_nv)
 
-    if not modules:  # pragma: no cover
+    if not modules:
         tty.verbose('Modulepath: no modules found in {0}'.format(dirname))
         return None
 
@@ -69,7 +69,7 @@ def find_modules_n(dirname, names):
     with working_dir(dirname):
         for name in names:
             assert isfilelike(name)
-            if name in marked_default_names:  # pragma: no cover
+            if name in marked_default_names:
                 tty.verbose('Skipping marked default for unversioned '
                             'modules in {0}'.format(dirname))
                 continue
@@ -87,7 +87,7 @@ def find_modules_nv(dirname, name):
     with working_dir(dirname):
         assert os.path.isdir(name)
         versions, dirs = listdir(name)
-        if dirs:  # pragma: no cover
+        if dirs:
             raise ValueError('Expected NV module structure not NVx')
         marked_default = pop_marked_default(name, versions)
         for version in versions:
@@ -110,7 +110,7 @@ def find_modules_nvv(dirname, name, version):
     with working_dir(basedir):
         assert os.path.isdir(version)
         variants, dirs = listdir(version)
-        if dirs:  # pragma: no cover
+        if dirs:
             tty.debug('In {0}, expected NVV module structure not '
                       'NVVx'.format(basedir))
             return None
@@ -143,14 +143,14 @@ def pop_linked_default(dirname, files):
         return None
 
     linked_default_file = os.path.join(dirname, linked_default_name)
-    if not os.path.islink(linked_default_file):  # pragma: no cover
+    if not os.path.islink(linked_default_file):
         tty.verbose(
             'Modulepath: expected file named `default` in {0} '
             'to be a link to a modulefile'.format(dirname))
         return None
 
     linked_default_source = os.path.realpath(linked_default_file)
-    if not linked_default_source.startswith(dirname):  # pragma: no cover
+    if not os.path.dirname(linked_default_source) == dirname:
         tty.warn(
             'Modulepath: expected file named `default` in {0} to be '
             'a link to a modulefile in the same directory'.format(dirname))
@@ -168,7 +168,7 @@ def pop_versioned_default(dirname, files):
         return None
     version_file = os.path.join(dirname, version_file_name)
     version = read_tcl_default_version(version_file)
-    if version is None:  # pragma: no cover
+    if version is None:
         tty.warn(
             'Could not determine .version default in {0}'.format(dirname))
     else:

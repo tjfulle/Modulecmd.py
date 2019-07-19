@@ -56,7 +56,7 @@ if not os.path.isdir(user_config_platform_path):  # pragma: no cover
 def join_user(basename):
     for dirname in (user_config_platform_path, user_config_path):
         filename = os.path.join(dirname, basename)
-        if os.path.exists(filename):  # pragma: no cover
+        if os.path.exists(filename):
             return filename
     return os.path.join(user_config_platform_path, basename)
 
