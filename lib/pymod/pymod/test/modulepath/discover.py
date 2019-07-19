@@ -23,7 +23,7 @@ def test_modulepath_discover_bad_marked_default(tmpdir):
     # modules
     tmpdir.join('a.py').write('')
     tmpdir.join('b.py').write('')
-    os.symlink(tmpdir.join('b.py'), os.path.join(tmpdir.strpath, 'default'))
+    os.symlink(tmpdir.join('b.py').strpath, os.path.join(tmpdir.strpath, 'default'))
     modules = pymod.modulepath.discover.find_modules(tmpdir.strpath)
     assert len(modules) == 2
     names = sorted([x.name for x in modules])
@@ -69,9 +69,9 @@ def test_modulepath_discover_bad_linked_default(tmpdir):
     a.join('default').write('')
     assert pymod.modulepath.discover.pop_linked_default(a.strpath, ['1.0.py', '2.0.py', 'default']) is None
 
-    os.remove(a.join('default'))
+    os.remove(a.join('default').strpath)
     tmpdir.join('foo').write('')
-    os.symlink(tmpdir.join('foo'), os.path.join(a.strpath, 'default'))
+    os.symlink(tmpdir.join('foo').strpath, os.path.join(a.strpath, 'default'))
     linked_real_dirname = os.path.dirname(os.path.realpath(os.path.join(a.strpath, 'default')))
     assert linked_real_dirname == os.path.realpath(tmpdir.strpath)
     assert pymod.modulepath.discover.pop_linked_default(a.strpath, ['1.0.py', '2.0.py', 'default']) is None
