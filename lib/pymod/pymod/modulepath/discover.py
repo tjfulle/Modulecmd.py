@@ -68,7 +68,8 @@ def find_modules_n(dirname, names):
     modules_n = []
     with working_dir(dirname):
         for name in names:
-            assert isfilelike(name)
+            if not isfilelike(name):
+                continue
             if name in marked_default_names:
                 tty.verbose('Skipping marked default for unversioned '
                             'modules in {0}'.format(dirname))
@@ -189,9 +190,13 @@ def read_tcl_default_version(version_file):
 
 def listdir(dirname):
     files, dirs = [], []
+    if not os.access(dirname, os.X_OK):  # pragma: no cover
+        return [], []
     with working_dir(dirname):
         for item in os.listdir('.'):
             if os.path.isdir(item):
+                if item in ('.git', '.svn', 'CVS'):  # pragma: no cover
+                    continue
                 dirs.append(item)
             else:
                 files.append(item)

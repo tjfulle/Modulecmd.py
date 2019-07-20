@@ -61,9 +61,13 @@ class Bash(Shell):
 
         s = StringIO()
         if current_module_implementation == 'pymod':
-            modulecmd = which('modulecmd')
-            if modulecmd is None:
-                raise Exception('Unable to find modulecmd executable')
+            if os.getenv('LMOD_CMD'):
+                modulecmd = os.environ['LMOD_CMD']
+            else:
+                modulecmd = which('modulecmd')
+                if modulecmd is None:
+                    raise Exception('Unable to find modulecmd executable')
+            s.write('module() { eval $(%s bash "$@"); };' % modulecmd)
             s.write('unset -f module;')
             s.write('pymod() { eval $(python -E $PYMOD_CMD bash "$@"); };')
             s.write('export -f pymod;')

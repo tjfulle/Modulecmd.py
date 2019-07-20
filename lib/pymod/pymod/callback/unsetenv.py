@@ -4,7 +4,7 @@ import pymod.environ
 category = 'environment'
 
 
-def unsetenv(module, mode, name):
+def unsetenv(module, mode, name, *args):
     """Unset value of environment variable `name`
 
     Arguments:
