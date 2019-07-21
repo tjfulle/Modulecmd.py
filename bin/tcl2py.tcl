@@ -615,6 +615,10 @@ proc setPutMode { value } {
     set putMode $value
 }
 
+proc _break {} {
+  puts stdout "_break\(\)"
+}
+
 proc myPuts args {
     global putMode
     foreach {a b c} $args break
@@ -777,6 +781,7 @@ proc execute-modulefile {modfile } {
 	interp alias $slave module-version {} module-version
 	interp alias $slave module-alias {} module-alias
 	interp alias $slave reportError {} reportError
+	interp alias $slave break {} _break
 
 	interp eval $slave {global ModulesCurrentModulefile g_help}
 	interp eval $slave [list "set" "ModulesCurrentModulefile" $modfile]

@@ -77,6 +77,18 @@ class Environ(dict):
     def filtered(self, include_os=False):
         return self.copy(include_os=include_os, filter_None=True)
 
+    def clone(self):
+        return {'aliases': self.aliases.copy(),
+                'shell_functions': self.shell_functions.copy(),
+                'env': self.copy()}
+
+    def restore(self, clone):
+        self.aliases = clone['aliases']
+        self.shell_functions = clone['shell_functions']
+        for key in list(self.keys()):
+            del self[key]
+        self.update(clone['env'])
+
     def copy(self, include_os=False, filter_None=False):
         env = dict(os.environ) if include_os else dict()
         if filter_None:
@@ -319,6 +331,14 @@ def filtered(include_os=False):
 
 def copy(include_os=False):
     return environ.copy(include_os=include_os)
+
+
+def clone():
+    return environ.clone()
+
+
+def restore(the_clone):
+    return environ.restore(the_clone)
 
 
 def get_lm_cellar():

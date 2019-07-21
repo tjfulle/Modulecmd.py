@@ -5,6 +5,7 @@ import socket
 import pymod.mc
 import pymod.user
 import pymod.modes
+import pymod.module
 import pymod.environ
 import pymod.callback
 import llnl.util.tty as tty
@@ -53,9 +54,13 @@ def execmodule_in_sandbox(module, mode):
     code = compile(module.read(mode), module.filename, 'exec')
     with working_dir(os.path.dirname(module.filename)):
         try:
+            if isinstance(module, pymod.module.TclModule):
+                clone = pymod.environ.clone()
             exec_(code, ns, {})
         except pymod.error.StopLoadingModuleError:
             pass
+        except pymod.error.TclModuleBreakError:
+            pymod.environ.restore(clone)
 
 
 def module_exec_sandbox(module, mode):

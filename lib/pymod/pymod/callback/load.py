@@ -42,7 +42,7 @@ def load(module, mode, name, **kwds):
         $ module load baz
         $ module ls
         Currently loaded modules
-            1) eggs +x  2) baz
+            1) eggs x=True  2) baz
 
     """
     pymod.modes.assert_known_mode(mode)

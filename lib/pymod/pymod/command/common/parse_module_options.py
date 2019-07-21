@@ -33,6 +33,8 @@ def parse_module_options(args):
                 raise ValueError('Options must be specified after module name')
             argv[-1][-1][opt] = val
         else:
+            # support spack style @<version>
+            item = item.replace('@', '/')
             argv.append((item, {}))
     return argv
 

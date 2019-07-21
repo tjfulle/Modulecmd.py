@@ -30,6 +30,11 @@ def test_modulepath_discover_bad_marked_default(tmpdir):
     assert names == ['a', 'b']
 
 
+def test_modulepath_discover_bad_n(tmpdir):
+    # The name 'f' does not exist
+    assert pymod.modulepath.discover.find_modules_n(tmpdir.strpath, ['f']) == []
+
+
 def test_modulepath_discover_bad_nv(tmpdir):
     a = tmpdir.mkdir('a')
     b = a.mkdir('b')

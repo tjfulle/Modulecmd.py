@@ -140,3 +140,16 @@ def test_tcl_unit(tcl_module_path, mock_modulepath):
     assert pymod.environ.environ['path'] == '/a/path:/b/path:/d/path'
     assert pymod.environ.environ['ENVAR'] == 'a/2.0'
     assert pymod.environ.environ.aliases['foo'] == 'SPAM'
+
+
+@pytest.mark.tcl
+def test_tcl_break(tmpdir, mock_modulepath):
+    f = tmpdir.join('f').write('''\
+#%Module1.0
+setenv foo BAR
+break
+setenv BAZ SPAM''')
+    mock_modulepath(tmpdir.strpath)
+    pymod.mc.load('f')
+    assert pymod.environ.get('foo') is None
+    assert pymod.environ.get('BAZ') is None

@@ -90,3 +90,7 @@ class CloneModuleNotFoundError(Exception):
 
 class StopLoadingModuleError(Exception):
     pass
+
+
+class TclModuleBreakError(Exception):
+    pass
