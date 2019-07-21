@@ -18,17 +18,9 @@ class Csh(Shell):
             return 'unsetenv {0};'.format(key)
         else:
             # csh barfs on long env vars
-            if len(val) > CSH_LIMIT:  # pragma: no cover
+            if len(val) > CSH_LIMIT:
                 if key == 'PATH':
-                    tty.warn('PATH exceeds {0} characters, truncating '
-                             'and appending /usr/bin:/bin...')
-                    newval = '/usr/bin' + os.pathsep + '/bin'
-                    for item in val.split(os.pathsep):
-                        tmp = item + os.pathsep + newval
-                        if len(tmp) < CSH_LIMIT:
-                            newval = tmp
-                        else:
-                            break
+                    val = self.truncate_path(val)
                 else:
                     msg = '{0} exceeds {1} characters, truncating...'
                     tty.warn(msg.format(key, CSH_LIMIT))
@@ -56,3 +48,16 @@ class Csh(Shell):
 
     def format_source_command(self, filename):
         return 'source {0}'.format(filename)
+
+    def truncate_path(self, path):
+        tty.warn('PATH exceeds {0} characters, truncating '
+                 'and appending /usr/bin:/bin'.format(CSH_LIMIT))
+        truncated = ['/usr/bin', '/bin']
+        length = len(truncated[0]) + len(truncated[1]) + 1
+        for (i, item) in enumerate(path.split(os.pathsep)):
+            if (len(item) + 1 + length) > CSH_LIMIT:
+                break
+            else:
+                length += (len(item) + 1)
+                truncated.insert(-2, item)
+        return os.pathsep.join(truncated)

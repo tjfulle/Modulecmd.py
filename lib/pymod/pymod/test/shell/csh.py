@@ -1,7 +1,10 @@
+import os
 import sys
 import pytest
+import string
 
 import pymod.shell
+import pymod.shell.csh
 from pymod.environ import Environ
 
 
@@ -65,3 +68,32 @@ def test_shell_csh_format_output(shell):
                   "alias VAR_0 'VAL_0';",
                   'unalias VAR_None 2> /dev/null || true;',]
     assert sorted(s) == sorted(s_expected)
+
+
+def test_shell_csh_var_overlimit(shell):
+    environ = Environ()
+    limit = pymod.shell.csh.CSH_LIMIT
+    toolong = 'A' * (limit + 5)
+    environ.update({'VAR': toolong})
+    s = pymod.shell.format_output(environ, environ.aliases, environ.shell_functions)
+    s_expected = 'setenv VAR "{0}";'.format('A' * limit)
+    assert s.strip() == s_expected
+
+
+def test_shell_csh_path_overlimit(shell):
+    environ = Environ()
+    limit = pymod.shell.csh.CSH_LIMIT
+    letters = string.ascii_uppercase
+    n = int(float(limit) / len(letters)) + 10
+    path = []
+    for i in range(len(letters)):
+        path.append(letters[i] * n)
+    spath = os.pathsep.join(path)
+    environ.update({'PATH': spath})
+    s = pymod.shell.format_output(environ, {}, {}).strip()
+    end = '/usr/bin{0}/bin";'.format(os.pathsep)
+    p = os.pathsep.join(path[:-2]) + os.pathsep + end
+    s_expected = 'setenv PATH "{0}'.format(p)
+    assert s.endswith(end)
+    assert s == s_expected
+
