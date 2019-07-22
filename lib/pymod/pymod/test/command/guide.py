@@ -1,6 +1,7 @@
 import pytest
 try:
     import docutils
+    from docutils import nodes, core
 except ImportError:
     docutils = None
 
