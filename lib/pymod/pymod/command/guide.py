@@ -9,6 +9,11 @@ try:
 except ImportError:  # pragma: no cover
     docutils = None
 
+try:
+    from docutils import nodes, core
+except ImportError: # pragma: no cover
+    docutils = -1
+
 
 description = "Display Modulecmd.py guides in the console"
 section = "info"
@@ -29,6 +34,10 @@ def setup_parser(subparser):
 def guide(parser, args):
     if docutils is None:  # pragma: no cover
         raise ImportError('Guides require docutils module')
+    elif docutils == -1:  # pragma: no cover
+        msg = ('There was an error importing several docutils components and '
+               'the guides cannot be displayed')
+        raise ImportError(msg)
     import rst2ansi
     filename = available_guides[args.guide]
     with redirect_stdout():
