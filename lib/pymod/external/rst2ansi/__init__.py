@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from __future__ import unicode_literals
 
-from docutils nodes, core
+from docutils import nodes, core
 from docutils.parsers.rst import roles
 
 from .visitor import Writer
