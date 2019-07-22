@@ -74,10 +74,6 @@ class Module(object):
         return not self.is_enabled
 
     @property
-    def do_not_register(self):
-        return False
-
-    @property
     def acquired_as(self):
         return self._acquired_as
 
@@ -266,10 +262,6 @@ class PyModule(Module):
         super(PyModule, self).__init__(modulepath, *parts)
         self.metadata = MetaData()
         self.metadata.parse(self.filename)
-
-    @property
-    def do_not_register(self):
-        return self.metadata.do_not_register
 
     @property
     def is_enabled(self):

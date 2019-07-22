@@ -24,7 +24,6 @@ def test_module_attrs(basic_python_module):
     m.opts = {'foo': True}
     assert not m.is_loaded
     assert not m.is_hidden
-    assert not m.do_not_register
 
 
 def test_module_whatis(basic_python_module):
@@ -70,7 +69,6 @@ def test_module_basic(tmpdir):
     one.join('a').write('')
     a = pymod.module.Module(one.strpath, 'a')
     assert a.is_enabled
-    assert not a.do_not_register
     a.format_help()
 
 

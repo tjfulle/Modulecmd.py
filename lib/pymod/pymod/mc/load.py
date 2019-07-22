@@ -87,7 +87,11 @@ def load_impl(module):
     # Now load it
     execmodule(module, pymod.modes.load)
 
-    if module.refcount != 0:
+    if getattr(module, 'exec_failed_do_not_register', False):
+        # Something happened during the execution of this module and we are not
+        # to register it.
+        pass
+    elif module.refcount != 0:
         # Nonzero reference count means the module load was completed by
         # someone else. This can only happen in the case of loading a module of
         # the same family. In that case, execmodule catches a FamilyLoadedError

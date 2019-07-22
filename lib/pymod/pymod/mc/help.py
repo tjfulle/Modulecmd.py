@@ -1,6 +1,6 @@
+import pymod.mc
 import pymod.modes
 import pymod.modulepath
-from pymod.mc.execmodule import execmodule_in_sandbox
 from pymod.error import ModuleNotFoundError
 
 

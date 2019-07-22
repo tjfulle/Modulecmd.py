@@ -6,7 +6,6 @@ class MetaData:
     def __init__(self):
         """Store meta data for module"""
         self.enable_if = True
-        self.do_not_register = False
 
     @property
     def is_enabled(self):
@@ -14,7 +13,7 @@ class MetaData:
 
     def parse(self, filename):
         """Reads meta data for module in ``filename``
-        # pymod: [enable_if=<bool expr> [,do_not_register=<bool expr>]]
+        # pymod: [enable_if=<bool expr>]
         """
         regex = re.compile(r'#\s*pymod\:')
         head = open(filename).readline()

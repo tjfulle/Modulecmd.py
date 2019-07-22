@@ -150,6 +150,8 @@ setenv foo BAR
 break
 setenv BAZ SPAM''')
     mock_modulepath(tmpdir.strpath)
-    pymod.mc.load('f')
+    m = pymod.mc.load('f')
     assert pymod.environ.get('foo') is None
     assert pymod.environ.get('BAZ') is None
+    assert not m.is_loaded
+
