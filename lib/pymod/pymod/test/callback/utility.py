@@ -70,3 +70,24 @@ def test_callback_get_hostname(tmpdir, mock_modulepath):
     tmpdir.join('a.py').write('host = get_hostname()')
     mock_modulepath(tmpdir.strpath)
     pymod.mc.load('a')
+
+
+@pytest.mark.unit
+def test_callback_execute(tmpdir):
+    execute = get_callback('execute')
+    tmpdir.join('foobar').write('')
+    f = os.path.join(tmpdir.strpath, 'foobar')
+    command = 'touch {0}'.format(f)
+    execute(None, pymod.modes.load, command)
+    assert os.path.isfile(f)
+
+
+def test_callback_execute_2(tmpdir, mock_modulepath):
+    f = os.path.join(tmpdir.strpath, 'foobar')
+    tmpdir.join('a.py').write("execute('touch {0}', when=mode()=='load')".format(f))
+    mock_modulepath(tmpdir.strpath)
+    pymod.mc.load('a')
+    assert os.path.isfile(f)
+    os.remove(f)
+    pymod.mc.unload('a')
+    assert not os.path.isfile(f)
