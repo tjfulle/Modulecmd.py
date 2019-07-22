@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 from __future__ import unicode_literals
 
-from docutils import nodes, core
+import docutils
 from docutils.parsers.rst import roles
 
 from .visitor import Writer
@@ -44,7 +44,7 @@ def rst2ansi(input_string, output_encoding='utf-8'):
   overrides['input_encoding'] = 'unicode'
 
   def style_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
-    return [nodes.TextElement(rawtext, text, classes=[name])], []
+    return [docutils.nodes.TextElement(rawtext, text, classes=[name])], []
 
   for color in COLORS:
     roles.register_local_role('ansi-fg-' + color, style_role)
@@ -52,5 +52,5 @@ def rst2ansi(input_string, output_encoding='utf-8'):
   for style in STYLES:
     roles.register_local_role('ansi-' + style, style_role)
 
-  out = core.publish_string(decode_str(input_string), settings_overrides=overrides, writer=Writer(unicode=output_encoding.startswith('utf')))
+  out = docutils.core.publish_string(decode_str(input_string), settings_overrides=overrides, writer=Writer(unicode=output_encoding.startswith('utf')))
   return out.decode(output_encoding)
