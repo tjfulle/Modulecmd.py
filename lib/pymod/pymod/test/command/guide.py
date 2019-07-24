@@ -1,3 +1,4 @@
+import sys
 import pytest
 try:
     import docutils
@@ -5,20 +6,19 @@ try:
 except ImportError:
     docutils = None
 
+
+pytestmark = pytest.mark.skipif(docutils is None or sys.version_info[:2] == (2,6),
+                                reason='Test runs only with python3 with docutils')
+
 from pymod.main import PymodCommand
 
 
-@pytest.mark.skipif(docutils is None, reason='Test requires docutils')
 def test_command_guide_basic():
     guide = PymodCommand('guide')
     guide('basic_usage')
 
 
-@pytest.mark.skipif(docutils is None, reason='Test requires docutils')
 def test_command_guide_bad():
     guide = PymodCommand('guide')
-    try:
+    with pytest.raises(SystemExit):
         guide('foo')
-        assert 0, 'Error should have raised'
-    except:
-        pass
