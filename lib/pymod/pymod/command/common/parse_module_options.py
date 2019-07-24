@@ -27,6 +27,13 @@ def parse_module_options(args):
     args = args or []
     for item in args:
         # Determine if this is an option for the module
+        if item.startswith('@'):
+            # support spack style <package> @<version>
+            version = item[1:]
+            if not argv:
+                raise ValueError('ill-placed @ version specifier')
+            argv[-1][0] += '/' + version
+            continue
         opt, val = parse_item_for_module_option(item)
         if opt is not None:
             if not argv:
@@ -35,7 +42,7 @@ def parse_module_options(args):
         else:
             # support spack style @<version>
             item = item.replace('@', '/')
-            argv.append((item, {}))
+            argv.append([item, {}])
     return argv
 
 
