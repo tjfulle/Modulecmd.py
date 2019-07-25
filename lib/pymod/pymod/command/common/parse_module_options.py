@@ -30,6 +30,8 @@ def parse_module_options(args):
         if item.startswith('@'):
             # support spack style <package> @<version>
             version = item[1:]
+            if not version:
+                raise ValueError('empty version after "@"')
             if not argv:
                 raise ValueError('ill-placed @ version specifier')
             argv[-1][0] += '/' + version

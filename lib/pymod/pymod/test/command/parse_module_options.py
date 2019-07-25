@@ -57,3 +57,25 @@ def test_command_parse_module_options_bad():
     args = ['baz', '-']
     with pytest.raises(IllFormedModuleOptionError):
         argv = parse_module_options(args)
+
+
+def test_command_parse_module_options_spack_ver():
+    args = ['baz@1.2']
+    argv = parse_module_options(args)
+    assert len(argv) == 1
+    name, opts = argv[0]
+    assert name == 'baz/1.2'
+
+    args = ['baz', '@1.2']
+    argv = parse_module_options(args)
+    assert len(argv) == 1
+    name, opts = argv[0]
+    assert name == 'baz/1.2'
+
+    with pytest.raises(ValueError):
+        args = ['@5.4']
+        argv = parse_module_options(args)
+
+    with pytest.raises(ValueError):
+        args = ['baz', '@']
+        argv = parse_module_options(args)

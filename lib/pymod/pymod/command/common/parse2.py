@@ -10,71 +10,71 @@ def parse(args):
     args = [x for arg in args for x in split_on_tokens(arg)]
 
     level = None
+    prev_tok = None
     module = {}
     i = 0
     while i < len(args):
         arg = args[i]
         next_arg = None if i > len(args) - 2 else args[i+1]
         if arg in tokens:
+            prev_tok = arg
             if not module:
                 raise ValueError('Module options must follow module name')
-            if arg == '%':
-                level = 'compiler'
-            elif arg == '^':
-                level = 'mpi'
-            elif arg == '@':
-                i += 1  # advance past the '@'
-                if next_arg is None:
-                    raise ValueError("Expected version string to follow '@'")
+            if not next_arg:
+                raise ValueError('Expected entries to follow token {0}'.format(arg))
+        else:
+            if prev_tok == '@':
                 prefix = '' if not level else level + '_'
                 if module.get(prefix + 'version') is not None:
                     raise ValueError('Duplicate version entry {0}: {1}'
-                                     .format(key, next_arg))
-                x = next_arg.split(os.path.sep)
+                                     .format(prefix, arg))
+                x = arg.split(os.path.sep)
                 if len(x) == 1:
                     version, variant = x[0], None
                 elif len(x) == 2:
                     version, variant = x[0], x[1]
                 else:
                     raise ValueError('Two many path seperators in version {0}'
-                                     .format(next_arg))
+                                     .format(arg))
 
                 module[prefix + 'version'] = version
                 module[prefix + 'variant'] = variant
-                # Now that we have the version, reset the level
-                level = None
-        else:
-            opt, val = parse_item_for_module_option(arg)
-            if opt is not None:
-                if not module:
-                    raise ValueError('Module options must follow module name')
-                module.setdefault('opts', {}).update({opt: val})
-            elif level in ('compiler', 'mpi'):
-                if not module:
-                    raise ValueError('Module hierarchy must follow module name')
-                module[level + '_vendor'] = arg
-                if next_arg != '@':
-                    level = None
+            elif prev_tok == '%':
+                module['compiler_vendor'] = arg
+                level = 'compiler'
+            elif prev_tok == '^':
+                module['mpi_vendor'] = arg
+                level = 'mpi'
             else:
-                x = arg.split(os.path.sep)
-                if len(x) == 1:
-                    name, version, variant = x[0], None, None
-                elif len(x) == 2:
-                    name, version, variant = x[0], x[1], None
-                elif len(x) == 3:
-                    name, version, variant = x[0], x[1], x[2]
+                # No previous token, must be an option or a new module
+                if is_option(arg):
+                    if not module:
+                        raise ValueError('Module options must follow module name')
+                    opt, val = parse_item_for_module_option(arg)
+                    module.setdefault('opts', {}).update({opt: val})
                 else:
-                    raise ValueError('Two many path seperators in {0}'
-                                     .format(arg))
-                module = {'name': name, 'version': version, 'variant': variant}
-                modules.append(module)
+                    x = arg.split(os.path.sep)
+                    if len(x) == 1:
+                        name, version, variant = x[0], None, None
+                    elif len(x) == 2:
+                        name, version, variant = x[0], x[1], None
+                    elif len(x) == 3:
+                        name, version, variant = x[0], x[1], x[2]
+                    else:
+                        raise ValueError('Two many path seperators in {0}'
+                                         .format(arg))
+                    module = {'name': name, 'version': version, 'variant': variant}
+                    modules.append(module)
+                    level = None
+
+            prev_tok = None
         i += 1
 
     return modules
 
 
 def split_on_tokens(expr):
-    if not expr:
+    if not expr:  # pragma: no cover
         return []
     split = ['']
     for s in expr:
@@ -83,7 +83,7 @@ def split_on_tokens(expr):
         else:
             split.append(s)
             split.append('')
-    return [x for x in split if x.split()]
+    return [x.strip() for x in split if x.split()]
 
 
 def parse_item_for_module_option(item):
@@ -105,27 +105,37 @@ def parse_item_for_module_option(item):
     else:
         try:
             val = ast.literal_eval(val)
-        except ValueError:
+        except (ValueError, SyntaxError):
             pass
     return opt, val
+
+
+def is_option(item):
+    return item.startswith(('+', '-', '~')) or '=' in item[1:]
 
 
 class IllFormedModuleOptionError(Exception):
     pass
 
 
-modules = parse(['foo@3.1.2', '+spam', '-baz', '~x', '%gcc@8.3.0', '^openmpi@3.1.2',
-                  'baz', '@2', 'opt=True', 'foo=x',
-                  'bar/4.3.9'])
-keys = ('name', 'version', 'variant',
-        'compiler_vendor', 'compiler_version', 'compiler_variant',
-        'mpi_vendor', 'mpi_version', 'mpi_variant',
-        'opts')
-for module in modules:
-    for key in keys:
-        value = module.get(key)
-        if value is None:
-            continue
-        sp = '' if key == 'name' else '  '
-        print('{0}{1}: {2}'.format(sp, key, value))
+def run(): # pragma: no cover
+    keys = ('name', 'version', 'variant',
+            'compiler_vendor', 'compiler_version', 'compiler_variant',
+            'mpi_vendor', 'mpi_version', 'mpi_variant',
+            'opts')
+    args =['foo@6.0', '+spam', '-baz', '%gcc@8.3.0', '^openmpi@3.1.2',
+           'baz', '@2', 'opt=True', 'foo=x', '~x',
+           'bar/4.3.9']
+    modules = parse(args)
+    for module in modules:
+        for key in keys:
+            value = module.get(key)
+            if value is None:
+                continue
+            sp = '' if key == 'name' else '  '
+            print('{0}{1}: {2}'.format(sp, key, value))
     print('')
+
+
+if __name__ == "__main__": # pragma: no cover
+    run()
