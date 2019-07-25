@@ -114,6 +114,18 @@ class IllFormedModuleOptionError(Exception):
     pass
 
 
-modules = parse(['foo@3.1.2', '%gcc@8.3.0', '^openmpi@3.1.2', '+spam', '-baz', '~x', 'baz', '@2', 'opt=True', 'foo=x', 'bar/4.3.9'])
+modules = parse(['foo@3.1.2', '+spam', '-baz', '~x', '%gcc@8.3.0', '^openmpi@3.1.2',
+                  'baz', '@2', 'opt=True', 'foo=x',
+                  'bar/4.3.9'])
+keys = ('name', 'version', 'variant',
+        'compiler_vendor', 'compiler_version', 'compiler_variant',
+        'mpi_vendor', 'mpi_version', 'mpi_variant',
+        'opts')
 for module in modules:
-    print(module)
+    for key in keys:
+        value = module.get(key)
+        if value is None:
+            continue
+        sp = '' if key == 'name' else '  '
+        print('{0}{1}: {2}'.format(sp, key, value))
+    print('')
