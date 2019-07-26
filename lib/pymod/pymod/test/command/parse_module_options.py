@@ -157,6 +157,10 @@ def test_command_parse_module_options_extended_4():
         # Too many / in version string
         args = ['foo@5/2/5']
         modules = parse_module_options(args)
+    with pytest.raises(ValueError):
+        # Too many / in version string
+        args = ['foo' '@5', '@4']
+        modules = parse_module_options(args)
 
 
 def test_command_parse_module_options_extended_5():
