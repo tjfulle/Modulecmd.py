@@ -1,3 +1,4 @@
+import os
 import sys
 import argparse
 
@@ -24,6 +25,9 @@ def setup_parser(subparser):
 
 def load(parser, args):
     argv = parse_module_options(args.args)
-    for (name, opts) in argv:
-        pymod.mc.load(name, opts=opts, insert_at=args.insert_at)
+    for (i, spec) in enumerate(argv):
+        insert_at = args.insert_at if i == 0 else None
+        name = spec['name'] if spec['version'] is None else \
+               os.path.sep.join([spec['name'], spec['version']])
+        pymod.mc.load(name, opts=spec['options'], insert_at=insert_at)
     pymod.mc.dump()
