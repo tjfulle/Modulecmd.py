@@ -3,6 +3,7 @@ import re
 import ast
 
 tokens = ('@', '%', '^')
+on_off_tokens = ('+', '-', '~')
 
 def parse(args):
 
@@ -90,12 +91,12 @@ def parse_item_for_module_option(item):
     try:
         opt, val = item.split('=', 1)
     except ValueError:
-        if not item.startswith(('+', '-', '~')):
+        if not item.startswith(on_off_tokens):
             return None, None
         # Possibly an option, make sure it is well formed.
         if len(item) == 1:
             raise IllFormedModuleOptionError(item)
-        if item[1] in ('+', '-', '~'):
+        if item[1] in on_off_tokens:
             raise IllFormedModuleOptionError(item)
         opt = item[1:]
         if not re.search(r'(?i)[a-z_]', opt[0]):
@@ -111,7 +112,7 @@ def parse_item_for_module_option(item):
 
 
 def is_option(item):
-    return item.startswith(('+', '-', '~')) or '=' in item[1:]
+    return item.startswith(on_off_tokens) or '=' in item[1:]
 
 
 class IllFormedModuleOptionError(Exception):
