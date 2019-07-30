@@ -534,11 +534,12 @@ proc doubleQuoteEscaped {text} {
 }
 
 proc cmdargs { cmd args } {
+    set cmdArgsL {}
     foreach arg $args {
-	#if {$arg != ""} {
+	if {$arg != ""} {
 	    set val [doubleQuoteEscaped $arg]
 	    lappend cmdArgsL "\"$val\""
-	#}
+	}
     }
     set cmdArgs [join $cmdArgsL ","]
     puts stdout "$cmd\($cmdArgs\)"
@@ -615,8 +616,8 @@ proc setPutMode { value } {
     set putMode $value
 }
 
-proc _break {} {
-  puts stdout "_break\(\)"
+proc my-break {} {
+  eval cmdargs "_break"
 }
 
 proc myPuts args {
@@ -743,8 +744,7 @@ proc module { command args } {
 }
 
 proc reportError {message} {
-    global ModulesCurrentModulefile g_fullName
-    puts stdout "log_error(\"\"\"$ModulesCurrentModulefile: ($g_fullName): $message\"\"\")"
+    puts stdout "log_error(\'\'\'$message\'\'\')"
 }
 
 proc execute-modulefile {modfile } {
@@ -781,8 +781,9 @@ proc execute-modulefile {modfile } {
 	interp alias $slave module-version {} module-version
 	interp alias $slave module-alias {} module-alias
 	interp alias $slave reportError {} reportError
-	interp alias $slave break {} _break
-
+	if {! [info exists env(SEMS_PLATFORM)]} {
+          interp alias $slave break {} my-break
+        }
 	interp eval $slave {global ModulesCurrentModulefile g_help}
 	interp eval $slave [list "set" "ModulesCurrentModulefile" $modfile]
 	interp eval $slave [list "set" "g_help" $g_help]
