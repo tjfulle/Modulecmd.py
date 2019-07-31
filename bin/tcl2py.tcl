@@ -616,11 +616,7 @@ proc setPutMode { value } {
     set putMode $value
 }
 
-proc my-break {} {
-  eval cmdargs "_break"
-}
-
-proc myPuts args {
+proc my-puts args {
     global putMode
     set nonewline 0
     switch [llength $args] {
@@ -653,7 +649,7 @@ proc myPuts args {
             error {puts ?-nonewline? ?channel? text}
         }
     }
-    if {$putMode != "inHelp"} {
+    if {$putMode != "to-console"} {
         if { ($channel == "stdout") || ($channel == "stderr") } {
             set channel "stdout"
             set text "log_info(\"$text\")"
@@ -768,8 +764,8 @@ proc execute-modulefile {modfile } {
 	interp alias $slave conflict {} conflict
 	interp alias $slave is-loaded {} is-loaded
 	interp alias $slave module {} module
-    interp alias $slave setPutMode {} setPutMode
-    interp alias $slave puts {} myPuts
+        interp alias $slave setPutMode {} setPutMode
+        interp alias $slave puts {} my-puts
 	interp alias $slave module-info {} module-info
 	interp alias $slave module-whatis {} module-whatis
 	interp alias $slave set-alias {} set-alias
@@ -780,7 +776,6 @@ proc execute-modulefile {modfile } {
 	interp alias $slave module-version {} module-version
 	interp alias $slave module-alias {} module-alias
 	interp alias $slave reportError {} reportError
-    interp alias $slave break {} my-break
 	interp eval $slave {global ModulesCurrentModulefile g_help}
 	interp eval $slave [list "set" "ModulesCurrentModulefile" $modfile]
 	interp eval $slave [list "set" "g_help" $g_help]
@@ -791,15 +786,30 @@ proc execute-modulefile {modfile } {
         if { $g_help && [info procs "ModulesHelp"] == "ModulesHelp" } {
             set start "help(\"\"\""
             set end   "\"\"\")"
-            setPutMode "inHelp"
+            setPutMode "to-console"
             puts stdout $start
 	    catch { ModulesHelp } errMsg
             puts stdout $end
             setPutMode "normal"
         }
         if {$sourceFailed} {
+          # no error in case of "continue" command
+          # catch continue even if called outside of a loop
+          if {$errorMsg eq {invoked "continue" outside of a loop} || $sourceFailed == 4} {
+            unset errorMsg
+            set errorVal 0
+            # catch break even if called outside of a loop
+          } elseif {$errorMsg eq {invoked "break" outside of a loop} || ($errorMsg eq {} && (![info exists ::errorInfo] || $::errorInfo eq {}))} {
+            # report load/unload evaluation break if verbosity level >= normal
+            unset errorMsg
+            set errorVal 0
+            setPutMode "to-console"
+            puts stdout "_break\(\)"
+            setPutMode "normal"
+          } else {
             reportError $errorMsg
             return 1
+          }
         }
     }]
     interp delete $slave

@@ -1,4 +1,5 @@
 import pymod.error
+import llnl.util.tty as tty
 
 category = 'utility'
 
@@ -16,4 +17,5 @@ def _break(module, mode):
     executed.
 
     """
+    tty.warn("Evaluation of {0} aborted".format(module.fullname))
     raise pymod.error.TclModuleBreakError

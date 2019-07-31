@@ -64,9 +64,6 @@ def execmodule_in_sandbox(module, mode):
             # environment and tell whoever called no to register this module
             pymod.environ.restore(clone)
             module.exec_failed_do_not_register = True
-            tty.warn('`break` encountered in TCL module {0}. Suggest '
-                     'replacing break with a call to `reportError(<message>) '
-                     'instead.'.format(module.fullname))
 
 def module_exec_sandbox(module, mode):
     callback = lambda cb, **kwds: pymod.callback.callback(cb, module, mode, **kwds)
