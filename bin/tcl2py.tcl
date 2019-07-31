@@ -622,33 +622,32 @@ proc my-break {} {
 
 proc myPuts args {
     global putMode
-    foreach {a b c} $args break
     set nonewline 0
     switch [llength $args] {
         1 {
             set channel stdout
-            set text $a
+            set text [lindex $args 0]
         }
         2 {
-            if {[string equal $a -nonewline]} {
+            if {[string equal [lindex $args 0] -nonewline]} {
                 set nonewline 1
                 set channel stdout
             } else {
-                set channel $a
+                set channel [lindex $args 0]
             }
-            set text $b
+            set text [lindex $args 1]
         }
         3 {
-            if {[string equal $a -nonewline]} {
+            if {[string equal [lindex $args 0] -nonewline]} {
                 set nonewline 1
-                set channel $b
-            } elseif {[string equal $b -nonewline]} {
+                set channel [lindex $args 1]
+            } elseif {[string equal [lindex $args 1] -nonewline]} {
                 set nonewline 1
-                set channel $a
+                set channel [lindex $args 0]
             } else {
                 error {puts ?-nonewline? ?channel? text}
             }
-            set text $c
+            set text [lindex $args 2]
         }
         default {
             error {puts ?-nonewline? ?channel? text}
@@ -769,8 +768,8 @@ proc execute-modulefile {modfile } {
 	interp alias $slave conflict {} conflict
 	interp alias $slave is-loaded {} is-loaded
 	interp alias $slave module {} module
-        interp alias $slave setPutMode {} setPutMode
-        interp alias $slave puts {} myPuts
+    interp alias $slave setPutMode {} setPutMode
+    interp alias $slave puts {} myPuts
 	interp alias $slave module-info {} module-info
 	interp alias $slave module-whatis {} module-whatis
 	interp alias $slave set-alias {} set-alias
@@ -781,9 +780,7 @@ proc execute-modulefile {modfile } {
 	interp alias $slave module-version {} module-version
 	interp alias $slave module-alias {} module-alias
 	interp alias $slave reportError {} reportError
-	if {! [info exists env(SEMS_PLATFORM)]} {
-          interp alias $slave break {} my-break
-        }
+    interp alias $slave break {} my-break
 	interp eval $slave {global ModulesCurrentModulefile g_help}
 	interp eval $slave [list "set" "ModulesCurrentModulefile" $modfile]
 	interp eval $slave [list "set" "g_help" $g_help]
