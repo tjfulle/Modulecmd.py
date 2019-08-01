@@ -67,11 +67,15 @@ def archive_module(module):
               family=module.family,
               opts=module.opts,
               acquired_as=module.acquired_as,
-              refcount=module.refcount)
+              refcount=module.refcount,
+              modulepath=module.modulepath)
     return ar
 
 
 def unarchive_module(ar):
+    path = ar.get('modulepath')
+    if path and not pymod.modulepath.contains(path):  # pragma: no cover
+        pymod.mc.use(path)
     module = pymod.modulepath.get(ar['filename'])
     if module is None:
         raise pymod.error.ModuleNotFoundError(ar['fullname'])

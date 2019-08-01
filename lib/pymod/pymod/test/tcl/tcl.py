@@ -232,3 +232,17 @@ if { ![info exists env(FOO)] } {
     assert not m.is_loaded
 
     pymod.environ.environ.pop('FOO')
+
+
+@pytest.mark.tcl
+def test_tcl_continue(tmpdir, mock_modulepath):
+    f = tmpdir.join('f').write('''\
+#%Module1.0
+setenv foo BAR
+continue
+setenv BAZ SPAM''')
+    mock_modulepath(tmpdir.strpath)
+    m = pymod.mc.load('f')
+    assert pymod.environ.get('foo') == 'BAR'
+    assert pymod.environ.get('BAZ') is None
+    assert m.is_loaded

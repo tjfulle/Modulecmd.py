@@ -31,8 +31,8 @@ class Bash(Shell):
         val = val.rstrip(';')
         return "alias {0}='{1}';".format(key, val)
 
-    def format_source_command(self, filename):
-        return 'source {0}'.format(filename)
+    def format_source_command(self, filename, *args):
+        return 'source {0} {1}'.format(filename, ' '.join(args)).strip()
 
     def filter_key(self, key):
         return key.startswith(('BASH_FUNC',))

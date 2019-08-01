@@ -62,9 +62,11 @@ class Modulepath:
 
     def _get(self, key):
         """Implementation of `get`"""
+        tty.debug(key)
         if os.path.isdir(key) and key in self:
             return self.getby_dirname(key)
         if os.path.isfile(key):
+            tty.debug(key)
             module = self.getby_filename(key)
             if module is not None:
                 module.acquired_as = module.filename
@@ -125,7 +127,9 @@ class Modulepath:
                 return path.modules
 
     def getby_filename(self, filename, use_file_modulepath=False):
+        tty.debug(filename)
         for path in self.path:
+            tty.debug(path.path)
             for module in path.modules:
                 if filename == module.filename:
                     return module

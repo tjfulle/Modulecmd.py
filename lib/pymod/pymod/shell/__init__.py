@@ -48,8 +48,8 @@ def set_shell(shell_name):
         _shell = get_shell(shell_name)
 
 
-def format_source_command(filename):
-    return _shell.format_source_command(filename)
+def format_source_command(filename, *args):
+    return _shell.format_source_command(filename, *args)
 
 
 def format_output(environ, aliases=None, shell_functions=None):

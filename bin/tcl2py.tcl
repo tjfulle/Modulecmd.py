@@ -795,11 +795,17 @@ proc execute-modulefile {modfile } {
         if {$sourceFailed} {
           # no error in case of "continue" command
           # catch continue even if called outside of a loop
-          if {$errorMsg eq {invoked "continue" outside of a loop} || $sourceFailed == 4} {
+          if {$errorMsg eq {invoked "continue" outside of a loop} || \
+              $sourceFailed == 4} {
             unset errorMsg
             set errorVal 0
+            setPutMode "to-console"
+            puts stdout "_continue\(\)"
+            setPutMode "normal"
             # catch break even if called outside of a loop
-          } elseif {$errorMsg eq {invoked "break" outside of a loop} || ($errorMsg eq {} && (![info exists ::errorInfo] || $::errorInfo eq {}))} {
+          } elseif {$errorMsg eq {invoked "break" outside of a loop} || \
+                   ($errorMsg eq {} && (![info exists ::errorInfo] || \
+                   $::errorInfo eq {}))} {
             # report load/unload evaluation break if verbosity level >= normal
             unset errorMsg
             set errorVal 0

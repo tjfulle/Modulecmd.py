@@ -4,7 +4,7 @@ import pymod.modes
 category = 'utility'
 
 
-def source(module, mode, filename):
+def source(module, mode, filename, *args):
     """Sources a shell script given by filename
 
     Arguments:
@@ -21,4 +21,4 @@ def source(module, mode, filename):
     """
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.load:
-        pymod.mc.source(filename)
+        pymod.mc.source(filename, *args)
