@@ -156,7 +156,7 @@ class Module(object):
             return os.path.sep.join((self.name, self.version.string))
         return os.path.sep.join((self.name, self.version.string, self.variant.string))
 
-    def format_info(self):
+    def format_dl_status(self):
         if self.is_default and self.is_loaded:
             return self.fullname + ' (D,L)'
         elif self.is_default:  # pragma: no cover

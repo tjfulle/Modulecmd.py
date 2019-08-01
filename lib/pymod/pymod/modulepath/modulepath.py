@@ -259,7 +259,7 @@ class Modulepath:
                     continue
                 s = colorize('@r{(None)}'.center(width))
             else:
-                modules = [self.colorize(m.format_info()) for m in modules]
+                modules = [self.colorize(m.format_dl_status()) for m in modules]
                 aliases = pymod.alias.get(directory)
                 if aliases:  # pragma: no cover
                     for (alias, target) in aliases:

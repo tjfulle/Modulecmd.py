@@ -37,12 +37,12 @@ def test_module_whatis(basic_python_module):
     m.format_whatis()
 
 
-def test_module_format_info(basic_python_module):
+def test_module_format_dl_status(basic_python_module):
     m = basic_python_module
     pymod.environ.set(pymod.names.loaded_modules, m.fullname)
-    m.format_info()
+    m.format_dl_status()
     m.is_default = True
-    m.format_info()
+    m.format_dl_status()
 
 
 def test_module_parts(tmpdir):

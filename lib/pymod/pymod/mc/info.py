@@ -21,6 +21,7 @@ def info(names):
                 s += '  @C{Family:}      %s\n' % module.family
 
             s += '  @C{Loaded:}       %s\n' % module.is_loaded
+            s += '  @C{Filename:}     %s\n' % module.filename
             s += '  @C{Modulepath:}   %s' % module.modulepath
 
             unlocked_by = module.unlocked_by()
