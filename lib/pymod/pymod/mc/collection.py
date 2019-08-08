@@ -3,6 +3,7 @@ import pymod.mc
 import pymod.modes
 import pymod.names
 import pymod.error
+import pymod.environ
 import pymod.collection
 import llnl.util.tty as tty
 
@@ -25,7 +26,7 @@ def restore(name):
     the_collection = pymod.collection.get(name)
     if the_collection is None:
         raise pymod.error.CollectionNotFoundError(name)
-    return restore_impl(the_collection)
+    return restore_impl(name, the_collection)
 
 
 def remove(name):
@@ -33,8 +34,9 @@ def remove(name):
     pymod.collection.remove(name)
 
 
-def restore_impl(the_collection):
+def restore_impl(name, the_collection):
     # First unload all loaded modules
+    pymod.environ.unset(pymod.names.loaded_collection)
     pymod.mc.purge(load_after_purge=False)
 
     # clear the modulepath
@@ -54,4 +56,5 @@ def restore_impl(the_collection):
             pymod.mc.load_impl(module)
             module.acquired_as = module.fullname
             assert module.is_loaded
+    pymod.environ.set(pymod.names.loaded_collection, name)
     return None

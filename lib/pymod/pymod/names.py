@@ -13,6 +13,7 @@ tutorial_save_env = '_LMT0_'
 tutorial_root_path = 'PYMOD_TUTORIAL_ROOT_PATH'
 
 sourced_files = 'PYMOD_SOURCED_FILES'
+loaded_collection = 'PYMOD_LOADED_COLLECTION'
 
 family_name = lambda key: 'MODULE_FAMILY_{0}'.format(key.upper())
 family_version = lambda key: 'MODULE_FAMILY_{0}_VERSION'.format(key.upper())

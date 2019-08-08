@@ -44,7 +44,7 @@ def load(name, opts=None, insert_at=None, caller='command_line'):
         if caller == 'command_line':
             collection = pymod.collection.get(name)
             if collection is not None:
-                return pymod.mc.collection.restore_impl(collection)
+                return pymod.mc.collection.restore_impl(name, collection)
         raise ModuleNotFoundError(name, mp=pymod.modulepath)
 
     # Set the command line options
