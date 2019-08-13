@@ -35,6 +35,28 @@ def add_save_command(parser):
     _subcommands['save'] = save
 
 
+def add_add_to_loaded_collection_command(parser):
+    def add_to_loaded_collection(args):
+        return pymod.mc.collection.add_to_loaded_collection(args.name)
+    p = parser.add_parser('add', help='Add module to currently loaded collection')
+    p.add_argument(
+        'name',
+        default=pymod.names.default_user_collection,
+        help='Name of module to add to currently loaded collection')
+    _subcommands['add'] = add_to_loaded_collection
+
+
+def add_pop_from_loaded_collection_command(parser):
+    def pop_from_loaded_collection(args):
+        return pymod.mc.collection.pop_from_loaded_collection(args.name)
+    p = parser.add_parser('pop', help='Pop module from currently loaded collection')
+    p.add_argument(
+        'name',
+        default=pymod.names.default_user_collection,
+        help='Name of module to pop from currently loaded collection')
+    _subcommands['pop'] = pop_from_loaded_collection
+
+
 def add_show_command(parser):
     def show(args):
         return pymod.mc.collection.show(args.name)
@@ -78,6 +100,8 @@ def setup_parser(subparser):
     add_show_command(sp)
     add_remove_command(sp)
     add_restore_command(sp)
+    add_add_to_loaded_collection_command(sp)
+    add_pop_from_loaded_collection_command(sp)
 
 
 def collection(parser, args):

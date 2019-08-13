@@ -3,6 +3,7 @@ import pytest
 
 import pymod.mc
 import pymod.paths
+import pymod.error
 import pymod.environ
 import pymod.collection
 
@@ -18,7 +19,7 @@ def collection(tmpdir):
 
 
 @pytest.fixture()
-def modules_path(tmpdir, namespace, modulecmds):
+def modules(tmpdir, namespace, modulecmds):
     m = modulecmds
     one = tmpdir.mkdir('1')
     one.join('a.py').write(m.setenv('a'))
@@ -32,8 +33,8 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-def test_collection_default(modules_path, mock_modulepath):
-    mock_modulepath(modules_path.path)
+def test_collection_default(modules, mock_modulepath):
+    mock_modulepath(modules.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     pymod.mc.collection.save(pymod.names.default_user_collection)
@@ -51,9 +52,9 @@ def test_collection_default(modules_path, mock_modulepath):
     assert not s.split()
 
 
-def test_collection_named(modules_path, mock_modulepath):
+def test_collection_named(modules, mock_modulepath):
 
-    mock_modulepath(modules_path.path)
+    mock_modulepath(modules.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     c = pymod.mc.load('c')
@@ -105,6 +106,23 @@ def test_collection_named(modules_path, mock_modulepath):
         pymod.mc.collection.restore('foo')
 
 
+def test_collection_add_pop(modules, mock_modulepath):
+    mock_modulepath(modules.path)
+    a = pymod.mc.load('a')
+    b = pymod.mc.load('b')
+    d = pymod.mc.load('d', opts={'x': True})
+
+    pymod.mc.collection.save('foo')
+    pymod.mc.collection.restore('foo')
+
+    pymod.mc.collection.add_to_loaded_collection('c')
+    pymod.mc.collection.pop_from_loaded_collection('a')
+    with pytest.raises(pymod.error.ModuleNotFoundError):
+        pymod.mc.collection.add_to_loaded_collection('baz')
+    with pytest.raises(Exception):
+        pymod.mc.collection.pop_from_loaded_collection('baz')
+
+
 def test_collection_bad(tmpdir):
     # nonexistent file: okay
     f = tmpdir.join('collections.json')
@@ -132,8 +150,8 @@ def test_collection_bad(tmpdir):
         collections.data
 
 
-def test_collection_read(modules_path, mock_modulepath):
-    mock_modulepath(modules_path.path)
+def test_collection_read(modules, mock_modulepath):
+    mock_modulepath(modules.path)
     a = pymod.mc.load('a')
     b = pymod.mc.load('b')
     pymod.mc.collection.save(pymod.names.default_user_collection)

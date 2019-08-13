@@ -5,6 +5,8 @@ import json
 from six import StringIO
 from ordereddict_backport import OrderedDict
 
+import pymod.mc
+import pymod.error
 import pymod.names
 import pymod.paths
 import pymod.compat
@@ -69,6 +71,54 @@ class Collections:
     def remove(self, name):
         self.data.pop(name, None)
         self.write(self.data, self.filename)
+
+    def add_to_loaded_collection(self, name):
+        """Add a module `name` to the currently loaded collection"""
+        collection_name = pymod.environ.get(pymod.names.loaded_collection)
+        if collection_name is None:
+            tty.die('There is no collection currently loaded')
+        data = OrderedDict(self.data.pop(collection_name))
+        module = pymod.modulepath.get(name)
+        if module is None:
+            raise pymod.error.ModuleNotFoundError(name)
+        if not module.is_loaded:
+            pymod.mc.load_impl(module)
+        for (mp, modules) in data.items():
+            if mp != module.modulepath:
+                continue
+            for other in modules:
+                if other['fullname'] == module.fullname:
+                    tty.warn('{0} is already in collection {1}'
+                             .format(name, collection_name))
+                    return
+        ar = pymod.mc.archive_module(module)
+        ar['refcount'] = 0
+        data.setdefault(module.modulepath, []).append(ar)
+        data = list(data.items())
+        self.data.update({collection_name: data})
+        self.write(self.data, self.filename)
+        return None
+
+    def pop_from_loaded_collection(self, name):
+        """Remove a module `name` to the currently loaded collection"""
+        collection_name = pymod.environ.get(pymod.names.loaded_collection)
+        if collection_name is None:
+            tty.die('There is not collection currently loaded')
+        data = OrderedDict(self.data.pop(collection_name))
+        module = pymod.modulepath.get(name)
+        if module is None:
+            raise pymod.error.ModuleNotFoundError(name)
+        if module.is_loaded:
+            pymod.mc.unload_impl(module)
+        for (mp, modules) in data.items():
+            if mp != module.modulepath:
+                continue
+            data[mp] = [other for other in modules if other['fullname'] == module.fullname]
+            break
+        data = list(data.items())
+        self.data.update({collection_name: data})
+        self.write(self.data, self.filename)
+        return None
 
     def filter_collections_by_regex(self, collections, regex):
         if regex:
@@ -141,6 +191,14 @@ def save(name, loaded_modules):
 
 def remove(name):
     return collections.remove(name)
+
+
+def pop_from_loaded_collection(name):
+    return collections.pop_from_loaded_collection(name)
+
+
+def add_to_loaded_collection(name):
+    return collections.add_to_loaded_collection(name)
 
 
 def get(name):

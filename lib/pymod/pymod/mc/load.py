@@ -1,5 +1,7 @@
 import pymod.mc
 import pymod.modes
+import pymod.names
+import pymod.environ
 import pymod.modulepath
 import pymod.collection
 
@@ -59,6 +61,13 @@ def load(name, opts=None, insert_at=None, caller='command_line'):
                      .format(module.fullname))
         return module
 
+    if pymod.environ.get(pymod.names.loaded_collection):  # pragma: no cover
+        collection = pymod.environ.get(pymod.names.loaded_collection)
+        tty.debug('Loading {0} on top of loaded collection {1}. '
+                  'Removing the collection name from the environment'
+                  .format(module.fullname, collection))
+        pymod.environ.unset(pymod.names.loaded_collection)
+
     if insert_at is not None:
         load_inserted_impl(module, insert_at)
     else:
@@ -76,6 +85,7 @@ def load_impl(module):
         The module to load
 
     """
+
     # See if a module of the same name is already loaded. If so, swap that
     # module with the requested module
     for other in pymod.mc.get_loaded_modules():

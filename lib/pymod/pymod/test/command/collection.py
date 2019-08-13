@@ -86,3 +86,17 @@ def test_command_collection_basic2(modules_path, mock_modulepath):
     collection('avail', '-t')
     collection('avail', '--terse')
     collection('avail', 'foo')
+
+
+def test_command_collection_add_pop(modules_path, mock_modulepath):
+
+    mock_modulepath(modules_path.path)
+    collection = PymodCommand('collection')
+    a = pymod.mc.load('a')
+    b = pymod.mc.load('b')
+    c = pymod.mc.load('c')
+
+    collection('save', 'foo')
+    collection('restore', 'foo')
+    collection('add', 'd')
+    collection('pop', 'a')

@@ -30,8 +30,18 @@ def restore(name):
 
 
 def remove(name):
-    """Save currently loaded modules to a collection"""
+    """Delete collection `name` from database"""
     pymod.collection.remove(name)
+
+
+def pop_from_loaded_collection(name):
+    """Remove module `name` from currently loaded collection"""
+    pymod.collection.pop_from_loaded_collection(name)
+
+
+def add_to_loaded_collection(name):
+    """Append module `name` to currently loaded collection"""
+    pymod.collection.add_to_loaded_collection(name)
 
 
 def restore_impl(name, the_collection):
