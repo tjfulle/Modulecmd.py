@@ -20,6 +20,7 @@ class Environ(dict):
     def __init__(self):
         self.aliases = {}
         self.shell_functions = {}
+        self.destination_dir = None
 
     def __getitem__(self, key):
         """Overload Environ[] to first check me, then os.environ"""
@@ -34,8 +35,16 @@ class Environ(dict):
 
     def format_output(self):
         env = self.copy()
-        return pymod.shell.format_output(
+        output = pymod.shell.format_output(
             env, self.aliases, self.shell_functions)
+        if self.destination_dir is not None:
+            output += 'cd {0};'.format(self.destination_dir)
+        return output
+
+    def set_destination_dir(self, dirname):
+        if not os.path.isdir(dirname):
+            tty.die('{0} is not a directory'.format(dirname))
+        self.destination_dir = dirname
 
     def get(self, key, default=None):
         """Overload Environ.get to first check me, then os.environ"""
@@ -347,3 +356,7 @@ def get_lm_cellar():
 
 def set_lm_cellar(cellar):
     return set_serialized(pymod.names.loaded_module_cellar, cellar)
+
+
+def set_destination_dir(dirname):
+    environ.set_destination_dir(dirname)
