@@ -110,7 +110,7 @@ class Modulepath:
             # Module has not been found.  Try an alias
             target = pymod.alias.get(key)
             if target is not None:
-                # It does not harm to append the alias's modulepath. If it is
+                # It does no harm to append the alias's modulepath. If it is
                 # already used, append_path is a null op, it is not already
                 # being used, then appending has less side effects than
                 # prepending.

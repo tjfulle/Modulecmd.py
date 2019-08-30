@@ -91,3 +91,17 @@ def test_callback_execute_2(tmpdir, mock_modulepath):
     os.remove(f)
     pymod.mc.unload('a')
     assert not os.path.isfile(f)
+
+
+def test_callback_chdir(tmpdir, mock_modulepath):
+    f = os.path.join(tmpdir.strpath, 'foobar')
+    d = tmpdir.mkdir('foo').strpath
+    tmpdir.join('a.py').write("chdir('{0}')".format(d))
+    tmpdir.join('b.py').write("chdir('a_fake_dir')")
+    mock_modulepath(tmpdir.strpath)
+    pymod.mc.load('a')
+    with pytest.raises(SystemExit):
+        pymod.mc.load('b')
+    s = pymod.environ.format_output()
+    x = [_.strip() for _ in s.split('\n') if _.split()][-1]
+    assert x == 'cd {0};'.format(d)

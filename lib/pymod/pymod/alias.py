@@ -37,7 +37,7 @@ class Aliases(object):
         for (name, info) in self.data.items():
             if info['modulepath'] == dirname:
                 value.append((name, info['target']))
-        return value
+        return value or None
 
     def read(self, filename):
         if os.path.isfile(filename):  # pragma: no cover

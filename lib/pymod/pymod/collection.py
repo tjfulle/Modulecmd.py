@@ -75,7 +75,7 @@ class Collections:
     def add_to_loaded_collection(self, name):
         """Add a module `name` to the currently loaded collection"""
         collection_name = pymod.environ.get(pymod.names.loaded_collection)
-        if collection_name is None:
+        if collection_name is None:  # pragma: no cover
             tty.die('There is no collection currently loaded')
         data = OrderedDict(self.data.pop(collection_name))
         module = pymod.modulepath.get(name)
@@ -87,7 +87,7 @@ class Collections:
             if mp != module.modulepath:
                 continue
             for other in modules:
-                if other['fullname'] == module.fullname:
+                if other['fullname'] == module.fullname:  # pragma: no cover
                     tty.warn('{0} is already in collection {1}'
                              .format(name, collection_name))
                     return
@@ -103,15 +103,15 @@ class Collections:
         """Remove a module `name` to the currently loaded collection"""
         collection_name = pymod.environ.get(pymod.names.loaded_collection)
         if collection_name is None:
-            tty.die('There is not collection currently loaded')
+            tty.die('There is no collection currently loaded')  # pragma: no cover
         data = OrderedDict(self.data.pop(collection_name))
         module = pymod.modulepath.get(name)
-        if module is None:
+        if module is None:  # pragma: no cover
             raise pymod.error.ModuleNotFoundError(name)
         if module.is_loaded:
             pymod.mc.unload_impl(module)
         for (mp, modules) in data.items():
-            if mp != module.modulepath:
+            if mp != module.modulepath:  # pragma: no cover
                 continue
             data[mp] = [other for other in modules if other['fullname'] == module.fullname]
             break
