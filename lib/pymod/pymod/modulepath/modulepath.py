@@ -139,16 +139,19 @@ class Modulepath:
         self.assign_defaults()
 
     def append_path(self, dirname):
+        dirname = Path.expand_name(dirname)
         if dirname in self:
             return
         path = Path(dirname)
         if not path.modules:
+            tty.verbose('No modules found in {0}'.format(path.path))
             return
         self.path.append(path)
         self.path_modified()
         return path.modules
 
     def prepend_path(self, dirname):
+        dirname = Path.expand_name(dirname)
         if dirname in self:
             path = self.path.pop(self.index(dirname))
         else:
@@ -173,7 +176,7 @@ class Modulepath:
             The modules in the directory that was removed
 
         """
-
+        dirname = Path.expand_name(dirname)
         if dirname not in self:  # pragma: no cover
             tty.warn('Modulepath: {0!r} is not in modulepath'.format(dirname))
             return []

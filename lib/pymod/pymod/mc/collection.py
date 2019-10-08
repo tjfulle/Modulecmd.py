@@ -50,6 +50,7 @@ def restore_impl(name, the_collection):
     pymod.mc.purge(load_after_purge=False)
 
     # clear the modulepath
+    orig_path = pymod.modulepath.path()
     path = pymod.modulepath.Modulepath([])
     pymod.modulepath.set_path(path)
 
@@ -67,4 +68,7 @@ def restore_impl(name, the_collection):
             module.acquired_as = module.fullname
             assert module.is_loaded
     pymod.environ.set(pymod.names.loaded_collection, name)
+    for p in orig_path:
+        if not pymod.modulepath.contains(p):
+            pymod.mc.use(p, append=True)
     return None

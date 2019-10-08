@@ -1,3 +1,6 @@
+import os
+from string import Template
+
 import pymod.cache
 import pymod.names
 import pymod.module
@@ -9,7 +12,7 @@ from contrib.util import groupby, join
 class Path:
     """Class to hold modules in a directory"""
     def __init__(self, dirname):
-        self.path = dirname
+        self.path = self.expand_name(dirname)
         self.modules = self.find_modules()
 
     def find_modules(self):
@@ -41,3 +44,9 @@ class Path:
         section = pymod.names.modulepath
         data = [pymod.module.as_dict(m) for m in modules]
         pymod.cache.set(section, key, data)
+
+    @classmethod
+    def expand_name(cls, dirname):
+        return os.path.expanduser(Template(dirname).safe_substitute(**(os.environ)))
+
+
