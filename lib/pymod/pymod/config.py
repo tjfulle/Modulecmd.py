@@ -119,7 +119,10 @@ def factory():
         envar = 'PYMOD_{0}'.format(key.upper())
         if os.getenv(envar):
             key = envar[6:].lower()
-            env[key] = os.environ[envar]
+            value = os.environ[envar]
+            if isinstance(defaults[key], bool):
+                value = False if value.upper() in ("0", "FALSE", "NO") else True
+            env[key] = value
 
     if env:
         cfg.push_scope('environment', env)

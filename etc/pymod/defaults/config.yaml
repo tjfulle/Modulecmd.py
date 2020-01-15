@@ -36,3 +36,6 @@ config:
 
   # Size of chunks used for environment variables that are serialized
   serialize_chunk_size: 200
+
+  # Don't use cache, can be slower
+  use_modulepath_cache: true

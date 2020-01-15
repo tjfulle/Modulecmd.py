@@ -1,8 +1,8 @@
 import os
 from string import Template
-
 import pymod.cache
 import pymod.names
+import pymod.config
 import pymod.module
 from pymod.modulepath.discover import find_modules
 
@@ -26,6 +26,8 @@ class Path:
             return modules
 
     def get_cached_modules(self):
+        if not pymod.config.get('use_modulepath_cache'):
+            return None
         key = self.path
         section = pymod.names.modulepath
         cached = pymod.cache.get(section, key)
@@ -40,6 +42,8 @@ class Path:
         return modules
 
     def cache_modules(self, modules):
+        if not pymod.config.get('use_modulepath_cache'):
+            return
         key = self.path
         section = pymod.names.modulepath
         data = [pymod.module.as_dict(m) for m in modules]

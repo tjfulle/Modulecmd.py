@@ -5,6 +5,7 @@ import atexit
 import pymod.names
 import pymod.modulepath
 
+import llnl.util.tty as tty
 from llnl.util.lang import Singleton
 
 
@@ -62,6 +63,7 @@ class Cache:
 
     @modifies_cache
     def remove(self):
+        tty.info("Removing the MODULEPATH cache")
         if os.path.isfile(self.filename):
             os.remove(self.filename)
         self._data = dict()
@@ -82,6 +84,7 @@ class Cache:
 
     def build(self):
         """Build the cache"""
+        tty.info("Building the MODULEPATH cache")
         self._data = {}
         self._data['version'] = cache_version_info
 
