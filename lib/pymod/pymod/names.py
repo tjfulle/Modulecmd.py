@@ -26,6 +26,7 @@ ld_preload = 'LD_PRELOAD'
 ld_library_path = 'LD_LIBRARY_PATH'
 platform_ld_library_path = ('DYLD_LIBRARY_PATH' if sys.platform == 'darwin'
                             else 'LD_LIBRARY_PATH')
+manpath = 'MANPATH'
 
 # Files to store collections and clones.  Paths relative to dot_dir.
 aliases_file_basename = 'aliases.yaml'

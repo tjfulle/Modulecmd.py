@@ -241,14 +241,15 @@ class Modulepath:
     def sort_key(module):
         return (module.name, module.version)
 
-    def avail(self, terse=False, regex=None):
+    def avail(self, terse=False, regex=None, long_format=False):
         if terse:
             return self.avail_terse(regex=regex)
         else:
-            return self.avail_full(regex=regex)
+            return self.avail_full(regex=regex, long_format=long_format)
 
-    def avail_full(self, regex=None):
+    def avail_full(self, regex=None, long_format=False):
         sio = StringIO()
+        sio.write('\n')
         _, width = tty.terminal_size()
         head = lambda x: (' ' + x + ' ').center(width, '-')
         for path in self:
@@ -267,10 +268,14 @@ class Modulepath:
                 if aliases:  # pragma: no cover
                     for (alias, target) in aliases:
                         i = bisect.bisect_left(modules, alias)
-                        modules.insert(i, colorize('@M{%s}->%s' % (alias, target)))
+                        insert_key = colorize('@M{%s}@@' % (alias))
+                        if long_format:  # pragma: no cover
+                            insert_key += ' -> %s' % (target)
+                        modules.insert(i, insert_key)
                 s = colified(modules, width=width)
             directory = directory.replace(os.path.expanduser('~/'), '~/')
-            sio.write(head(directory) + '\n')
+            # sio.write(head(directory) + '\n')
+            sio.write(colorize('@G{%s}:\n' % (directory)))
             sio.write(s + '\n')
         return sio.getvalue()
 

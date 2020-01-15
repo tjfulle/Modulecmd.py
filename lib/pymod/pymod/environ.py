@@ -1,4 +1,5 @@
 import os
+import sys
 from argparse import Namespace
 from textwrap import wrap
 
@@ -7,7 +8,7 @@ import pymod.shell
 import pymod.modulepath
 
 from contrib.util import boolean
-from contrib.util import join, split, pop
+from contrib.util import join, split, pop, get_system_manpath
 from pymod.serialize import serialize, deserialize
 from pymod.serialize import serialize_chunked, deserialize_chunked
 
@@ -21,6 +22,7 @@ class Environ(dict):
         self.aliases = {}
         self.shell_functions = {}
         self.destination_dir = None
+        self._sys_manpath = None
 
     def __getitem__(self, key):
         """Overload Environ[] to first check me, then os.environ"""
@@ -126,6 +128,26 @@ class Environ(dict):
             key = pymod.names.platform_ld_library_path
         return key
 
+    @property
+    def sys_manpath(self):  # pragma: no cover
+        if self._sys_manpath is None:
+            self._sys_manpath = get_system_manpath()
+        return self._sys_manpath
+
+    def set_manpath_if_needed(self):  # pragma: no cover
+        if sys.platform == 'darwin' and not self.get(pymod.names.manpath):
+            # On macOS, MANPATH, if set, must also include system paths,
+            # otherwise man will not search the system paths (it only searches
+            # MANPATH)
+            self.set(pymod.names.manpath, self.sys_manpath)
+
+    def unset_manpath_if_needed(self, path):  # pragma: no cover
+        assert path.key == pymod.names.manpath
+        if sys.platform == 'darwin':
+            cur_manpath = join(path.value, sep=os.pathsep)
+            if cur_manpath == self.sys_manpath:
+                path.value = None
+
     def save_ld_library_path(self, key):
         if key.endswith(pymod.names.ld_library_path):
             # sometimes python doesn't pick up ld_library_path :(
@@ -162,7 +184,9 @@ class Environ(dict):
         self.shell_functions[key] = None
 
     def append_path(self, key, value, sep=os.pathsep):
-        if key == pymod.names.modulepath:
+        if key == pymod.names.manpath:  # pragma: no cover
+            self.set_manpath_if_needed()
+        elif key == pymod.names.modulepath:
             raise ValueError(
                 'Do not set MODULEPATH directly in Environ object.  '
                 'Set it in the Modulepath instead')
@@ -179,7 +203,9 @@ class Environ(dict):
         self.set_path(current_path)
 
     def prepend_path(self, key, value, sep=os.pathsep):
-        if key == pymod.names.modulepath:
+        if key == pymod.names.manpath:  # pragma: no cover
+            self.set_manpath_if_needed()
+        elif key == pymod.names.modulepath:
             raise ValueError(
                 'Do not set MODULEPATH directly in Environ object.  '
                 'Set it in the Modulepath instead')
@@ -215,6 +241,8 @@ class Environ(dict):
             pop(current_path.value, value)
         if count > 0:
             current_path.meta[value] = (count, priority)
+        if key == pymod.names.manpath:  # pragma: no cover
+            self.unset_manpath_if_needed(current_path)
         self.set_path(current_path)
 
 

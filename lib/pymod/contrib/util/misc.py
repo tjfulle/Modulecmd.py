@@ -3,10 +3,12 @@ import re
 import textwrap
 import subprocess
 from llnl.util.tty import terminal_size
+from spack.util.executable import Executable
 
 __all__ = [
     'split', 'join', 'join_args', 'decode_str', 'encode_str', 'boolean', 'pop',
-    'strip_quotes', 'check_output', 'which', 'is_executable', 'textfill', 'listdir'
+    'strip_quotes', 'check_output', 'which', 'is_executable', 'textfill', 'listdir',
+    'get_system_manpath',
     ]
 
 
@@ -124,3 +126,17 @@ def textfill(string, width=None, indent=None, **kwds):
         kwds['subsequent_indent'] = ' ' * indent
     s = textwrap.fill(string, width, **kwds)
     return s.lstrip()
+
+
+def get_system_manpath():
+    for x in ('/usr/bin/manpath', '/bin/manpath'):
+        if os.path.isfile(x):
+            manpath = Executable(x)
+            break
+    else:
+        return None
+    env = os.environ.copy()
+    env.pop('MANPATH', None)
+    env['PATH'] = '/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin'
+    output = manpath('-w', output=str, env=env)
+    return output.strip()
