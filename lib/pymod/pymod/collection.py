@@ -14,6 +14,7 @@ import pymod.environ
 
 import llnl.util.tty as tty
 from llnl.util.tty import terminal_size
+from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
 from llnl.util.lang import Singleton
 
@@ -139,8 +140,9 @@ class Collections:
         if not terse:
             _, width = terminal_size()
             s = colified(names, width=width)
-            sio.write('{0}\n{1}\n'
-                      .format(' Saved collections '.center(width, '-'), s))
+            #sio.write('{0}\n{1}\n'
+            #          .format(' Saved collections '.center(width, '-'), s))
+            sio.write(colorize('@G{Saved collections}:\n%s\n' % (s)))
         else:
             sio.write('\n'.join(c for c in names))
         string = sio.getvalue()
