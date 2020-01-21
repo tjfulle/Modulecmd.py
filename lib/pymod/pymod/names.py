@@ -12,6 +12,8 @@ serialized_key = lambda key, i: '{0}_{1}'.format(key, i)
 tutorial_save_env = '_LMT0_'
 tutorial_root_path = 'PYMOD_TUTORIAL_ROOT_PATH'
 
+session_id = "PYMOD_SESSION_ID"
+
 sourced_files = 'PYMOD_SOURCED_FILES'
 loaded_collection = 'PYMOD_LOADED_COLLECTION'
 

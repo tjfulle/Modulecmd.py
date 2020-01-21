@@ -1,5 +1,7 @@
 import os
 import re
+import sys
+import getpass
 import textwrap
 import subprocess
 from llnl.util.tty import terminal_size
@@ -8,7 +10,7 @@ from spack.util.executable import Executable
 __all__ = [
     'split', 'join', 'join_args', 'decode_str', 'encode_str', 'boolean', 'pop',
     'strip_quotes', 'check_output', 'which', 'is_executable', 'textfill', 'listdir',
-    'get_system_manpath',
+    'get_system_manpath', 'get_processes',
     ]
 
 
@@ -89,13 +91,13 @@ def strip_quotes(item):
     return item
 
 
-def check_output(command):
+def check_output(command, shell=True):
     """Implementation of subprocess's check_output"""
     import subprocess
-    fh = open(os.devnull, 'a')
-    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=fh)
-    out, err = p.communicate()
-    returncode = p.poll()
+    with open(os.devnull, "a") as fh:
+        p = subprocess.Popen(command, shell=shell, stdout=subprocess.PIPE, stderr=fh)
+        out, err = p.communicate()
+        returncode = p.poll()
     return decode_str(out)
 
 
@@ -140,3 +142,52 @@ def get_system_manpath():
     env['PATH'] = '/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin'
     output = manpath('-w', output=str, env=env)
     return output.strip()
+
+
+def run(command):
+    devnull = open("/dev/null", "w")
+    pread, pwrite = os.pipe()
+    pid = os.fork()
+    if pid == 0:
+        os.close(pread)
+        os.dup2(pwrite, sys.stdout.fileno())
+        os.dup2(devnull.fileno(), sys.stderr.fileno())
+        os.execvp(command[0], command)
+    os.close(pwrite)
+    out = ""
+    while 1:
+        buf = os.read(pread, 512).decode("utf-8")
+        if len(buf) == 0:
+            break
+        out = out + buf
+    os.close(pread)
+    devnull.close()
+    pid, _ = os.waitpid(pid, 0)
+    return out
+
+
+def get_processes():
+    """
+    Gathers all processes.
+    """
+    if sys.platform == "darwin":
+        out = run(["ps", "-Ao", "user,pid,ppid,etime,pcpu,vsz,command"])
+    else:
+        out = run(["ps", "-Ao", "user,pid,ppid,etime,pcpu,vsz,args"])
+
+    user = getpass.getuser()
+    procs = {}
+    regex = re.compile("[ \n\t\r\v]+")
+    for line in out.split(os.linesep):
+        if not line.split():
+            continue
+        line = [_.strip() for _ in regex.split(line, 6)]
+        if len(line) >= 6:
+            if line[0] != user:
+                continue
+            pid = int(line[1])
+            ppid = int(line[2])
+            name = line[-1]
+            procs[pid] = {"ppid": ppid, "pid": pid, "name": str(line[-1])}
+
+    return procs

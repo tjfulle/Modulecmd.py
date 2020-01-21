@@ -116,8 +116,8 @@ def test_environ_set_env():
 
 
 def test_environ_set_serialized_dict():
-    pymod.environ.set_serialized('A', {0: 1})
-    assert pymod.environ.get_deserialized('A') == {0: 1}
+    pymod.environ.set_serialized('A', {'a': 1})
+    assert pymod.environ.get_deserialized('A') == {'a': 1}
 
 
 def test_environ_set_serialized_list():

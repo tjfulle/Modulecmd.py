@@ -193,13 +193,13 @@ class Environ(dict):
         key = self.fix_ld_library_path(key)
         allow_dups = pymod.config.get('allow_duplicate_path_entries')
         current_path = self.get_path(key, sep=sep)
-        count, priority = current_path.meta.pop(value, (0, -1))
-        if count == 0 and value in current_path.value:
-            count = current_path.value.count(value)
-        count += 1
+        d = current_path.meta.pop(value, {"count": 0, "priority": -1})
+        if d["count"] == 0 and value in current_path.value:
+            d["count"] = current_path.value.count(value)
+        d["count"] += 1
         if allow_dups or value not in current_path.value:
             current_path.value.append(value)
-        current_path.meta[value] = (count, priority)
+        current_path.meta[value] = d
         self.set_path(current_path)
 
     def prepend_path(self, key, value, sep=os.pathsep):
@@ -212,14 +212,14 @@ class Environ(dict):
         key = self.fix_ld_library_path(key)
         allow_dups = pymod.config.get('allow_duplicate_path_entries')
         current_path = self.get_path(key, sep=sep)
-        count, priority = current_path.meta.pop(value, (0, -1))
-        if count == 0 and value in current_path.value:
-            count = current_path.value.count(value)
-        count += 1
+        d = current_path.meta.pop(value, {"count": 0, "priority": -1})
+        if d["count"] == 0 and value in current_path.value:
+            d["count"] = current_path.value.count(value)
+        d["count"] += 1
         if not allow_dups:
             pop(current_path.value, value)
         current_path.value.insert(0, value)
-        current_path.meta[value] = (count, priority)
+        current_path.meta[value] = d
         self.set_path(current_path)
 
     def remove_path(self, key, value, sep=os.pathsep):
@@ -230,17 +230,17 @@ class Environ(dict):
         key = self.fix_ld_library_path(key)
         allow_dups = pymod.config.get('allow_duplicate_path_entries')
         current_path = self.get_path(key, sep=sep)
-        count, priority = current_path.meta.pop(value, (0, -1))
-        if count == 0 and value in current_path.value: # pragma: no cover
+        d = current_path.meta.pop(value, {"count": 0, "priority": -1})
+        if d["count"] == 0 and value in current_path.value: # pragma: no cover
             tty.warn('Inconsistent refcount state')
-            count = current_path.value.count(value)
+            d["count"] = current_path.value.count(value)
             if pymod.config.get('debug'):
                 raise Exception('Inconsistent refcount state')
-        count -= 1
-        if (allow_dups and count > 0) or count <= 0:
+        d["count"] -= 1
+        if (allow_dups and d["count"] > 0) or d["count"] <= 0:
             pop(current_path.value, value)
-        if count > 0:
-            current_path.meta[value] = (count, priority)
+        if d["count"] > 0:
+            current_path.meta[value] = d
         if key == pymod.names.manpath:  # pragma: no cover
             self.unset_manpath_if_needed(current_path)
         self.set_path(current_path)
@@ -342,11 +342,11 @@ def set_serialized_impl(container, label, value):
         container.set(key, chunk)
 
 
-def get_deserialized(label):
-    return get_deserialized_impl(environ, label)
+def get_deserialized(label, default=None):
+    return get_deserialized_impl(environ, label, default=default)
 
 
-def get_deserialized_impl(container, label):
+def get_deserialized_impl(container, label, default=None):
     i = 0
     chunks = []
     while True:
@@ -356,9 +356,11 @@ def get_deserialized_impl(container, label):
         except KeyError:
             break
         if chunk is None:
-            return
+            return None
         chunks.append(chunk)
         i += 1
+    if not chunks:
+        return default
     return deserialize_chunked(chunks)
 
 
@@ -376,14 +378,6 @@ def clone():
 
 def restore(the_clone):
     return environ.restore(the_clone)
-
-
-def get_lm_cellar():
-    return get_deserialized(pymod.names.loaded_module_cellar)
-
-
-def set_lm_cellar(cellar):
-    return set_serialized(pymod.names.loaded_module_cellar, cellar)
 
 
 def set_destination_dir(dirname):

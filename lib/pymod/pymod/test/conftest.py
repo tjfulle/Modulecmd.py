@@ -28,7 +28,7 @@ def no_dump(monkeypatch):
 @pytest.fixture(scope='function', autouse=True)
 def os_environ():
     """Cleans out os.environ"""
-    real_env = os.environ.copy()
+    orig_env = os.environ.copy()
     os.environ.pop(pymod.names.modulepath, None)
     os.environ.pop(pymod.names.initial_env, None)
     os.environ.pop(pymod.names.loaded_modules, None)
@@ -48,7 +48,7 @@ def os_environ():
     for key in to_pop:
         os.environ.pop(key, None)
     yield os.environ
-    os.environ = real_env
+    os.environ = orig_env
 
 
 @pytest.fixture(scope='function', autouse=True)
@@ -60,11 +60,11 @@ def pymod_cache():
 @pytest.fixture(scope='function', autouse=True)
 def pymod_environ():
     """Mocks up a fake pymod.environ for use by tests."""
-    real_environ = pymod.environ.environ
+    orig_environ = pymod.environ.environ
     env = pymod.environ.Environ()
     pymod.environ.environ = env
     yield pymod.environ.environ
-    pymod.environ.environ = real_environ
+    pymod.environ.environ = orig_environ
 
 
 @pytest.fixture(scope='function', autouse=True)

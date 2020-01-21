@@ -53,7 +53,9 @@ def get_loaded_modules():
     if _loaded_modules is None:
         tty.debug('Reading loaded modules')
         _loaded_modules = []
-        lm_cellar = pymod.environ.get_lm_cellar()
+        lm_cellar = pymod.environ.get_deserialized(
+            pymod.names.loaded_module_cellar, default=[]
+        )
         for ar in lm_cellar:
             module = unarchive_module(ar)
             _loaded_modules.append(module)
@@ -94,7 +96,7 @@ def set_loaded_modules(modules):
 
     assert all([m.acquired_as is not None for m in _loaded_modules])
     lm = [archive_module(m) for m in _loaded_modules]
-    pymod.environ.set_lm_cellar(lm)
+    pymod.environ.set_serialized(pymod.names.loaded_module_cellar, lm)
 
     # The following are for compatibility with other module programs
     lm_names = [m.fullname for m in _loaded_modules]
