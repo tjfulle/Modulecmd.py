@@ -1,7 +1,6 @@
 import os
 import sys
 from argparse import Namespace
-from textwrap import wrap
 
 import pymod.names
 import pymod.shell
@@ -67,7 +66,6 @@ class Environ(dict):
         p.meta_key = pymod.names.loaded_module_meta(key)
         p.sep = sep
         p.value = split(self.get(key), sep=sep)
-        meta = self.get(p.meta_key)
         serialized = self.get(p.meta_key)
         p.meta = {} if serialized is None else deserialize(serialized)
         return p

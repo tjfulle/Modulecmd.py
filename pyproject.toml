@@ -1,0 +1,11 @@
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+(
+    __pycache__
+  | \.cache
+  | \.git
+  | ^/lib/pymod/external
+)
+'''

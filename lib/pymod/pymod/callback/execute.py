@@ -45,6 +45,6 @@ def execute(module, mode, command, when=None):
         }
         try:
             exe(*xc[1:], **kwargs)
-        except:  # pragma: no cover
+        except:  # noqa: E722;  pragma: no cover
             tty.warn("Command {0!r} failed".format(command))
     return

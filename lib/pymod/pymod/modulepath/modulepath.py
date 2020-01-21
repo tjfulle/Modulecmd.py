@@ -7,7 +7,6 @@ import pymod.alias
 import pymod.names
 import pymod.module
 from pymod.modulepath.path import Path
-from pymod.modulepath.discover import find_modules
 
 from contrib.util import groupby, join
 
@@ -256,7 +255,7 @@ class Modulepath:
         sio = StringIO()
         sio.write("\n")
         _, width = tty.terminal_size()
-        head = lambda x: (" " + x + " ").center(width, "-")
+        # head = lambda x: (" " + x + " ").center(width, "-")
         for path in self:
             directory = path.path
             modules = sorted(

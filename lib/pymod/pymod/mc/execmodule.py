@@ -1,6 +1,5 @@
 import os
 import sys
-import socket
 
 import pymod.mc
 import pymod.user
@@ -8,7 +7,6 @@ import pymod.modes
 import pymod.module
 import pymod.environ
 import pymod.callback
-import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir
 from llnl.util.lang import Singleton
 

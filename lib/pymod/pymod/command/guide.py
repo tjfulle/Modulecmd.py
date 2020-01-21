@@ -1,5 +1,4 @@
 import os
-import sys
 import pymod.paths
 from contrib.util.tty.pager import pager
 from contrib.util.tty import redirect_stdout
@@ -10,7 +9,7 @@ except ImportError:  # pragma: no cover
     docutils = None
 
 try:
-    from docutils import nodes, core
+    from docutils import nodes, core  # noqa: F401
 except ImportError:  # pragma: no cover
     docutils = -1
 

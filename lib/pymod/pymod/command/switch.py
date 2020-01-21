@@ -1,10 +1,8 @@
-import os
 import sys
 
 import pymod.mc
 import pymod.config
 import pymod.environ
-import llnl.util.tty as tty
 
 description = "Switch from using Modulecmd.py to TCL module (or vice-versa)"
 section = "developer"

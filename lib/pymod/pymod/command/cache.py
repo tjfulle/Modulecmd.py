@@ -12,7 +12,7 @@ def add_build_command(parser):
     def build(args):
         pymod.cache.build()
 
-    p = parser.add_parser("build", help="Build the module cache")
+    parser.add_parser("build", help="Build the module cache")
     _subcommands["build"] = build
 
 
@@ -21,7 +21,7 @@ def add_rebuild_command(parser):
         pymod.cache.remove()
         pymod.cache.build()
 
-    p = parser.add_parser("rebuild", help="Rebuild the module cache")
+    parser.add_parser("rebuild", help="Rebuild the module cache")
     _subcommands["rebuild"] = rebuild
 
 
@@ -29,7 +29,7 @@ def add_remove_command(parser):
     def remove(args):
         pymod.cache.remove()
 
-    p = parser.add_parser("remove", help="Remove the module cache")
+    parser.add_parser("remove", help="Remove the module cache")
     _subcommands["remove"] = remove
 
 

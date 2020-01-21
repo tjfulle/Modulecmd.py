@@ -63,5 +63,5 @@ class Version:
 def try_int(item):
     try:
         return int(item)
-    except:
+    except:  # noqa: E722
         return item

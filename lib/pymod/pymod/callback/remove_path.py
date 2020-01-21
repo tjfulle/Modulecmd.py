@@ -38,7 +38,8 @@ def remove_path(module, mode, name, *values, **kwds):
     Here, ":" is the separator ``sep``.
 
     Examples:
-    Consider the module ``baz`` that removes `baz` from the path-like environment variable `BAZ`
+    Consider the module ``baz`` that removes `baz` from the path-like
+    environment variable `BAZ`
 
     .. code-block:: python
 

@@ -1,6 +1,3 @@
-import pymod.config
-
-
 class ModuleNotFoundError(Exception):
     def __init__(self, modulename, mp=None):
         msg = "{0!r} is not a module.  See {1!r}.".format(modulename, "module avail")

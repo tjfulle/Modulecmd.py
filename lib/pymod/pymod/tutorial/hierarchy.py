@@ -1,5 +1,3 @@
-import os
-
 import pymod.mc
 import pymod.names
 import pymod.environ

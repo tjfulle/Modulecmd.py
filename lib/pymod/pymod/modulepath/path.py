@@ -6,8 +6,6 @@ import pymod.config
 import pymod.module
 from pymod.modulepath.discover import find_modules
 
-from contrib.util import groupby, join
-
 
 class Path:
     """Class to hold modules in a directory"""

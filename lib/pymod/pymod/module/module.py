@@ -15,9 +15,6 @@ from llnl.util.tty import terminal_size
 __all__ = ["Namespace", "Module", "PyModule", "TclModule"]
 
 
-# --------------------------------------------------------------------------- #
-# --------------------------- MODULE CLASS ---------------------------------- #
-# --------------------------------------------------------------------------- #
 class Module(object):
     ext = None
 
@@ -317,3 +314,7 @@ class Namespace(object):
     def set_defaults(self, **kwargs):
         for (key, value) in kwargs.items():
             self.set(key, value["default"])
+
+
+class TCLSHNotFoundError(Exception):
+    pass

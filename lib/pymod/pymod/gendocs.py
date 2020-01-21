@@ -194,7 +194,7 @@ class Callback:
     def _get_section(self, section):
         content = []
         in_section = 0
-        regex = re.compile("(\w+)\s+\(([a-zA-Z0-9-_ ]+)\)")
+        #  regex = re.compile("(\w+)\s+\(([a-zA-Z0-9-_ ]+)\)")
         for line in self.raw_doc.split("\n"):
             if self.section_re.search(line):
                 if line.lower().startswith(section):

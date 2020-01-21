@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import atexit
 from llnl.util.lang import Singleton

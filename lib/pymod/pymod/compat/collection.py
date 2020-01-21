@@ -1,8 +1,5 @@
 import os
-import re
-import sys
 import json
-from six import StringIO
 from ordereddict_backport import OrderedDict
 
 import pymod.modulepath
@@ -11,9 +8,6 @@ import pymod.paths
 import pymod.environ
 
 import llnl.util.tty as tty
-from llnl.util.tty import terminal_size
-from llnl.util.tty.colify import colified
-from llnl.util.lang import Singleton
 
 
 def upgrade(new, old, old_version):  # pragma: no cover
@@ -22,7 +16,7 @@ def upgrade(new, old, old_version):  # pragma: no cover
     elif old_version != new.version:
         raise ValueError(
             "No known conversion from Collections version "
-            "{0} to {1}".format(version, new.version)
+            "{0} to {1}".format(old_version, new.version)
         )
 
 

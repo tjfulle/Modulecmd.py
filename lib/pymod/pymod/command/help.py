@@ -1,4 +1,3 @@
-import os
 import sys
 import pymod.mc
 import pymod.command

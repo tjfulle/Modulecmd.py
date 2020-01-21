@@ -5,7 +5,6 @@ from pymod.error import ModuleNotFoundError
 
 
 def find(names):
-    all_modules = [m for p in pymod.modulepath.walk() for m in p.modules]
     for name in names:
         s = None
         candidates = pymod.modulepath.candidates(name)
