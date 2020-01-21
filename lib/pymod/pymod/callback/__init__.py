@@ -49,7 +49,7 @@ import llnl.util.tty as tty
 
 
 # Patterns to ignore in the callbacks directory when looking for callbacks.
-ignore_files = r'^\.|^__init__.py$|^#|flycheck_'
+ignore_files = r"^\.|^__init__.py$|^#|flycheck_"
 
 CATEGORY = "category"
 
@@ -60,15 +60,14 @@ _all_callbacks = None
 
 def log_callback(func_name, *args, **kwargs):
     signature = StringIO()
-    signature.write('{0}('.format(func_name))
+    signature.write("{0}(".format(func_name))
     if args:
-        signature.write(', '.join('{0!r}'.format(_) for _ in args))
+        signature.write(", ".join("{0!r}".format(_) for _ in args))
     if kwargs:
         if args:
-            signature.write(', ')
-        signature.write(', '.join('{0}={1!r}'.format(*_)
-                                  for _ in kwargs.items()))
-    signature.write(')\n')
+            signature.write(", ")
+        signature.write(", ".join("{0}={1!r}".format(*_) for _ in kwargs.items()))
+    signature.write(")\n")
     pymod.mc.cur_module_command_his.write(signature.getvalue())
 
 
@@ -86,7 +85,7 @@ def all_callbacks():
         for path in callback_paths:
             for file in os.listdir(path):
                 if file.endswith(".py") and not re.search(ignore_files, file):
-                    callback = re.sub(r'.py$', '', file)
+                    callback = re.sub(r".py$", "", file)
                     _all_callbacks.append(callback)
 
         _all_callbacks.sort()
@@ -130,17 +129,20 @@ def callback(func_name, module, mode, when=None, **kwds):
 
 def callback_impl(func, module, mode, when=None, **kwds):
     if when is None:
-        when = (mode != pymod.modes.load_partial and
-                mode not in pymod.modes.informational)
+        when = (
+            mode != pymod.modes.load_partial and mode not in pymod.modes.informational
+        )
     if not when:
         func = lambda *args, **kwargs: None
+
     def wrapper(*args, **kwargs):
         if mode == pymod.modes.show:
             log_callback(func.__name__, *args, **kwargs)
-            if not getattr(func, 'eval_on_show', False):
+            if not getattr(func, "eval_on_show", False):
                 return
         kwargs.update(kwds)
         return func(module, mode, *args, **kwargs)
+
     return wrapper
 
 
@@ -153,16 +155,17 @@ def get_module(cb_name):
         name of the callback for which to get a module (contains ``-``, not ``_``).
     """
     # Import the callback from the built-in directory
-    module_name = '{0}.{1}'.format(__name__, cb_name)
-    module = __import__(module_name,
-                        fromlist=[cb_name, CATEGORY],
-                        level=0)
+    module_name = "{0}.{1}".format(__name__, cb_name)
+    module = __import__(module_name, fromlist=[cb_name, CATEGORY], level=0)
 
     attr_setdefault(module, CATEGORY, "")
 
     if not hasattr(module, cb_name):  # pragma: no cover
-        tty.die("callback module {0} ({1}) must define function {2!r}."
-                .format(module.__name__, module.__file__, cb_name))
+        tty.die(
+            "callback module {0} ({1}) must define function {2!r}.".format(
+                module.__name__, module.__file__, cb_name
+            )
+        )
 
     return module
 

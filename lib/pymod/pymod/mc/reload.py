@@ -10,8 +10,8 @@ def reload(name):
     if module is None:
         raise ModuleNotFoundError(name, pymod.modulepath)
     if not module.is_loaded:
-        tty.warn('{0} is not loaded!'.format(module.fullname))
+        tty.warn("{0} is not loaded!".format(module.fullname))
         return
     assert module.is_loaded
-    pymod.mc.swap_impl(module, module, maintain_state=True, caller='reload')
+    pymod.mc.swap_impl(module, module, maintain_state=True, caller="reload")
     return module

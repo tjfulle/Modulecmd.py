@@ -25,15 +25,15 @@ class Shell(object):
         sio = StringIO()
 
         for (envar, defn) in environ.items():
-            sio.write(self.format_environment_variable(envar, defn)+'\n')
+            sio.write(self.format_environment_variable(envar, defn) + "\n")
 
         if aliases is not None:
             for (alias, defn) in aliases.items():
-                sio.write(self.format_alias(alias, defn)+'\n')
+                sio.write(self.format_alias(alias, defn) + "\n")
 
         if shell_functions is not None:
             for (fun, defn) in shell_functions.items():
-                sio.write(self.format_shell_function(fun, defn)+'\n')
+                sio.write(self.format_shell_function(fun, defn) + "\n")
 
         return sio.getvalue()
 

@@ -31,7 +31,7 @@ class Clones(object):
         return dict()
 
     def write(self, clones, filename):
-        with open(filename, 'w') as fh:
+        with open(filename, "w") as fh:
             json.dump(clones, fh, indent=2)
 
     def save(self, name):
@@ -47,16 +47,15 @@ class Clones(object):
 
     def avail(self, terse=False):
         names = sorted([x for x in self.data.keys()])
-        if not names: # pragma: no cover
-            return ''
+        if not names:  # pragma: no cover
+            return ""
         sio = StringIO()
         if not terse:
             _, width = terminal_size()
             s = colified(names, width=width)
-            sio.write('{0}\n{1}\n'
-                        .format(' Saved clones '.center(width, '-'), s))
+            sio.write("{0}\n{1}\n".format(" Saved clones ".center(width, "-"), s))
         else:
-            sio.write('\n'.join(c for c in names))
+            sio.write("\n".join(c for c in names))
         return sio.getvalue()
 
 
@@ -64,6 +63,7 @@ def factory():
     basename = pymod.names.clones_file_basename
     filename = pymod.paths.join_user(basename)
     return Clones(filename)
+
 
 clones = Singleton(factory)
 

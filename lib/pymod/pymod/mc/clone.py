@@ -42,16 +42,17 @@ def restore_impl(the_clone):
 
     # Load modules to make sure aliases/functions are restored
     lm_cellar = pymod.environ.get_deserialized_impl(
-            the_clone,
-            pymod.names.loaded_module_cellar)
+        the_clone, pymod.names.loaded_module_cellar
+    )
     if lm_cellar:
         loaded_modules = []
         for ar in lm_cellar:
             try:
                 module = pymod.mc.unarchive_module(ar)
             except pymod.error.ModuleNotFoundError:
-                raise pymod.error.CloneModuleNotFoundError(ar['fullname'],
-                                                           ar['filename'])
+                raise pymod.error.CloneModuleNotFoundError(
+                    ar["fullname"], ar["filename"]
+                )
             loaded_modules.append(module)
         pymod.mc.set_loaded_modules(loaded_modules)
 

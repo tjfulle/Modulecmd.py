@@ -1,7 +1,7 @@
 import pymod.modes
 import pymod.environ
 
-category = 'environment'
+category = "environment"
 
 
 def unsetenv(module, mode, name, *args):

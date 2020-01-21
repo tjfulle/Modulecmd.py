@@ -2,7 +2,7 @@ import pymod.mc
 import pymod.modes
 from pymod.error import ModuleNotFoundError
 
-category = 'module'
+category = "module"
 
 
 def load(module, mode, name, **kwds):
@@ -46,14 +46,14 @@ def load(module, mode, name, **kwds):
 
     """
     pymod.modes.assert_known_mode(mode)
-    opts = kwds.get('opts', None)
+    opts = kwds.get("opts", None)
     pymod.modes.assert_known_mode(mode)
     if mode == pymod.modes.unload:
         # We are in unload mode and the module was requested to be loaded.
         # So, we reverse the action and unload it
         try:
-            pymod.mc.unload(name, caller='modulefile')
+            pymod.mc.unload(name, caller="modulefile")
         except ModuleNotFoundError:
             return
     else:
-        pymod.mc.load(name, opts=opts, caller='modulefile')
+        pymod.mc.load(name, opts=opts, caller="modulefile")

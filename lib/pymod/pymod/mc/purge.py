@@ -11,7 +11,7 @@ def purge(load_after_purge=True):
             pymod.mc.unload_impl(module)
 
     if load_after_purge:
-        load_after_purge = pymod.config.get('load_after_purge')
+        load_after_purge = pymod.config.get("load_after_purge")
         tty.debug(str(load_after_purge))
         if load_after_purge is not None:
             for name in load_after_purge:

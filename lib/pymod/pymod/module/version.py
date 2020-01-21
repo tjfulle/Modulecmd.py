@@ -9,19 +9,20 @@ class Version:
     [major[.minor[.patch[-variant]]]]
 
     """
+
     def __init__(self, version_string=None):
         self.tuple = tuple()
-        self.string = version_string or ''
+        self.string = version_string or ""
         if version_string is not None:
             try:
-                version_string, variant = version_string.split('-')
+                version_string, variant = version_string.split("-")
             except ValueError:
                 variant = None
-            parts = [try_int(part) for part in split(version_string, '.')]
+            parts = [try_int(part) for part in split(version_string, ".")]
             if variant is not None:
                 parts.append(try_int(variant))
             self.tuple = tuple(parts)
-        for (i, attr) in enumerate(('major', 'minor', 'patch', 'variant')):
+        for (i, attr) in enumerate(("major", "minor", "patch", "variant")):
             try:
                 value = self.tuple[i]
             except IndexError:

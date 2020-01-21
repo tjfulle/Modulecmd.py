@@ -7,7 +7,7 @@ import pymod.modulepath
 from pymod.error import ModuleNotFoundError
 
 
-def show(name, opts=None, insert_at=None, mode='load'):
+def show(name, opts=None, insert_at=None, mode="load"):
     """Show the commands that would result from loading module given by `name`
 
     Parameters

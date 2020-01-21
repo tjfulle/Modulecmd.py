@@ -4,7 +4,7 @@ import pymod.environ
 import llnl.util.tty as tty
 
 
-category = 'utility'
+category = "utility"
 
 
 def chdir(module, mode, dirname):

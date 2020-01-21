@@ -3,11 +3,11 @@ from pymod.error import PrereqMissingError
 
 
 def _partition(key):
-    first, _, last = key.partition(':')
+    first, _, last = key.partition(":")
     if not last.split():
-        first, last = 'name', first
-    elif first not in ('family', 'name'):
-        raise Exception('{0} not a known ID to prereq'.format(first))
+        first, last = "name", first
+    elif first not in ("family", "name"):
+        raise Exception("{0} not a known ID to prereq".format(first))
     return first, last
 
 
@@ -17,7 +17,7 @@ def prereq_any(*prereqs):
     lm_fams = [m.family for m in loaded_modules if m.family]
     for prereq in prereqs:
         key, val = _partition(prereq)
-        a = lm_fams if key == 'family' else lm_names
+        a = lm_fams if key == "family" else lm_names
         if val in a:
             return
     raise PrereqMissingError(*prereqs)
@@ -29,7 +29,7 @@ def prereq(*prereqs):
     lm_fams = [m.family for m in loaded_modules if m.family]
     for prereq in prereqs:
         key, val = _partition(prereq)
-        a = lm_fams if key == 'family' else lm_names
+        a = lm_fams if key == "family" else lm_names
         if val in a:
             continue
         raise PrereqMissingError(val)

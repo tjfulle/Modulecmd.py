@@ -1,7 +1,7 @@
 import pymod.mc
 import pymod.modes
 
-category = 'family'
+category = "family"
 
 
 def family(module, mode, family_name):

@@ -6,7 +6,7 @@ import llnl.util.tty as tty
 from contrib.util import split
 from spack.util.executable import Executable
 
-category = 'utility'
+category = "utility"
 
 
 def execute(module, mode, command, when=None):
@@ -35,16 +35,16 @@ def execute(module, mode, command, when=None):
     if when is not None and not when:
         return
 
-    xc = split(command, ' ', 1)
+    xc = split(command, " ", 1)
     exe = Executable(xc[0])
-    with open(os.devnull, 'a') as fh:
+    with open(os.devnull, "a") as fh:
         kwargs = {
-            'env': pymod.environ.filtered(),
-            'output': fh,
-            'error': subprocess.sys.stdout,
+            "env": pymod.environ.filtered(),
+            "output": fh,
+            "error": subprocess.sys.stdout,
         }
         try:
             exe(*xc[1:], **kwargs)
         except:  # pragma: no cover
-            tty.warn('Command {0!r} failed'.format(command))
+            tty.warn("Command {0!r} failed".format(command))
     return

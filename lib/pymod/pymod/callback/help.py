@@ -1,6 +1,6 @@
 import pymod.modes
 
-category = 'info'
+category = "info"
 
 
 def help(module, mode, help_string, **kwargs):

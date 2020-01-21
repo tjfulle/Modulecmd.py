@@ -15,9 +15,10 @@ def use(dirname, append=False, delete=False):
     else:
         prepended_modules = pymod.modulepath.prepend_path(dirname)
         if prepended_modules is None:
-            tty.warn('No modules were found in {0}.  '
-                     'This path will not be added to MODULEPATH'
-                     .format(dirname))
+            tty.warn(
+                "No modules were found in {0}.  "
+                "This path will not be added to MODULEPATH".format(dirname)
+            )
             return None
         bumped = determine_swaps_due_to_prepend(prepended_modules)
         for (old, new) in bumped:

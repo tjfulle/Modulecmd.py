@@ -2,7 +2,7 @@ import pymod.mc
 import pymod.modes
 from pymod.error import ModuleNotFoundError
 
-category = 'module'
+category = "module"
 
 
 def unload(module, mode, name):
@@ -49,6 +49,6 @@ def unload(module, mode, name):
         return
     else:
         try:
-            pymod.mc.unload(name, caller='modulefile')
+            pymod.mc.unload(name, caller="modulefile")
         except ModuleNotFoundError:
             return None

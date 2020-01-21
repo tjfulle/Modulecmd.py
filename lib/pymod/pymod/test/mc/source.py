@@ -6,8 +6,8 @@ import pymod.modulepath
 
 @pytest.fixture()
 def script(tmpdir):
-    f = tmpdir.join('script')
-    f.write('echo FOO')
+    f = tmpdir.join("script")
+    f.write("echo FOO")
     return f.strpath
 
 
@@ -15,5 +15,5 @@ def script(tmpdir):
 def test_mc_source_command(script, capsys):
     pymod.mc.source(script)
     captured = capsys.readouterr()
-    command = r'source {0};'.format(script)
+    command = r"source {0};".format(script)
     assert captured[0].strip() == command.strip()

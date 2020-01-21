@@ -1,7 +1,7 @@
 import socket
 import pymod.modes
 
-category = 'utility'
+category = "utility"
 
 
 def get_hostname(module, mode):

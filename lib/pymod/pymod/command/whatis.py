@@ -4,18 +4,19 @@ import pymod.mc
 description = (
     "Display module whatis string.  The whatis string is a short informational\n"
     "message a module can provide.  If not defined by the module, a default is \n"
-    "displayed.")
+    "displayed."
+)
 section = "info"
 level = "short"
 
 
 def setup_parser(subparser):
     subparser.add_argument(
-        'names', nargs='+',
-        help='Module[s] to display whatis string')
+        "names", nargs="+", help="Module[s] to display whatis string"
+    )
 
 
 def whatis(parser, args):
     for name in args.names:
         s = pymod.mc.whatis(name)
-        sys.stderr.write(s + '\n')
+        sys.stderr.write(s + "\n")

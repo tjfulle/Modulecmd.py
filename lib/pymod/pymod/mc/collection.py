@@ -17,7 +17,7 @@ def save(name):
 def show(name):
     """Save the collection `name`"""
     s = pymod.collection.show(name)
-    sys.stderr.write(s+'\n')
+    sys.stderr.write(s + "\n")
     return 0
 
 
@@ -60,10 +60,11 @@ def restore_impl(name, the_collection):
         for ar in archives:
             try:
                 module = pymod.mc.unarchive_module(ar)
-                tty.verbose('Loading part of collection: {0}'.format(module))
+                tty.verbose("Loading part of collection: {0}".format(module))
             except pymod.error.ModuleNotFoundError:
-                raise pymod.error.CollectionModuleNotFoundError(ar['fullname'],
-                                                                ar['filename'])
+                raise pymod.error.CollectionModuleNotFoundError(
+                    ar["fullname"], ar["filename"]
+                )
             pymod.mc.load_impl(module)
             module.acquired_as = module.fullname
             assert module.is_loaded

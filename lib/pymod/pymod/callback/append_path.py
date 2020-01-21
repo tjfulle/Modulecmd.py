@@ -4,7 +4,7 @@ import pymod.names
 import pymod.environ
 import pymod.callback
 
-category = 'path'
+category = "path"
 
 
 def append_path(module, mode, name, *values, **kwargs):
@@ -65,7 +65,7 @@ def append_path(module, mode, name, *values, **kwargs):
         for value in values:
             pymod.callback.use.use(module, mode, value, append=True)
         return
-    sep = kwargs.get('sep', os.pathsep)
+    sep = kwargs.get("sep", os.pathsep)
     if mode == pymod.modes.unload:
         for value in values:
             pymod.environ.remove_path(name, value, sep)

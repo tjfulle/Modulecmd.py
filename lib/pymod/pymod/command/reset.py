@@ -1,8 +1,8 @@
 import pymod.mc
 
-description = 'Reset environment to initial state'
-level = 'short'
-section = 'basic'
+description = "Reset environment to initial state"
+level = "short"
+section = "basic"
 
 
 def setup_parser(subparser):

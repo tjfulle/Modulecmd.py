@@ -1,7 +1,7 @@
 import pymod.mc
 import pymod.modes
 
-category = 'module'
+category = "module"
 
 
 def swap(module, mode, cur, new, **kwargs):
@@ -49,4 +49,4 @@ def swap(module, mode, cur, new, **kwargs):
     pymod.modes.assert_known_mode(mode)
     if mode != pymod.modes.unload:
         # We don't swap modules in unload mode
-        return pymod.mc.swap(cur, new, caller='modulefile')
+        return pymod.mc.swap(cur, new, caller="modulefile")

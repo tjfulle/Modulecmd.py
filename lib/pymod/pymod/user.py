@@ -13,8 +13,9 @@ class UserEnv:
             self._module = None
             self._modulename = None
         else:
-            modulename = 'pymod._{0}'.format(
-                os.path.splitext(os.path.basename(filename))[0])
+            modulename = "pymod._{0}".format(
+                os.path.splitext(os.path.basename(filename))[0]
+            )
             self._module = load_module_from_file(modulename, filename)
             assert self._module is not None
             self._modulename = modulename
@@ -27,8 +28,10 @@ class UserEnv:
 
 def factory():
     basename = pymod.names.user_env_file_basename
-    for dirname in (pymod.paths.user_config_platform_path,
-                    pymod.paths.user_config_path):
+    for dirname in (
+        pymod.paths.user_config_platform_path,
+        pymod.paths.user_config_path,
+    ):
         if os.path.exists(os.path.join(dirname, basename)):
             filename = os.path.join(dirname, basename)
             break

@@ -12,5 +12,5 @@ def find(names):
         if not candidates:
             raise ModuleNotFoundError(name)
         for module in candidates:
-            s = '@*{%s}\n  @C{%s}' % (module.fullname, module.filename)
-            sys.stderr.write(colorize(s) + '\n')
+            s = "@*{%s}\n  @C{%s}" % (module.fullname, module.filename)
+            sys.stderr.write(colorize(s) + "\n")

@@ -1,6 +1,6 @@
 import pymod.modes
 
-category = 'utility'
+category = "utility"
 
 
 def mode(module, mode):

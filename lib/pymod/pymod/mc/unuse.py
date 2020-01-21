@@ -55,7 +55,7 @@ def determine_swaps_due_to_removal(popped_modules):
     # will be loaded in the orphans place
     orphaned = [m for m in popped_modules if m.is_loaded]
     for (i, orphan) in enumerate(orphaned):
-        for attr in ('fullname', 'name'):
+        for attr in ("fullname", "name"):
             other = pymod.modulepath.get(getattr(orphan, attr))
             if other is not None:
                 orphaned[i] = (orphan, other)

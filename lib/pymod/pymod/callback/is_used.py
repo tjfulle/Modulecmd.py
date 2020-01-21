@@ -1,6 +1,6 @@
 import pymod.modulepath
 
-category = 'modulepath'
+category = "modulepath"
 
 
 def is_used(module, mode, dirname):

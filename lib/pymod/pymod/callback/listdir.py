@@ -1,6 +1,6 @@
 import contrib.util
 
-category = 'utility'
+category = "utility"
 
 
 def listdir(module, mode, dirname, key=None):

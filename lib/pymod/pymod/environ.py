@@ -17,7 +17,6 @@ from llnl.util.lang import Singleton
 
 
 class Environ(dict):
-
     def __init__(self):
         self.aliases = {}
         self.shell_functions = {}
@@ -31,21 +30,18 @@ class Environ(dict):
         return os.environ[key]
 
     def is_empty(self):
-        return (not len(self) and
-                not len(self.aliases) and
-                not len(self.shell_functions))
+        return not len(self) and not len(self.aliases) and not len(self.shell_functions)
 
     def format_output(self):
         env = self.copy()
-        output = pymod.shell.format_output(
-            env, self.aliases, self.shell_functions)
+        output = pymod.shell.format_output(env, self.aliases, self.shell_functions)
         if self.destination_dir is not None:
-            output += 'cd {0};'.format(self.destination_dir)
+            output += "cd {0};".format(self.destination_dir)
         return output
 
     def set_destination_dir(self, dirname):
         if not os.path.isdir(dirname):
-            tty.die('{0} is not a directory'.format(dirname))
+            tty.die("{0} is not a directory".format(dirname))
         self.destination_dir = dirname
 
     def get(self, key, default=None):
@@ -89,16 +85,18 @@ class Environ(dict):
         return self.copy(include_os=include_os, filter_None=True)
 
     def clone(self):
-        return {'aliases': self.aliases.copy(),
-                'shell_functions': self.shell_functions.copy(),
-                'env': self.copy()}
+        return {
+            "aliases": self.aliases.copy(),
+            "shell_functions": self.shell_functions.copy(),
+            "env": self.copy(),
+        }
 
     def restore(self, clone):
-        self.aliases = clone['aliases']
-        self.shell_functions = clone['shell_functions']
+        self.aliases = clone["aliases"]
+        self.shell_functions = clone["shell_functions"]
         for key in list(self.keys()):
             del self[key]
-        self.update(clone['env'])
+        self.update(clone["env"])
 
     def copy(self, include_os=False, filter_None=False):
         env = dict(os.environ) if include_os else dict()
@@ -135,7 +133,7 @@ class Environ(dict):
         return self._sys_manpath
 
     def set_manpath_if_needed(self):  # pragma: no cover
-        if sys.platform == 'darwin' and not self.get(pymod.names.manpath):
+        if sys.platform == "darwin" and not self.get(pymod.names.manpath):
             # On macOS, MANPATH, if set, must also include system paths,
             # otherwise man will not search the system paths (it only searches
             # MANPATH)
@@ -143,7 +141,7 @@ class Environ(dict):
 
     def unset_manpath_if_needed(self, path):  # pragma: no cover
         assert path.key == pymod.names.manpath
-        if sys.platform == 'darwin':
+        if sys.platform == "darwin":
             cur_manpath = join(path.value, sep=os.pathsep)
             if cur_manpath == self.sys_manpath:
                 path.value = None
@@ -151,13 +149,14 @@ class Environ(dict):
     def save_ld_library_path(self, key):
         if key.endswith(pymod.names.ld_library_path):
             # sometimes python doesn't pick up ld_library_path :(
-            self['__{0}__'.format(key)] = self[key]
+            self["__{0}__".format(key)] = self[key]
 
     def set(self, key, value):
         if key == pymod.names.modulepath:
             raise ValueError(
-                'Do not set MODULEPATH directly in Environ object.  '
-                'Set it in the Modulepath instead')
+                "Do not set MODULEPATH directly in Environ object.  "
+                "Set it in the Modulepath instead"
+            )
         key = self.fix_ld_library_path(key)
         self[key] = value
         self.save_ld_library_path(key)
@@ -165,8 +164,9 @@ class Environ(dict):
     def unset(self, key):
         if key == pymod.names.modulepath:
             raise ValueError(
-                'Do not set MODULEPATH directly in Environ object.  '
-                'Unset it in the Modulepath instead')
+                "Do not set MODULEPATH directly in Environ object.  "
+                "Unset it in the Modulepath instead"
+            )
         key = self.fix_ld_library_path(key)
         self[key] = None
         self.save_ld_library_path(key)
@@ -188,10 +188,11 @@ class Environ(dict):
             self.set_manpath_if_needed()
         elif key == pymod.names.modulepath:
             raise ValueError(
-                'Do not set MODULEPATH directly in Environ object.  '
-                'Set it in the Modulepath instead')
+                "Do not set MODULEPATH directly in Environ object.  "
+                "Set it in the Modulepath instead"
+            )
         key = self.fix_ld_library_path(key)
-        allow_dups = pymod.config.get('allow_duplicate_path_entries')
+        allow_dups = pymod.config.get("allow_duplicate_path_entries")
         current_path = self.get_path(key, sep=sep)
         d = current_path.meta.pop(value, {"count": 0, "priority": -1})
         if d["count"] == 0 and value in current_path.value:
@@ -207,10 +208,11 @@ class Environ(dict):
             self.set_manpath_if_needed()
         elif key == pymod.names.modulepath:
             raise ValueError(
-                'Do not set MODULEPATH directly in Environ object.  '
-                'Set it in the Modulepath instead')
+                "Do not set MODULEPATH directly in Environ object.  "
+                "Set it in the Modulepath instead"
+            )
         key = self.fix_ld_library_path(key)
-        allow_dups = pymod.config.get('allow_duplicate_path_entries')
+        allow_dups = pymod.config.get("allow_duplicate_path_entries")
         current_path = self.get_path(key, sep=sep)
         d = current_path.meta.pop(value, {"count": 0, "priority": -1})
         if d["count"] == 0 and value in current_path.value:
@@ -225,17 +227,18 @@ class Environ(dict):
     def remove_path(self, key, value, sep=os.pathsep):
         if key == pymod.names.modulepath:
             raise ValueError(
-                'Do not remove MODULEPATH directly from Environ object.  '
-                'Use the Modulepath object instead')
+                "Do not remove MODULEPATH directly from Environ object.  "
+                "Use the Modulepath object instead"
+            )
         key = self.fix_ld_library_path(key)
-        allow_dups = pymod.config.get('allow_duplicate_path_entries')
+        allow_dups = pymod.config.get("allow_duplicate_path_entries")
         current_path = self.get_path(key, sep=sep)
         d = current_path.meta.pop(value, {"count": 0, "priority": -1})
-        if d["count"] == 0 and value in current_path.value: # pragma: no cover
-            tty.warn('Inconsistent refcount state')
+        if d["count"] == 0 and value in current_path.value:  # pragma: no cover
+            tty.warn("Inconsistent refcount state")
             d["count"] = current_path.value.count(value)
-            if pymod.config.get('debug'):
-                raise Exception('Inconsistent refcount state')
+            if pymod.config.get("debug"):
+                raise Exception("Inconsistent refcount state")
         d["count"] -= 1
         if (allow_dups and d["count"] > 0) or d["count"] <= 0:
             pop(current_path.value, value)

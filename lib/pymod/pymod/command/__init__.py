@@ -16,7 +16,7 @@ import pymod.paths
 python_list = list
 
 # Patterns to ignore in the commands directory when looking for commands.
-ignore_files = r'^\.|^__init__.py$|^#|flycheck_'
+ignore_files = r"^\.|^__init__.py$|^#|flycheck_"
 
 SETUP_PARSER = "setup_parser"
 DESCRIPTION = "description"
@@ -29,7 +29,7 @@ def python_name(cmd_name):
 
 def cmd_name(python_name):
     """Convert module name (with ``_``) to command name (with ``-``)."""
-    return python_name.replace('_', '-')
+    return python_name.replace("_", "-")
 
 
 #: global, cached list of all commands -- access through all_commands()
@@ -50,7 +50,7 @@ def all_commands():
         for path in command_paths:
             for file in os.listdir(path):
                 if file.endswith(".py") and not re.search(ignore_files, file):
-                    command = re.sub(r'.py$', '', file)
+                    command = re.sub(r".py$", "", file)
                     _all_commands.append(cmd_name(command))
 
         _all_commands.sort()
@@ -69,18 +69,21 @@ def get_module(cmd_name):
     pname = python_name(cmd_name)
 
     # Import the command from the built-in directory
-    module_name = '{0}.{1}'.format(__name__, pname)
-    module = __import__(module_name,
-                        fromlist=[pname, SETUP_PARSER, DESCRIPTION],
-                        level=0)
-    tty.debug('Imported {0} from built-in commands'.format(pname))
+    module_name = "{0}.{1}".format(__name__, pname)
+    module = __import__(
+        module_name, fromlist=[pname, SETUP_PARSER, DESCRIPTION], level=0
+    )
+    tty.debug("Imported {0} from built-in commands".format(pname))
 
     attr_setdefault(module, SETUP_PARSER, lambda *args: None)  # null-op
     attr_setdefault(module, DESCRIPTION, "")
 
     if not hasattr(module, pname):  # pragma: no cover
-        tty.die("Command module {0} ({1}) must define function {2!r}."
-                .format(module.__name__, module.__file__, pname))
+        tty.die(
+            "Command module {0} ({1}) must define function {2!r}.".format(
+                module.__name__, module.__file__, pname
+            )
+        )
 
     return module
 

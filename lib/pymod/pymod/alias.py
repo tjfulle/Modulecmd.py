@@ -13,6 +13,7 @@ from llnl.util.tty.colify import colified
 
 class Aliases(object):
     """Provides mechanism for having aliases to other modules"""
+
     def __init__(self, filename):
         self.filename = filename
         self._data = None
@@ -35,31 +36,32 @@ class Aliases(object):
     def getby_modulepath(self, dirname):
         value = []
         for (name, info) in self.data.items():
-            if info['modulepath'] == dirname:
-                value.append((name, info['target']))
+            if info["modulepath"] == dirname:
+                value.append((name, info["target"]))
         return value or None
 
     def read(self, filename):
         if os.path.isfile(filename):  # pragma: no cover
             data = yaml.load(open(filename))
-            aliases = data.pop('aliases', dict())
+            aliases = data.pop("aliases", dict())
             if data:
-                raise ValueError("Expected single top level key "
-                                 "'aliases' in {0}".format(filename))
+                raise ValueError(
+                    "Expected single top level key " "'aliases' in {0}".format(filename)
+                )
             return aliases
         return dict()
 
     def write(self, aliases, filename):
-        with open(filename, 'w') as fh:
-            yaml.dump({'aliases': aliases}, fh, default_flow_style=False)
+        with open(filename, "w") as fh:
+            yaml.dump({"aliases": aliases}, fh, default_flow_style=False)
 
     def save(self, target, name):
         """Save the alias 'name' to target"""
         self.data[name] = {
-            'target': target.fullname,
-            'filename': target.filename,
-            'modulepath': target.modulepath,
-            }
+            "target": target.fullname,
+            "filename": target.filename,
+            "modulepath": target.modulepath,
+        }
         self.write(self.data, self.filename)
         return
 
@@ -69,23 +71,23 @@ class Aliases(object):
 
     def avail(self, terse=False):
         if not self.data:  # pragma: no cover
-            return ''
+            return ""
 
         keys = sorted(list(self.data.keys()))
-        fun = lambda key: '{0} -> {1} ({2})'.format(
+        fun = lambda key: "{0} -> {1} ({2})".format(
             key,
-            self.data[key]['target'],
-            colorize('@C{%s}'%self.data[key]['modulepath']))
+            self.data[key]["target"],
+            colorize("@C{%s}" % self.data[key]["modulepath"]),
+        )
         names = [fun(_) for _ in keys]
 
         sio = StringIO()
         if not terse:
             _, width = terminal_size()
             s = colified(names, width=width)
-            sio.write('{0}\n{1}\n'
-                      .format(' Aliases '.center(width, '-'), s))
+            sio.write("{0}\n{1}\n".format(" Aliases ".center(width, "-"), s))
         else:
-            sio.write('{0}\n'.format('\n'.join(c for c in names)))
+            sio.write("{0}\n".format("\n".join(c for c in names)))
         string = sio.getvalue()
         return string
 
@@ -94,6 +96,7 @@ def factory():
     basename = pymod.names.aliases_file_basename
     filename = pymod.paths.join_user(basename)
     return Aliases(filename)
+
 
 aliases = Singleton(factory)
 

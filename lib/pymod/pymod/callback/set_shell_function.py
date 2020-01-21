@@ -1,7 +1,7 @@
 import pymod.modes
 import pymod.environ
 
-category = 'alias'
+category = "alias"
 
 
 def set_shell_function(module, mode, name, value):

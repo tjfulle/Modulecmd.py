@@ -5,12 +5,12 @@ from .shell import Shell
 # --  B  A  S  H    S  H  E  L  L-------------------------------------------- #
 # --------------------------------------------------------------------------- #
 class Bash(Shell):
-    name = 'bash'
+    name = "bash"
 
     def format_environment_variable(self, key, val=None):
         """Define variable in bash syntax"""
         if val is None:
-            return 'unset {0};'.format(key)
+            return "unset {0};".format(key)
         return '{0}="{1}";\nexport {0};'.format(key, val)
 
     def format_shell_function(self, key, val=None):
@@ -18,32 +18,32 @@ class Bash(Shell):
         # Modify module definition of function so that there is
         # one and only one semicolon at the end.
         if val is None:
-            return 'unset -f {0} 2> /dev/null || true;'.format(key)
-        val = val.rstrip(';')
-        return '{0}() {{ {1}; }};'.format(key, val)
+            return "unset -f {0} 2> /dev/null || true;".format(key)
+        val = val.rstrip(";")
+        return "{0}() {{ {1}; }};".format(key, val)
 
     def format_alias(self, key, val=None):
         # Define or undefine a bash shell alias.
         # Modify module definition of function so that there is
         # one and only one semicolon at the end.
         if val is None:
-            return 'unalias {0} 2> /dev/null || true;'.format(key)
-        val = val.rstrip(';')
+            return "unalias {0} 2> /dev/null || true;".format(key)
+        val = val.rstrip(";")
         return "alias {0}='{1}';".format(key, val)
 
     def format_source_command(self, filename, *args):
-        return 'source {0} {1}'.format(filename, ' '.join(args)).strip()
+        return "source {0} {1}".format(filename, " ".join(args)).strip()
 
     def filter_key(self, key):
-        return key.startswith(('BASH_FUNC',))
+        return key.startswith(("BASH_FUNC",))
 
     def cloned_env(self, environ):  # pragma: no cover
         env = dict()
         for (key, val) in environ.items():
-            match = re.search('BASH_FUNC_(?P<n>.*?)%%', key)
+            match = re.search("BASH_FUNC_(?P<n>.*?)%%", key)
             if match:
-                key = match.group('n')
-                val = val[val.find('{')+1:val.rfind('}')].strip()
+                key = match.group("n")
+                val = val[val.find("{") + 1 : val.rfind("}")].strip()
             env[key] = val
         return env
 
@@ -52,30 +52,31 @@ class Bash(Shell):
         import os
         from six import StringIO
         from contrib.util import which
+
         for (key, val) in os.environ.items():
-            if key.startswith('BASH_FUNC_module'):
+            if key.startswith("BASH_FUNC_module"):
                 break
         else:
-            raise Exception('Unable to find module bash function')
-        current_module_implementation = 'pymod' if 'PYMOD_CMD' in val else 'tcl'
+            raise Exception("Unable to find module bash function")
+        current_module_implementation = "pymod" if "PYMOD_CMD" in val else "tcl"
 
         s = StringIO()
-        if current_module_implementation == 'pymod':
-            if os.getenv('LMOD_CMD'):
-                modulecmd = os.environ['LMOD_CMD']
+        if current_module_implementation == "pymod":
+            if os.getenv("LMOD_CMD"):
+                modulecmd = os.environ["LMOD_CMD"]
             else:
-                modulecmd = which('modulecmd')
+                modulecmd = which("modulecmd")
                 if modulecmd is None:
-                    raise Exception('Unable to find modulecmd executable')
+                    raise Exception("Unable to find modulecmd executable")
             s.write('module() { eval $(%s bash "$@"); };' % modulecmd)
-            s.write('unset -f module;')
+            s.write("unset -f module;")
             s.write('pymod() { eval $(python -E $PYMOD_CMD bash "$@"); };')
-            s.write('export -f pymod;')
+            s.write("export -f pymod;")
             s.write('module() { eval $(%s bash "$@"); };' % modulecmd)
-            s.write('export -f module;')
+            s.write("export -f module;")
         else:
-            s.write('unset -f module;')
-            s.write('unset -f pymod;')
+            s.write("unset -f module;")
+            s.write("unset -f pymod;")
             s.write('module() { eval $(python -E $PYMOD_CMD bash "$@"); };')
-            s.write('export -f module;')
+            s.write("export -f module;")
         return s.getvalue()

@@ -53,9 +53,9 @@ class Session:
 def clean():
     shell = os.path.basename(os.getenv("SHELL", "bash"))
     procs = get_processes()
-    shell_procs = sorted([
-        pid for (pid, proc) in procs.items() if proc["name"].endswith(shell)
-    ])
+    shell_procs = sorted(
+        [pid for (pid, proc) in procs.items() if proc["name"].endswith(shell)]
+    )
     dirname = session.savedir
     for filename in os.listdir(dirname):
         fpid = int(os.path.splitext(filename)[0])

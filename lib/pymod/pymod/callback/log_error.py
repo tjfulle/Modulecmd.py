@@ -2,7 +2,7 @@ import pymod.mc
 import pymod.modes
 import llnl.util.tty as tty
 
-category = 'utility'
+category = "utility"
 
 
 def log_error(module, mode, string):

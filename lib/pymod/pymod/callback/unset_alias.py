@@ -1,7 +1,7 @@
 import pymod.modes
 import pymod.environ
 
-category = 'alias'
+category = "alias"
 
 
 def unset_alias(module, mode, name):

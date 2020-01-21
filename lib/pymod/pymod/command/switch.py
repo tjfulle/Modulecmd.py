@@ -17,7 +17,7 @@ def setup_parser(subparser):
 
 def switch(parser, args):  # pragma: no cover
     s = pymod.shell.switch()
-    if pymod.config.get('dryrun'):
+    if pymod.config.get("dryrun"):
         sys.stderr.write(s)
     else:
         pymod.mc.purge(load_after_purge=False)

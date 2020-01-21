@@ -9,20 +9,21 @@ from spack.util.executable import which
 
 def load_config(filename):
     dict = yaml.load(open(filename))
-    return dict.get('config')
+    return dict.get("config")
 
 
-has_tclsh = which('tclsh') is not None
+has_tclsh = which("tclsh") is not None
 
 
 class Configuration(object):
-    scope_names = ['defaults', 'user', 'environment', 'command_line']
+    scope_names = ["defaults", "user", "environment", "command_line"]
+
     def __init__(self):
         self.scopes = {}
 
     def push_scope(self, scope_name, data):
         """Add a scope to the Configuration."""
-        if 'defaults' in self.scopes and scope_name != 'defaults':
+        if "defaults" in self.scopes and scope_name != "defaults":
             self.verify_config(data, scope_name)
         self.scopes.setdefault(scope_name, {}).update(dict(data))
 
@@ -30,19 +31,19 @@ class Configuration(object):
         """Verify that the types match those of the default scope"""
         for (key, val) in data.items():
             try:
-                default = self.scopes['defaults'][key]
+                default = self.scopes["defaults"][key]
             except KeyError:
-                msg = 'Unknown user config var {0!r}'.format(key)
+                msg = "Unknown user config var {0!r}".format(key)
                 raise ValueError(msg)
-            if scope == 'environment':
+            if scope == "environment":
                 # Environment variables are always strings.
                 if isinstance(default, list):
-                    val = split(val, sep=',')
+                    val = split(val, sep=",")
                 else:
                     val = type(default)(val)
                 data[key] = val
             elif type(default) != type(val):
-                m = 'User config var {0!r} must be of type {1!r}, not {2!r}'
+                m = "User config var {0!r} must be of type {1!r}, not {2!r}"
                 msg = m.format(key, type(default).__name__, type(val).__name__)
                 raise ValueError(msg)
 
@@ -78,6 +79,7 @@ class Configuration(object):
             for scope_name in self.scope_names[::-1]:
                 self.scopes.setdefault(scope_name, {}).update({key: value})
 
+
 def factory():
     """Singleton Configuration instance.
 
@@ -96,27 +98,29 @@ def factory():
     config_basename = pymod.names.config_file_basename
 
     default_config_file = os.path.join(
-        pymod.paths.etc_path, 'defaults', config_basename)
+        pymod.paths.etc_path, "defaults", config_basename
+    )
     defaults = load_config(default_config_file)
-    cfg.push_scope('defaults', defaults)
+    cfg.push_scope("defaults", defaults)
 
-    admin_config_file = os.path.join(
-        pymod.paths.etc_path, config_basename)
+    admin_config_file = os.path.join(pymod.paths.etc_path, config_basename)
     if os.path.isfile(admin_config_file):
         admin = load_config(admin_config_file)
-        cfg.push_scope('user', admin)
+        cfg.push_scope("user", admin)
 
-    for dirname in (pymod.paths.user_config_path,
-                    pymod.paths.user_config_platform_path):
+    for dirname in (
+        pymod.paths.user_config_path,
+        pymod.paths.user_config_platform_path,
+    ):
         user_config_file = os.path.join(dirname, config_basename)
         if os.path.exists(user_config_file):
             user = load_config(user_config_file)
-            cfg.push_scope('user', user)
+            cfg.push_scope("user", user)
 
     # Environment variable
     env = {}
     for key in defaults:
-        envar = 'PYMOD_{0}'.format(key.upper())
+        envar = "PYMOD_{0}".format(key.upper())
         if os.getenv(envar):
             key = envar[6:].lower()
             value = os.environ[envar]
@@ -125,7 +129,7 @@ def factory():
             env[key] = value
 
     if env:
-        cfg.push_scope('environment', env)
+        cfg.push_scope("environment", env)
 
     return cfg
 

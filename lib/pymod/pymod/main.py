@@ -32,52 +32,49 @@ stat_names = pstats.Stats.sort_arg_dict_default
 
 #: top-level aliases for pymod commands
 aliases = {
-    'av': 'avail',
-    'add': 'load',
-    'ls': 'list',
-    'rm': 'unload',
-    'which': 'find',
-    'cn': 'collection',
+    "av": "avail",
+    "add": "load",
+    "ls": "list",
+    "rm": "unload",
+    "which": "find",
+    "cn": "collection",
 }
 
 #: help levels in order of detail (i.e., number of commands shown)
-levels = ['short', 'long']
+levels = ["short", "long"]
 
 #: intro text for help at different levels
 intro_by_level = {
-    'short': 'These are common pymod commands:',
-    'long':  'Complete list of pymod commands:',
+    "short": "These are common pymod commands:",
+    "long": "Complete list of pymod commands:",
 }
 
 #: control top-level pymod options shown in basic vs. advanced help
-options_by_level = {
-    'short': ['h', 'V', 'color', 'dryrun'],
-    'long': 'all'
-}
+options_by_level = {"short": ["h", "V", "color", "dryrun"], "long": "all"}
 
 #: Longer text for each section, to show in help
 section_descriptions = {
-    'info':        'informational',
-    'basic':       'modify environment',
-    'developer':   'developer',
-    'modulepath':  'modulepath',
-    'collections': 'collections',
-    'clones':      'clones',
-    'help':        'more help',
+    "info": "informational",
+    "basic": "modify environment",
+    "developer": "developer",
+    "modulepath": "modulepath",
+    "collections": "collections",
+    "clones": "clones",
+    "help": "more help",
 }
 
 #: preferential command order for some sections (e.g., build pipeline is
 #: in execution order, not alphabetical)
 section_order = {
-    'info': ['avail', 'list', 'whatis', 'show', 'cat', 'more', 'find'],
-    'basic': ['load', 'unload', 'reload', 'swap', 'purge', 'refresh'],
-    'modulepath': ['path', 'use', 'unuse'],
-    'collections': ['save', 'restore'],
-    'clones': ['save', 'restore', 'remove',],
+    "info": ["avail", "list", "whatis", "show", "cat", "more", "find"],
+    "basic": ["load", "unload", "reload", "swap", "purge", "refresh"],
+    "modulepath": ["path", "use", "unuse"],
+    "collections": ["save", "restore"],
+    "clones": ["save", "restore", "remove"],
 }
 
 #: Properties that commands are required to set.
-required_command_properties = ['level', 'description']
+required_command_properties = ["level", "description"]
 
 #: Recorded directory where module command was originally invoked
 pymod_working_dir = None
@@ -109,8 +106,9 @@ def index_commands():
         for p in required_command_properties:
             prop = getattr(cmd_module, p, None)
             if not prop:
-                tty.die('Command doesn\'t define a property {0!r}: {1}'
-                        .format(p, command))
+                tty.die(
+                    "Command doesn't define a property {0!r}: {1}".format(p, command)
+                )
 
         # add commands to lists for their level and higher levels
         for level in reversed(levels):
@@ -126,21 +124,19 @@ def index_commands():
 class PymodHelpFormatter(argparse.RawTextHelpFormatter):
     def _format_actions_usage(self, actions, groups):
         """Formatter with more concise usage strings."""
-        usage = super(
-            PymodHelpFormatter, self)._format_actions_usage(actions, groups)
+        usage = super(PymodHelpFormatter, self)._format_actions_usage(actions, groups)
 
         # compress single-character flags that are not mutually exclusive
         # at the beginning of the usage string
-        chars = ''.join(re.findall(r'\[-(.)\]', usage))
-        usage = re.sub(r'\[-.\] ?', '', usage)
+        chars = "".join(re.findall(r"\[-(.)\]", usage))
+        usage = re.sub(r"\[-.\] ?", "", usage)
         if chars:
-            return '[-%s] %s' % (chars, usage)
+            return "[-%s] %s" % (chars, usage)
         else:
             return usage
 
 
 class PymodArgumentParser(argparse.ArgumentParser):
-
     def _print_message(self, message, file=None):
         if message:
             if file is None:
@@ -166,7 +162,7 @@ class PymodArgumentParser(argparse.ArgumentParser):
 
         # Create a list of subcommand actions. Argparse internals are nasty!
         # Note: you can only call _get_subactions() once.  Even nastier!
-        if not hasattr(self, 'actions'):
+        if not hasattr(self, "actions"):
             self.actions = self._subparsers._actions[-1]._get_subactions()
 
         # make a set of commands not yet added.
@@ -183,8 +179,7 @@ class PymodArgumentParser(argparse.ArgumentParser):
             cmd_set = set(c for c in commands)
 
             # make a dict of commands of interest
-            cmds = dict((a.dest, a) for a in self.actions
-                        if a.dest in cmd_set)
+            cmds = dict((a.dest, a) for a in self.actions if a.dest in cmd_set)
 
             # add commands to a group in order, and add the group
             group = argparse._ArgumentGroup(self, title=title)
@@ -196,9 +191,11 @@ class PymodArgumentParser(argparse.ArgumentParser):
 
         # select only the options for the particular level we're showing.
         show_options = options_by_level[level]
-        if show_options != 'all':
-            opts = dict((opt.option_strings[0].strip('-'), opt)
-                        for opt in self._optionals._group_actions)
+        if show_options != "all":
+            opts = dict(
+                (opt.option_strings[0].strip("-"), opt)
+                for opt in self._optionals._group_actions
+            )
 
             new_actions = [opts[letter] for letter in show_options]
             self._optionals._group_actions = new_actions
@@ -206,8 +203,7 @@ class PymodArgumentParser(argparse.ArgumentParser):
         # custom, more concise usage for top level
         help_options = self._optionals._group_actions
         help_options = help_options + [self._positionals._group_actions[-1]]
-        formatter.add_usage(
-            self.usage, help_options, self._mutually_exclusive_groups)
+        formatter.add_usage(self.usage, help_options, self._mutually_exclusive_groups)
 
         # description
         formatter.add_text(self.description)
@@ -220,8 +216,8 @@ class PymodArgumentParser(argparse.ArgumentParser):
         sections = index[level]
 
         for section in sorted(sections):
-            if section == 'help':
-                continue   # Cover help in the epilog.
+            if section == "help":
+                continue  # Cover help in the epilog.
 
             group_description = section_descriptions.get(section, section)
 
@@ -230,12 +226,14 @@ class PymodArgumentParser(argparse.ArgumentParser):
 
             # add commands whose order we care about first.
             if section in section_order:
-                commands.extend(cmd for cmd in section_order[section]
-                                if cmd in to_display)
+                commands.extend(
+                    cmd for cmd in section_order[section] if cmd in to_display
+                )
 
             # add rest in alphabetical order.
-            commands.extend(cmd for cmd in sorted(sections[section])
-                            if cmd not in commands)
+            commands.extend(
+                cmd for cmd in sorted(sections[section]) if cmd not in commands
+            )
 
             # add the group to the parser
             add_subcommand_group(group_description, commands)
@@ -244,36 +242,39 @@ class PymodArgumentParser(argparse.ArgumentParser):
         add_group(self._optionals)
 
         # epilog
-        formatter.add_text("""\
+        formatter.add_text(
+            """\
 {help}:
   module help --all       list all commands and options
-  module help <command>   help on a specific command"""
-.format(help=section_descriptions['help']))
+  module help <command>   help on a specific command""".format(
+                help=section_descriptions["help"]
+            )
+        )
 
         # determine help from format above
         return formatter.format_help()
 
     def add_subparsers(self, **kwargs):
         """Ensure that sensible defaults are propagated to subparsers"""
-        kwargs.setdefault('metavar', 'SUBCOMMAND')
+        kwargs.setdefault("metavar", "SUBCOMMAND")
         sp = super(PymodArgumentParser, self).add_subparsers(**kwargs)
         old_add_parser = sp.add_parser
 
         def add_parser(name, **kwargs):
-            kwargs.setdefault('formatter_class', PymodHelpFormatter)
+            kwargs.setdefault("formatter_class", PymodHelpFormatter)
             return old_add_parser(name, **kwargs)
+
         sp.add_parser = add_parser
         return sp
 
     def add_command(self, cmd_name):
         """Add one subcommand to this parser."""
         # lazily initialize any subparsers
-        if not hasattr(self, 'subparsers'):
+        if not hasattr(self, "subparsers"):
             # remove the "shell" and the dummy "command" argument.
-            if self._actions[-1].dest == 'command':
+            if self._actions[-1].dest == "command":
                 self._remove_action(self._actions[-1])
-            self.subparsers = self.add_subparsers(metavar='COMMAND',
-                                                  dest="command")
+            self.subparsers = self.add_subparsers(metavar="COMMAND", dest="command")
 
         # each command module implements a parser() function, to which we
         # pass its subparser for setup.
@@ -283,15 +284,18 @@ class PymodArgumentParser(argparse.ArgumentParser):
         alias_list = [k for k, v in aliases.items() if v == cmd_name]
 
         subparser = self.subparsers.add_parser(
-            cmd_name, aliases=alias_list,
-            help=module.description, description=module.description)
+            cmd_name,
+            aliases=alias_list,
+            help=module.description,
+            description=module.description,
+        )
         module.setup_parser(subparser)
 
         # return the callable function for the command
         return pymod.command.get_command(cmd_name)
 
-    def format_help(self, level='short'):
-        if self.prog in ('pymod', 'modulecmd.py'):
+    def format_help(self, level="short"):
+        if self.prog in ("pymod", "modulecmd.py"):
             # use format_help_sections for the main pymod parser, but not
             # for subparsers
             return self.format_help_sections(level)
@@ -303,50 +307,76 @@ class PymodArgumentParser(argparse.ArgumentParser):
 def make_argument_parser(**kwargs):
     """Create an basic argument parser without any subcommands added."""
     parser = PymodArgumentParser(
-        formatter_class=PymodHelpFormatter, add_help=False,
+        formatter_class=PymodHelpFormatter,
+        add_help=False,
         description=(
-            'pymod - Environment modules framework implemented in Python\n\n'
-            'Environment modules, or just modules, are files containing commands that,\n'
-            'when processed by the module Framework, modify the current shell\'s\n'
-            'environment.  Modules allow users to dynamically modify their environment.\n'
-            'This, python, implementation of an environment module framework is inspired\n'
-            'by existing frameworks written in C/TCL and Lua and seeks parity with the\n'
-            'original TCL environment modules.'),
-        **kwargs)
+            "pymod - Environment modules framework implemented in Python\n\n"
+            "Environment modules, or just modules, are files containing commands that,\n"
+            "when processed by the module Framework, modify the current shell's\n"
+            "environment.  Modules allow users to dynamically modify their environment.\n"
+            "This, python, implementation of an environment module framework is inspired\n"
+            "by existing frameworks written in C/TCL and Lua and seeks parity with the\n"
+            "original TCL environment modules."
+        ),
+        **kwargs
+    )
 
     parser.add_argument(
-        '-h', '--help',
-        dest='help', action='store_const', const='short', default=None,
-        help="show this help message and exit")
+        "-h",
+        "--help",
+        dest="help",
+        action="store_const",
+        const="short",
+        default=None,
+        help="show this help message and exit",
+    )
     parser.add_argument(
-        '-H', '--all-help',
-        dest='help', action='store_const', const='long', default=None,
-        help="show help for all commands (same as pymod help --all)")
+        "-H",
+        "--all-help",
+        dest="help",
+        action="store_const",
+        const="long",
+        default=None,
+        help="show help for all commands (same as pymod help --all)",
+    )
     parser.add_argument(
-        '--time', action='store_true', default=False,
-        help='time execution of command')
+        "--time", action="store_true", default=False, help="time execution of command"
+    )
     parser.add_argument(
-        '--verbose', action='store_true', default=False,
-        help='print additional output')
+        "--verbose", action="store_true", default=False, help="print additional output"
+    )
     parser.add_argument(
-        '-d', '--debug', action='store_true', default=False,
-        help='run additional debug checks')
+        "-d",
+        "--debug",
+        action="store_true",
+        default=False,
+        help="run additional debug checks",
+    )
     parser.add_argument(
-        '--dryrun', action='store_true', default=False,
-        help='print commands to console, but do not execute them')
+        "--dryrun",
+        action="store_true",
+        default=False,
+        help="print commands to console, but do not execute them",
+    )
     parser.add_argument(
-        '--pdb', action='store_true', default=False,
-        help='run execution through pdb debugger')
+        "--pdb",
+        action="store_true",
+        default=False,
+        help="run execution through pdb debugger",
+    )
     parser.add_argument(
-        '--trace', action='store_true', default=False,
-        help='trace execution of command')
+        "--trace", action="store_true", default=False, help="trace execution of command"
+    )
     parser.add_argument(
-        '-V', '--version', action='store_true',
-        help='show version number and exit')
+        "-V", "--version", action="store_true", help="show version number and exit"
+    )
     parser.add_argument(
-        '--color', action='store', default='auto',
-        choices=('always', 'never', 'auto'),
-        help="when to colorize output (default: auto)")
+        "--color",
+        action="store",
+        default="auto",
+        choices=("always", "never", "auto"),
+        help="when to colorize output (default: auto)",
+    )
 
     return parser
 
@@ -362,6 +392,7 @@ class PymodCommand(object):
     Use this to invoke pymod commands directly from Python and check
     their output.
     """
+
     def __init__(self, command_name):
         """Create a new PymodCommand that invokes ``command_name`` when called.
 
@@ -392,16 +423,16 @@ class PymodCommand(object):
         self.returncode = None
         self.error = None
 
-        args, unknown = self.parser.parse_known_args(
-            [self.command_name] + list(argv))
+        args, unknown = self.parser.parse_known_args([self.command_name] + list(argv))
 
-        fail_on_error = kwargs.get('fail_on_error', True)
+        fail_on_error = kwargs.get("fail_on_error", True)
 
         out = StringIO()
         try:
             with log_output(out):
                 self.returncode = _invoke_command(
-                    self.command, self.parser, args, unknown)
+                    self.command, self.parser, args, unknown
+                )
 
         except SystemExit as e:
             self.returncode = e.code
@@ -413,9 +444,13 @@ class PymodCommand(object):
 
         if fail_on_error and self.returncode not in (None, 0):
             raise PymodCommandError(
-                "Command exited with code %d: %s(%s)" % (
-                    self.returncode, self.command_name,
-                    ', '.join("'%s'" % a for a in argv)))
+                "Command exited with code %d: %s(%s)"
+                % (
+                    self.returncode,
+                    self.command_name,
+                    ", ".join("'%s'" % a for a in argv),
+                )
+            )
 
         return out.getvalue()
 
@@ -425,18 +460,18 @@ def setup_main_options(args):
     # Set up environment based on args.
     tty.set_verbose(args.verbose)
     tty.set_debug(args.debug)
-#    tty.set_trace(args.trace)
+    #    tty.set_trace(args.trace)
 
     # debug must be set first so that it can even affect behavior of
     # errors raised by pymod.config.
     if args.debug:
         # pymod.error.debug = True
-        pymod.config.set('debug', True, scope='command_line')
+        pymod.config.set("debug", True, scope="command_line")
 
     if args.dryrun:
-        pymod.config.set('dryrun', True, scope='command_line')
+        pymod.config.set("dryrun", True, scope="command_line")
 
-    if args.shell != pymod.config.get('default_shell'):
+    if args.shell != pymod.config.get("default_shell"):
         pymod.shell.set_shell(args.shell)
 
     # when to use color (takes always, auto, or never)
@@ -451,9 +486,9 @@ def allows_unknown_args(command):
     args in.
     """
     info = dict(inspect.getmembers(command))
-    varnames = info['__code__'].co_varnames
-    argcount = info['__code__'].co_argcount
-    return (argcount == 3 and varnames[2] == 'unknown_args')
+    varnames = info["__code__"].co_varnames
+    argcount = info["__code__"].co_argcount
+    return argcount == 3 and varnames[2] == "unknown_args"
 
 
 def _invoke_command(command, parser, args, unknown_args):
@@ -462,8 +497,7 @@ def _invoke_command(command, parser, args, unknown_args):
         return_val = command(parser, args, unknown_args)
     else:
         if unknown_args:
-            tty.die('unrecognized arguments: {0}'
-                    .format(' '.join(unknown_args)))
+            tty.die("unrecognized arguments: {0}".format(" ".join(unknown_args)))
         return_val = command(parser, args)
 
     # Allow commands to return and error code if they want
@@ -484,16 +518,16 @@ def main(argv=None):
     argv = argv or sys.argv[1:]
     assert len(argv) >= 1
     shell = argv.pop(0)
-    shells = ('bash', 'csh', 'python')
+    shells = ("bash", "csh", "python")
     if shell not in shells:
-        raise ValueError('shell argument must by one of {0}'.format(shells))
+        raise ValueError("shell argument must by one of {0}".format(shells))
 
     # Create a parser with a simple positional argument first.  We'll
     # lazily load the subcommand(s) we need later. This allows us to
     # avoid loading all the modules from pymod.command when we don't need
     # them, which reduces startup latency.
     parser = make_argument_parser()
-    parser.add_argument('command', nargs=argparse.REMAINDER)
+    parser.add_argument("command", nargs=argparse.REMAINDER)
     args, unknown = parser.parse_known_args(argv)
     args.shell = shell
 
@@ -507,7 +541,7 @@ def main(argv=None):
     # -h, -H, and -V are special as they do not require a command, but
     # all the other options do nothing without a command.
     if args.version:
-        sys.stderr.write(str(pymod.pymod_version) + '\n')
+        sys.stderr.write(str(pymod.pymod_version) + "\n")
         return 0
     elif args.help:
         message = parser.format_help(level=args.help)
@@ -531,8 +565,8 @@ def main(argv=None):
         try:
             command = parser.add_command(cmd_name)
         except ImportError:
-           # if pymod.config.get('config:debug'):
-           #     raise
+            # if pymod.config.get('config:debug'):
+            #     raise
             tty.die("Unknown command: %s" % args.command[0])
 
         # Re-parse with the proper sub-parser added.
@@ -544,19 +578,21 @@ def main(argv=None):
         # now we can actually execute the command.
         if args.pdb:
             import pdb
-            pdb.runctx('_invoke_command(command, parser, args, unknown)',
-                       globals(), locals())
+
+            pdb.runctx(
+                "_invoke_command(command, parser, args, unknown)", globals(), locals()
+            )
             return 0
         else:
             return _invoke_command(command, parser, args, unknown)
 
     except Exception as e:
-        if pymod.config.get('debug'):
+        if pymod.config.get("debug"):
             raise
         tty.die(str(e))
 
     except KeyboardInterrupt:
-        sys.stderr.write('\n')
+        sys.stderr.write("\n")
         tty.die("Keyboard interrupt.")
 
     except SystemExit as e:

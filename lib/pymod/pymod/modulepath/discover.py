@@ -10,23 +10,23 @@ from contrib.util import strip_quotes
 
 """Functions for finding modules on MODULEPATH"""
 
-marked_default_names = ('default', '.version')
+marked_default_names = ("default", ".version")
 
 
 def find_modules(dirname):
 
     dirname = os.path.expanduser(dirname)
 
-    if dirname == '/':
-        raise ValueError('Requesting to find modules in root directory')
+    if dirname == "/":
+        raise ValueError("Requesting to find modules in root directory")
 
     if not os.access(dirname, os.R_OK):
-        tty.verbose('{0!r} is not an accessible directory'.format(dirname))
+        tty.verbose("{0!r} is not an accessible directory".format(dirname))
         return None
 
     if not os.path.isdir(dirname):  # pragma: no cover
         # This should be redundant because of the previous check
-        tty.verbose('{0!r} is not a directory'.format(dirname))
+        tty.verbose("{0!r} is not a directory".format(dirname))
         return None
 
     first_level_files, first_level_dirs = listdir(dirname)
@@ -40,11 +40,14 @@ def find_modules(dirname):
         second_level_files, second_level_dirs = listdir(first_level_dir)
         if second_level_dirs:
             # <dirname>/<name>/<version>/<variants>
-            maybe_module_files = [f for f in second_level_files
-                                  if f not in marked_default_names]
+            maybe_module_files = [
+                f for f in second_level_files if f not in marked_default_names
+            ]
             if maybe_module_files:
-                tty.warn('Skipping files in directory {0} '
-                         'with NVV structure'.format(first_level_dir))
+                tty.warn(
+                    "Skipping files in directory {0} "
+                    "with NVV structure".format(first_level_dir)
+                )
             for version in second_level_dirs:
                 # The second level directory is the version in NVV format
                 modules_nvv = find_modules_nvv(dirname, name, version)
@@ -57,7 +60,7 @@ def find_modules(dirname):
                 modules.extend(modules_nv)
 
     if not modules:
-        tty.verbose('Modulepath: no modules found in {0}'.format(dirname))
+        tty.verbose("Modulepath: no modules found in {0}".format(dirname))
         return None
 
     return modules
@@ -71,8 +74,10 @@ def find_modules_n(dirname, names):
             if not isfilelike(name):
                 continue
             if name in marked_default_names:
-                tty.verbose('Skipping marked default for unversioned '
-                            'modules in {0}'.format(dirname))
+                tty.verbose(
+                    "Skipping marked default for unversioned "
+                    "modules in {0}".format(dirname)
+                )
                 continue
             module = pymod.module.module(dirname, name)
             if module is not None:
@@ -89,7 +94,7 @@ def find_modules_nv(dirname, name):
         assert os.path.isdir(name)
         versions, dirs = listdir(name)
         if dirs:
-            raise ValueError('Expected NV module structure not NVx')
+            raise ValueError("Expected NV module structure not NVx")
         marked_default = pop_marked_default(name, versions)
         for version in versions:
             module = pymod.module.module(dirname, name, version)
@@ -112,8 +117,9 @@ def find_modules_nvv(dirname, name, version):
         assert os.path.isdir(version)
         variants, dirs = listdir(version)
         if dirs:
-            tty.debug('In {0}, expected NVV module structure not '
-                      'NVVx'.format(basedir))
+            tty.debug(
+                "In {0}, expected NVV module structure not " "NVVx".format(basedir)
+            )
             return None
         for variant in variants:
             module = pymod.module.module(dirname, name, version, variant)
@@ -129,15 +135,17 @@ def pop_marked_default(dirname, versions):
     linked_default = pop_linked_default(dirname, versions)
     versioned_default = pop_versioned_default(dirname, versions)
     if linked_default and versioned_default:
-        tty.warn('A linked and versioned default exist in {0}, '
-                 'choosing the linked'.format(dirname))
+        tty.warn(
+            "A linked and versioned default exist in {0}, "
+            "choosing the linked".format(dirname)
+        )
         return linked_default
     return linked_default or versioned_default
 
 
 def pop_linked_default(dirname, files):
     """Look for a file named `default` that is a symlink to a module file"""
-    linked_default_name = 'default'
+    linked_default_name = "default"
     try:
         files.remove(linked_default_name)
     except ValueError:
@@ -146,15 +154,17 @@ def pop_linked_default(dirname, files):
     linked_default_file = os.path.join(dirname, linked_default_name)
     if not os.path.islink(linked_default_file):
         tty.verbose(
-            'Modulepath: expected file named `default` in {0} '
-            'to be a link to a modulefile'.format(dirname))
+            "Modulepath: expected file named `default` in {0} "
+            "to be a link to a modulefile".format(dirname)
+        )
         return None
 
     linked_default_source = os.path.realpath(linked_default_file)
     if not os.path.dirname(linked_default_source) == dirname:
         tty.warn(
-            'Modulepath: expected file named `default` in {0} to be '
-            'a link to a modulefile in the same directory'.format(dirname))
+            "Modulepath: expected file named `default` in {0} to be "
+            "a link to a modulefile in the same directory".format(dirname)
+        )
         return None
 
     return linked_default_source
@@ -162,7 +172,7 @@ def pop_linked_default(dirname, files):
 
 def pop_versioned_default(dirname, files):
     """TCL modules .version scheme"""
-    version_file_name = '.version'
+    version_file_name = ".version"
     try:
         files.remove(version_file_name)
     except ValueError:
@@ -170,19 +180,17 @@ def pop_versioned_default(dirname, files):
     version_file = os.path.join(dirname, version_file_name)
     version = read_tcl_default_version(version_file)
     if version is None:
-        tty.warn(
-            'Could not determine .version default in {0}'.format(dirname))
+        tty.warn("Could not determine .version default in {0}".format(dirname))
     else:
         default_file = os.path.join(dirname, version)
         if os.path.exists(default_file):
             return default_file
-        tty.warn(
-            '{0!r}: version default does not exist'.format(default_file))
+        tty.warn("{0!r}: version default does not exist".format(default_file))
 
 
 def read_tcl_default_version(version_file):
     for line in open(version_file).readlines():
-        if " ".join(line.split()).startswith('set ModulesVersion'):
+        if " ".join(line.split()).startswith("set ModulesVersion"):
             tmp = line.split("#", 1)[0].split()[-1]
             version = strip_quotes(tmp)
             return version
@@ -193,9 +201,9 @@ def listdir(dirname):
     if not os.access(dirname, os.X_OK):  # pragma: no cover
         return [], []
     with working_dir(dirname):
-        for item in os.listdir('.'):
+        for item in os.listdir("."):
             if os.path.isdir(item):
-                if item in ('.git', '.svn', 'CVS'):  # pragma: no cover
+                if item in (".git", ".svn", "CVS"):  # pragma: no cover
                     continue
                 dirs.append(item)
             else:

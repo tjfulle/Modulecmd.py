@@ -2,7 +2,7 @@ import pymod.mc
 import pymod.modes
 from pymod.error import ModuleNotFoundError
 
-category = 'module'
+category = "module"
 
 
 def load_first(module, mode, *names):
@@ -55,11 +55,11 @@ def load_first(module, mode, *names):
             if mode == pymod.modes.unload:
                 # We are in unload mode and the module was requested to be
                 # loaded. So, we reverse the action and unload it
-                return pymod.mc.unload(name, caller='load_first')
+                return pymod.mc.unload(name, caller="load_first")
             else:
-                return pymod.mc.load(name, caller='load_first')
+                return pymod.mc.load(name, caller="load_first")
         except ModuleNotFoundError:
             continue
     if names and name is None:
         return
-    raise ModuleNotFoundError(','.join(names))
+    raise ModuleNotFoundError(",".join(names))

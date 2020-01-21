@@ -1,6 +1,6 @@
 import llnl.util.tty.color
 
-category = 'utility'
+category = "utility"
 
 
 def colorize(module, mode, string, **kwargs):

@@ -1,5 +1,6 @@
 from enum_backport import Enum
 
+
 class Modes(Enum):
     NULL = 0
     LOAD = 1
@@ -25,13 +26,13 @@ def assert_known_mode(mode):
 
 
 _mapping = {
-    null: 'null',
-    load: 'load',
-    unload: 'unload',
-    whatis: 'whatis',
-    help: 'help',
-    show: 'show',
-    load_partial: 'load_partial'
+    null: "null",
+    load: "load",
+    unload: "unload",
+    whatis: "whatis",
+    help: "help",
+    show: "show",
+    load_partial: "load_partial",
 }
 
 

@@ -6,10 +6,10 @@ import pymod.modulepath
 def test_regression_register(tmpdir, mock_modulepath):
     # Module refcount was being updated *after* it was archived, so it was
     # effectively not updated :(
-    tmpdir.join('a.py').write('')
+    tmpdir.join("a.py").write("")
     mock_modulepath(tmpdir.strpath)
 
-    a = pymod.modulepath.get('a')
+    a = pymod.modulepath.get("a")
     pymod.mc.register_module(a)
 
     loaded_modules = pymod.mc.get_loaded_modules()

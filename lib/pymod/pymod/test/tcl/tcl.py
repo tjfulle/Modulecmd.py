@@ -7,8 +7,7 @@ import pymod.module
 import pymod.modulepath
 from pymod.module.tcl2py import tcl2py
 
-pytestmark = pytest.mark.skipif(not pymod.config.has_tclsh,
-                                reason='No tclsh')
+pytestmark = pytest.mark.skipif(not pymod.config.has_tclsh, reason="No tclsh")
 
 py_content = """\
 whatis("adds `.' to your PATH environment variable ")
@@ -43,38 +42,45 @@ setenv foo BAR
 set-alias alias BAZ
 """
 
+
 @pytest.fixture()
 def tcl_module_path(tmpdir):
 
-    d = tmpdir.mkdir('tcl2')
-    p = d.join('1.0')
+    d = tmpdir.mkdir("tcl2")
+    p = d.join("1.0")
     p.write(tcl_content)
 
-    tcl = tmpdir.mkdir('tcl')
-    p = tcl.join('1.0')
-    p.write("""\
+    tcl = tmpdir.mkdir("tcl")
+    p = tcl.join("1.0")
+    p.write(
+        """\
 #%Module1.0
 append-path     path /b/path
 prepend-path    path /a/path
 setenv ENVAR tcl/1.0
-set-alias foo BAR""")
+set-alias foo BAR"""
+    )
 
-    a = tmpdir.mkdir('a')
-    p = a.join('1.0')
-    p.write("""\
+    a = tmpdir.mkdir("a")
+    p = a.join("1.0")
+    p.write(
+        """\
 #%Module1.0
 append-path path  /c/path
 setenv ENVAR a/1.0
-set-alias foo BAZ""")
+set-alias foo BAZ"""
+    )
 
-    p = a.join('2.0')
-    p.write("""\
+    p = a.join("2.0")
+    p.write(
+        """\
 #%Module1.0
 append-path path  /d/path
 setenv ENVAR a/2.0
-set-alias foo SPAM""")
+set-alias foo SPAM"""
+    )
 
-    p = a.join('.version')
+    p = a.join(".version")
     p.write('set ModulesVersion "1.0"')
 
     return tmpdir.strpath
@@ -83,9 +89,9 @@ set-alias foo SPAM""")
 @pytest.mark.tcl
 def test_tcl_tcl2py_1(tcl_module_path, mock_modulepath):
     mock_modulepath(tcl_module_path)
-    module = pymod.modulepath.get('tcl2')
+    module = pymod.modulepath.get("tcl2")
     assert isinstance(module, pymod.module.TclModule)
-    assert module.version.string == '1.0'
+    assert module.version.string == "1.0"
     stdout = tcl2py(module, pymod.modes.load)
     assert stdout == py_content
 
@@ -93,11 +99,11 @@ def test_tcl_tcl2py_1(tcl_module_path, mock_modulepath):
 @pytest.mark.tcl
 def test_tcl_tcl2py_2(tcl_module_path, mock_modulepath):
     mock_modulepath(tcl_module_path)
-    pymod.environ.set(pymod.names.ld_library_path, 'path_a')
-    pymod.environ.set(pymod.names.ld_preload, 'path_c')
-    module = pymod.modulepath.get('tcl2')
+    pymod.environ.set(pymod.names.ld_library_path, "path_a")
+    pymod.environ.set(pymod.names.ld_preload, "path_c")
+    module = pymod.modulepath.get("tcl2")
     assert isinstance(module, pymod.module.TclModule)
-    assert module.version.string == '1.0'
+    assert module.version.string == "1.0"
     stdout = tcl2py(module, pymod.modes.load)
     assert stdout == py_content
 
@@ -107,142 +113,152 @@ def test_tcl_tcl2py_2(tcl_module_path, mock_modulepath):
 def test_tcl_unit(tcl_module_path, mock_modulepath):
     mock_modulepath(tcl_module_path)
 
-    tcl = pymod.modulepath.get('tcl')
+    tcl = pymod.modulepath.get("tcl")
     assert tcl is not None
-    assert tcl.name == 'tcl'
-    assert tcl.fullname == 'tcl/1.0'
+    assert tcl.name == "tcl"
+    assert tcl.fullname == "tcl/1.0"
     assert isinstance(tcl, pymod.module.TclModule)
 
     # version 1.0 should be the default
-    a1 = pymod.modulepath.get('a')
+    a1 = pymod.modulepath.get("a")
     assert a1 is not None
-    assert a1.name == 'a'
-    assert a1.fullname == 'a/1.0'
+    assert a1.name == "a"
+    assert a1.fullname == "a/1.0"
     assert isinstance(a1, pymod.module.TclModule)
 
-    a2 = pymod.modulepath.get('a/2.0')
+    a2 = pymod.modulepath.get("a/2.0")
     assert a2 is not None
-    assert a2.name == 'a'
-    assert a2.fullname == 'a/2.0'
+    assert a2.name == "a"
+    assert a2.fullname == "a/2.0"
     assert isinstance(a2, pymod.module.TclModule)
 
     pymod.mc.load_impl(tcl)
-    assert pymod.environ.environ['path'] == '/a/path:/b/path'
-    assert pymod.environ.environ['ENVAR'] == 'tcl/1.0'
-    assert pymod.environ.environ.aliases['foo'] == 'BAR'
+    assert pymod.environ.environ["path"] == "/a/path:/b/path"
+    assert pymod.environ.environ["ENVAR"] == "tcl/1.0"
+    assert pymod.environ.environ.aliases["foo"] == "BAR"
 
     pymod.mc.load_impl(a1)
-    assert pymod.environ.environ['path'] == '/a/path:/b/path:/c/path'
-    assert pymod.environ.environ['ENVAR'] == 'a/1.0'
-    assert pymod.environ.environ.aliases['foo'] == 'BAZ'
+    assert pymod.environ.environ["path"] == "/a/path:/b/path:/c/path"
+    assert pymod.environ.environ["ENVAR"] == "a/1.0"
+    assert pymod.environ.environ.aliases["foo"] == "BAZ"
 
     pymod.mc.load_impl(a2)
-    assert pymod.environ.environ['path'] == '/a/path:/b/path:/d/path'
-    assert pymod.environ.environ['ENVAR'] == 'a/2.0'
-    assert pymod.environ.environ.aliases['foo'] == 'SPAM'
+    assert pymod.environ.environ["path"] == "/a/path:/b/path:/d/path"
+    assert pymod.environ.environ["ENVAR"] == "a/2.0"
+    assert pymod.environ.environ.aliases["foo"] == "SPAM"
 
 
 @pytest.mark.tcl
 def test_tcl_break(tmpdir, mock_modulepath):
-    f = tmpdir.join('f').write('''\
+    f = tmpdir.join("f").write(
+        """\
 #%Module1.0
 setenv foo BAR
 break
-setenv BAZ SPAM''')
+setenv BAZ SPAM"""
+    )
     mock_modulepath(tmpdir.strpath)
-    m = pymod.mc.load('f')
-    assert pymod.environ.get('foo') is None
-    assert pymod.environ.get('BAZ') is None
+    m = pymod.mc.load("f")
+    assert pymod.environ.get("foo") is None
+    assert pymod.environ.get("BAZ") is None
     assert not m.is_loaded
 
 
 @pytest.mark.tcl
 def test_tcl_env(tmpdir, mock_modulepath):
-    f = tmpdir.join('f').write('''\
+    f = tmpdir.join("f").write(
+        """\
 #%Module1.0
 if [info exists env(FOO)] {
   setenv BAZ $env(FOO)
 } else {
   setenv BAZ SPAM
 }
-''')
+"""
+    )
     mock_modulepath(tmpdir.strpath)
-    pymod.environ.set('FOO', 'BAR')
-    m = pymod.mc.load('f')
-    assert pymod.environ.get('BAZ') == 'BAR'
+    pymod.environ.set("FOO", "BAR")
+    m = pymod.mc.load("f")
+    assert pymod.environ.get("BAZ") == "BAR"
     assert m.is_loaded
-    pymod.mc.unload('f')
+    pymod.mc.unload("f")
 
-    pymod.environ.environ.pop('FOO')
-    m = pymod.mc.load('f')
-    assert pymod.environ.get('BAZ') == 'SPAM'
-    pymod.environ.environ.pop('BAZ')
-    pymod.environ.environ.pop('FOO', None)
+    pymod.environ.environ.pop("FOO")
+    m = pymod.mc.load("f")
+    assert pymod.environ.get("BAZ") == "SPAM"
+    pymod.environ.environ.pop("BAZ")
+    pymod.environ.environ.pop("FOO", None)
 
 
 @pytest.mark.tcl
 def test_tcl_env_break(tmpdir, mock_modulepath):
-    f = tmpdir.join('f').write('''\
+    f = tmpdir.join("f").write(
+        """\
 #%Module1.0
 if { [info exists env(FOO)] } {
   break
 } else {
   setenv BAZ SPAM
 }
-''')
+"""
+    )
     mock_modulepath(tmpdir.strpath)
 
-    pymod.environ.environ.pop('FOO', None)
-    m = pymod.mc.load('f')
-    assert pymod.environ.get('BAZ') == 'SPAM'
+    pymod.environ.environ.pop("FOO", None)
+    m = pymod.mc.load("f")
+    assert pymod.environ.get("BAZ") == "SPAM"
     assert m.is_loaded
-    pymod.mc.unload('f')
+    pymod.mc.unload("f")
 
-    pymod.environ.set('FOO', 'BAR')
-    pymod.environ.environ.pop('BAZ', None)
-    m = pymod.mc.load('f')
-    assert pymod.environ.get('BAZ') is None
+    pymod.environ.set("FOO", "BAR")
+    pymod.environ.environ.pop("BAZ", None)
+    m = pymod.mc.load("f")
+    assert pymod.environ.get("BAZ") is None
     assert not m.is_loaded
 
-    pymod.environ.environ.pop('FOO')
+    pymod.environ.environ.pop("FOO")
 
 
 @pytest.mark.tcl
 def test_tcl_env_break_neg(tmpdir, mock_modulepath):
-    f = tmpdir.join('f').write('''\
+    f = tmpdir.join("f").write(
+        """\
 #%Module1.0
 if { ![info exists env(FOO)] } {
   setenv BAZ SPAM
 } else {
   break
 }
-''')
+"""
+    )
     mock_modulepath(tmpdir.strpath)
 
-    pymod.environ.environ.pop('FOO', None)
-    m = pymod.mc.load('f')
-    assert pymod.environ.get('BAZ') == 'SPAM'
+    pymod.environ.environ.pop("FOO", None)
+    m = pymod.mc.load("f")
+    assert pymod.environ.get("BAZ") == "SPAM"
     assert m.is_loaded
-    pymod.mc.unload('f')
+    pymod.mc.unload("f")
 
-    pymod.environ.set('FOO', 'BAR')
-    pymod.environ.environ.pop('BAZ', None)
-    m = pymod.mc.load('f')
-    assert pymod.environ.get('BAZ') is None
+    pymod.environ.set("FOO", "BAR")
+    pymod.environ.environ.pop("BAZ", None)
+    m = pymod.mc.load("f")
+    assert pymod.environ.get("BAZ") is None
     assert not m.is_loaded
 
-    pymod.environ.environ.pop('FOO')
+    pymod.environ.environ.pop("FOO")
 
 
 @pytest.mark.tcl
 def test_tcl_continue(tmpdir, mock_modulepath):
-    f = tmpdir.join('f').write('''\
+    f = tmpdir.join("f").write(
+        """\
 #%Module1.0
 setenv foo BAR
 continue
-setenv BAZ SPAM''')
+setenv BAZ SPAM"""
+    )
     mock_modulepath(tmpdir.strpath)
-    m = pymod.mc.load('f')
-    assert pymod.environ.get('foo') == 'BAR'
-    assert pymod.environ.get('BAZ') is None
+    m = pymod.mc.load("f")
+    assert pymod.environ.get("foo") == "BAR"
+    assert pymod.environ.get("BAZ") is None
     assert m.is_loaded

@@ -4,7 +4,7 @@ import pymod.names
 import pymod.environ
 import pymod.callback
 
-category = 'path'
+category = "path"
 
 
 def prepend_path(module, mode, name, *values, **kwds):
@@ -65,7 +65,7 @@ def prepend_path(module, mode, name, *values, **kwds):
         for value in values:
             pymod.callback.use.use(module, mode, value)
         return
-    sep = kwds.get('sep', os.pathsep)
+    sep = kwds.get("sep", os.pathsep)
     if mode == pymod.modes.unload:
         for value in values:
             pymod.environ.remove_path(name, value, sep)

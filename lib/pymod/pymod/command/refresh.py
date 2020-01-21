@@ -1,8 +1,8 @@
 import pymod.mc
 
-description = 'Unload and reload all loaded modules'
-level = 'short'
-section = 'basic'
+description = "Unload and reload all loaded modules"
+level = "short"
+section = "basic"
 
 
 def setup_parser(subparser):

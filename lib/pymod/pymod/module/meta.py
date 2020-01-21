@@ -15,12 +15,12 @@ class MetaData:
         """Reads meta data for module in ``filename``
         # pymod: [enable_if=<bool expr>]
         """
-        regex = re.compile(r'#\s*pymod\:')
+        regex = re.compile(r"#\s*pymod\:")
         head = open(filename).readline()
         if not regex.search(head):
             return
-        pymod_directive = split(regex.split(head, 1)[1], ',')
-        kwds = dict([split(x, '=', 1) for x in pymod_directive])
+        pymod_directive = split(regex.split(head, 1)[1], ",")
+        kwds = dict([split(x, "=", 1) for x in pymod_directive])
         for (key, default) in vars(self).items():
             expr = kwds.pop(key, None)
             if expr is None:
@@ -37,6 +37,7 @@ class MetaData:
 
 def eval_bool_expr(expr):
     import os, sys
+
     # The above inserts aren't used locally, but might be in the eval below
     try:
         return bool(eval(expr))
@@ -47,12 +48,16 @@ def eval_bool_expr(expr):
 class MetaDataValueError(Exception):
     def __init__(self, expr, filename):
         superini = super(MetaDataValueError, self).__init__
-        superini('Failed to evaluate meta data statement {0!r} '
-                 'in {1}' .format(expr, filename))
+        superini(
+            "Failed to evaluate meta data statement {0!r} "
+            "in {1}".format(expr, filename)
+        )
 
 
 class MetaDataUnknownFieldsError(Exception):
     def __init__(self, fields, filename):
         superini = super(MetaDataUnknownFieldsError, self).__init__
-        superini('Unknown MetaData fields {0!r} in module file '
-                 '{1}'.format(', '.join(fields), filename))
+        superini(
+            "Unknown MetaData fields {0!r} in module file "
+            "{1}".format(", ".join(fields), filename)
+        )

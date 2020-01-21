@@ -1,6 +1,6 @@
 import llnl.util.filesystem
 
-category = 'utility'
+category = "utility"
 
 
 def mkdirp(module, mode, *paths, **kwargs):

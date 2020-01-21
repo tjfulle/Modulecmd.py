@@ -4,6 +4,7 @@ import pymod.environ
 
 from pymod.tutorial.common import rmdir
 
+
 def teardown():
     env = pymod.environ.get_deserialized(pymod.names.tutorial_save_env)
     if env:

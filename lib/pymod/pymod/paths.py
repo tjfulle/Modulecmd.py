@@ -15,6 +15,7 @@ def ancestor(dir, n=1):
         parent = os.path.dirname(parent)
     return parent
 
+
 #: This file lives in $prefix/lib/pymod/pymod/__file__
 prefix = ancestor(__file__, 4)
 
@@ -28,23 +29,24 @@ bin_path = os.path.join(prefix, "bin")
 pymod_script = os.path.join(bin_path, "pymod")
 
 # pymod directory hierarchy
-lib_path              = os.path.join(prefix, "lib", "pymod")
-external_path         = os.path.join(lib_path, "contrib")
-module_path           = os.path.join(lib_path, "pymod")
-command_path          = os.path.join(module_path, "command")
-callback_path         = os.path.join(module_path, "callback")
-test_path             = os.path.join(module_path, "test")
-modulepath_path       = os.path.join(module_path, "modulepath")
-var_path              = os.path.join(prefix, "var", "pymod")
-share_path            = os.path.join(prefix, "share", "pymod")
-docs_path             = os.path.join(prefix, "docs", "pymod")
-etc_path              = os.path.join(prefix, "etc", "pymod")
+lib_path = os.path.join(prefix, "lib", "pymod")
+external_path = os.path.join(lib_path, "contrib")
+module_path = os.path.join(lib_path, "pymod")
+command_path = os.path.join(module_path, "command")
+callback_path = os.path.join(module_path, "callback")
+test_path = os.path.join(module_path, "test")
+modulepath_path = os.path.join(module_path, "modulepath")
+var_path = os.path.join(prefix, "var", "pymod")
+share_path = os.path.join(prefix, "share", "pymod")
+docs_path = os.path.join(prefix, "docs", "pymod")
+etc_path = os.path.join(prefix, "etc", "pymod")
 
 
 #: User configuration location
-user_config_path          = os.getenv('PYMOD_CONFIG_PATH', os.path.expanduser('~/.pymod'))
-user_config_platform_path = os.getenv('PYMOD_CONFIG_PLATFORM_PATH',
-                                      os.path.join(user_config_path, sys.platform.lower()))
+user_config_path = os.getenv("PYMOD_CONFIG_PATH", os.path.expanduser("~/.pymod"))
+user_config_platform_path = os.getenv(
+    "PYMOD_CONFIG_PLATFORM_PATH", os.path.join(user_config_path, sys.platform.lower())
+)
 
 if not os.path.isdir(user_config_path):  # pragma: no cover
     os.makedirs(user_config_path)

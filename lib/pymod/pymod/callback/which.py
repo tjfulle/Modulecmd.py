@@ -1,6 +1,6 @@
 import contrib.util
 
-category = 'utility'
+category = "utility"
 
 
 def which(module, mode, exename):

@@ -2,7 +2,7 @@ import pymod.mc
 import pymod.modes
 import pymod.environ
 
-category = 'utility'
+category = "utility"
 
 
 def getenv(module, mode, key, default=None):

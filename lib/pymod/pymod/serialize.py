@@ -13,12 +13,12 @@ def deserialize(serialized):
 
 
 def serialize_chunked(raw):
-    chunk_size = pymod.config.get('serialize_chunk_size')
+    chunk_size = pymod.config.get("serialize_chunk_size")
     return wrap(serialize(raw), chunk_size)
 
 
 def deserialize_chunked(serialized_chunks):
-    return deserialize(''.join(serialized_chunks))
+    return deserialize("".join(serialized_chunks))
 
 
 def _encode(item):

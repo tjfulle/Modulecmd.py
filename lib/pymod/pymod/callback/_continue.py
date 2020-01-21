@@ -1,6 +1,6 @@
 import pymod.error
 
-category = 'utility'
+category = "utility"
 
 
 def _continue(module, mode):

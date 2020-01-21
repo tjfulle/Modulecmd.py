@@ -10,7 +10,7 @@ from llnl.util.lang import Singleton
 
 __shells__ = (Shell, Bash, Csh, Python)
 
-default_shell = os.path.basename(os.getenv('SHELL', 'bash'))
+default_shell = os.path.basename(os.getenv("SHELL", "bash"))
 
 
 def get_shell(shell_name=None):
@@ -29,12 +29,12 @@ def get_shell(shell_name=None):
     """
     global name
     if shell_name is None:
-        shell_name = pymod.config.get('default_shell')
+        shell_name = pymod.config.get("default_shell")
     for shelltype in __shells__:
         if shell_name == shelltype.name:
             name = shell_name
             return shelltype()
-    raise ValueError('Unknown shell ' + shell_name)
+    raise ValueError("Unknown shell " + shell_name)
 
 
 _shell = Singleton(get_shell)

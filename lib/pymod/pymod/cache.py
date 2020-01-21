@@ -14,11 +14,13 @@ cache_version_info = (0, 1, 0)
 
 def modifies_cache(fun):
     from functools import wraps
+
     @wraps(fun)
     def inner(self, *args, **kwargs):
         returnvalue = fun(self, *args, **kwargs)
         self.modified = True
         return returnvalue
+
     return inner
 
 
@@ -32,12 +34,12 @@ class Cache:
     def data(self):
         if self._data is None:
             self._data = self.load()
-            version = tuple(self._data.get('version', []))
+            version = tuple(self._data.get("version", []))
             if self._data and version != cache_version_info:  # pragma: no cover
                 # Old version, forget it
                 self._data = {}
                 self._modified = True
-            self._data['version'] = cache_version_info
+            self._data["version"] = cache_version_info
         return self._data
 
     @property
@@ -58,7 +60,7 @@ class Cache:
         return data
 
     def write(self):
-        with open(self.filename, 'w') as fh:
+        with open(self.filename, "w") as fh:
             json.dump(self.data, fh, indent=2)
 
     @modifies_cache
@@ -86,7 +88,7 @@ class Cache:
         """Build the cache"""
         tty.info("Building the MODULEPATH cache")
         self._data = {}
-        self._data['version'] = cache_version_info
+        self._data["version"] = cache_version_info
 
         # Build the modulepath cache
         for path in pymod.modulepath.walk():
@@ -134,4 +136,6 @@ def remove():
 def dump_cache_if_modified():  # pragma: no cover
     if cache.modified:
         cache.write()
+
+
 atexit.register(dump_cache_if_modified)

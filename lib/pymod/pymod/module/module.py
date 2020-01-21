@@ -12,7 +12,7 @@ from contrib.util import textfill
 import llnl.util.tty as tty
 from llnl.util.tty import terminal_size
 
-__all__ = ['Namespace', 'Module', 'PyModule', 'TclModule']
+__all__ = ["Namespace", "Module", "PyModule", "TclModule"]
 
 
 # --------------------------------------------------------------------------- #
@@ -20,16 +20,17 @@ __all__ = ['Namespace', 'Module', 'PyModule', 'TclModule']
 # --------------------------------------------------------------------------- #
 class Module(object):
     ext = None
+
     def __init__(self, modulepath, *parts):
         self.filename = os.path.join(modulepath, *parts)
 
         if not os.path.isfile(self.filename):
-            raise IOError('{0} is not a file'.format(self.filename))
+            raise IOError("{0} is not a file".format(self.filename))
 
         parts = list(parts)
         if self.ext:
             parts[-1], ext = os.path.splitext(parts[-1])
-            assert ext == self.ext, 'ext={0!r}!={1!r}'.format(ext, self.ext)
+            assert ext == self.ext, "ext={0!r}!={1!r}".format(ext, self.ext)
         version = variant = None
         if len(parts) == 1:
             self.name, = parts
@@ -38,13 +39,13 @@ class Module(object):
         elif len(parts) == 3:
             self.name, version, variant = parts
         else:
-            raise ValueError('Too many parts to construct module definition')
+            raise ValueError("Too many parts to construct module definition")
         self.version = Version(version)
         self.variant = Version(variant)
 
         self.modulepath = modulepath
         self.family = None
-        self.whatisstr = ''
+        self.whatisstr = ""
         self.helpstr = None
         self.is_default = False
         self._unlocked_by_me = []
@@ -55,10 +56,10 @@ class Module(object):
         self.registered_options = {}
 
     def __str__(self):
-        return 'Module(name={0})'.format(self.fullname)
+        return "Module(name={0})".format(self.fullname)
 
     def __repr__(self):
-        return 'Module(name={0})'.format(self.fullname)
+        return "Module(name={0})".format(self.fullname)
 
     @property
     def is_loaded(self):
@@ -87,10 +88,12 @@ class Module(object):
 
     @acquired_as.setter
     def acquired_as(self, arg):
-        assert (arg == self.filename or
-                arg == self.name or
-                arg == self.fullname or
-                arg.endswith(self.fullname)), 'Bad arg: {0} (fullname: {1})'.format(arg, self.fullname)
+        assert (
+            arg == self.filename
+            or arg == self.name
+            or arg == self.fullname
+            or arg.endswith(self.fullname)
+        ), "Bad arg: {0} (fullname: {1})".format(arg, self.fullname)
         self._acquired_as = arg
 
     @property
@@ -100,9 +103,11 @@ class Module(object):
     @refcount.setter
     def refcount(self, count):
         if count < 0:
-            raise ValueError('Negative reference count for {0}.  This should '
-                             'never happen.  Please report this failure to '
-                             'the Modulecmd.py developers'.format(self))
+            raise ValueError(
+                "Negative reference count for {0}.  This should "
+                "never happen.  Please report this failure to "
+                "the Modulecmd.py developers".format(self)
+            )
         self._refcount = count
 
     def endswith(self, string):
@@ -139,7 +144,7 @@ class Module(object):
         return list(unlocks_me[::-1])
 
     def read(self, mode):
-        raise NotImplementedError # pragma: no cover
+        raise NotImplementedError  # pragma: no cover
 
     def prepare(self):
         pass
@@ -158,55 +163,57 @@ class Module(object):
 
     def format_dl_status(self):
         if self.is_default and self.is_loaded:
-            return self.fullname + ' (D,L)'
+            return self.fullname + " (D,L)"
         elif self.is_default:  # pragma: no cover
-            return self.fullname + ' (D)'
+            return self.fullname + " (D)"
         elif self.is_loaded:
-            return self.fullname + ' (L)'
+            return self.fullname + " (L)"
         return self.fullname
 
     def format_whatis(self):
         if not self.whatisstr:  # pragma: no cover
-            return '{0}: no "whatis" description has been provided'.format(self.fullname)
+            return '{0}: no "whatis" description has been provided'.format(
+                self.fullname
+            )
         sio = StringIO()
         _, width = terminal_size()
-        rule = '=' * width
-        head = '{0}'.format((" " + self.name + " ").center(width, '='))
+        rule = "=" * width
+        head = "{0}".format((" " + self.name + " ").center(width, "="))
         text_width = min(width, 80)
-        sio.write(head + '\n')
-        sio.write(fill(self.whatisstr, width=text_width)+'\n')
+        sio.write(head + "\n")
+        sio.write(fill(self.whatisstr, width=text_width) + "\n")
         option_help = self.option_help_string()
         if option_help:  # pragma: no cover
-            sio.write('\n' + option_help + '\n')
+            sio.write("\n" + option_help + "\n")
         sio.write(rule)
         return sio.getvalue()
 
     def set_whatis(self, *args, **kwargs):
         if isinstance(self, TclModule):
             if len(args) != 1:
-                raise ValueError('unknown whatis args length for tcl module')
-            self.whatisstr += args[0] + '\n'
+                raise ValueError("unknown whatis args length for tcl module")
+            self.whatisstr += args[0] + "\n"
         else:
             for arg in args:
-                self.whatisstr += arg + '\n'
+                self.whatisstr += arg + "\n"
         for (key, value) in kwargs.items():
-            key = ' '.join(key.split('_'))
-            self.whatisstr += '\n' + key + ':\n'
+            key = " ".join(key.split("_"))
+            self.whatisstr += "\n" + key + ":\n"
             self.whatisstr += textfill(value, indent=2)
 
     def format_help(self):
         if self.helpstr is None:
-            return '{0}: no help string provided'.format(self.fullname)
+            return "{0}: no help string provided".format(self.fullname)
 
         sio = StringIO()
         _, width = terminal_size()
-        rule = '=' * width
-        head = '{0}'.format((" " + self.name + " ").center(width, '='))
-        sio.write(head + '\n')
-        sio.write(fill(self.helpstr)+'\n')
+        rule = "=" * width
+        head = "{0}".format((" " + self.name + " ").center(width, "="))
+        sio.write(head + "\n")
+        sio.write(fill(self.helpstr) + "\n")
         option_help = self.option_help_string()
         if option_help:  # pragma: no cover
-            sio.write('\n' + option_help + '\n')
+            sio.write("\n" + option_help + "\n")
         sio.write(rule)
         return sio.getvalue()
 
@@ -229,8 +236,11 @@ class Module(object):
             else:
                 opts.set(key, value)
         if unrecognized:
-            tty.die('{0}: unrecognized options: {1}'
-                    .format(self.fullname, ', '.join(unrecognized)))
+            tty.die(
+                "{0}: unrecognized options: {1}".format(
+                    self.fullname, ", ".join(unrecognized)
+                )
+            )
 
         return opts
 
@@ -240,23 +250,25 @@ class Module(object):
         max_opt_name_length = max([len(_) for _ in self.registered_options])
         column_start = min(20, max_opt_name_length)
         help_string = StringIO()
-        help_string.write('Module options:\n')
+        help_string.write("Module options:\n")
         text_width = 80 - column_start
-        subsequent_indent = ' ' * column_start
+        subsequent_indent = " " * column_start
         for (key, kwds) in self.registered_options.items():
-            pad = ' ' * max(column_start - len(key) - 2, 2)
-            line = '  {0}{1}'.format(key, pad)
-            this_help_str = kwds['help']
+            pad = " " * max(column_start - len(key) - 2, 2)
+            line = "  {0}{1}".format(key, pad)
+            this_help_str = kwds["help"]
             if this_help_str is not None:
-                this_help_str = fill(this_help_str, width=text_width,
-                                     subsequent_indent=subsequent_indent)
+                this_help_str = fill(
+                    this_help_str, width=text_width, subsequent_indent=subsequent_indent
+                )
                 line += this_help_str
-            help_string.write(line+'\n')
+            help_string.write(line + "\n")
         return help_string.getvalue().rstrip()
 
 
 class PyModule(Module):
-    ext = '.py'
+    ext = ".py"
+
     def __init__(self, modulepath, *parts):
         # strip the file extension off the last part and call class initializer
         super(PyModule, self).__init__(modulepath, *parts)
@@ -271,7 +283,7 @@ class PyModule(Module):
         return os.path.splitext(self.filename)[0].endswith(string)
 
     def read(self, mode):
-        return open(self.filename, 'r').read()
+        return open(self.filename, "r").read()
 
 
 class TclModule(Module):
@@ -282,21 +294,26 @@ class TclModule(Module):
             return tcl2py(self, mode)
         except Exception as e:  # pragma: no cover
             tty.die(e.args[0])
-            return ''
+            return ""
 
 
 class Namespace(object):
     def __init__(self, **kwds):
         for (key, val) in kwds.items():
             self.set(key, val)
+
     def __str__(self):  # pragma: no cover
-        return 'Namespace({0})'.format(self.joined(', '))
+        return "Namespace({0})".format(self.joined(", "))
+
     def joined(self, sep):
-        return sep.join('{0}={1!r}'.format(*_) for _ in self.__dict__.items())
+        return sep.join("{0}={1!r}".format(*_) for _ in self.__dict__.items())
+
     def set(self, key, value):
         setattr(self, key, value)
+
     def as_dict(self):
         return dict(self.__dict__)
+
     def set_defaults(self, **kwargs):
         for (key, value) in kwargs.items():
-            self.set(key, value['default'])
+            self.set(key, value["default"])

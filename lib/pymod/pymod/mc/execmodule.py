@@ -51,7 +51,7 @@ def execmodule_in_sandbox(module, mode):
     # Execute the environment
     module.prepare()
     ns = module_exec_sandbox(module, mode)
-    code = compile(module.read(mode), module.filename, 'exec')
+    code = compile(module.read(mode), module.filename, "exec")
     with working_dir(os.path.dirname(module.filename)):
         try:
             if isinstance(module, pymod.module.TclModule):
@@ -65,37 +65,38 @@ def execmodule_in_sandbox(module, mode):
             pymod.environ.restore(clone)
             module.exec_failed_do_not_register = True
 
+
 def module_exec_sandbox(module, mode):
     callback = lambda cb, **kwds: pymod.callback.callback(cb, module, mode, **kwds)
     ns = {
-        'os': os,
-        'sys': sys,
-        'env': pymod.environ.copy(include_os=True),
-        'self': module,
-        'user_env': pymod.user.env,
-        'is_darwin': 'darwin' in sys.platform,
-        'IS_DARWIN': 'darwin' in sys.platform,
+        "os": os,
+        "sys": sys,
+        "env": pymod.environ.copy(include_os=True),
+        "self": module,
+        "user_env": pymod.user.env,
+        "is_darwin": "darwin" in sys.platform,
+        "IS_DARWIN": "darwin" in sys.platform,
         #
-        'add_option': module.add_option,
-        'opts': Singleton(module.parse_opts)
+        "add_option": module.add_option,
+        "opts": Singleton(module.parse_opts),
     }
 
     for fun in pymod.callback.all_callbacks():
         kwds = {}
-        if fun.endswith(('set_alias', 'set_shell_function', 'getenv')):
+        if fun.endswith(("set_alias", "set_shell_function", "getenv")):
             # when='always' because we may partially load a module just define
             # aliases and functions.  This is used by the clone capability that
             # can set environment variables from a clone, but cannot know what
             # aliases and functions existed in the clone.
-            kwds['when'] = 'always'
-        elif fun == 'whatis':
+            kwds["when"] = "always"
+        elif fun == "whatis":
             # filter out this function if not in whatis mode
-            kwds['when'] = mode == pymod.modes.whatis
-        elif fun == 'help':
+            kwds["when"] = mode == pymod.modes.whatis
+        elif fun == "help":
             # filter out this function if not in help mode
-            kwds['when'] = mode == pymod.modes.help
+            kwds["when"] = mode == pymod.modes.help
         else:
             # Let the function know nothing was explicitly set
-            kwds['when'] = None
+            kwds["when"] = None
         ns[fun] = callback(fun, **kwds)
     return ns

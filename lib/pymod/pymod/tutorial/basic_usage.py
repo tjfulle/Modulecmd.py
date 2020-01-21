@@ -38,24 +38,27 @@ def write_basic_module_and_script(name, version, modulepath, scriptpath):
         fullname = join_path(name, version)
 
     if version is None:
-        scriptname = 'script-{0}'.format(name).lower()
+        scriptname = "script-{0}".format(name).lower()
     else:
-        scriptname = 'script-{0}-{1}'.format(name, version).lower()
+        scriptname = "script-{0}-{1}".format(name, version).lower()
 
-    modulefile = join_path(modulepath, fullname + '.py')
+    modulefile = join_path(modulepath, fullname + ".py")
     scriptfile = join_path(scriptpath, scriptname)
 
     mkdirp(os.path.dirname(modulefile))
     mkdirp(os.path.dirname(scriptfile))
 
-    with open(modulefile, 'w') as fh:
-        fh.write('\n# Prepend the PATH environment variable with my bin directory\n')
+    with open(modulefile, "w") as fh:
+        fh.write("\n# Prepend the PATH environment variable with my bin directory\n")
         fh.write("prepend_path('PATH', {0!r})\n".format(sanitize(scriptpath)))
 
-    with open(scriptfile, 'w') as fh:
-        fh.write('#!/usr/bin/env sh\n')
-        fh.write('echo "This is a script associated with module {0} in {1}"\n'
-                 .format(fullname, modulepath))
+    with open(scriptfile, "w") as fh:
+        fh.write("#!/usr/bin/env sh\n")
+        fh.write(
+            'echo "This is a script associated with module {0} in {1}"\n'.format(
+                fullname, modulepath
+            )
+        )
 
     make_executable(scriptfile)
 
@@ -73,8 +76,8 @@ def gen_basic_modules(base_dir):
 
     """
 
-    basic_sw_dir = mkdirp(base_dir, 'basic', 'sw')
-    basic_modules_dir = mkdirp(base_dir, 'basic', 'modules')
+    basic_sw_dir = mkdirp(base_dir, "basic", "sw")
+    basic_modules_dir = mkdirp(base_dir, "basic", "modules")
 
     dirs = []
     for i in range(3):
@@ -83,17 +86,17 @@ def gen_basic_modules(base_dir):
 
         if i == 0:
             # A exists only in one directory
-            name = 'A'
-            scriptpath = mkdirp(sw_dir, name, 'bin')
+            name = "A"
+            scriptpath = mkdirp(sw_dir, name, "bin")
             write_basic_module_and_script(name, None, modulepath, scriptpath)
 
-        name = 'B'
-        scriptpath = mkdirp(sw_dir, name, 'bin')
+        name = "B"
+        scriptpath = mkdirp(sw_dir, name, "bin")
         write_basic_module_and_script(name, None, modulepath, scriptpath)
 
-        name = 'C'
-        version = '{0}.0'.format(i + 1)
-        scriptpath = mkdirp(sw_dir, name, version, 'bin')
+        name = "C"
+        version = "{0}.0".format(i + 1)
+        scriptpath = mkdirp(sw_dir, name, version, "bin")
         write_basic_module_and_script(name, version, modulepath, scriptpath)
 
         dirs.append(modulepath)

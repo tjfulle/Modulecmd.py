@@ -12,7 +12,7 @@ def format_output():  # pragma: no cover
 def dump(stream=None):  # pragma: no cover
     """Dump the final results to the shell to be evaluated"""
     output = format_output()
-    stream = sys.stderr if pymod.config.get('dryrun') else stream or sys.stdout
+    stream = sys.stderr if pymod.config.get("dryrun") else stream or sys.stdout
     stream.write(output)
 
     output = pymod.mc._mc.format_changed_module_state()

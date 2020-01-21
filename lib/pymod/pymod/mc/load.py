@@ -10,7 +10,7 @@ from pymod.error import ModuleNotFoundError, ModuleLoadError
 import llnl.util.tty as tty
 
 
-def load(name, opts=None, insert_at=None, caller='command_line'):
+def load(name, opts=None, insert_at=None, caller="command_line"):
     """Load the module given by `name`
 
     This is a higher level interface to `load_impl` that gets the actual module
@@ -38,12 +38,12 @@ def load(name, opts=None, insert_at=None, caller='command_line'):
     ModuleNotFoundError
 
     """
-    tty.verbose('Loading {0}'.format(name))
+    tty.verbose("Loading {0}".format(name))
 
     # Execute the module
     module = pymod.modulepath.get(name)
     if module is None:
-        if caller == 'command_line':
+        if caller == "command_line":
             collection = pymod.collection.get(name)
             if collection is not None:
                 return pymod.mc.collection.restore_impl(name, collection)
@@ -54,18 +54,24 @@ def load(name, opts=None, insert_at=None, caller='command_line'):
         module.opts = opts
 
     if module.is_loaded:
-        if caller == 'modulefile':
+        if caller == "modulefile":
             pymod.mc.increment_refcount(module)
         else:
-            tty.warn('{0} is already loaded, use \'module reload\' to reload'
-                     .format(module.fullname))
+            tty.warn(
+                "{0} is already loaded, use 'module reload' to reload".format(
+                    module.fullname
+                )
+            )
         return module
 
     if pymod.environ.get(pymod.names.loaded_collection):  # pragma: no cover
         collection = pymod.environ.get(pymod.names.loaded_collection)
-        tty.debug('Loading {0} on top of loaded collection {1}. '
-                  'Removing the collection name from the environment'
-                  .format(module.fullname, collection))
+        tty.debug(
+            "Loading {0} on top of loaded collection {1}. "
+            "Removing the collection name from the environment".format(
+                module.fullname, collection
+            )
+        )
         pymod.environ.unset(pymod.names.loaded_collection)
 
     if insert_at is not None:
@@ -97,7 +103,7 @@ def load_impl(module):
     # Now load it
     execmodule(module, pymod.modes.load)
 
-    if getattr(module, 'exec_failed_do_not_register', False):
+    if getattr(module, "exec_failed_do_not_register", False):
         # Something happened during the execution of this module and we are not
         # to register it.
         pass
@@ -107,9 +113,11 @@ def load_impl(module):
         # the same family. In that case, execmodule catches a FamilyLoadedError
         # exception and swaps this module with the module of the same family.
         # The swap completes the load.
-        if not (pymod.mc._mc._swapped_on_family_update and
-                module == pymod.mc._mc._swapped_on_family_update[-1][1]): # pragma: no cover
-            raise ModuleLoadError('Expected 0 refcount')
+        if not (
+            pymod.mc._mc._swapped_on_family_update
+            and module == pymod.mc._mc._swapped_on_family_update[-1][1]
+        ):  # pragma: no cover
+            raise ModuleLoadError("Expected 0 refcount")
     else:
         pymod.mc.register_module(module)
 

@@ -1,5 +1,5 @@
-compiler_vendors = ['gcc', 'clang', 'intel', 'pgi', 'ucc']
-mpi_vendors = ['openmpi', 'mpich', 'umpi']
+compiler_vendors = ["gcc", "clang", "intel", "pgi", "ucc"]
+mpi_vendors = ["openmpi", "mpich", "umpi"]
 
 
 class Namespace:

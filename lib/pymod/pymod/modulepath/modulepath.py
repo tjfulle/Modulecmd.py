@@ -48,7 +48,7 @@ class Modulepath:
         for (i, path) in enumerate(self.path):
             if path.path == dirname:
                 return i
-        raise ValueError('{0} not in Modulepath'.format(dirname))  # pragma: no cover
+        raise ValueError("{0} not in Modulepath".format(dirname))  # pragma: no cover
 
     def clear(self):
         for path in self.path[::-1]:
@@ -114,11 +114,14 @@ class Modulepath:
                 # already used, append_path is a null op, it is not already
                 # being used, then appending has less side effects than
                 # prepending.
-                self.append_path(target['modulepath'])
-                module = self.getby_filename(target['filename'])
+                self.append_path(target["modulepath"])
+                module = self.getby_filename(target["filename"])
                 if module is None:  # pragma: no cover
-                    tty.warn('Alias {0} points to nonexistent target {1}'
-                             .format(key, target['target']))
+                    tty.warn(
+                        "Alias {0} points to nonexistent target {1}".format(
+                            key, target["target"]
+                        )
+                    )
         return module
 
     def getby_dirname(self, dirname):
@@ -144,7 +147,7 @@ class Modulepath:
             return
         path = Path(dirname)
         if not path.modules:
-            tty.verbose('No modules found in {0}'.format(path.path))
+            tty.verbose("No modules found in {0}".format(path.path))
             return
         self.path.append(path)
         self.path_modified()
@@ -178,7 +181,7 @@ class Modulepath:
         """
         dirname = Path.expand_name(dirname)
         if dirname not in self:  # pragma: no cover
-            tty.warn('Modulepath: {0!r} is not in modulepath'.format(dirname))
+            tty.warn("Modulepath: {0!r} is not in modulepath".format(dirname))
             return []
 
         modules_in_dir = self.getby_dirname(dirname)
@@ -202,23 +205,25 @@ class Modulepath:
         default. A module is explicitly made the default by creating a symlink
         to it (in the same directory) named 'default'
         """
+
         def module_default_sort_key(module):
-            sort_key = (1 if module.marked_as_default else -1,
-                        module.version,
-                        module.variant,
-                        -self.index(module.modulepath))
+            sort_key = (
+                1 if module.marked_as_default else -1,
+                module.version,
+                module.variant,
+                -self.index(module.modulepath),
+            )
             return sort_key
+
         self.defaults = {}
         grouped = groupby(
-            [module for path in self.path for module in path.modules],
-            lambda x: x.name)
+            [module for path in self.path for module in path.modules], lambda x: x.name
+        )
         for (_, modules) in grouped:
             for module in modules:
                 module.is_default = False
             if len(modules) > 1:
-                modules = sorted(modules,
-                                 key=module_default_sort_key,
-                                 reverse=True)
+                modules = sorted(modules, key=module_default_sort_key, reverse=True)
                 modules[0].is_default = True
             self.defaults[modules[0].name] = modules[0]
 
@@ -229,12 +234,12 @@ class Modulepath:
 
     def colorize(self, string):
         """Colorize item for output to console"""
-        D = '(%s)' % colorize('@R{D}')
-        L = '(%s)' % colorize('@G{L}')
-        DL = '(%s,%s)' % (colorize('@R{D}'), colorize('@G{L}'))
-        colorized = string.replace('(D)', D)
-        colorized = colorized.replace('(L)', L)
-        colorized = colorized.replace('(D,L)', DL)
+        D = "(%s)" % colorize("@R{D}")
+        L = "(%s)" % colorize("@G{L}")
+        DL = "(%s,%s)" % (colorize("@R{D}"), colorize("@G{L}"))
+        colorized = string.replace("(D)", D)
+        colorized = colorized.replace("(L)", L)
+        colorized = colorized.replace("(D,L)", DL)
         return colorized
 
     @staticmethod
@@ -249,34 +254,36 @@ class Modulepath:
 
     def avail_full(self, regex=None, long_format=False):
         sio = StringIO()
-        sio.write('\n')
+        sio.write("\n")
         _, width = tty.terminal_size()
-        head = lambda x: (' ' + x + ' ').center(width, '-')
+        head = lambda x: (" " + x + " ").center(width, "-")
         for path in self:
             directory = path.path
-            modules = sorted([m for m in path.modules if m.is_enabled], key=self.sort_key)
+            modules = sorted(
+                [m for m in path.modules if m.is_enabled], key=self.sort_key
+            )
             modules = self.filter_modules_by_regex(modules, regex)
             if not os.path.isdir(directory):  # pragma: no cover
-                s = colorize('@r{(Directory not readable)}'.center(width))
+                s = colorize("@r{(Directory not readable)}".center(width))
             elif not modules:  # pragma: no cover
                 if regex:
                     continue
-                s = colorize('@r{(None)}'.center(width))
+                s = colorize("@r{(None)}".center(width))
             else:
                 modules = [self.colorize(m.format_dl_status()) for m in modules]
                 aliases = pymod.alias.get(directory)
                 if aliases:  # pragma: no cover
                     for (alias, target) in aliases:
                         i = bisect.bisect_left(modules, alias)
-                        insert_key = colorize('@M{%s}@@' % (alias))
+                        insert_key = colorize("@M{%s}@@" % (alias))
                         if long_format:  # pragma: no cover
-                            insert_key += ' -> %s' % (target)
+                            insert_key += " -> %s" % (target)
                         modules.insert(i, insert_key)
                 s = colified(modules, width=width)
-            directory = directory.replace(os.path.expanduser('~/'), '~/')
+            directory = directory.replace(os.path.expanduser("~/"), "~/")
             # sio.write(head(directory) + '\n')
-            sio.write(colorize('@G{%s}:\n' % (directory)))
-            sio.write(s + '\n')
+            sio.write(colorize("@G{%s}:\n" % (directory)))
+            sio.write(s + "\n")
         return sio.getvalue()
 
     def avail_terse(self, regex=None):
@@ -290,9 +297,9 @@ class Modulepath:
             modules = self.filter_modules_by_regex(modules, regex)
             if not modules:  # pragma: no cover
                 continue
-            sio.write(directory + ':\n')
-            sio.write('\n'.join(m.fullname for m in modules))
-        sio.write('\n')
+            sio.write(directory + ":\n")
+            sio.write("\n".join(m.fullname for m in modules))
+        sio.write("\n")
         return sio.getvalue()
 
     def candidates(self, key):

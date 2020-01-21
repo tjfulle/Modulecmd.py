@@ -2,9 +2,9 @@ import os
 import sys
 import pymod.modulepath
 
-description = 'Show MODULEPATH'
-level = 'short'
-section = 'modulepath'
+description = "Show MODULEPATH"
+level = "short"
+section = "modulepath"
 
 
 def setup_parser(subparser):
@@ -12,10 +12,11 @@ def setup_parser(subparser):
 
 
 def path(parser, args):
-    home = os.path.expanduser('~')
+    home = os.path.expanduser("~")
     paths = []
     for path in pymod.modulepath.path():
-        paths.append(path.replace(home, '~'))
-    s = '\n'.join('{0}) {1}'.format(i, dirname) for i, dirname
-                  in enumerate(paths, start=1))
-    sys.stderr.write(s + '\n')
+        paths.append(path.replace(home, "~"))
+    s = "\n".join(
+        "{0}) {1}".format(i, dirname) for i, dirname in enumerate(paths, start=1)
+    )
+    sys.stderr.write(s + "\n")

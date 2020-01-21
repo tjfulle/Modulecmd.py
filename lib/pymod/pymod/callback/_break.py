@@ -1,7 +1,7 @@
 import pymod.error
 import llnl.util.tty as tty
 
-category = 'utility'
+category = "utility"
 
 
 def _break(module, mode):

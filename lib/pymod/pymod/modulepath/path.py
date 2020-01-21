@@ -11,6 +11,7 @@ from contrib.util import groupby, join
 
 class Path:
     """Class to hold modules in a directory"""
+
     def __init__(self, dirname):
         self.path = self.expand_name(dirname)
         self.modules = self.find_modules()
@@ -26,7 +27,7 @@ class Path:
             return modules
 
     def get_cached_modules(self):
-        if not pymod.config.get('use_modulepath_cache'):
+        if not pymod.config.get("use_modulepath_cache"):
             return None
         key = self.path
         section = pymod.names.modulepath
@@ -42,7 +43,7 @@ class Path:
         return modules
 
     def cache_modules(self, modules):
-        if not pymod.config.get('use_modulepath_cache'):
+        if not pymod.config.get("use_modulepath_cache"):
             return
         key = self.path
         section = pymod.names.modulepath
@@ -52,5 +53,3 @@ class Path:
     @classmethod
     def expand_name(cls, dirname):
         return os.path.expanduser(Template(dirname).safe_substitute(**(os.environ)))
-
-
