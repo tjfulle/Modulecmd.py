@@ -258,7 +258,7 @@ def test_mc_load_bad_callback(tmpdir, mock_modulepath):
             acquired_as=a.acquired_as,
         )
     ]
-    pymod.environ.set_serialized(pymod.names.loaded_module_cellar, lm_cellar)
+    pymod.environ.set(pymod.names.loaded_module_cellar, lm_cellar, serialize=True)
     pymod.mc._mc._loaded_modules = [a]
 
     # This should not error out, even though 'FAKE' does not exist.  This is by

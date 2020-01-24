@@ -25,7 +25,7 @@ class Path:
             return modules
 
     def get_cached_modules(self):
-        if not pymod.config.get("use_modulepath_cache"):
+        if not pymod.config.get("use_modulepath_cache"):  # pragma: no cover
             return None
         key = self.path
         section = pymod.names.modulepath
@@ -41,7 +41,7 @@ class Path:
         return modules
 
     def cache_modules(self, modules):
-        if not pymod.config.get("use_modulepath_cache"):
+        if not pymod.config.get("use_modulepath_cache"):  # pragma: no cover
             return
         key = self.path
         section = pymod.names.modulepath

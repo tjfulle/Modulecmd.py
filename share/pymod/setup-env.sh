@@ -15,10 +15,12 @@ DIR="$( cd -P "$( dirname "$SOURCE" )"/.. >/dev/null && cd .. && pwd )"
 PYMOD_DIR="${DIR}"
 PYMOD_PKG_DIR="${PYMOD_DIR}"/lib/pymod/pymod
 PYMOD_CMD="${PYMOD_DIR}"/bin/modulecmd.py
+PYMOD_SESSION_ID=$$
 MODULESHOME="${DIR}"
 export PYMOD_PKG_DIR
 export PYMOD_CMD
 export PYMOD_DIR
+export PYMOD_SESSION_ID
 export MODULESHOME
 
 ########################################################################

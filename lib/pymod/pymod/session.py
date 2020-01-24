@@ -10,7 +10,7 @@ import pymod.names
 
 class Session:
     def __init__(self):
-        self.savedir = os.path.join(pymod.paths.user_config_path, "sessions")
+        self.savedir = os.path.join(pymod.paths.user_config_path, ".sessions")
         if not os.path.isdir(self.savedir):
             os.makedirs(self.savedir)
         pid = Session.pid()

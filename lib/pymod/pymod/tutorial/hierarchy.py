@@ -29,8 +29,8 @@ def hierarchy():
 
     pymod.modulepath.append_path(core_base_dir)
 
-    if not pymod.environ.get_deserialized(pymod.names.tutorial_save_env):
-        pymod.environ.set_serialized(pymod.names.tutorial_save_env, env)
+    if not pymod.environ.get(pymod.names.tutorial_save_env, serialized=True):
+        pymod.environ.set(pymod.names.tutorial_save_env, env, serialize=True)
 
     return
 

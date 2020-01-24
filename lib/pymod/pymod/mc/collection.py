@@ -70,6 +70,6 @@ def restore_impl(name, the_collection):
             assert module.is_loaded
     pymod.environ.set(pymod.names.loaded_collection, name)
     for p in orig_path:
-        if not pymod.modulepath.contains(p):
+        if not pymod.modulepath.contains(p):  # pragma: no cover
             pymod.mc.use(p, append=True)
     return None

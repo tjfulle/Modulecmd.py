@@ -2,6 +2,7 @@ import os
 import pytest
 import pymod.names
 import pymod.environ
+from contrib.util import boolean
 
 
 def test_environ_set_get_unset():
@@ -92,20 +93,20 @@ def test_environ_remove_path():
     assert pymod.environ.environ[name] is None
 
 
-def test_environ_get_bool():
+def test_environ_get_with_type():
     assert pymod.environ.is_empty()
     pymod.environ.set("A", "1")
-    assert pymod.environ.get_bool("A") == True
+    assert pymod.environ.get("A", type=boolean) == True
     pymod.environ.set("A", "TRUE")
-    assert pymod.environ.get_bool("A") == True
+    assert pymod.environ.get("A", type=boolean) == True
     pymod.environ.set("A", "ON")
-    assert pymod.environ.get_bool("A") == True
+    assert pymod.environ.get("A", type=boolean) == True
     pymod.environ.set("A", "0")
-    assert pymod.environ.get_bool("A") == False
+    assert pymod.environ.get("A", type=boolean) == False
     pymod.environ.set("A", "OFF")
-    assert pymod.environ.get_bool("A") == False
+    assert pymod.environ.get("A", type=boolean) == False
     pymod.environ.set("A", "FALSE")
-    assert pymod.environ.get_bool("A") == False
+    assert pymod.environ.get("A", type=boolean) == False
 
 
 def test_environ_set_env():
@@ -116,18 +117,18 @@ def test_environ_set_env():
 
 
 def test_environ_set_serialized_dict():
-    pymod.environ.set_serialized("A", {"a": 1})
-    assert pymod.environ.get_deserialized("A") == {"a": 1}
+    pymod.environ.set("A", {"a": 1}, serialize=True)
+    assert pymod.environ.get("A", serialized=True) == {"a": 1}
 
 
 def test_environ_set_serialized_list():
-    pymod.environ.set_serialized("A", [0, 1])
-    assert pymod.environ.get_deserialized("A") == [0, 1]
+    pymod.environ.set("A", [0, 1], serialize=True)
+    assert pymod.environ.get("A", serialized=True) == [0, 1]
 
 
 def test_environ_set_serialized_None():
-    pymod.environ.set_serialized("A", None)
-    assert pymod.environ.get_deserialized("A") is None
+    pymod.environ.set("A", None, serialize=True)
+    assert pymod.environ.get("A", serialized=True) is None
 
 
 def test_environ_set_get_path():

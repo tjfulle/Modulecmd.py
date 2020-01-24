@@ -43,12 +43,10 @@ class Environ(dict):
             tty.die("{0} is not a directory".format(dirname))
         self.destination_dir = dirname
 
-    def get(self, key, default=None):
+    def get(self, key, default=None, type=None):
         """Overload Environ.get to first check me, then os.environ"""
-        return super(Environ, self).get(key, os.getenv(key, default))
-
-    def get_bool(self, key):
-        return boolean(self.get(key))
+        val = super(Environ, self).get(key, os.getenv(key, default))
+        return val if type is None else type(val)
 
     def get_path(self, key, sep=os.pathsep):
         """Get the path given by `key`
@@ -267,15 +265,15 @@ def format_output():
     return environ.format_output()
 
 
-def get(key, default=None):
-    return environ.get(key, default)
+def get(key, default=None, serialized=False, type=None):
+    if serialized:
+        return _get_and_deserialize(environ, key, default=default)
+    return environ.get(key, default, type=type)
 
 
-def get_bool(key):
-    return environ.get_bool(key)
-
-
-def set(key, value):
+def set(key, value, serialize=False):
+    if serialize:
+        return _serialize_and_set(environ, key, value)
     return environ.set(key, value)
 
 
@@ -320,11 +318,7 @@ def set_path(key, path, sep=os.pathsep):
     return environ.set(key, value)
 
 
-def set_serialized(label, value):
-    return set_serialized_impl(environ, label, value)
-
-
-def set_serialized_impl(container, label, value):
+def _serialize_and_set(container, label, value):
 
     # Reset previously set values
     for (key, item) in os.environ.items():
@@ -343,11 +337,7 @@ def set_serialized_impl(container, label, value):
         container.set(key, chunk)
 
 
-def get_deserialized(label, default=None):
-    return get_deserialized_impl(environ, label, default=default)
-
-
-def get_deserialized_impl(container, label, default=None):
+def _get_and_deserialize(container, label, default=None):
     i = 0
     chunks = []
     while True:

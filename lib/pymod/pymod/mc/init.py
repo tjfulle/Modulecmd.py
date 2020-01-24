@@ -10,5 +10,5 @@ def init(dirnames):
         pymod.mc.collection.restore(pymod.names.default_user_collection)
     for dirname in dirnames:
         pymod.mc.use(dirname, append=True)
-    pymod.environ.set_serialized(pymod.names.initial_env, initial_env)
+    pymod.environ.set(pymod.names.initial_env, initial_env, serialize=True)
     return

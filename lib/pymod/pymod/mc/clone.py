@@ -41,7 +41,7 @@ def restore_impl(the_clone):
         pymod.environ.set(key, val)
 
     # Load modules to make sure aliases/functions are restored
-    lm_cellar = pymod.environ.get_deserialized_impl(
+    lm_cellar = pymod.environ._get_and_deserialize(
         the_clone, pymod.names.loaded_module_cellar
     )
     if lm_cellar:

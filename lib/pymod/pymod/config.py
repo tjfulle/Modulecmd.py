@@ -124,7 +124,7 @@ def factory():
         if os.getenv(envar):
             key = envar[6:].lower()
             value = os.environ[envar]
-            if isinstance(defaults[key], bool):
+            if isinstance(defaults[key], bool):  # pragma: no cover
                 value = False if value.upper() in ("0", "FALSE", "NO") else True
             env[key] = value
 

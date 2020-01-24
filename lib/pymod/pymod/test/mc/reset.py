@@ -6,7 +6,7 @@ import pymod.names
 def test_mc_reset(tmpdir, mock_modulepath):
     initial_env = pymod.environ.copy(include_os=True)
     assert pymod.names.modulepath in initial_env
-    pymod.environ.set_serialized(pymod.names.initial_env, initial_env)
+    pymod.environ.set(pymod.names.initial_env, initial_env, serialize=True)
     env = pymod.mc.reset()
     # MODULEPATH is Popped
     assert not pymod.names.modulepath in env
