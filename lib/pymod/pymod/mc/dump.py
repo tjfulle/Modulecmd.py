@@ -1,6 +1,7 @@
 import sys
 import pymod.config
 import pymod.environ
+from llnl.util.tty.color import colorize
 
 
 def format_output():  # pragma: no cover
@@ -17,4 +18,4 @@ def dump(stream=None):  # pragma: no cover
 
     output = pymod.mc._mc.format_changed_module_state()
     if output.split():
-        sys.stderr.write(output)
+        sys.stderr.write(colorize(output))

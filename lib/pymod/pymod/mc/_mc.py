@@ -3,6 +3,7 @@ from six import StringIO
 
 import pymod.names
 import pymod.error
+import pymod.config
 import pymod.module
 import pymod.environ
 import pymod.modulepath
@@ -11,6 +12,7 @@ import llnl.util.tty as tty
 
 
 _loaded_modules = None
+_initial_loaded_modules = None
 _swapped_explicitly = []
 _swapped_on_version_change = []
 _swapped_on_family_update = []
@@ -59,6 +61,8 @@ def get_loaded_modules():
         for ar in lm_cellar:
             module = unarchive_module(ar)
             _loaded_modules.append(module)
+        global _initial_loaded_modules
+        _initial_loaded_modules = [m.fullname for m in _loaded_modules]
     # return copy so that no one else can modify the loaded modules
     return list(_loaded_modules)
 
@@ -177,44 +181,58 @@ def format_changed_module_state():
     sio = StringIO()
     debug_mode = pymod.config.get("debug")
 
+    if _loaded_modules is not None and pymod.config.get("verbose"):
+        new_modules = [
+            m for m in _loaded_modules if m.fullname not in _initial_loaded_modules
+        ]
+        if new_modules:
+            sio.write("The following modules were @G{loaded}\n")
+            for (i, m) in enumerate(new_modules):
+                sio.write("  {0}) {1}\n".format(i + 1, m.fullname))
+            sio.write("\n")
+
     # Report swapped
     if _swapped_explicitly:
-        sio.write("\nThe following modules have been swapped\n")
+        sio.write("The following modules have been @G{swapped}\n")
         for (i, (m1, m2)) in enumerate(_swapped_explicitly):
             a, b = m1.fullname, m2.fullname
             sio.write("  {0}) {1} => {2}\n".format(i + 1, a, b))
+        sio.write("\n")
 
     # Report reloaded
     if _swapped_on_family_update:  # pragma: no cover
         sio.write(
-            "\nThe following modules in the same family have "
-            "been updated with a version change:\n"
+            "The following modules in the same family have "
+            "been @G{updated with a version change}\n"
         )
         for (i, (m1, m2)) in enumerate(_swapped_on_family_update):
             a, b, fam = m1.fullname, m2.fullname, m1.family
             sio.write("  {0}) {1} => {2} ({3})\n".format(i + 1, a, b, fam))
+        sio.write("\n")
 
     if _swapped_on_version_change:
         sio.write(
-            "\nThe following modules have been updated " "with a version change:\n"
+            "The following modules have been @G{updated with a version change}\n"
         )
         for (i, (m1, m2)) in enumerate(_swapped_on_version_change):
             a, b = m1.fullname, m2.fullname
             sio.write("  {0}) {1} => {2}\n".format(i + 1, a, b))
+        sio.write("\n")
 
     # Report changes due to to change in modulepath
     if _unloaded_on_mp_change:  # pragma: no cover
         lm_files = [_.filename for _ in get_loaded_modules()]
         unloaded = [_ for _ in _unloaded_on_mp_change if _.filename not in lm_files]
         sio.write(
-            "\nThe following modules have been unloaded " "with a MODULEPATH change:\n"
+            "The following modules have been @G{unloaded with a MODULEPATH change}\n"
         )
         for (i, m) in enumerate(unloaded):
             sio.write("  {0}) {1}\n".format(i + 1, m.fullname))
+        sio.write("\n")
 
     if _swapped_on_mp_change:
         sio.write(
-            "\nThe following modules have been updated " "with a MODULEPATH change:\n"
+            "The following modules have been @G{updated with a MODULEPATH change}\n"
         )
         for (i, (m1, m2)) in enumerate(_swapped_on_mp_change):
             a, b = m1.fullname, m2.fullname
@@ -223,6 +241,7 @@ def format_changed_module_state():
                 a += " ({0})".format(m1.modulepath)
                 b = "\n" + " " * n + b + " ({0})".format(m2.modulepath)
             sio.write("  {0}) {1} => {2}\n".format(i + 1, a, b))
+        sio.write("\n")
 
     return sio.getvalue()
 
