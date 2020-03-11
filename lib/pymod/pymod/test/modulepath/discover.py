@@ -4,10 +4,9 @@ import pymod.modulepath
 
 
 def test_modulepath_discover_root(mock_modulepath):
-    with pytest.raises(ValueError):
-        modules = pymod.modulepath.discover.find_modules("/")
-    with pytest.raises(ValueError):
-        mock_modulepath("/")
+    assert pymod.modulepath.discover.find_modules("/") is None
+    p = mock_modulepath("/")
+    assert not p.path
     assert pymod.modulepath.discover.find_modules("fake") is None
 
 
@@ -31,30 +30,7 @@ def test_modulepath_discover_bad_marked_default(tmpdir):
     assert names == ["a", "b"]
 
 
-def test_modulepath_discover_bad_n(tmpdir):
-    # The name 'f' does not exist
-    assert pymod.modulepath.discover.find_modules_n(tmpdir.strpath, ["f"]) == []
-
-
-def test_modulepath_discover_bad_nv(tmpdir):
-    a = tmpdir.mkdir("a")
-    b = a.mkdir("b")
-    a.join("1.0.py").write("")
-    a.join("2.0.py").write("")
-    with pytest.raises(ValueError):
-        pymod.modulepath.discover.find_modules_nv(tmpdir.strpath, "a")
-
-
-def test_modulepath_discover_bad_nvv(tmpdir):
-    a = tmpdir.mkdir("a")
-    one = a.mkdir("1")
-    one.join("1.0.py").write("")
-    one.join("2.0.py").write("")
-    one.mkdir("b")
-    assert pymod.modulepath.discover.find_modules_nvv(tmpdir.strpath, "a", "1") is None
-
-
-def test_modulepath_discover_skip_nvv(tmpdir):
+def test_modulepath_discover_nvv(tmpdir):
     a = tmpdir.mkdir("a")
     # These next two will be skipped
     a.join("1.0.py").write("")
@@ -63,9 +39,10 @@ def test_modulepath_discover_skip_nvv(tmpdir):
     one.join("1.0.py").write("")
     one.join("2.0.py").write("")
     modules = pymod.modulepath.discover.find_modules(tmpdir.strpath)
-    assert len(modules) == 2
+    assert len(modules) == 4
     x = sorted([(_.name, _.version.string, _.variant.string) for _ in modules])
-    assert x == [("a", "1", "1.0"), ("a", "1", "2.0")]
+    print(x)
+    assert x == [("a", "1", "1.0"), ("a", "1", "2.0"), ("a", "1.0", ""), ("a", "2.0", "")]
 
 
 def test_modulepath_discover_bad_linked_default(tmpdir):

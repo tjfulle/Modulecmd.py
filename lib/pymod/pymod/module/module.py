@@ -18,29 +18,33 @@ __all__ = ["Namespace", "Module", "PyModule", "TclModule"]
 class Module(object):
     ext = None
 
-    def __init__(self, modulepath, *parts):
-        self.filename = os.path.join(modulepath, *parts)
+    def __init__(self, root, path):
+
+        self.filename = os.path.join(root, path)
 
         if not os.path.isfile(self.filename):
             raise IOError("{0} is not a file".format(self.filename))
 
-        parts = list(parts)
+        parts = path.split(os.path.sep)
         if self.ext:
             parts[-1], ext = os.path.splitext(parts[-1])
             assert ext == self.ext, "ext={0!r}!={1!r}".format(ext, self.ext)
+
         version = variant = None
         if len(parts) == 1:
-            self.name, = parts
+            name = parts[0]
         elif len(parts) == 2:
-            self.name, version = parts
+            name, version = parts
         elif len(parts) == 3:
-            self.name, version, variant = parts
+            name, version, variant = parts
         else:
-            raise ValueError("Too many parts to construct module definition")
+            name = os.path.join(*parts)
+
+        self.name = name
         self.version = Version(version)
         self.variant = Version(variant)
 
-        self.modulepath = modulepath
+        self.modulepath = root
         self.family = None
         self.whatisstr = ""
         self.helpstr = None

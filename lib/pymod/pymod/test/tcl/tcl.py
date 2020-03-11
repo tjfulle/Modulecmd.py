@@ -123,7 +123,7 @@ def test_tcl_unit(tcl_module_path, mock_modulepath):
     a1 = pymod.modulepath.get("a")
     assert a1 is not None
     assert a1.name == "a"
-    assert a1.fullname == "a/1.0"
+    assert a1.fullname == "a/1.0", a1.fullname
     assert isinstance(a1, pymod.module.TclModule)
 
     a2 = pymod.modulepath.get("a/2.0")

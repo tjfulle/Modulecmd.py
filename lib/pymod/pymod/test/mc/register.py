@@ -2,7 +2,7 @@ import pytest
 import pymod.mc
 import pymod.error
 import pymod.modulepath
-from pymod.module import module
+from pymod.module import factory
 
 
 def test_mc_register_1(tmpdir, mock_modulepath):
@@ -18,7 +18,7 @@ def test_mc_register_2(tmpdir, mock_modulepath):
     pymod.config.set("skip_add_devpack", True)
     tmpdir.join("devpack.py").write("")
     mock_modulepath(tmpdir.strpath)
-    m = module(tmpdir.strpath, "devpack.py")
+    m = factory(tmpdir.strpath, "devpack.py")
     pymod.mc.register_module(m)
     assert m.filename not in [_.filename for _ in pymod.mc.get_loaded_modules()]
     pymod.config.set("skip_add_devpack", value)
@@ -26,7 +26,7 @@ def test_mc_register_2(tmpdir, mock_modulepath):
 
 def test_mc_register_3(tmpdir):
     tmpdir.join("a.py").write("")
-    a = module(tmpdir.strpath, "a.py")
+    a = factory(tmpdir.strpath, "a.py")
     with pytest.raises(pymod.error.InconsistentModuleStateError):
         pymod.mc.register_module(a)
 
@@ -50,7 +50,7 @@ def test_mc_refcount_decrement(tmpdir, mock_modulepath):
 
 def test_mc_refcount(tmpdir, mock_modulepath):
     tmpdir.join("a.py").write("")
-    a = module(tmpdir.strpath, "a.py")
+    a = factory(tmpdir.strpath, "a.py")
     pymod.mc.increment_refcount(a)
     assert a.refcount == 1
 

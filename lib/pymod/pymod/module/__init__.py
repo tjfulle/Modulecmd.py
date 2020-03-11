@@ -6,8 +6,8 @@ from pymod.module.module import *
 import llnl.util.tty as tty
 
 
-def module(dirname, *parts):
-    filename = os.path.join(dirname, *parts)
+def factory(root, path):
+    filename = os.path.join(root, path)
     if not os.path.isfile(filename):  # pragma: no cover
         tty.verbose("{0} does not exist".format(filename))
         return None
@@ -22,7 +22,7 @@ def module(dirname, *parts):
     else:
         return None
 
-    module = module_type(dirname, *parts)
+    module = module_type(root, path)
     if pymod.config.get("debug"):  # pragma: no cover
         if module_type == TclModule and "gcc" in filename:
             tty.debug(module.name)
@@ -42,12 +42,12 @@ def as_dict(module):
 
 def from_dict(dikt):
     filename = dikt["file"]
-    modulepath = dikt["modulepath"]
-    assert filename.startswith(modulepath)
-    parts = filename[(len(modulepath) + 1) :].split(os.path.sep)
+    root = dikt["modulepath"]
+    assert filename.startswith(root)
+    path = filename.replace(root+os.path.sep, "")
     module_type = {"PyModule": PyModule, "TclModule": TclModule}[dikt["type"]]
     try:
-        module = module_type(modulepath, *parts)
+        module = module_type(root, path)
     except IOError:
         return None
     assert module.filename == filename

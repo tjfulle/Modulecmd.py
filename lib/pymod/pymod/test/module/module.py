@@ -6,14 +6,14 @@ import pymod.module
 @pytest.fixture()
 def basic_python_module(tmpdir):
     tmpdir.join("a.py").write('add_option("foo")\n' 'setenv("a", "a")')
-    m = pymod.module.module(tmpdir.strpath, "a.py")
+    m = pymod.module.factory(tmpdir.strpath, "a.py")
     return m
 
 
 @pytest.fixture()
 def basic_tcl_module(tmpdir):
     tmpdir.join("a").write('#%Module1.0\nsetenv a "a"')
-    m = pymod.module.module(tmpdir.strpath, "a")
+    m = pymod.module.factory(tmpdir.strpath, "a")
     return m
 
 
@@ -47,21 +47,24 @@ def test_module_format_dl_status(basic_python_module):
 
 def test_module_parts(tmpdir):
     d = tmpdir
-    s = "abcde"
-    for x in s:
+    parts = list("abcde")
+    for x in parts:
         d = d.mkdir(x)
+    path = os.path.join(*parts)
 
     with pytest.raises(IOError):
-        pymod.module.Module(tmpdir.strpath, *list(s))
+        pymod.module.Module(tmpdir.strpath, path)
 
     f = d.join("f")
     f.write("")
-    parts = list(s + "f")
+    parts.append("f")
     ff = os.path.join(tmpdir.strpath, *parts)
     assert f.strpath == ff
     assert os.path.isfile(ff)
-    with pytest.raises(ValueError):
-        pymod.module.Module(tmpdir.strpath, *parts)
+    path = os.path.join(*parts)
+    m = pymod.module.Module(tmpdir.strpath, path)
+    assert m.version.major is None
+    assert m.variant.major is None
 
 
 def test_module_basic(tmpdir):

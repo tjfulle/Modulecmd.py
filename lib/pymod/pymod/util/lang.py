@@ -126,7 +126,7 @@ def get_system_manpath():
     env = os.environ.copy()
     env.pop("MANPATH", None)
     env["PATH"] = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin"
-    output = manpath("-w", output=str, env=env)
+    output = manpath(output=str, env=env)
     return output.strip()
 
 
