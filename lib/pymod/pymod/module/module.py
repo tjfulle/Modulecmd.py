@@ -8,7 +8,7 @@ from pymod.module.meta import MetaData
 from pymod.module.tcl2py import tcl2py
 from pymod.module.version import Version
 
-from contrib.util import textfill
+from pymod.util.lang import textfill
 import llnl.util.tty as tty
 from llnl.util.tty import terminal_size
 

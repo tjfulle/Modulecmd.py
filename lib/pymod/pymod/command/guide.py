@@ -1,7 +1,7 @@
 import os
 import pymod.paths
-from contrib.util.tty.pager import pager
-from contrib.util.tty import redirect_stdout
+from pymod.util.tty.pager import pager
+from pymod.util.tty import redirect_stdout
 
 try:
     import docutils

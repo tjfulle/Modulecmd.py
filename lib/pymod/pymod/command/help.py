@@ -2,7 +2,7 @@ import sys
 import pymod.mc
 import pymod.command
 import pymod.modulepath
-from contrib.util.tty import redirect_stdout
+from pymod.util.tty import redirect_stdout
 
 description = "get help on pymod and its commands"
 section = "help"

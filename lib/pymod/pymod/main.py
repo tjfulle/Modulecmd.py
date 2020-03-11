@@ -24,7 +24,7 @@ import pymod.shell
 import llnl.util.tty as tty
 import llnl.util.tty.color as color
 from llnl.util.tty.log import log_output
-from contrib.util.tty import redirect_stdout
+from pymod.util.tty import redirect_stdout
 
 
 #: names of profile statistics

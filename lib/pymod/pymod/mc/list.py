@@ -1,7 +1,7 @@
 from six import StringIO
 import pymod.mc
 import pymod.module
-from contrib.util.tty import grep_pat_in_string
+from pymod.util.tty import grep_pat_in_string
 from llnl.util.tty import terminal_size
 from llnl.util.tty.colify import colified
 

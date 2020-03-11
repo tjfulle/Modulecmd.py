@@ -8,10 +8,20 @@ from llnl.util.tty import terminal_size
 from spack.util.executable import Executable
 
 __all__ = [
-    'split', 'join', 'join_args', 'decode_str', 'encode_str', 'boolean', 'pop',
-    'strip_quotes', 'check_output', 'which', 'is_executable', 'textfill', 'listdir',
-    'get_system_manpath', 'get_processes',
-    ]
+    "split",
+    "join",
+    "join_args",
+    "boolean",
+    "pop",
+    "strip_quotes",
+    "check_output",
+    "which",
+    "is_executable",
+    "textfill",
+    "listdir",
+    "get_system_manpath",
+    "get_processes",
+]
 
 
 def listdir(dirname, key=None):
@@ -41,39 +51,13 @@ def join(arg, sep):
 
 def join_args(*args):
     """Join args as strings"""
-    return ' '.join('{0}'.format(x) for x in args)
-
-
-def decode_str(x):
-    """Decode the string"""
-    if x is None:
-        return None
-    try:
-        return x.decode('utf-8', 'ignore')
-    except (AttributeError, TypeError):
-        return x
-
-
-def encode_str(string):
-    try:
-        return string.encode('utf-8')
-    except AttributeError:
-        return string
+    return " ".join("{0}".format(x) for x in args)
 
 
 def boolean(item):
     if item is None:
         return None
-    return True if item.upper() in ('TRUE', 'ON', '1') else False
-
-
-def pop(list, item, from_back=False):
-    if item in list:
-        if from_back:
-            i = -(list[::-1].index(item)) - 1
-        else:
-            i = list.index(item)
-        list.pop(i)
+    return True if item.upper() in ("TRUE", "ON", "1") else False
 
 
 def strip_quotes(item):
@@ -87,25 +71,27 @@ def strip_quotes(item):
         item = item[1:-1]
     # SEMs uses <NAME> as an identifier, but < gets escaped, so remove
     # the escape character
-    item = re.sub(r'[\\]+', '', item)
+    item = re.sub(r"[\\]+", "", item)
     return item
 
 
 def check_output(command, shell=True):
     """Implementation of subprocess's check_output"""
-    import subprocess
     with open(os.devnull, "a") as fh:
         p = subprocess.Popen(command, shell=shell, stdout=subprocess.PIPE, stderr=fh)
         out, err = p.communicate()
-        returncode = p.poll()
-    return decode_str(out)
+        p.poll()
+    try:
+        return out.decode("utf-8", "ignore")
+    except (AttributeError, TypeError):
+        return out
 
 
 def which(executable, PATH=None, default=None):
     """Find path to the executable"""
     if is_executable(executable):
         return executable
-    PATH = PATH or os.getenv('PATH')
+    PATH = PATH or os.getenv("PATH")
     for d in split(PATH, os.pathsep):
         if not os.path.isdir(d):
             continue
@@ -124,23 +110,23 @@ def textfill(string, width=None, indent=None, **kwds):
     if width is None:
         _, width = terminal_size()
     if indent is not None:
-        kwds['initial_indent'] = ' ' * indent
-        kwds['subsequent_indent'] = ' ' * indent
+        kwds["initial_indent"] = " " * indent
+        kwds["subsequent_indent"] = " " * indent
     s = textwrap.fill(string, width, **kwds)
-    return s.lstrip()
+    return s
 
 
 def get_system_manpath():
-    for x in ('/usr/bin/manpath', '/bin/manpath'):
+    for x in ("/usr/bin/manpath", "/bin/manpath"):
         if os.path.isfile(x):
             manpath = Executable(x)
             break
-    else:
+    else:  # pragma: no cover
         return None
     env = os.environ.copy()
-    env.pop('MANPATH', None)
-    env['PATH'] = '/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin'
-    output = manpath('-w', output=str, env=env)
+    env.pop("MANPATH", None)
+    env["PATH"] = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin"
+    output = manpath("-w", output=str, env=env)
     return output.strip()
 
 
@@ -170,10 +156,9 @@ def get_processes():
     """
     Gathers all processes.
     """
-    if sys.platform == "darwin":
-        out = run(["ps", "-Ao", "user,pid,ppid,etime,pcpu,vsz,command"])
-    else:
-        out = run(["ps", "-Ao", "user,pid,ppid,etime,pcpu,vsz,args"])
+    command = ["ps", "-Ao", "user,pid,ppid,etime,pcpu,vsz"]
+    command += ["command"] if sys.platform == "darwin" else ["args"]
+    out = run(command)
 
     user = getpass.getuser()
     procs = {}
@@ -187,7 +172,16 @@ def get_processes():
                 continue
             pid = int(line[1])
             ppid = int(line[2])
-            name = line[-1]
-            procs[pid] = {"ppid": ppid, "pid": pid, "name": str(line[-1])}
+            name = str(line[-1])
+            procs[pid] = {"ppid": ppid, "pid": pid, "name": name}
 
     return procs
+
+
+def pop(list, item, from_back=False):
+    if item in list:
+        if from_back:
+            i = -(list[::-1].index(item)) - 1
+        else:
+            i = list.index(item)
+        list.pop(i)

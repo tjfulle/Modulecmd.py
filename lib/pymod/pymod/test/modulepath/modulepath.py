@@ -3,7 +3,7 @@ import pytest
 import pymod.paths
 import pymod.module
 import pymod.modulepath
-from contrib.util.itertools import groupby
+from pymod.util.itertools import groupby
 
 
 basic_py_module = """\

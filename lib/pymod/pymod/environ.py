@@ -6,10 +6,9 @@ import pymod.names
 import pymod.shell
 import pymod.modulepath
 
-from contrib.util import boolean
-from contrib.util import join, split, pop, get_system_manpath
 from pymod.serialize import serialize, deserialize
 from pymod.serialize import serialize_chunked, deserialize_chunked
+from pymod.util.lang import join, split, pop, get_system_manpath
 
 import llnl.util.tty as tty
 from llnl.util.lang import Singleton

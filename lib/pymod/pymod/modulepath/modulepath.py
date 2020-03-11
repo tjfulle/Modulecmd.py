@@ -8,7 +8,8 @@ import pymod.names
 import pymod.module
 from pymod.modulepath.path import Path
 
-from contrib.util import groupby, join
+from pymod.util.lang import join
+from pymod.util.itertools import groupby
 
 import llnl.util.tty as tty
 from llnl.util.tty.color import colorize

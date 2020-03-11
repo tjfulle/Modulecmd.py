@@ -4,7 +4,7 @@ import pymod.names
 from pymod.modulepath.modulepath import Modulepath
 from pymod.modulepath.discover import find_modules
 
-from contrib.util import split
+from pymod.util.lang import split
 from llnl.util.lang import Singleton
 
 

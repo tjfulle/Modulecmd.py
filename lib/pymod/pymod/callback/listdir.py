@@ -1,4 +1,4 @@
-import contrib.util
+from pymod.util.lang import listdir as _listdir
 
 category = "utility"
 
@@ -18,8 +18,8 @@ def listdir(module, mode, dirname, key=None):
         contents (list): Contents of `dirname`
 
     Notes:
-    - This is a wrapper to ``contrib.util.listdir``
+    - This is a wrapper to ``pymod.util.listdir``
     - If ``key`` is given, it must be a callable object
 
     """
-    return contrib.util.listdir(dirname, key=key)
+    return _listdir(dirname, key=key)

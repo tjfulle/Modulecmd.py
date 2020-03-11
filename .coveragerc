@@ -11,6 +11,7 @@ omit =
      lib/pymod/pymod/compat/*
      lib/pymod/external/*
      lib/pymod/contrib/*
+     lib/pymod/pymod/util/tty/*
 
 [report]
 # Regexes for lines to exclude from consideration

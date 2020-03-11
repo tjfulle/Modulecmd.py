@@ -211,9 +211,7 @@ def format_changed_module_state():
         sio.write("\n")
 
     if _swapped_on_version_change:
-        sio.write(
-            "The following modules have been @G{updated with a version change}\n"
-        )
+        sio.write("The following modules have been @G{updated with a version change}\n")
         for (i, (m1, m2)) in enumerate(_swapped_on_version_change):
             a, b = m1.fullname, m2.fullname
             sio.write("  {0}) {1} => {2}\n".format(i + 1, a, b))

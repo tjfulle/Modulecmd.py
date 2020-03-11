@@ -49,7 +49,7 @@ class Bash(Shell):
         """Switch the underlying module implementation"""
         import os
         from six import StringIO
-        from contrib.util import which
+        from pymod.util.lang import which
 
         for (key, val) in os.environ.items():
             if key.startswith("BASH_FUNC_module"):

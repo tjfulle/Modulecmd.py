@@ -5,7 +5,7 @@ import pymod.environ
 
 import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir
-from contrib.util import strip_quotes
+from pymod.util.lang import strip_quotes
 
 """Functions for finding modules on MODULEPATH"""
 

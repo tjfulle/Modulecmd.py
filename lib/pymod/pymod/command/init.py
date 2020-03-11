@@ -3,7 +3,7 @@ import os
 import pymod.mc
 import pymod.names
 import pymod.collection
-from contrib.util import split
+from pymod.util.lang import split
 
 description = "Initialize modules (should only be called by the startup script)."
 level = "long"

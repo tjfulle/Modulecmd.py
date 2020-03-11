@@ -2,7 +2,7 @@ import os
 import pytest
 import pymod.names
 import pymod.environ
-from contrib.util import boolean
+from pymod.util.lang import boolean
 
 
 def test_environ_set_get_unset():

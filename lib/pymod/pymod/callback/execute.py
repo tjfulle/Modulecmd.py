@@ -3,7 +3,7 @@ import subprocess
 import pymod.modes
 import pymod.environ
 import llnl.util.tty as tty
-from contrib.util import split
+from pymod.util.lang import split
 from spack.util.executable import Executable
 
 category = "utility"

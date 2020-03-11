@@ -2,7 +2,7 @@ import os
 import ruamel.yaml as yaml
 import pymod.paths
 import pymod.names
-from contrib.util import split
+from pymod.util.lang import split
 from llnl.util.lang import Singleton
 from spack.util.executable import which
 

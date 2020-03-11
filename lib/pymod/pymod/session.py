@@ -2,7 +2,7 @@ import os
 import json
 import atexit
 from llnl.util.lang import Singleton
-from contrib.util import get_processes
+from pymod.util.lang import get_processes
 
 import pymod.paths
 import pymod.names

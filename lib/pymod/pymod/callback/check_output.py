@@ -1,4 +1,4 @@
-import contrib.util
+from pymod.util.lang import check_output as _check_output
 
 category = "utility"
 
@@ -15,9 +15,9 @@ def check_output(module, mode, command):
         output (str): The output of `command`
 
     Notes:
-    This is a wrapper to `contrib.util.check_output`.  Where
+    This is a wrapper to `pymod.util.check_output`.  Where
     `subprocess.check_output` exists, it is called.  Otherwise, an implementation of
     `subprocess.check_output` is provided.
 
     """
-    return contrib.util.check_output(command)
+    return _check_output(command)

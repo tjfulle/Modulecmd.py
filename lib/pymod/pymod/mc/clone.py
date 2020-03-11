@@ -4,7 +4,7 @@ import pymod.clone
 import pymod.error
 import pymod.environ
 
-from contrib.util import split
+from pymod.util.lang import split
 
 
 def save(name):

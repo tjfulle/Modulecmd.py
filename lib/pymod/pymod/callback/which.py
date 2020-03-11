@@ -1,4 +1,4 @@
-import contrib.util
+from pymod.util.lang import which as _which
 
 category = "utility"
 
@@ -18,4 +18,4 @@ def which(module, mode, exename):
     This is a wrapper to `contib.util.which`.
 
     """
-    return contrib.util.which(exename)
+    return _which(exename)

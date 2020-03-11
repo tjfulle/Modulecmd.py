@@ -2,7 +2,7 @@ import pymod.paths
 import pymod.error
 import pymod.modulepath
 import pymod.collection
-from contrib.util.tty.pager import pager
+from pymod.util.tty.pager import pager
 
 
 def get_entity_text(name):

@@ -1,4 +1,4 @@
-from contrib.util import split
+from pymod.util.lang import split
 
 
 class Version:

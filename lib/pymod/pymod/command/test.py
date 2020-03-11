@@ -7,7 +7,7 @@ from six import StringIO
 
 from llnl.util.filesystem import working_dir
 from llnl.util.tty.colify import colify
-from contrib.util.tty import redirect_stdout2 as redirect_stdout
+from pymod.util.tty import redirect_stdout2 as redirect_stdout
 
 import pymod.paths
 import pymod.modulepath
