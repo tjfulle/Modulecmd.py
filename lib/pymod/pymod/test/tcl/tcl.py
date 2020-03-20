@@ -9,13 +9,13 @@ from pymod.module.tcl2py import tcl2py
 
 pytestmark = pytest.mark.skipif(not pymod.config.has_tclsh, reason="No tclsh")
 
-py_content = """\
-whatis("adds `.' to your PATH environment variable ")
+py_content = '''
+whatis("""adds `.' to your PATH environment variable """)
 append_path("path", "/b/path", sep=":")
 prepend_path("path", "/a/path", sep=":")
 setenv("foo","BAR")
 set_alias("alias","BAZ")
-"""
+'''
 
 
 tcl_content = """\
