@@ -51,6 +51,8 @@ def _find(directory):
 
         modulefiles = []
         for basename in files:
+            if basename.startswith("."):
+                continue
             f = os.path.join(dirname, basename)
             path = f.replace(directory + os.path.sep, "")
             module = pymod.module.factory(directory, path)
@@ -76,7 +78,7 @@ def mark_explicit_defaults(modules, defaults):
             tty.warn("There is no module named {0}".format(name))
             continue
         for module in mods:
-            if module.filename == filename:
+            if os.path.realpath(module.filename) == os.path.realpath(filename):
                 module.marked_as_default = True
                 break
         else:

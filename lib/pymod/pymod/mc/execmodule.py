@@ -7,6 +7,7 @@ import pymod.modes
 import pymod.module
 import pymod.environ
 import pymod.callback
+import llnl.util.tty as tty
 from llnl.util.filesystem import working_dir
 from llnl.util.lang import Singleton
 
@@ -47,6 +48,7 @@ def execmodule_in_sandbox(module, mode):
     """Execute python module in sandbox"""
 
     # Execute the environment
+    tty.debug("Executing module {0} with mode {1}".format(module, mode))
     module.prepare()
     ns = module_exec_sandbox(module, mode)
     code = compile(module.read(mode), module.filename, "exec")
