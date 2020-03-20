@@ -398,7 +398,7 @@ proc module-whatis { args } {
     }
 
     regsub -all {[\n]} $msg  " " msg2
-    puts stdout "whatis(\"\"\"$msg2\"\"\")"
+    puts stdout "whatis(\"\"\"$msg\"\"\")"
 }
 
 proc setenv { var val args } {

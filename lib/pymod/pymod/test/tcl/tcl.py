@@ -9,7 +9,7 @@ from pymod.module.tcl2py import tcl2py
 
 pytestmark = pytest.mark.skipif(not pymod.config.has_tclsh, reason="No tclsh")
 
-py_content = '''
+py_content = '''\
 whatis("""adds `.' to your PATH environment variable """)
 append_path("path", "/b/path", sep=":")
 prepend_path("path", "/a/path", sep=":")
@@ -93,7 +93,11 @@ def test_tcl_tcl2py_1(tcl_module_path, mock_modulepath):
     assert isinstance(module, pymod.module.TclModule)
     assert module.version.string == "1.0"
     stdout = tcl2py(module, pymod.modes.load)
-    assert stdout == py_content
+    try:
+        stdout = stdout.decode("utf-8")
+    except AttributeError:
+        pass
+    assert str(stdout) == str(py_content)
 
 
 @pytest.mark.tcl
