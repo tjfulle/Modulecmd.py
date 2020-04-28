@@ -93,7 +93,7 @@ class Module(object):
             arg == self.filename
             or arg == self.name
             or arg == self.fullname
-            or arg.endswith(self.fullname)
+            or self.endswith(arg)
         ), "Bad arg: {0} (fullname: {1})".format(arg, self.fullname)
         self._acquired_as = arg
 
@@ -111,8 +111,12 @@ class Module(object):
             )
         self._refcount = count
 
+    @property
+    def path(self):
+        return self.filename if self.ext is None else os.path.splitext(self.filename)[0]
+
     def endswith(self, string):
-        return self.filename.endswith(string)
+        return len(string) > len(self.fullname) and self.path.endswith(string)
 
     def unlocks_path(self, path):
         """Called by the callback `use` to register which paths are unlocked
@@ -280,14 +284,11 @@ class PyModule(Module):
     def is_enabled(self):
         return self.metadata.is_enabled
 
-    def endswith(self, string):
-        return os.path.splitext(self.filename)[0].endswith(string)
-
     def read(self, mode):
         return open(self.filename, "r").read()
 
-
 class TclModule(Module):
+
     def read(self, mode):
         if not pymod.config.has_tclsh:  # pragma: no cover
             raise TCLSHNotFoundError
