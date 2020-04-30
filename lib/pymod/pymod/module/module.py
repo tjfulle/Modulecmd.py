@@ -53,8 +53,12 @@ class Module(object):
         self.marked_as_default = False
         self._acquired_as = None  # How the module was initially loaded
         self._refcount = 0
+
+        # Mapping containing items set on command line (before parsing)
         self.kwargv = {}
-        self.registered_options = {}
+
+        # Options registered by a module using `add_option`
+        self.registered_options = []
 
     def __str__(self):
         return "Module(name={0})".format(self.fullname)
@@ -225,21 +229,32 @@ class Module(object):
     def set_help_string(self, helpstr):
         self.helpstr = helpstr
 
-    def add_option(self, name, default=None, help=None):
-        # Save for later parsing
-        self.registered_options[name] = dict(default=default, help=help)
+    def add_option(self, *args, **kwargs):
+        if not args:
+            raise TypeError("add_option() missing 1 required positional argument: 'name'")
+        default = kwargs.pop("default", None)
+        help = kwargs.pop("help", None)
+        name = max(args, key=len)
+        dest = kwargs.pop("dest", name)
+        if kwargs:
+            kwd = list(kwargs.keys())[0]
+            raise TypeError("add_option() got an unexpected keyword argument {0!r}".format(kwd))
+        opt = ModuleOption(name, dest=dest, default=default, keys=list(args), help=help)
+        self.registered_options.append(opt)
 
     def parse_opts(self):
-        opts = Namespace()
-        opts.set_defaults(**self.registered_options)
+        parsed = Namespace()
+        parsed.set_defaults(*self.registered_options)
 
         # Set passed arguments
         unrecognized = []
         for (key, value) in self.kwargv.items():
-            if key not in self.registered_options:
-                unrecognized.append(key)
+            for opt in self.registered_options:
+                if key in opt.keys:
+                    parsed.set(opt.dest, value)
+                    break
             else:
-                opts.set(key, value)
+                unrecognized.append(key)
         if unrecognized:
             tty.die(
                 "{0}: unrecognized options: {1}".format(
@@ -247,21 +262,21 @@ class Module(object):
                 )
             )
 
-        return opts
+        return parsed
 
     def option_help_string(self):
         if not self.registered_options:
             return None
-        max_opt_name_length = max([len(_) for _ in self.registered_options])
+        max_opt_name_length = max([len(opt.dest) for opt in self.registered_options])
         column_start = min(20, max_opt_name_length)
         help_string = StringIO()
         help_string.write("Module options:\n")
         text_width = 80 - column_start
         subsequent_indent = " " * column_start
-        for (key, kwds) in self.registered_options.items():
-            pad = " " * max(column_start - len(key) - 2, 2)
-            line = "  {0}{1}".format(key, pad)
-            this_help_str = kwds["help"]
+        for opt in self.registered_options:
+            pad = " " * max(column_start - len(opt.dest) - 2, 2)
+            line = "  {0}{1}".format(opt.dest, pad)
+            this_help_str = opt.help
             if this_help_str is not None:
                 this_help_str = fill(
                     this_help_str, width=text_width, subsequent_indent=subsequent_indent
@@ -286,6 +301,7 @@ class PyModule(Module):
 
     def read(self, mode):
         return open(self.filename, "r").read()
+
 
 class TclModule(Module):
 
@@ -316,9 +332,18 @@ class Namespace(object):
     def as_dict(self):
         return dict(self.__dict__)
 
-    def set_defaults(self, **kwargs):
-        for (key, value) in kwargs.items():
-            self.set(key, value["default"])
+    def set_defaults(self, *args):
+        for arg in args:
+            self.set(arg.dest, arg.default)
+
+
+class ModuleOption:
+    def __init__(self, name, dest=None, default=None, keys=None, help=None):
+        self.name = name
+        self.dest = dest or name
+        self.default = default
+        self.keys = keys or [name]
+        self.help = help
 
 
 class TCLSHNotFoundError(Exception):
