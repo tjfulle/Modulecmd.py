@@ -25,8 +25,8 @@ def set_path(other_path):
     _path = other_path
 
 
-def get(key):
-    return _path.get(key)
+def get(key, use_file_modulepath=False):
+    return _path.get(key, use_file_modulepath=use_file_modulepath)
 
 
 def append_path(dirname):

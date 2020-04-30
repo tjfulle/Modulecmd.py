@@ -60,14 +60,14 @@ class Modulepath:
             return None
         return join([p.path for p in self.path], os.pathsep)
 
-    def _get(self, key):
+    def _get(self, key, use_file_modulepath=False):
         """Implementation of `get`"""
         tty.debug(key)
         if os.path.isdir(key) and key in self:
             return self.getby_dirname(key)
         if os.path.isfile(key):
             tty.debug(key)
-            module = self.getby_filename(key)
+            module = self.getby_filename(key, use_file_modulepath=use_file_modulepath)
             if module is not None:
                 module.acquired_as = module.filename
             return module
@@ -89,7 +89,7 @@ class Modulepath:
                         return module
         return None
 
-    def get(self, key):
+    def get(self, key, use_file_modulepath=False):
         """Get a module from the available modules using the following rules:
 
         If `key`:
@@ -105,7 +105,7 @@ class Modulepath:
                filename ends with `key`.
 
         """
-        module = self._get(key)
+        module = self._get(key, use_file_modulepath=use_file_modulepath)
         if module is None:
             # Module has not been found.  Try an alias
             target = pymod.alias.get(key)
@@ -136,6 +136,17 @@ class Modulepath:
             for module in path.modules:
                 if filename == module.filename:
                     return module
+
+        if not use_file_modulepath:
+            return None
+
+        # This file is not on the MODULEPATH, add it
+        modules = self.append_path(os.path.dirname(filename))
+        for module in modules:
+            if filename == module.filename:
+                return module
+
+        # Hmmmm, how did we get this far???
         return None
 
     def path_modified(self):
