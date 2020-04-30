@@ -131,6 +131,7 @@ class Modulepath:
 
     def getby_filename(self, filename, use_file_modulepath=False):
         tty.debug(filename)
+        filename = os.path.abspath(filename)
         for path in self.path:
             tty.debug(path.path)
             for module in path.modules:
