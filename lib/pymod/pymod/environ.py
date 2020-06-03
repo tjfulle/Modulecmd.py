@@ -20,6 +20,7 @@ class Environ(dict):
         self.shell_functions = {}
         self.destination_dir = None
         self._sys_manpath = None
+        self.files_to_source = []
 
     def __getitem__(self, key):
         """Overload Environ[] to first check me, then os.environ"""
@@ -32,7 +33,12 @@ class Environ(dict):
 
     def format_output(self):
         env = self.copy()
-        output = pymod.shell.format_output(env, self.aliases, self.shell_functions)
+        output = pymod.shell.format_output(
+            env,
+            aliases=self.aliases,
+            shell_functions=self.shell_functions,
+            files_to_source=self.files_to_source
+        )
         if self.destination_dir is not None:
             output += "cd {0};".format(self.destination_dir)
         return output
@@ -243,6 +249,9 @@ class Environ(dict):
             self.unset_manpath_if_needed(current_path)
         self.set_path(current_path)
 
+    def source_file(self, filename, *args):
+        self.files_to_source.append((filename, args))
+
 
 def factory():
     return Environ()
@@ -372,3 +381,7 @@ def restore(the_clone):
 
 def set_destination_dir(dirname):
     environ.set_destination_dir(dirname)
+
+
+def source_file(filename, *args):
+    environ.source_file(filename, *args)

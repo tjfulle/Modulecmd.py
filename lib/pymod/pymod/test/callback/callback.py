@@ -125,10 +125,8 @@ def test_callback_source(tmpdir, capsys):
     baz.write("echo BAZ")
     source = get_callback("source")
     source(None, pymod.modes.load, baz.strpath)
-    captured = capsys.readouterr()
-    command = r"source {0};".format(baz.strpath)
-    assert captured[0].strip() == command.strip()
-
+    assert len(pymod.environ.environ.files_to_source) == 1
+    assert pymod.environ.environ.files_to_source[0][0] == baz.strpath
     with pytest.raises(ValueError):
         source(None, pymod.modes.load, "fake.txt")
 

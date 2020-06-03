@@ -116,9 +116,8 @@ def test_mc_execmodule_source(tmpdir, modulecmds, mock_modulepath, capsys):
     tmpdir.join("a.py").write(m.source(baz.strpath))
     mock_modulepath(tmpdir.strpath)
     a = pymod.mc.load("a")
-    captured = capsys.readouterr()
-    command = "source {0};".format(baz.strpath)
-    assert captured[0].strip() == command.strip()
+    assert pymod.environ.environ.files_to_source[0][0] == baz.strpath
+    pymod.environ.environ.files_to_source = []
 
 
 def test_mc_execmodule_load_first(tmpdir, mock_modulepath):

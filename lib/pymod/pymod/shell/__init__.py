@@ -52,8 +52,13 @@ def format_source_command(filename, *args):
     return _shell.format_source_command(filename, *args)
 
 
-def format_output(environ, aliases=None, shell_functions=None):
-    return _shell.format_output(environ, aliases, shell_functions)
+def format_output(environ, aliases=None, shell_functions=None, files_to_source=None):
+    return _shell.format_output(
+        environ,
+        aliases=aliases,
+        shell_functions=shell_functions,
+        files_to_source=files_to_source
+    )
 
 
 def filter_env(environ):

@@ -19,7 +19,9 @@ class Shell(object):
     def switch(self):  # pragma: no cover
         raise NotImplementedError
 
-    def format_output(self, environ, aliases=None, shell_functions=None):
+    def format_output(
+        self, environ, aliases=None, shell_functions=None, files_to_source=None
+    ):
         sio = StringIO()
 
         for (envar, defn) in environ.items():
@@ -32,6 +34,11 @@ class Shell(object):
         if shell_functions is not None:
             for (fun, defn) in shell_functions.items():
                 sio.write(self.format_shell_function(fun, defn) + "\n")
+
+        if files_to_source:
+            for (filename, args) in files_to_source:
+                command = self.format_source_command(filename, *args)
+            sio.write(command + ";\n")
 
         return sio.getvalue()
 
