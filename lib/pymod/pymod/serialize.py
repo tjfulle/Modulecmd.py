@@ -4,12 +4,13 @@ from textwrap import wrap
 import pymod.config
 
 
-def serialize(raw):
-    return _encode(json.dumps(raw))
+def serialize(string):
+    return _encode(json.dumps(string))
 
 
 def deserialize(serialized):
-    return json.loads(_decode(serialized))
+    string = _decode(serialized)
+    return json.loads(string)
 
 
 def serialize_chunked(raw):

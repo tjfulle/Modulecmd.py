@@ -75,7 +75,7 @@ def mark_explicit_defaults(modules, defaults):
     for (name, filename) in defaults.items():
         mods = modules.get(name)
         if mods is None:
-            tty.warn("There is no module named {0}".format(name))
+            tty.debug("There is no module named {0}".format(name))
             continue
         for module in mods:
             if os.path.realpath(module.filename) == os.path.realpath(filename):
@@ -147,14 +147,14 @@ def pop_versioned_default(dirname, files):
 def read_tcl_default_version(filename):
     with open(filename) as fh:
         for (i, line) in enumerate(fh.readlines()):
-            line = line.strip()
+            line = " ".join(line.split())
             if i == 0 and not line.startswith("#%Module"):
                 tty.debug("version file does not have #%Module header")
             if line.startswith("set ModulesVersion"):
                 raw_version = line.split("#", 1)[0].split()[-1]
                 try:
                     version = eval(raw_version)
-                except NameError:
+                except (SyntaxError, NameError):
                     version = raw_version
                 return version
     return None

@@ -41,7 +41,7 @@ def load(name, opts=None, insert_at=None, caller="command_line"):
     tty.verbose("Loading {0}".format(name))
 
     # Execute the module
-    module = pymod.modulepath.get(name, use_file_modulepath=caller=="command_line")
+    module = pymod.modulepath.get(name, use_file_modulepath=True)  # caller=="command_line")
     if module is None:
         if caller == "command_line":
             collection = pymod.collection.get(name)
