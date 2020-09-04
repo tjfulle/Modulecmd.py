@@ -21,6 +21,7 @@ class Environ(dict):
         self.destination_dir = None
         self._sys_manpath = None
         self.files_to_source = []
+        self.raw_shell_commands = []
 
     def __getitem__(self, key):
         """Overload Environ[] to first check me, then os.environ"""
@@ -37,7 +38,8 @@ class Environ(dict):
             env,
             aliases=self.aliases,
             shell_functions=self.shell_functions,
-            files_to_source=self.files_to_source
+            files_to_source=self.files_to_source,
+            raw_shell_commands=self.raw_shell_commands
         )
         if self.destination_dir is not None:
             output += "cd {0};".format(self.destination_dir)
@@ -252,6 +254,9 @@ class Environ(dict):
     def source_file(self, filename, *args):
         self.files_to_source.append((filename, args))
 
+    def raw_shell_command(self, command):
+        self.raw_shell_commands.append(command)
+
 
 def factory():
     return Environ()
@@ -385,3 +390,7 @@ def set_destination_dir(dirname):
 
 def source_file(filename, *args):
     environ.source_file(filename, *args)
+
+
+def raw_shell_command(command):
+    environ.raw_shell_command(command)

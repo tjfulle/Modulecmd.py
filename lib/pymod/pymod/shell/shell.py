@@ -20,7 +20,12 @@ class Shell(object):
         raise NotImplementedError
 
     def format_output(
-        self, environ, aliases=None, shell_functions=None, files_to_source=None
+        self,
+        environ,
+        aliases=None,
+        shell_functions=None,
+        files_to_source=None,
+        raw_shell_commands=None,
     ):
         sio = StringIO()
 
@@ -39,6 +44,10 @@ class Shell(object):
             for (filename, args) in files_to_source:
                 command = self.format_source_command(filename, *args)
             sio.write(command + ";\n")
+
+        if raw_shell_commands is not None:
+            for command in raw_shell_commands:
+                sio.write(command + ";\n")
 
         return sio.getvalue()
 

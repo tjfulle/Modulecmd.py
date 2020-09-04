@@ -52,12 +52,19 @@ def format_source_command(filename, *args):
     return _shell.format_source_command(filename, *args)
 
 
-def format_output(environ, aliases=None, shell_functions=None, files_to_source=None):
+def format_output(
+    environ,
+    aliases=None,
+    shell_functions=None,
+    files_to_source=None,
+    raw_shell_commands=None
+):
     return _shell.format_output(
         environ,
         aliases=aliases,
         shell_functions=shell_functions,
-        files_to_source=files_to_source
+        files_to_source=files_to_source,
+        raw_shell_commands=raw_shell_commands
     )
 
 

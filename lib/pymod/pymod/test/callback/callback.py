@@ -425,3 +425,11 @@ def test_callback_is_used(tmpdir, mock_modulepath):
     use(a, pymod.modes.load, two.strpath)
     assert is_used(None, pymod.modes.load, one.strpath)
     assert is_used(None, pymod.modes.load, two.strpath)
+
+
+def test_callback_raw(tmpdir, capsys):
+    baz = tmpdir.join("baz")
+    raw = get_callback("raw")
+    raw(None, pymod.modes.load, "echo 'BAZ'")
+    assert len(pymod.environ.environ.raw_shell_commands) == 1
+    assert pymod.environ.environ.raw_shell_commands[0] == "echo 'BAZ'"
