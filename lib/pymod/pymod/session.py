@@ -1,6 +1,9 @@
 import os
+import glob
 import json
+import time
 import atexit
+import random
 from llnl.util.lang import Singleton
 from pymod.util.lang import get_processes
 
@@ -10,23 +13,13 @@ import pymod.names
 
 class Session:
     def __init__(self):
-        self.savedir = os.path.join(pymod.paths.user_config_path, ".sessions")
+        id = random.randint(10000, 99999)
+        self.id = id
+        self.savedir = os.path.join(pymod.paths.user_config_path, "sessions")
         if not os.path.isdir(self.savedir):
             os.makedirs(self.savedir)
-        pid = Session.pid()
-        self.filename = os.path.join(self.savedir, "{0}.json".format(pid))
+        self.filename = os.path.join(self.savedir, "{0}.json".format(self.id))
         self.data = self.load()
-
-    @staticmethod
-    def pid():
-        if pymod.names.session_id in os.environ:
-            return os.environ[pymod.names.session_id]
-        pid = os.getpid()
-        procs = get_processes()
-        while pid in procs:
-            proc = procs[pid]
-            pid = proc["ppid"]
-        return proc["pid"]
 
     def load(self):
         if not os.path.isfile(self.filename):
@@ -50,16 +43,13 @@ class Session:
 
 
 def clean():
-    shell = os.path.basename(os.getenv("SHELL", "bash"))
-    procs = get_processes()
-    shell_procs = sorted(
-        [pid for (pid, proc) in procs.items() if proc["name"].endswith(shell)]
-    )
+    # Remove session files more than 7 days old
+    now = time.time()
     dirname = session.savedir
-    for filename in os.listdir(dirname):
-        fpid = int(os.path.splitext(filename)[0])
-        if fpid not in shell_procs:
-            os.remove(os.path.join(dirname, filename))
+    for filename in glob.glob(os.path.join(session.savedir, "*.json")):
+        modified_time = os.stat(filename).st_mtime
+        if modified_time < now - 7 * 24 * 60 * 60:
+            os.remove(filename)
 
 
 session = Singleton(Session)
@@ -81,8 +71,8 @@ def dump():
     session.dump()
 
 
-def pid():
-    return session.pid()
+def id():
+    return session.id()
 
 
 def remove(key):

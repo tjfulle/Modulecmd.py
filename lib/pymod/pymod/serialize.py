@@ -1,4 +1,5 @@
 import json
+import zlib
 import base64
 from textwrap import wrap
 import pymod.config
@@ -14,8 +15,11 @@ def deserialize(serialized):
 
 
 def serialize_chunked(raw):
+    serialized = serialize(raw)
     chunk_size = pymod.config.get("serialize_chunk_size")
-    return wrap(serialize(raw), chunk_size)
+    if chunk_size < 0:
+        return [serialized]
+    return wrap(serialized, chunk_size)
 
 
 def deserialize_chunked(serialized_chunks):
@@ -23,8 +27,16 @@ def deserialize_chunked(serialized_chunks):
 
 
 def _encode(item):
-    return base64.urlsafe_b64encode(str(item).encode()).decode()
+    encoded = str(item).encode("utf-8")
+    compress = pymod.config.get("compress_serialized_variables")
+    if compress:
+        encoded = zlib.compress(encoded)
+    return base64.urlsafe_b64encode(encoded).decode()
 
 
 def _decode(item):
-    return base64.urlsafe_b64decode(str(item)).decode()
+    encoded = base64.urlsafe_b64decode(str(item))
+    compress = pymod.config.get("compress_serialized_variables")
+    if compress:
+        encoded = zlib.decompress(encoded)
+    return encoded.decode()

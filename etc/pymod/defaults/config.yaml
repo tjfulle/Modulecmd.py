@@ -35,7 +35,11 @@ config:
   color: auto
 
   # Size of chunks used for environment variables that are serialized
-  serialize_chunk_size: 200
+  # Negative number means unlimited
+  serialize_chunk_size: -1
+
+  # Compress serialized variables
+  compress_serialized_variables: true
 
   # Don't use cache, can be slower
   use_modulepath_cache: true
