@@ -17,7 +17,7 @@ def find_modules(directory):
     directory = os.path.expanduser(directory)
 
     if directory == "/":
-        tty.warn("Requesting to find modules in root directory")
+        tty.verbose("Requesting to find modules in root directory")
         return None
 
     if not os.access(directory, os.R_OK):
@@ -82,7 +82,7 @@ def mark_explicit_defaults(modules, defaults):
                 module.marked_as_default = True
                 break
         else:
-            tty.warn("No matching module to mark default for {0}".format(name))
+            tty.verbose("No matching module to mark default for {0}".format(name))
 
 
 def pop_marked_default(dirname, versions):
@@ -91,7 +91,7 @@ def pop_marked_default(dirname, versions):
     linked_default = pop_linked_default(dirname, versions)
     versioned_default = pop_versioned_default(dirname, versions)
     if linked_default and versioned_default:
-        tty.warn(
+        tty.verbose(
             "A linked and versioned default exist in {0}, "
             "choosing the linked".format(dirname)
         )
@@ -117,7 +117,7 @@ def pop_linked_default(dirname, files):
 
     linked_default_source = os.path.realpath(linked_default_file)
     if not os.path.dirname(linked_default_source) == dirname:
-        tty.warn(
+        tty.verbose(
             "Modulepath: expected file named `default` in {0} to be "
             "a link to a modulefile in the same directory".format(dirname)
         )
@@ -136,12 +136,12 @@ def pop_versioned_default(dirname, files):
     version_file = os.path.join(dirname, version_file_name)
     version = read_tcl_default_version(version_file)
     if version is None:
-        tty.warn("Could not determine .version default in {0}".format(dirname))
+        tty.verbose("Could not determine .version default in {0}".format(dirname))
     else:
         default_file = os.path.join(dirname, version)
         if os.path.exists(default_file):
             return default_file
-        tty.warn("{0!r}: version default does not exist".format(default_file))
+        tty.verbose("{0!r}: version default does not exist".format(default_file))
 
 
 def read_tcl_default_version(filename):

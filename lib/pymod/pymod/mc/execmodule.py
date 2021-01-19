@@ -61,7 +61,7 @@ def execmodule_in_sandbox(module, mode):
             pass
         except pymod.error.TclModuleBreakError:
             # `break` command encountered.  we need to roll back changes to the
-            # environment and tell whoever called no to register this module
+            # environment and tell whoever called not to register this module
             pymod.environ.restore(clone)
             module.exec_failed_do_not_register = True
 
