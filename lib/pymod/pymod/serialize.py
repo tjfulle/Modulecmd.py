@@ -5,8 +5,8 @@ from textwrap import wrap
 import pymod.config
 
 
-def serialize(string):
-    return _encode(json.dumps(string))
+def serialize(obj):
+    return _encode(json.dumps(obj))
 
 
 def deserialize(serialized):

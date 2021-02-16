@@ -29,15 +29,6 @@ class Shell(object):
     ):
         sio = StringIO()
 
-        if files_to_source:
-            for (filename, args) in files_to_source:
-                command = self.format_source_command(filename, *args)
-                sio.write(command + ";\n")
-
-        if raw_shell_commands is not None:
-            for command in raw_shell_commands:
-                sio.write(command + ";\n")
-
         for (envar, defn) in environ.items():
             sio.write(self.format_environment_variable(envar, defn) + "\n")
 
@@ -48,6 +39,15 @@ class Shell(object):
         if shell_functions is not None:
             for (fun, defn) in shell_functions.items():
                 sio.write(self.format_shell_function(fun, defn) + "\n")
+
+        if files_to_source:
+            for (filename, args) in files_to_source:
+                command = self.format_source_command(filename, *args)
+                sio.write(command + ";\n")
+
+        if raw_shell_commands is not None:
+            for command in raw_shell_commands:
+                sio.write(command + ";\n")
 
         return sio.getvalue()
 
