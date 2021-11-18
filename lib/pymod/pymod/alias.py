@@ -94,7 +94,7 @@ class Aliases(object):
 
 def factory():
     basename = pymod.names.aliases_file_basename
-    filename = pymod.paths.join_user(basename)
+    filename = pymod.paths.join_user(basename, cache=True)
     return Aliases(filename)
 
 

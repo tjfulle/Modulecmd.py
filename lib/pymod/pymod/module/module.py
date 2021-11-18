@@ -236,10 +236,11 @@ class Module(object):
         help = kwargs.pop("help", None)
         name = max(args, key=len)
         dest = kwargs.pop("dest", name)
+        type = kwargs.pop("type", str)
         if kwargs:
             kwd = list(kwargs.keys())[0]
             raise TypeError("add_option() got an unexpected keyword argument {0!r}".format(kwd))
-        opt = ModuleOption(name, dest=dest, default=default, keys=list(args), help=help)
+        opt = ModuleOption(name, dest=dest, default=default, keys=list(args), help=help, type=type)
         self.registered_options.append(opt)
 
     def parse_opts(self):
@@ -249,6 +250,11 @@ class Module(object):
         # Set passed arguments
         unrecognized = []
         for (key, value) in self.kwargv.items():
+            if type is bool:
+                value = Boolean(value)
+                if value is None:
+                    v = self.kwargv[key]
+                    tty.die("Expected {0} to be a boolean, got {1}".format(key, v))
             for opt in self.registered_options:
                 if key in opt.keys:
                     parsed.set(opt.dest, value)
@@ -338,12 +344,23 @@ class Namespace(object):
 
 
 class ModuleOption:
-    def __init__(self, name, dest=None, default=None, keys=None, help=None):
+    def __init__(self, name, dest=None, default=None, keys=None, help=None, type=str):
         self.name = name
         self.dest = dest or name
         self.default = default
         self.keys = keys or [name]
         self.help = help
+        self.type = type
+
+
+def Boolean(value):
+    if value.lower() in ("false", "0", "off"):
+        value = False
+    elif value.lower() in ("true", "1", "on"):
+        value = True
+    else:
+        value = None
+    return value
 
 
 class TCLSHNotFoundError(Exception):

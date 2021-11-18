@@ -108,14 +108,10 @@ def factory():
         admin = load_config(admin_config_file)
         cfg.push_scope("user", admin)
 
-    for dirname in (
-        pymod.paths.user_config_path,
-        pymod.paths.user_config_platform_path,
-    ):
-        user_config_file = os.path.join(dirname, config_basename)
-        if os.path.exists(user_config_file):
-            user = load_config(user_config_file)
-            cfg.push_scope("user", user)
+    user_config_file = os.path.join(pymod.paths.user_config_path, config_basename)
+    if os.path.exists(user_config_file):
+        user = load_config(user_config_file)
+        cfg.push_scope("user", user)
 
     # Environment variable
     env = {}

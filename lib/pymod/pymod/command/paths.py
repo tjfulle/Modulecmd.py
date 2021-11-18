@@ -22,7 +22,6 @@ def paths(parser, args):
     a = []
     add_path(a, "prefix")
     add_path(a, "user_config_path")
-    add_path(a, "user_config_platform_path")
     n = max([len(x[0]) for x in a]) + 1
     for (name, path) in a:
         sys.stderr.write("{0:{1}s} {2}\n".format(name + ":", n, path))

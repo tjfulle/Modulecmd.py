@@ -15,7 +15,7 @@ class Session:
     def __init__(self):
         id = random.randint(10000, 99999)
         self.id = id
-        self.savedir = os.path.join(pymod.paths.user_config_path, "sessions")
+        self.savedir = os.path.join(pymod.paths.user_cache_path, "sessions")
         if not os.path.isdir(self.savedir):
             os.makedirs(self.savedir)
         self.filename = os.path.join(self.savedir, "{0}.json".format(self.id))

@@ -43,24 +43,19 @@ etc_path = os.path.join(prefix, "etc", "pymod")
 
 
 #: User configuration location
-user_config_path = os.getenv("PYMOD_CONFIG_PATH", os.path.expanduser("~/.pymod"))
-user_config_platform_path = os.getenv(
-    "PYMOD_CONFIG_PLATFORM_PATH", os.path.join(user_config_path, sys.platform.lower())
-)
+user_config_path = os.getenv("PYMOD_USER_CONFIG_PATH", os.path.expanduser("~/.pymod"))
+user_cache_path = os.getenv("PYMOD_USER_CACHE_PATH", os.path.expanduser("~/.pymod/cache"))
 
 if not os.path.isdir(user_config_path):  # pragma: no cover
     os.makedirs(user_config_path)
 
-if not os.path.isdir(user_config_platform_path):  # pragma: no cover
-    os.makedirs(user_config_platform_path)
+if not os.path.isdir(user_cache_path):  # pragma: no cover
+    os.makedirs(user_cache_path)
 
-
-def join_user(basename):
-    for dirname in (user_config_platform_path, user_config_path):
-        filename = os.path.join(dirname, basename)
-        if os.path.exists(filename):
-            return filename
-    return os.path.join(user_config_platform_path, basename)
+def join_user(basename, cache=False):
+    if cache:
+        return os.path.join(user_cache_path, basename)
+    return os.path.join(user_config_path, basename)
 
 
 del sys

@@ -28,17 +28,8 @@ class UserEnv:
 
 def factory():
     basename = pymod.names.user_env_file_basename
-    for dirname in (
-        pymod.paths.user_config_platform_path,
-        pymod.paths.user_config_path,
-    ):
-        if os.path.exists(os.path.join(dirname, basename)):
-            filename = os.path.join(dirname, basename)
-            break
-    else:
-        filename = None
-    if filename is not None:
-        assert os.path.isfile(os.path.realpath(filename))
+    f = pymod.paths.join_user(basename)
+    filename = f if os.path.isfile(f) else None
     return UserEnv(filename)
 
 

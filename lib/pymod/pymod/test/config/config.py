@@ -15,7 +15,7 @@ def test_config_default():
 
 def test_confing_user():
     basename = pymod.names.config_file_basename
-    user_config_file = os.path.join(pymod.paths.user_config_platform_path, basename)
+    user_config_file = os.path.join(pymod.paths.user_config_path, basename)
     user_config = """\
 config:
   debug: true
@@ -113,7 +113,7 @@ def test_confing_scopes():
 
     # Write the user config
     basename = pymod.names.config_file_basename
-    user_config_file = os.path.join(pymod.paths.user_config_platform_path, basename)
+    user_config_file = os.path.join(pymod.paths.user_config_path, basename)
     user_config = """\
 config:
   editor: {editor}

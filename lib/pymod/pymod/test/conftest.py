@@ -117,7 +117,7 @@ def mock_config():
 
     dirname = py.path.local(tempfile.mkdtemp())
     pymod.paths.user_config_path = dirname.strpath
-    pymod.paths.user_config_platform_path = dirname.mkdir("platform").strpath
+    pymod.paths.user_cache_path = dirname.strpath
 
     pymod.config.config = cfg
 
