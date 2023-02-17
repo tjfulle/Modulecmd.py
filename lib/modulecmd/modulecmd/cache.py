@@ -91,8 +91,8 @@ class Cache:
         self._data["version"] = cache_version_info
 
         # Build the modulepath cache
-        for path in modulecmd.modulepath.walk():
-            path.find_modules()
+        for path in modulecmd.modulepath.path():
+            modulecmd.modulepath.Path(path)
         self.write()
 
 

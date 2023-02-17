@@ -9,7 +9,6 @@ import modulecmd.system
 import modulecmd.error
 import modulecmd.names
 import modulecmd.paths
-import modulecmd.compat
 import modulecmd.environ
 
 import llnl.util.tty as tty
@@ -42,10 +41,7 @@ class Collections:
             obj = dict(json.load(open(filename)))
             version = obj.get("Version")
             version = version if version is None else tuple(version)
-            if version != Collections.version:  # pragma: no cover
-                return modulecmd.compat.collection.upgrade(self, obj, version)
-            else:
-                return dict(obj["Collections"])
+            return dict(obj["Collections"])
         return dict()
 
     def write(self, collections, filename):

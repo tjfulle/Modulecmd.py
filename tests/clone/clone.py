@@ -36,7 +36,7 @@ def test_clone_named(tmpdir, mock_modulepath):
     modulecmd.system.purge()
 
     # remove a module
-    f = os.path.join(modulecmd.modulepath._path.path[0].path, "a.py")
+    f = os.path.join(modulecmd.modulepath.path()[0], "a.py")
     os.remove(f)
     with pytest.raises(modulecmd.error.CloneModuleNotFoundError):
         modulecmd.system.restore_clone("foo")

@@ -1,6 +1,7 @@
 import os
 
 import modulecmd.names
+from modulecmd.modulepath.path import Path
 from modulecmd.modulepath.modulepath import Modulepath
 from modulecmd.modulepath.discover import find_modules
 
@@ -17,7 +18,7 @@ _path = Singleton(factory)
 
 
 def path():
-    return [p.path for p in _path.path]
+    return list(_path.path.keys())
 
 
 def set_path(other_path):
@@ -51,10 +52,6 @@ def candidates(name):
 
 def contains(path):
     return path in _path
-
-
-def walk(start=0):
-    return _path.walk(start=0)
 
 
 def size():

@@ -289,24 +289,24 @@ def test_modulepath_auto_bump(dirtrees, mock_modulepath):
     m2 = modulecmd.modulepath.get("ucc")
     assert m2.version == "4.0.0"
 
-    for path in modulecmd.modulepath.walk():
-        assert path.path is not None
+    for path in modulecmd.modulepath.path():
+        assert path is not None
 
     modulecmd.modulepath.clear()
 
 
-def test_modulepath_walk(dirtrees, mock_modulepath):
+def test_modulepath_traverse(dirtrees, mock_modulepath):
 
     d1 = dirtrees.join("1").strpath
     d2 = dirtrees.join("2").strpath
     mock_modulepath([d1, d2])
     i = 0
-    for path in modulecmd.modulepath.walk():
+    for path in modulecmd.modulepath.path():
         if i == 0:
-            assert path.path == d1
+            assert path == d1
             i += 1
         elif i == 1:
-            assert path.path == d2
+            assert path == d2
             i += 1
         else:
             assert False, "Should never get here"

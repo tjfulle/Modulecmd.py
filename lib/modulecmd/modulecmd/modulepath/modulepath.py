@@ -2,11 +2,14 @@ import os
 import re
 import bisect
 from six import StringIO
+from types import SimpleNamespace
+from collections import OrderedDict as ordered_dict
 
 import modulecmd.alias
 import modulecmd.names
 import modulecmd.module
 from modulecmd.modulepath.path import Path
+from modulecmd._util import expand_string
 
 from modulecmd.util.lang import join
 from modulecmd.util.itertools import groupby
@@ -18,25 +21,21 @@ from llnl.util.tty.colify import colified
 
 class Modulepath:
     def __init__(self, directories):
-        self.path = []
+        self.path = ordered_dict()
         for directory in directories:
             path = Path(directory)
             if not path.modules:
                 continue
-            self.path.append(path)
+            self.path[path.path] = path.modules
         self.defaults = {}
         self.assign_defaults()
 
     def __contains__(self, dirname):
-        return dirname in [p.path for p in self.path]
+        return dirname in self.path
 
     def __iter__(self):
-        return iter(self.path)
-
-    def walk(self, start=0):
-        assert start >= 0
-        for path in self.path[start:]:
-            yield path
+        for (dirname, modules) in self.path.items():
+            yield SimpleNamespace(path=dirname, modules=modules)
 
     def __len__(self):
         return len(self.path)
@@ -44,21 +43,16 @@ class Modulepath:
     def size(self):
         return len(self)
 
-    def index(self, dirname):
-        for (i, path) in enumerate(self.path):
-            if path.path == dirname:
-                return i
-        raise ValueError("{0} not in Modulepath".format(dirname))  # pragma: no cover
-
     def clear(self):
-        for path in self.path[::-1]:
-            self.remove_path(path.path)
+        paths = list(reversed(self.path))
+        for path in paths:
+            self.remove_path(path)
 
     @property
     def value(self):
         if not self.path:
             return None
-        return join([p.path for p in self.path], os.pathsep)
+        return join(list(self.path.keys()), os.pathsep)
 
     def _get(self, key, use_file_modulepath=False):
         """Implementation of `get`"""
@@ -79,8 +73,8 @@ class Modulepath:
                 module.acquired_as = module.name
             return module
         else:
-            for path in self.path:
-                for module in path.modules:
+            for (path, modules) in self.path.items():
+                for module in modules:
                     if module.fullname == key:
                         module.acquired_as = key
                         return module
@@ -132,9 +126,9 @@ class Modulepath:
     def getby_filename(self, filename, use_file_modulepath=False):
         tty.debug(filename)
         filename = os.path.abspath(filename)
-        for path in self.path:
-            tty.debug(path.path)
-            for module in path.modules:
+        for (path, modules) in self.path.items():
+            tty.debug(path)
+            for module in modules:
                 if filename == module.filename:
                     return module
 
@@ -161,21 +155,24 @@ class Modulepath:
         if not path.modules:
             tty.verbose("No modules found in {0}".format(path.path))
             return
-        self.path.append(path)
+        self.path[path.path] = path.modules
         self.path_modified()
         return path.modules
 
     def prepend_path(self, dirname):
         dirname = Path.expand_name(dirname)
-        if dirname in self:
-            path = self.path.pop(self.index(dirname))
-        else:
+        modules = self.path.get(dirname)
+        if modules is None:
             path = Path(dirname)
             if not path.modules:
                 return None
-        self.path.insert(0, path)
+            self.path[path.path] = path.modules
+            self.path.move_to_end(path.path, last=False)
+            modules = path.modules
+        else:
+            self.path.move_to_end(dirname, last=False)
         self.path_modified()
-        return path.modules
+        return modules
 
     def remove_path(self, dirname):
         """Remove `dirname` from the modulepath
@@ -197,7 +194,7 @@ class Modulepath:
             return []
 
         modules_in_dir = self.getby_dirname(dirname)
-        self.path.pop(self.index(dirname))
+        self.path.pop(dirname, None)
         self.path_modified()
 
         return modules_in_dir
@@ -219,18 +216,17 @@ class Modulepath:
         """
 
         def module_default_sort_key(module):
+            n = list(self.path.keys()).index(module.modulepath)
             sort_key = (
                 1 if module.marked_as_default else -1,
                 module.version,
                 module.variant,
-                -self.index(module.modulepath),
+                -n,
             )
             return sort_key
 
         self.defaults = {}
-        grouped = groupby(
-            [module for path in self.path for module in path.modules], lambda x: x.name
-        )
+        grouped = groupby([m for _ in self.path.values() for m in _], lambda x: x.name)
         for (_, modules) in grouped:
             for module in modules:
                 module.is_default = False
