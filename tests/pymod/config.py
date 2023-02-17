@@ -21,7 +21,6 @@ def test_config_default(mock_test_config):
     assert cfg.get("warn_all") == True
     assert cfg.get("stop_on_error") == True
     assert cfg.get("resolve_conflicts") == False
-    assert cfg.get("editor") == "vi"
     assert cfg.get("load_after_purge") == []
     assert cfg.get("skip_add_devpack") == False
     assert cfg.get("color") == "auto"

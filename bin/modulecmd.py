@@ -13,12 +13,8 @@ modulecmd_file = os.path.realpath(os.path.expanduser(__file__))
 modulecmd_prefix = os.path.dirname(os.path.dirname(modulecmd_file))
 
 # Allow modulecmd libs to be imported in our scripts
-modulecmd_lib_path = os.path.join(modulecmd_prefix, "lib", "modulecmd")
+modulecmd_lib_path = os.path.join(modulecmd_prefix)
 sys.path.insert(0, modulecmd_lib_path)
-
-# Add external libs
-modulecmd_external_libs = os.path.join(modulecmd_lib_path, "external")
-sys.path.insert(0, modulecmd_external_libs)
 
 # Once we've set up the system path, run the modulecmd main method
 import modulecmd.main  # noqa
