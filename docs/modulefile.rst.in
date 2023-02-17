@@ -1,0 +1,161 @@
+.. _modulefiles:
+
+===========
+Modulefiles
+===========
+
+----------
+References
+----------
+
+- :ref:`the-modulepath`
+
+--------
+Overview
+--------
+
+Module files are python scripts that are executed by the `Modulecmd.py`_ framework.  Modulefiles
+
+- have a ``.py`` file extension;
+- must exist on the :ref:`basic-usage-modulepath` to be found; and
+- are executed by `Modulecmd.py`_ in a sandboxed environment.
+
+For compatibility with existing systems, `Modulecmd.py`_ can execute TCL
+modulefiles, but they are not covered in this guide.
+
+------------------
+Naming conventions
+------------------
+
+Several naming conventions are supported:
+
+- name only;
+- name/version; and
+- name/version/variant.
+
+^^^^^^^^^
+Name only
+^^^^^^^^^
+
+In the name only naming convention, a module's name, version, and other information is embedded directly in the module's name.  For instance, a module ``baz``, version ``1.0`` might be named: ``<prefix>/baz-1.0.py``, where ``prefix`` is a path on the ``MODULEPATH``.  This naming convention is common with TCL modules but prevents some `Modulecmd.py`_ features from being effectuated, such as the :ref:`one-name-rule`.
+
+^^^^^^^^^^^^
+Name/version
+^^^^^^^^^^^^
+
+In the name/version convention, the name of a module is given by a directory ``<name>`` and its version by the python script ``<version>.py``.  For example, the module ``baz``, version ``1.0`` would be: ``<prefix>/baz/1.0.py``, where ``prefix`` is a path on the ``MODULEPATH``.
+
+.. note::
+
+  This name/version convention is the preferred naming convention for `Modulecmd.py`_.
+
+^^^^^^^^^^^^^^^^^^^^
+Name/version/variant
+^^^^^^^^^^^^^^^^^^^^
+
+In the name/version/variant convention,  the module ``baz``, version ``1.0``, with variant ``a`` would be named: ``<prefix>/baz/1.0/a.py``, where ``prefix`` is a path on the ``MODULEPATH``.
+
+---------------
+Module commands
+---------------
+
+`Modulecmd.py`_ executes module files in an environment providing many commands
+for interacting with the shell's environment.
+
+%(commands)s
+
+
+-------
+Logging
+-------
+
+**log_info**\ *(message)*
+
+    Writes an informational message to the console.
+
+    **Arguments**
+
+    *message* (str): Message to write
+
+**log_warning**\ *(message)*
+
+    Writes a warning message to the console.
+
+    **Arguments**
+
+    *message* (str): Message to write
+
+**log_error**\ *(message)*
+
+    Writes an error message to the console and raises an exception
+
+    **Arguments**
+
+    *message* (str): Message to write
+
+
+---------------------
+Other defined objects
+---------------------
+
+**is_darwin**, **IS_DARWIN**
+
+    Is the OS darwin?
+
+**env**
+
+    A reference to the current environment
+
+**self**
+
+    A reference to the module itself
+
+**user_env**
+
+    A reference to the user's environment file
+
+**get_hostname**\ *()*
+
+    Get the host name
+
+**mode**\ *()*
+
+    The current mode ('load', 'unload', etc)
+
+--------------
+Module Options
+--------------
+A module can support command line options.  Options are specified on the command line as
+
+.. code-block:: console
+
+  $ module load <modulename> [+option[=value] [+option...]]
+
+The following modulefile functions register options
+
+``add_option(name, help=None)``
+    Register a module option.
+
+^^^^^^^^
+Examples
+^^^^^^^^
+
+To specify two options for module 'spam', in modulefile spam.py do
+
+.. code-block:: python
+
+  add_option('x')
+  add_option('b')
+
+  if (opts.b):
+      # Do something
+  if (opts.x == 'baz'):
+      # Do something
+
+On the commandline, the module spam can be loaded as
+
+.. code-block:: console
+
+  $ module load spam +b x=baz
+
+.. _Modulecmd.py: https://www.github.com/tjfulle/Modulecmd.py
