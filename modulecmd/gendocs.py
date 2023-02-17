@@ -4,7 +4,7 @@ import inspect
 import textwrap
 from io import StringIO
 from argparse import ArgumentParser
-from ordereddict_backport import OrderedDict
+from collections import OrderedDict
 
 import modulecmd.paths
 import modulecmd.callback
