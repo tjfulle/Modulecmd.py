@@ -9,11 +9,10 @@ from collections import OrderedDict as ordered_dict
 import modulecmd.alias
 import modulecmd.names
 import modulecmd.module
-from modulecmd.util import join, split, groupby, working_dir, singleton, terminal_size
+import modulecmd.util as util
 
 import llnl.util.tty as tty
 from llnl.util.tty.color import colorize
-from llnl.util.tty.colify import colified
 
 
 def expand_name(dirname):
@@ -50,7 +49,7 @@ class Modulepath:
     def value(self):
         if not self.path:
             return None
-        return join(list(self.path.keys()), os.pathsep)
+        return util.join(list(self.path.keys()), os.pathsep)
 
     def _get(self, key, use_file_modulepath=False):
         """Implementation of `get`"""
@@ -223,7 +222,7 @@ class Modulepath:
             return sort_key
 
         self.defaults = {}
-        grouped = groupby([m for _ in self.path.values() for m in _], lambda x: x.name)
+        grouped = util.groupby([m for _ in self.path.values() for m in _], lambda x: x.name)
         for (_, modules) in grouped:
             for module in modules:
                 module.is_default = False
@@ -260,7 +259,7 @@ class Modulepath:
     def avail_full(self, regex=None, long_format=False):
         sio = StringIO()
         sio.write("\n")
-        width = terminal_size().columns
+        width = util.terminal_size().columns
         # head = lambda x: (" " + x + " ").center(width, "-")
         for (directory, modules) in self.path.items():
             modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
@@ -281,7 +280,7 @@ class Modulepath:
                         if long_format:  # pragma: no cover
                             insert_key += " -> %s" % (target)
                         modules.insert(i, insert_key)
-                s = colified(modules, width=width)
+                s = util.colify(modules, width=width)
             directory = directory.replace(os.path.expanduser("~/"), "~/")
             # sio.write(head(directory) + '\n')
             sio.write(colorize("@G{%s}:\n" % (directory)))
@@ -333,7 +332,7 @@ def find_modules2(root, branch=None):
         return []
     elif root in (".git", ".svn", "CVS"):  # pragma: no cover
         return []
-    with working_dir(root):
+    with util.working_dir(root):
         for p in os.listdir(branch or "."):
             if modulecmd.module.ishidden(p):
                 continue
@@ -510,7 +509,7 @@ def listdir(dirname):
     files, dirs = [], []
     if not os.access(dirname, os.X_OK):  # pragma: no cover
         return [], []
-    with working_dir(dirname):
+    with util.working_dir(dirname):
         for item in os.listdir("."):
             if os.path.isdir(item):
                 if item in (".git", ".svn", "CVS"):  # pragma: no cover
@@ -550,11 +549,11 @@ def cache_modules(path, modules):
 
 
 def factory():  # pragma: no cover
-    path = split(os.getenv(modulecmd.names.modulepath), os.pathsep)
+    path = util.split(os.getenv(modulecmd.names.modulepath), os.pathsep)
     return Modulepath(path)
 
 
-_path = singleton(factory)
+_path = util.singleton(factory)
 
 
 def path():

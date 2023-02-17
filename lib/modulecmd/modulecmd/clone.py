@@ -5,9 +5,7 @@ from six import StringIO
 import modulecmd.names
 import modulecmd.paths
 import modulecmd.environ
-from modulecmd.util import singleton, terminal_size
-
-from llnl.util.tty.colify import colified
+from modulecmd.util import singleton, terminal_size, colify
 
 
 class Clones(object):
@@ -51,7 +49,7 @@ class Clones(object):
         sio = StringIO()
         if not terse:
             width = terminal_size().columns
-            s = colified(names, width=width)
+            s = colify(names, width=width)
             sio.write("{0}\n{1}\n".format(" Saved clones ".center(width, "-"), s))
         else:
             sio.write("\n".join(c for c in names))

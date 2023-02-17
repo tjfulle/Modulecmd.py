@@ -16,10 +16,9 @@ import modulecmd.names
 import modulecmd.paths
 import modulecmd.shell
 import modulecmd.user
-from modulecmd.util import working_dir, singleton, terminal_size
+from modulecmd.util import working_dir, singleton, terminal_size, colify
 
 import llnl.util.tty as tty
-from llnl.util.tty.colify import colified
 from llnl.util.tty.color import colorize
 from modulecmd.error import (
     FamilyLoadedError,
@@ -655,7 +654,7 @@ def list(terse=False, show_command=False, regex=None):
             "{0}) {1}".format(i + 1, m) for (i, m) in enumerate(loaded_module_names)
         ]
         width = terminal_size().columns
-        sio.write(colified(loaded, indent=4, width=max(100, width)))
+        sio.write(colify(loaded, indent=4, width=max(100, width)))
 
     s = sio.getvalue()
     if regex:

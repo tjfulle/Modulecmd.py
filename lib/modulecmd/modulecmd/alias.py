@@ -4,10 +4,9 @@ from six import StringIO
 
 import modulecmd.names
 import modulecmd.paths
-from modulecmd.util import singleton, terminal_size
+from modulecmd.util import singleton, terminal_size, colify
 
 from llnl.util.tty.color import colorize
-from llnl.util.tty.colify import colified
 
 
 class Aliases(object):
@@ -83,7 +82,7 @@ class Aliases(object):
         sio = StringIO()
         if not terse:
             width = terminal_size().columns
-            s = colified(names, width=width)
+            s = colify(names, width=width)
             sio.write("{0}\n{1}\n".format(" Aliases ".center(width, "-"), s))
         else:
             sio.write("{0}\n".format("\n".join(c for c in names)))
