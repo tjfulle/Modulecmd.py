@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 
@@ -10,21 +10,21 @@ if sys.version_info[:2] < (2, 6):
     sys.exit("Modulecmd.py requires Python 2.6 or higher."
              "This is Python %d.%d.%d." % v_info)
 
-# Find pymod's location and its prefix.
-pymod_file = os.path.realpath(os.path.expanduser(__file__))
-pymod_prefix = os.path.dirname(os.path.dirname(pymod_file))
+# Find modulecmd's location and its prefix.
+modulecmd_file = os.path.realpath(os.path.expanduser(__file__))
+modulecmd_prefix = os.path.dirname(os.path.dirname(modulecmd_file))
 
-# Allow pymod libs to be imported in our scripts
-pymod_lib_path = os.path.join(pymod_prefix, "lib", "pymod")
-sys.path.insert(0, pymod_lib_path)
+# Allow modulecmd libs to be imported in our scripts
+modulecmd_lib_path = os.path.join(modulecmd_prefix, "lib", "modulecmd")
+sys.path.insert(0, modulecmd_lib_path)
 
 # Add external libs
-pymod_external_libs = os.path.join(pymod_lib_path, "external")
+modulecmd_external_libs = os.path.join(modulecmd_lib_path, "external")
 
 if sys.version_info[:2] == (2, 6):
-    sys.path.insert(0, os.path.join(pymod_external_libs, 'py26'))
+    sys.path.insert(0, os.path.join(modulecmd_external_libs, 'py26'))
 
-sys.path.insert(0, pymod_external_libs)
+sys.path.insert(0, modulecmd_external_libs)
 
 # Briefly: ruamel.yaml produces a .pth file when installed with pip that
 # makes the site installed package the preferred one, even though sys.path
@@ -35,6 +35,6 @@ if 'ruamel.yaml' in sys.modules:
 if 'ruamel' in sys.modules:
     del sys.modules['ruamel']
 
-# Once we've set up the system path, run the pymod main method
-import pymod.main  # noqa
-sys.exit(pymod.main.main())
+# Once we've set up the system path, run the modulecmd main method
+import modulecmd.main  # noqa
+sys.exit(modulecmd.main.main())
