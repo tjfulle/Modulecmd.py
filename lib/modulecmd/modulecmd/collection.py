@@ -2,17 +2,16 @@ import os
 import re
 import sys
 import json
-from six import StringIO
+from io import StringIO
 from collections import OrderedDict
 
+import modulecmd.xio as xio
 import modulecmd.system
 import modulecmd.error
 import modulecmd.names
 import modulecmd.paths
 import modulecmd.environ
 from modulecmd.util import singleton, terminal_size, colify, colorize
-
-import llnl.util.tty as tty
 
 
 class Collections:
@@ -72,7 +71,7 @@ class Collections:
         """Add a module `name` to the currently loaded collection"""
         collection_name = modulecmd.environ.get(modulecmd.names.loaded_collection)
         if collection_name is None:  # pragma: no cover
-            tty.die("There is no collection currently loaded")
+            xio.die("There is no collection currently loaded")
         data = OrderedDict(self.data.pop(collection_name))
         module = modulecmd.modulepath.get(name)
         if module is None:
@@ -84,7 +83,7 @@ class Collections:
                 continue
             for other in modules:
                 if other["fullname"] == module.fullname:  # pragma: no cover
-                    tty.warn(
+                    xio.warn(
                         "{0} is already in collection {1}".format(name, collection_name)
                     )
                     return
@@ -100,7 +99,7 @@ class Collections:
         """Remove a module `name` to the currently loaded collection"""
         collection_name = modulecmd.environ.get(modulecmd.names.loaded_collection)
         if collection_name is None:
-            tty.die("There is no collection currently loaded")  # pragma: no cover
+            xio.die("There is no collection currently loaded")  # pragma: no cover
         data = OrderedDict(self.data.pop(collection_name))
         module = modulecmd.modulepath.get(name)
         if module is None:  # pragma: no cover
@@ -153,7 +152,7 @@ class Collections:
         """
         collection = self.get(name)
         if collection is None:  # pragma: no cover
-            tty.warning("{0!r} is not a collection".format(name))
+            xio.warn("{0!r} is not a collection".format(name))
             return
 
         sio = StringIO()

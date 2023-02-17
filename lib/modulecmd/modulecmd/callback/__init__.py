@@ -39,14 +39,12 @@ from __future__ import print_function
 import os
 import re
 import sys
-from six import StringIO
+from io import StringIO
 
 import modulecmd.modes
 import modulecmd.paths
 import modulecmd.system
-
-from llnl.util.lang import attr_setdefault
-import llnl.util.tty as tty
+import modulecmd.xio as xio
 
 
 # Patterns to ignore in the callbacks directory when looking for callbacks.
@@ -163,7 +161,7 @@ def get_module(cb_name):
     attr_setdefault(module, CATEGORY, "")
 
     if not hasattr(module, cb_name):  # pragma: no cover
-        tty.die(
+        xio.die(
             "callback module {0} ({1}) must define function {2!r}.".format(
                 module.__name__, module.__file__, cb_name
             )
@@ -181,3 +179,10 @@ def get_callback(cb_name):
         name of the callback for which to get a module
     """
     return getattr(get_module(cb_name), cb_name)
+
+
+def attr_setdefault(obj, name, value):
+    """Like dict.setdefault, but for objects."""
+    if not hasattr(obj, name):
+        setattr(obj, name, value)
+    return getattr(obj, name)

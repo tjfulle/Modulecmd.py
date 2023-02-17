@@ -2,7 +2,7 @@ import os
 import re
 import inspect
 import textwrap
-from six import StringIO
+from io import StringIO
 from argparse import ArgumentParser
 from ordereddict_backport import OrderedDict
 

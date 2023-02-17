@@ -1,9 +1,9 @@
 import os
 import sys
+from modulecmd.util import singleton, load_module_from_file
 import modulecmd.config
 import modulecmd.names
 import modulecmd.paths
-from llnl.util.lang import load_module_from_file, Singleton
 
 
 class UserEnv:
@@ -46,4 +46,4 @@ def reset():  # pragma: no cover
     env = factory()
 
 
-env = Singleton(factory)
+env = singleton(factory)

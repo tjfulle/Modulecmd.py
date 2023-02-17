@@ -87,7 +87,6 @@ set-alias foo SPAM"""
     return tmpdir.strpath
 
 
-@pytest.mark.tcl
 def test_tcl_tcl2py_1(tcl_module_path, mock_modulepath):
     mock_modulepath(tcl_module_path)
     module = modulecmd.modulepath.get("tcl2")
@@ -101,7 +100,6 @@ def test_tcl_tcl2py_1(tcl_module_path, mock_modulepath):
     assert str(stdout) == str(py_content)
 
 
-@pytest.mark.tcl
 def test_tcl_tcl2py_2(tcl_module_path, mock_modulepath):
     mock_modulepath(tcl_module_path)
     modulecmd.environ.set(modulecmd.names.ld_library_path, "path_a")
@@ -113,8 +111,6 @@ def test_tcl_tcl2py_2(tcl_module_path, mock_modulepath):
     assert stdout == py_content
 
 
-@pytest.mark.unit
-@pytest.mark.tcl
 def test_tcl_unit(tcl_module_path, mock_modulepath):
     mock_modulepath(tcl_module_path)
 
@@ -153,7 +149,6 @@ def test_tcl_unit(tcl_module_path, mock_modulepath):
     assert modulecmd.environ.environ.aliases["foo"] == "SPAM"
 
 
-@pytest.mark.tcl
 def test_tcl_break(tmpdir, mock_modulepath):
     f = tmpdir.join("f").write(
         """\
@@ -169,7 +164,6 @@ setenv BAZ SPAM"""
     assert not m.is_loaded
 
 
-@pytest.mark.tcl
 def test_tcl_env(tmpdir, mock_modulepath):
     f = tmpdir.join("f").write(
         """\
@@ -195,7 +189,6 @@ if [info exists env(FOO)] {
     modulecmd.environ.environ.pop("FOO", None)
 
 
-@pytest.mark.tcl
 def test_tcl_env_break(tmpdir, mock_modulepath):
     f = tmpdir.join("f").write(
         """\
@@ -224,7 +217,6 @@ if { [info exists env(FOO)] } {
     modulecmd.environ.environ.pop("FOO")
 
 
-@pytest.mark.tcl
 def test_tcl_env_break_neg(tmpdir, mock_modulepath):
     f = tmpdir.join("f").write(
         """\
@@ -253,7 +245,6 @@ if { ![info exists env(FOO)] } {
     modulecmd.environ.environ.pop("FOO")
 
 
-@pytest.mark.tcl
 def test_tcl_continue(tmpdir, mock_modulepath):
     f = tmpdir.join("f").write(
         """\

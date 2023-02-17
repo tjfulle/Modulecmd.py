@@ -22,7 +22,6 @@ setenv('ENVAR_2', self.version.string)"""
     return tmpdir.strpath
 
 
-@pytest.mark.unit
 def test_mc_family_load_1(mock_module):
     family = "compiler"
     module = mock_module("ucc", "1.2", "ucc/1.2.py")
@@ -31,8 +30,6 @@ def test_mc_family_load_1(mock_module):
     assert modulecmd.environ.environ["MODULE_FAMILY_COMPILER_VERSION"] == "1.2"
 
 
-@pytest.mark.mf
-@pytest.mark.unit
 def test_mc_family_unload_1(mock_module):
     module = mock_module("ucc", "2.0", "ucc/2.0.py")
     modulecmd.environ.set("MODULE_FAMILY_COMPILER", "ucc")
@@ -42,7 +39,6 @@ def test_mc_family_unload_1(mock_module):
     assert modulecmd.environ.environ["MODULE_FAMILY_COMPILER_VERSION"] is None
 
 
-@pytest.mark.sandbox
 def test_mc_family_xyz(modules_path, mock_modulepath, get_loaded_modules):
     def standard_assertions(module):
         name_key = modulecmd.names.family_name("xyz")

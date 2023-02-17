@@ -74,7 +74,6 @@ def test_callback_get_hostname(tmpdir, mock_modulepath):
     modulecmd.system.load("a")
 
 
-@pytest.mark.unit
 def test_callback_execute(tmpdir):
     execute = get_callback("execute")
     tmpdir.join("foobar").write("")

@@ -11,6 +11,7 @@ import shutil
 import termios
 import textwrap
 import subprocess
+import importlib.util
 from io import StringIO
 from types import SimpleNamespace
 from contextlib import contextmanager
@@ -336,6 +337,24 @@ def remove_directory(path: str) -> None:
         pass
 
 
+def touch(path):
+    """Creates an empty file at the specified path."""
+    perms = os.O_WRONLY | os.O_CREAT | os.O_NONBLOCK | os.O_NOCTTY
+    fd = None
+    try:
+        fd = os.open(path, perms)
+        os.utime(path, None)
+    finally:
+        if fd is not None:
+            os.close(fd)
+
+
+def touchp(path):
+    """Like ``touch``, but creates any parent directories needed for the file."""
+    mkdirp(os.path.dirname(path))
+    touch(path)
+
+
 def force_remove(*paths: str) -> None:
     """Remove files without printing errors.  Like ``rm -f``"""
     for path in paths:
@@ -512,3 +531,24 @@ def terminal_size():
         rc = (os.environ.get("LINES", 25), os.environ.get("COLUMNS", 80))
 
     return SimpleNamespace(rows=int(rc[0]) or 25, columns=int(rc[1]) or 80)
+
+
+def load_module_from_file(module_name, module_path):
+    """Loads a python module from the path of the corresponding file.
+
+    Args:
+        module_name (str): namespace where the python module will be loaded,
+            e.g. ``foo.bar``
+        module_path (str): path of the python file containing the module
+
+    Returns:
+        A valid module object
+
+    Raises:
+        ImportError: when the module can't be loaded
+        FileNotFoundError: when module_path doesn't exist
+    """
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module

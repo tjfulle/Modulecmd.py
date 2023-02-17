@@ -1,13 +1,12 @@
 import os
 import json
-from ordereddict_backport import OrderedDict
+from collections import OrderedDict
 
+import modulecmd.xio as xio
 import modulecmd.modulepath
 import modulecmd.names
 import modulecmd.paths
 import modulecmd.environ
-
-import llnl.util.tty as tty
 
 
 def upgrade(new, old, old_version):  # pragma: no cover
@@ -27,7 +26,7 @@ def upgrade_None_to_1_0(new, old, depth=[0]):
         raise ValueError("Recursion!")
 
     version_string = ".".join(str(_) for _ in new.version)
-    tty.info(
+    xio.info(
         "Converting Modulecmd.py collections version 0.0 to "
         "version {0}".format(version_string)
     )
@@ -39,7 +38,7 @@ def upgrade_None_to_1_0(new, old, depth=[0]):
             if new_collection is None:
                 break
             if not os.path.isdir(path):
-                tty.warn(
+                xio.warn(
                     "Collection {0} contains directory {1} which "
                     "does not exist!  This collection will be skipped".format(
                         name, path
@@ -49,7 +48,7 @@ def upgrade_None_to_1_0(new, old, depth=[0]):
                 break
             avail = mp.append_path(path)
             if avail is None:
-                tty.warn(
+                xio.warn(
                     "Collection {0} contains directory {1} which "
                     "does not have any available modules!  "
                     "This collection will be skipped".format(name, path)
@@ -59,7 +58,7 @@ def upgrade_None_to_1_0(new, old, depth=[0]):
             for (fullname, filename, opts) in m_descs:
                 m = mp.get(filename)
                 if m is None:
-                    tty.warn(
+                    xio.warn(
                         "Collection {0} requests module {1} which "
                         "can not be found! This collection will be skipped".format(
                             name, fullname
@@ -73,7 +72,7 @@ def upgrade_None_to_1_0(new, old, depth=[0]):
                 new_collection.setdefault(m.modulepath, []).append(ar)
 
         if new_collection is None:
-            tty.warn(
+            xio.warn(
                 "Skipping collection {0} because of previous " "errors".format(name)
             )
             continue

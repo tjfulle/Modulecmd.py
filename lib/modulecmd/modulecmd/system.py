@@ -1,6 +1,8 @@
 import os
 import sys
+from io import StringIO
 
+import modulecmd.xio as xio
 import modulecmd.alias
 import modulecmd.callback
 import modulecmd.clone
@@ -13,11 +15,9 @@ import modulecmd.module
 import modulecmd.modulepath
 import modulecmd.names
 import modulecmd.paths
-import modulecmd.shell
 import modulecmd.user
 from modulecmd.util import working_dir, singleton, terminal_size, colify, colorize
 
-import llnl.util.tty as tty
 from modulecmd.error import (
     FamilyLoadedError,
     ModuleConflictError,
@@ -28,7 +28,6 @@ from modulecmd.error import (
 )
 from modulecmd.xio import pager
 from modulecmd.util import split, grep_pat_in_string
-from six import StringIO, exec_
 
 
 builtin_list = list
@@ -59,7 +58,7 @@ class system_state:
     @property
     def loaded_modules(self):
         if self._loaded_modules is None:
-            tty.debug("Reading loaded modules")
+            xio.debug("Reading loaded modules")
             self._loaded_modules = []
             lm_cellar = modulecmd.environ.get(
                 modulecmd.names.loaded_module_cellar, default=[], serialized=True
@@ -381,7 +380,7 @@ def restore_collection_impl(name, the_collection):
         for ar in archives:
             try:
                 module = unarchive_module(ar)
-                tty.verbose("Loading part of collection: {0}".format(module))
+                xio.verbose("Loading part of collection: {0}".format(module))
             except modulecmd.error.ModuleNotFoundError:
                 raise modulecmd.error.CollectionModuleNotFoundError(
                     ar["fullname"], ar["filename"]
@@ -479,7 +478,7 @@ def execmodule_in_sandbox(module, mode):
     """Execute python module in sandbox"""
 
     # Execute the environment
-    tty.debug("Executing module {0} with mode {1}".format(module, mode))
+    xio.debug("Executing module {0} with mode {1}".format(module, mode))
     module.prepare()
     ns = module_exec_sandbox(module, mode)
     code = compile(module.read(mode), module.filename, "exec")
@@ -487,7 +486,7 @@ def execmodule_in_sandbox(module, mode):
         try:
             if isinstance(module, modulecmd.module.TclModule):
                 clone = modulecmd.environ.clone()
-            exec_(code, ns, {})
+            exec(code, ns, {})
         except modulecmd.error.StopLoadingModuleError:
             pass
         except modulecmd.error.TclModuleBreakError:
@@ -693,7 +692,7 @@ def load(name, opts=None, insert_at=None, caller="command_line"):
     ModuleNotFoundError
 
     """
-    tty.verbose("Loading {0}".format(name))
+    xio.verbose("Loading {0}".format(name))
 
     # Execute the module
     module = modulecmd.modulepath.get(
@@ -714,7 +713,7 @@ def load(name, opts=None, insert_at=None, caller="command_line"):
         if caller == "modulefile":
             module.refcount += 1
         else:
-            tty.warn(
+            xio.warn(
                 "{0} is already loaded, use 'module reload' to reload".format(
                     module.fullname
                 )
@@ -723,7 +722,7 @@ def load(name, opts=None, insert_at=None, caller="command_line"):
 
     if modulecmd.environ.get(modulecmd.names.loaded_collection):  # pragma: no cover
         collection = modulecmd.environ.get(modulecmd.names.loaded_collection)
-        tty.debug(
+        xio.debug(
             "Loading {0} on top of loaded collection {1}. "
             "Removing the collection name from the environment".format(
                 module.fullname, collection
@@ -876,7 +875,7 @@ def purge(load_after_purge=True):
 
     if load_after_purge:
         load_after_purge = modulecmd.config.get("load_after_purge")
-        tty.debug(str(load_after_purge))
+        xio.debug(str(load_after_purge))
         if load_after_purge is not None:
             for name in load_after_purge:
                 load(name)
@@ -894,11 +893,11 @@ def refresh():
     """Unload all modules from environment and reload them"""
     loaded_modules = state.loaded_modules
     for module in loaded_modules[::-1]:
-        tty.verbose("Unloading {0}".format(module))
+        xio.verbose("Unloading {0}".format(module))
         if module.is_loaded:
             unload_impl(module)
     for module in loaded_modules:
-        tty.verbose("Loading {0}".format(module))
+        xio.verbose("Loading {0}".format(module))
         if not module.is_loaded:
             load_impl(module)
 
@@ -909,7 +908,7 @@ def reload(name):
     if module is None:
         raise ModuleNotFoundError(name, modulecmd.modulepath)
     if not module.is_loaded:
-        tty.warn("{0} is not loaded!".format(module.fullname))
+        xio.warn("{0} is not loaded!".format(module.fullname))
         return
     assert module.is_loaded
     swap_impl(module, module, maintain_state=True, caller="reload")
@@ -974,7 +973,7 @@ def swap(module_a_name, module_b_name, caller="command_line"):
     if module_b is None:
         raise ModuleNotFoundError(module_b_name, modulecmd.modulepath)
     if module_b.is_loaded:
-        tty.warn("{0} is already loaded!".format(module_b.fullname))
+        xio.warn("{0} is already loaded!".format(module_b.fullname))
         return module_b
     if not module_a.is_loaded:
         return load_impl(module_b)
@@ -1064,12 +1063,12 @@ def unload(name, tolerant=False, caller="command_line"):
         elif loaded.fullname == name:
             break
     else:
-        tty.warn("Module {0} is not loaded".format(name))
+        xio.warn("Module {0} is not loaded".format(name))
         return
 
     if modulecmd.environ.get(modulecmd.names.loaded_collection):  # pragma: no cover
         collection = modulecmd.environ.get(modulecmd.names.loaded_collection)
-        tty.debug(
+        xio.debug(
             "Unloading {0} on top of loaded collection {1}. "
             "Removing the collection name from the environment".format(
                 module.fullname, collection
@@ -1175,7 +1174,7 @@ def use(dirname, append=False, delete=False):
     else:
         prepended_modules = modulecmd.modulepath.prepend_path(dirname)
         if prepended_modules is None:
-            tty.warn(
+            xio.warn(
                 "No modules were found in {0}.  "
                 "This path will not be added to MODULEPATH".format(dirname)
             )

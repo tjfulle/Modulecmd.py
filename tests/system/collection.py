@@ -32,7 +32,6 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
 def test_mc_restore_good(modules_path, mock_modulepath):
 
     mock_modulepath(modules_path.path)
@@ -61,7 +60,6 @@ def test_mc_restore_good(modules_path, mock_modulepath):
     modulecmd.system.show_collection("foo")
 
 
-@pytest.mark.unit
 def test_mc_restore_bad(modules_path, mock_modulepath):
     with pytest.raises(CollectionNotFoundError):
         modulecmd.system.restore_collection("fake")

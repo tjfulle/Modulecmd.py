@@ -11,7 +11,6 @@ def script(tmpdir):
     return f.strpath
 
 
-@pytest.mark.unit
 def test_mc_source_command(script):
     modulecmd.system.source(script)
     assert len(modulecmd.environ.environ.files_to_source) == 1

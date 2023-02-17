@@ -18,7 +18,6 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
 def test_mc_purge(modules_path, mock_modulepath):
     mock_modulepath(modules_path.path)
     a = modulecmd.system.load("a")
@@ -36,7 +35,6 @@ def test_mc_purge(modules_path, mock_modulepath):
     assert not d.is_loaded
 
 
-@pytest.mark.unit
 def test_mc_purge_load_after(modules_path, mock_modulepath):
     modulecmd.config.set("load_after_purge", ["a", "b"])
     mock_modulepath(modules_path.path)

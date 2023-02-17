@@ -5,8 +5,6 @@ import modulecmd.system
 import modulecmd.error
 import modulecmd.environ
 
-pytestmark = pytest.mark.hierarchy
-
 compiler_vendor = "ucc"
 mpi_vendor = "umpi"
 compiler_versions = ("1.0", "2.0")

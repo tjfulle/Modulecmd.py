@@ -1,6 +1,5 @@
 import subprocess
 from modulecmd.util import *
-from llnl.util.filesystem import working_dir, touch
 
 
 def test_util_lang_split():

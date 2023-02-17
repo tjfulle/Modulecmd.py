@@ -76,6 +76,11 @@ def info(message: str, end: str = "\n") -> None:
         cprint("{bold}{blue}==>{endc} %s" % message, end=end)
 
 
+def verbose(message: str, end: str = "\n") -> None:
+    if LOG_LEVEL >= DEBUG:
+        cprint("{bold}{green}==>{endc} %s" % message, end=end)
+
+
 def warn(message: str, end: str = "\n") -> None:
     if LOG_LEVEL >= WARN:
         fmt = "{bold}{magenta}==>{endc} Warning: %s" % message

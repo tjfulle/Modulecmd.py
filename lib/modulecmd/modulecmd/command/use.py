@@ -1,5 +1,4 @@
 import modulecmd.system
-import modulecmd.shell
 import modulecmd.modulepath
 
 

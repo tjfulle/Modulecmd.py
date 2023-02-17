@@ -22,7 +22,7 @@ family_version = lambda key: "MODULE_FAMILY_{0}_VERSION".format(key.upper())
 
 default_user_collection = "default"
 
-config_file_basename = "config.yaml"
+config_file_basename = ".modulecmd.ini"
 
 ld_preload = "LD_PRELOAD"
 ld_library_path = "LD_LIBRARY_PATH"

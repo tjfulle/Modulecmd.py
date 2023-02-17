@@ -6,12 +6,11 @@ from string import Template
 from collections import OrderedDict as ordered_dict
 
 
+import modulecmd.xio as xio
 import modulecmd.alias
 import modulecmd.names
 import modulecmd.module
 import modulecmd.util as util
-
-import llnl.util.tty as tty
 
 
 def expand_name(dirname):
@@ -52,11 +51,11 @@ class Modulepath:
 
     def _get(self, key, use_file_modulepath=False):
         """Implementation of `get`"""
-        tty.debug(key)
+        xio.debug(key)
         if os.path.isdir(key) and key in self:
             return self.getby_dirname(key)
         if os.path.isfile(key):
-            tty.debug(key)
+            xio.debug(key)
             module = self.getby_filename(key, use_file_modulepath=use_file_modulepath)
             if module is not None:
                 module.acquired_as = module.filename
@@ -107,7 +106,7 @@ class Modulepath:
                 self.append_path(target["modulepath"])
                 module = self.getby_filename(target["filename"])
                 if module is None:  # pragma: no cover
-                    tty.warn(
+                    xio.warn(
                         "Alias {0} points to nonexistent target {1}".format(
                             key, target["target"]
                         )
@@ -120,10 +119,10 @@ class Modulepath:
                 return modules
 
     def getby_filename(self, filename, use_file_modulepath=False):
-        tty.debug(filename)
+        xio.debug(filename)
         filename = os.path.abspath(filename)
         for (path, modules) in self.path.items():
-            tty.debug(path)
+            xio.debug(path)
             for module in modules:
                 if filename == module.filename:
                     return module
@@ -149,7 +148,7 @@ class Modulepath:
             return
         modules = find_modules(dirname)
         if not modules:
-            tty.verbose(f"No modules found in {dirname}")
+            xio.verbose(f"No modules found in {dirname}")
             return
         self.path[dirname] = modules
         self.path_modified()
@@ -185,7 +184,7 @@ class Modulepath:
         """
         dirname = expand_name(dirname)
         if dirname not in self.path:  # pragma: no cover
-            tty.warn("Modulepath: {0!r} is not in modulepath".format(dirname))
+            xio.warn("Modulepath: {0!r} is not in modulepath".format(dirname))
             return []
 
         modules_in_dir = self.getby_dirname(dirname)
@@ -329,7 +328,7 @@ skip_dirs = (".git", ".svn", "CVS")
 def find_modules2(root, branch=None):
     modules = []
     if root == "/":
-        tty.verbose("Requesting to find modules in root directory")
+        xio.verbose("Requesting to find modules in root directory")
         return []
     elif root in (".git", ".svn", "CVS"):  # pragma: no cover
         return []
@@ -363,16 +362,16 @@ def _find_modules(directory):
     directory = os.path.expanduser(directory)
 
     if directory == "/":
-        tty.verbose("Requesting to find modules in root directory")
+        xio.verbose("Requesting to find modules in root directory")
         return None
 
     if not os.access(directory, os.R_OK):
-        tty.verbose("{0!r} is not an accessible directory".format(directory))
+        xio.verbose("{0!r} is not an accessible directory".format(directory))
         return None
 
     if not os.path.isdir(directory):  # pragma: no cover
         # This should be redundant because of the previous check
-        tty.verbose("{0!r} is not a directory".format(directory))
+        xio.verbose("{0!r} is not a directory".format(directory))
         return None
 
     return _find(directory)
@@ -421,14 +420,14 @@ def mark_explicit_defaults(modules, defaults):
     for (name, filename) in defaults.items():
         mods = modules.get(name)
         if mods is None:
-            tty.debug("There is no module named {0}".format(name))
+            xio.debug("There is no module named {0}".format(name))
             continue
         for module in mods:
             if os.path.realpath(module.filename) == os.path.realpath(filename):
                 module.marked_as_default = True
                 break
         else:
-            tty.verbose("No matching module to mark default for {0}".format(name))
+            xio.verbose("No matching module to mark default for {0}".format(name))
 
 
 def pop_marked_default(dirname, versions):
@@ -437,7 +436,7 @@ def pop_marked_default(dirname, versions):
     linked_default = pop_linked_default(dirname, versions)
     versioned_default = pop_versioned_default(dirname, versions)
     if linked_default and versioned_default:
-        tty.verbose(
+        xio.verbose(
             "A linked and versioned default exist in {0}, "
             "choosing the linked".format(dirname)
         )
@@ -455,7 +454,7 @@ def pop_linked_default(dirname, files):
 
     linked_default_file = os.path.join(dirname, linked_default_name)
     if not os.path.islink(linked_default_file):
-        tty.verbose(
+        xio.verbose(
             "Modulepath: expected file named `default` in {0} "
             "to be a link to a modulefile".format(dirname)
         )
@@ -463,7 +462,7 @@ def pop_linked_default(dirname, files):
 
     linked_default_source = os.path.realpath(linked_default_file)
     if not os.path.dirname(linked_default_source) == dirname:
-        tty.verbose(
+        xio.verbose(
             "Modulepath: expected file named `default` in {0} to be "
             "a link to a modulefile in the same directory".format(dirname)
         )
@@ -482,12 +481,12 @@ def pop_versioned_default(dirname, files):
     version_file = os.path.join(dirname, version_file_name)
     version = read_tcl_default_version(version_file)
     if version is None:
-        tty.verbose("Could not determine .version default in {0}".format(dirname))
+        xio.verbose("Could not determine .version default in {0}".format(dirname))
     else:
         default_file = os.path.join(dirname, version)
         if os.path.exists(default_file):
             return default_file
-        tty.verbose("{0!r}: version default does not exist".format(default_file))
+        xio.verbose("{0!r}: version default does not exist".format(default_file))
 
 
 def read_tcl_default_version(filename):
@@ -495,7 +494,7 @@ def read_tcl_default_version(filename):
         for (i, line) in enumerate(fh.readlines()):
             line = " ".join(line.split())
             if i == 0 and not line.startswith("#%Module"):
-                tty.debug("version file does not have #%Module header")
+                xio.debug("version file does not have #%Module header")
             if line.startswith("set ModulesVersion"):
                 raw_version = line.split("#", 1)[0].split()[-1]
                 try:

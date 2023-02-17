@@ -1,4 +1,4 @@
-from enum_backport import Enum
+from enum import Enum
 
 
 class Modes(Enum):

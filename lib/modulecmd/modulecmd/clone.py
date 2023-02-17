@@ -1,6 +1,6 @@
 import os
 import json
-from six import StringIO
+from io import StringIO
 
 import modulecmd.names
 import modulecmd.paths

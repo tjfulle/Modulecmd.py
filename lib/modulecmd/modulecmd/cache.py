@@ -4,9 +4,8 @@ import atexit
 
 import modulecmd.names
 import modulecmd.modulepath
-
-import llnl.util.tty as tty
-from llnl.util.lang import Singleton
+import modulecmd.xio as xio
+from modulecmd.util import singleton
 
 
 cache_version_info = (0, 1, 0)
@@ -65,7 +64,7 @@ class Cache:
 
     @modifies_cache
     def remove(self):
-        tty.info("Removing the MODULEPATH cache")
+        xio.info("Removing the MODULEPATH cache")
         if os.path.isfile(self.filename):
             os.remove(self.filename)
         self._data = dict()
@@ -86,7 +85,7 @@ class Cache:
 
     def build(self):
         """Build the cache"""
-        tty.info("Building the MODULEPATH cache")
+        xio.info("Building the MODULEPATH cache")
         self._data = {}
         self._data["version"] = cache_version_info
 
@@ -102,7 +101,7 @@ def factory():
     return Cache(filename)
 
 
-cache = Singleton(factory)
+cache = singleton(factory)
 
 
 def modified():

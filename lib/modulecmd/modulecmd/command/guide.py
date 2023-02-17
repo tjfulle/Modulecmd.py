@@ -1,6 +1,7 @@
 import os
+import modulecmd.third_party.rst2ansi as rst2ansi
 import modulecmd.paths
-from modulecmd.util import pager
+from modulecmd.xio import pager
 from modulecmd._util.tty import redirect_stdout
 
 try:
@@ -42,7 +43,6 @@ def guide(parser, args):
             "the guides cannot be displayed"
         )
         raise ImportError(msg)
-    import rst2ansi
 
     filename = available_guides[args.guide]
     with redirect_stdout():

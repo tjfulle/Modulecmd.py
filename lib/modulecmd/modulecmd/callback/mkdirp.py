@@ -15,8 +15,5 @@ def mkdirp(module, mode, *paths, **kwargs):
         mode (permission bits): optional permissions to set on the created directory \
                 -- uses OS default if not provided
 
-    Notes:
-    This is a wrapper to `llnl.util.filesystem.mkdirp`.
-
     """
     return modulecmd.util.mkdirp(*paths, **kwargs)

@@ -10,8 +10,7 @@ import modulecmd.paths
 import modulecmd.config
 import modulecmd.environ
 import modulecmd.modulepath
-
-from llnl.util.lang import Singleton
+from modulecmd.util import singleton
 
 
 @pytest.fixture(autouse=True)
@@ -60,7 +59,7 @@ def os_environ():
 @pytest.fixture(scope="function", autouse=True)
 def modulecmd_cache():
     """Mocks up a fake modulecmd.cache for use by tests."""
-    modulecmd.cache.cache = Singleton(modulecmd.cache.factory)
+    modulecmd.cache.cache = singleton(modulecmd.cache.factory)
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -109,22 +108,15 @@ def mock_modulepath(request):
 @pytest.fixture(scope="session", autouse=True)
 def mock_config():
     """Removes user defined changes from config"""
-    real_configuration = modulecmd.config.config
-    cfg = modulecmd.config.Configuration()
-    basename = modulecmd.names.config_file_basename
-    default_config_file = os.path.join(modulecmd.paths.etc_path, "defaults", basename)
-    defaults = modulecmd.config.load_config(default_config_file)
-    cfg.push_scope("defaults", defaults)
-
+    os.environ.pop("MODULECMD_CONFIG_DIR", None)
+    real_configuration = modulecmd.config._config
+    cfg = modulecmd.config.configuration()
     dirname = py.path.local(tempfile.mkdtemp())
     modulecmd.paths.user_config_path = dirname.strpath
     modulecmd.paths.user_cache_path = dirname.strpath
-
-    modulecmd.config.config = cfg
-
-    yield modulecmd.config.config
-
-    modulecmd.config.config = real_configuration
+    modulecmd.config._config = cfg
+    yield modulecmd.config._config
+    modulecmd.config._config = real_configuration
 
 
 @pytest.fixture()

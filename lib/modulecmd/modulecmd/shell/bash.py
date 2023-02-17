@@ -1,5 +1,8 @@
+import os
 import re
+from io import StringIO
 from .shell import Shell
+from modulecmd.util import which
 
 
 class Bash(Shell):
@@ -47,9 +50,6 @@ class Bash(Shell):
 
     def switch(self):  # pragma: no cover
         """Switch the underlying module implementation"""
-        import os
-        from six import StringIO
-        from modulecmd.util import which
 
         for (key, val) in os.environ.items():
             if key.startswith("BASH_FUNC_module"):

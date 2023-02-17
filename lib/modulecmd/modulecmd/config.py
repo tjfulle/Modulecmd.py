@@ -1,150 +1,74 @@
 import os
-import ruamel.yaml as yaml
-import modulecmd.paths
-import modulecmd.names
-from modulecmd.util import split, singleton
-from spack.util.executable import which
+from configparser import ConfigParser
 
-
-def load_config(filename):
-    dict = yaml.load(open(filename))
-    return dict.get("config")
+from modulecmd.util import singleton, split, which
 
 
 has_tclsh = which("tclsh") is not None
 
 
-class Configuration(object):
-    scope_names = ["defaults", "user", "environment", "command_line"]
+default_settings = {
+    "debug": False,
+    "verbose": False,
+    "default_shell": "bash",
+    "warn_all": True,
+    "stop_on_error": True,
+    "resolve_conflicts": False,
+    "allow_duplicate_path_entries": False,
+    "editor": "vi",
+    "load_after_purge": [],
+    "skip_add_devpack": False,
+    "color": "auto",
+    "serialize_chunk_size": -1,
+    "compress_serialized_variables": True,
+    "use_modulepath_cache": True,
+    "tclsh": has_tclsh,
+}
 
+
+class configuration:
     def __init__(self):
-        self.scopes = {}
-
-    def push_scope(self, scope_name, data):
-        """Add a scope to the Configuration."""
-        if "defaults" in self.scopes and scope_name != "defaults":
-            self.verify_config(data, scope_name)
-        self.scopes.setdefault(scope_name, {}).update(dict(data))
-
-    def verify_config(self, data, scope):
-        """Verify that the types match those of the default scope"""
-        for (key, val) in data.items():
-            try:
-                default = self.scopes["defaults"][key]
-            except KeyError:
-                msg = "Unknown user config var {0!r}".format(key)
-                raise ValueError(msg)
-            if scope == "environment":
-                # Environment variables are always strings.
-                if isinstance(default, list):
-                    val = split(val, sep=",")
+        config_dir = os.getenv("MODULECMD_CONFIG_DIR", "~")
+        self.config_dir = os.path.expanduser(config_dir)
+        self.config_file = os.path.join(self.config_dir, ".modulecmd.ini")
+        self.data = dict(default_settings)
+        if os.path.exists(self.config_file):
+            fd = ConfigParser()
+            fd.read(self.config_file)
+            for (key, default_value) in self.data.items():
+                if not fd.has_option("modulecmd", key):
+                    continue
+                elif isinstance(default_value, bool):
+                    value = fd.getboolean("modulecmd", key)
+                elif isinstance(default_value, int):
+                    value = fd.getint("modulecmd", key)
+                elif isinstance(default_value, float):
+                    value = fd.getfloat("modulecmd", key)
+                elif isinstance(default_value, list):
+                    value = split(fd.get("modulecmd", key), sep=None)
                 else:
-                    val = type(default)(val)
-                data[key] = val
-            elif type(default) != type(val):
-                m = "User config var {0!r} must be of type {1!r}, not {2!r}"
-                msg = m.format(key, type(default).__name__, type(val).__name__)
-                raise ValueError(msg)
+                    value = fd.get("modulecmd", key)
+                self.data[key] = value
 
-    def remove_scope(self, scope_name):
-        return self.scopes.pop(scope_name, None)
+    def get(self, key, default=None):
+        return self.data.get(key, default)
 
-    def get(self, key, default=None, scope=None):
-        if key is None:
-            if scope is not None:
-                return self.scopes[scope]
-            cfg = {}
-            for scope_name in self.scope_names[::-1]:
-                if scope_name in self.scopes:
-                    cfg.update(self.scopes[scope_name])
-            return cfg
-
-        if scope is not None:
-            value = self.scopes[scope].get(key, default)
-        else:
-            for scope_name in self.scope_names[::-1]:
-                if scope_name in self.scopes:
-                    value = self.scopes[scope_name].get(key)
-                    if value is not None:
-                        break
-            else:
-                value = default
-        return value
-
-    def set(self, key, value, scope=None):
-        if scope is not None:
-            self.scopes.setdefault(scope, {}).update({key: value})
-        else:
-            for scope_name in self.scope_names[::-1]:
-                self.scopes.setdefault(scope_name, {}).update({key: value})
+    def set(self, key, value):
+        self.data[key] = value
 
 
-def factory():
-    """singleton Configuration instance.
-
-    This constructs one instance associated with this module and returns
-    it. It is bundled inside a function so that configuratoin can be
-    initialized lazily.
-
-    Returns
-    -------
-    cfg : Configuration
-        object for accessing Modulecmd.py configuration
-
-    """
-    cfg = Configuration()
-
-    config_basename = modulecmd.names.config_file_basename
-
-    default_config_file = os.path.join(
-        modulecmd.paths.etc_path, "defaults", config_basename
-    )
-    defaults = load_config(default_config_file)
-    cfg.push_scope("defaults", defaults)
-
-    admin_config_file = os.path.join(modulecmd.paths.etc_path, config_basename)
-    if os.path.isfile(admin_config_file):
-        admin = load_config(admin_config_file)
-        cfg.push_scope("user", admin)
-
-    user_config_file = os.path.join(modulecmd.paths.user_config_path, config_basename)
-    if os.path.exists(user_config_file):
-        user = load_config(user_config_file)
-        cfg.push_scope("user", user)
-
-    # Environment variable
-    env = {}
-    for key in defaults:
-        envar = "PYMOD_{0}".format(key.upper())
-        if os.getenv(envar):
-            key = envar[6:].lower()
-            value = os.environ[envar]
-            if isinstance(defaults[key], bool):  # pragma: no cover
-                value = False if value.upper() in ("0", "FALSE", "NO") else True
-            env[key] = value
-
-    if env:
-        cfg.push_scope("environment", env)
-
-    return cfg
-
-
-config = singleton(factory)
+_config = singleton(configuration)
 
 
 def get(key, default=None, scope=None):
     """Module-level wrapper for ``Configuration.get()``."""
-    return config.get(key, default, scope)
+    return _config.get(key, default=default)
 
 
 def set(key, value, scope=None):  # pragma: no cover
     """Convenience function for getting single values in config files."""
-    return config.set(key, value, scope)
+    return _config.set(key, value)
 
 
-class ConfigError(Exception):
-    pass
-
-
-class ConfigSectionError(Exception):
-    pass
+def config_file():
+    return _config.config_file

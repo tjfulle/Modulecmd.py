@@ -5,7 +5,7 @@ from .python import Python
 from .shell import Shell
 
 import modulecmd.config
-from llnl.util.lang import Singleton
+from modulecmd.util import singleton
 
 
 __shells__ = (Shell, Bash, Csh, Python)
@@ -37,7 +37,7 @@ def get_shell(shell_name=None):
     raise ValueError("Unknown shell " + shell_name)
 
 
-_shell = Singleton(get_shell)
+_shell = singleton(get_shell)
 name = None
 
 

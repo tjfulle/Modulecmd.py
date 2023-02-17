@@ -19,7 +19,6 @@ def modules_path(tmpdir, namespace, modulecmds):
     return ns
 
 
-@pytest.mark.unit
 def test_mc_swap_1(modules_path, mock_modulepath):
     mock_modulepath(modules_path.path)
     modulecmd.system.load("a")

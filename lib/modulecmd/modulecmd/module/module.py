@@ -1,7 +1,8 @@
 import os
-from six import StringIO
+from io import StringIO
 from textwrap import fill
 
+import modulecmd.xio as xio
 import modulecmd.system
 import modulecmd.config
 from modulecmd.module.meta import MetaData
@@ -9,7 +10,6 @@ from modulecmd.module.tcl2py import tcl2py
 from modulecmd.module.version import Version
 
 from modulecmd.util import textfill, terminal_size
-import llnl.util.tty as tty
 
 __all__ = ["Namespace", "Module", "PyModule", "TclModule"]
 
@@ -262,7 +262,7 @@ class Module(object):
                 value = Boolean(value)
                 if value is None:
                     v = self.kwargv[key]
-                    tty.die("Expected {0} to be a boolean, got {1}".format(key, v))
+                    xio.die("Expected {0} to be a boolean, got {1}".format(key, v))
             for opt in self.registered_options:
                 if key in opt.keys:
                     parsed.set(opt.dest, value)
@@ -270,7 +270,7 @@ class Module(object):
             else:
                 unrecognized.append(key)
         if unrecognized:
-            tty.die(
+            xio.die(
                 "{0}: unrecognized options: {1}".format(
                     self.fullname, ", ".join(unrecognized)
                 )
@@ -319,12 +319,12 @@ class PyModule(Module):
 
 class TclModule(Module):
     def read(self, mode):
-        if not modulecmd.config.has_tclsh:  # pragma: no cover
+        if not modulecmd.config.get("tclsh"):  # pragma: no cover
             raise TCLSHNotFoundError
         try:
             return tcl2py(self, mode)
         except Exception as e:  # pragma: no cover
-            tty.die(e.args[0])
+            xio.die(e.args[0])
             return ""
 
 

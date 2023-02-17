@@ -3,14 +3,13 @@ import re
 import sys
 import argparse
 import pytest
-from six import StringIO
+from io import StringIO
 
-from llnl.util.tty.colify import colify
 from modulecmd._util.tty import redirect_stdout2 as redirect_stdout
 
 import modulecmd.paths
 import modulecmd.modulepath
-from modulecmd.util import working_dir
+from modulecmd.util import working_dir, colify
 
 description = "run modulecmd's unit tests"
 section = "developer"
@@ -71,7 +70,7 @@ def do_list(args, unknown_args):
             sys.stderr.write(indent + name)
 
     if args.list:
-        colify(output_lines)
+        colify(output_lines) + "\n"
 
 
 def test(parser, args, unknown_args):

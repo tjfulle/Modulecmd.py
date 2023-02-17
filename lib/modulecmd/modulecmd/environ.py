@@ -2,16 +2,14 @@ import os
 import sys
 from argparse import Namespace
 
+import modulecmd.xio as xio
 import modulecmd.names
 import modulecmd.shell
 import modulecmd.modulepath
 
 from modulecmd.serialize import serialize, deserialize
 from modulecmd.serialize import serialize_chunked, deserialize_chunked
-from modulecmd.util import join, split, pop, get_system_manpath
-
-import llnl.util.tty as tty
-from llnl.util.lang import Singleton
+from modulecmd.util import join, split, pop, get_system_manpath, singleton
 
 
 class Environ(dict):
@@ -47,7 +45,7 @@ class Environ(dict):
 
     def set_destination_dir(self, dirname):
         if not os.path.isdir(dirname):
-            tty.die("{0} is not a directory".format(dirname))
+            xio.die("{0} is not a directory".format(dirname))
         self.destination_dir = dirname
 
     def get(self, key, default=None, type=None):
@@ -238,7 +236,7 @@ class Environ(dict):
         current_path = self.get_path(key, sep=sep)
         d = current_path.meta.pop(value, {"count": 0, "priority": -1})
         if d["count"] == 0 and value in current_path.value:  # pragma: no cover
-            tty.warn("Inconsistent refcount state")
+            xio.warn("Inconsistent refcount state")
             d["count"] = current_path.value.count(value)
             if modulecmd.config.get("debug"):
                 raise Exception("Inconsistent refcount state")
@@ -262,7 +260,7 @@ def factory():
     return Environ()
 
 
-environ = Singleton(factory)
+environ = singleton(factory)
 
 
 def set_env(env):

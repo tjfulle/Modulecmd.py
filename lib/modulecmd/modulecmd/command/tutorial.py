@@ -1,5 +1,5 @@
+import modulecmd.xio as xio
 import modulecmd.tutorial
-import llnl.util.tty as tty
 
 description = "Setup or teardown Modulecmd.py's mock tutorial MODULEPATH"
 section = "basic"
@@ -16,9 +16,9 @@ def setup_parser(subparser):
 
 def tutorial(parser, args):
     if args.action == "basic":
-        tty.info("Setting up Modulecmd.py's basic mock tutorial MODULEPATH")
+        xio.info("Setting up Modulecmd.py's basic mock tutorial MODULEPATH")
         modulecmd.tutorial.basic_usage()
     elif args.action == "teardown":
-        tty.info("Removing Modulecmd.py's mock tutorial MODULEPATH")
+        xio.info("Removing Modulecmd.py's mock tutorial MODULEPATH")
         modulecmd.tutorial.teardown()
     modulecmd.system.dump()

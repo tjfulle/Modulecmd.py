@@ -1,13 +1,7 @@
-# File adapted from spack/cmd/__init__.py
-
-from __future__ import print_function
-
 import os
 import re
 
-from llnl.util.lang import attr_setdefault
-import llnl.util.tty as tty
-
+import modulecmd.xio as xio
 import modulecmd.config
 import modulecmd.paths
 
@@ -73,13 +67,13 @@ def get_module(cmd_name):
     module = __import__(
         module_name, fromlist=[pname, SETUP_PARSER, DESCRIPTION], level=0
     )
-    tty.debug("Imported {0} from built-in commands".format(pname))
+    xio.debug("Imported {0} from built-in commands".format(pname))
 
     attr_setdefault(module, SETUP_PARSER, lambda *args: None)  # null-op
     attr_setdefault(module, DESCRIPTION, "")
 
     if not hasattr(module, pname):  # pragma: no cover
-        tty.die(
+        xio.die(
             "Command module {0} ({1}) must define function {2!r}.".format(
                 module.__name__, module.__file__, pname
             )
@@ -97,3 +91,10 @@ def get_command(cmd_name):
     """
     pname = python_name(cmd_name)
     return getattr(get_module(pname), pname)
+
+
+def attr_setdefault(obj, name, value):
+    """Like dict.setdefault, but for objects."""
+    if not hasattr(obj, name):
+        setattr(obj, name, value)
+    return getattr(obj, name)

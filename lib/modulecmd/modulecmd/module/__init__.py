@@ -1,9 +1,8 @@
 import os
 
+import modulecmd.xio as xio
 import modulecmd.config
 from modulecmd.module.module import *
-
-import llnl.util.tty as tty
 
 
 def factory(root, path):
@@ -17,9 +16,9 @@ def factory(root, path):
     module = module_type(root, path)
     if modulecmd.config.get("debug"):  # pragma: no cover
         if module_type == TclModule and "gcc" in file:
-            tty.debug(module.name)
-            tty.debug(module.modulepath)
-            tty.debug(module.filename, "\n")
+            xio.debug(module.name)
+            xio.debug(module.modulepath)
+            xio.debug(module.filename, "\n")
 
     return module
 

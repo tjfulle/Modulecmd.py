@@ -11,7 +11,6 @@ import sys
 import inspect
 import pstats
 import argparse
-from six import StringIO
 
 
 import modulecmd.xio as xio
@@ -22,9 +21,6 @@ import modulecmd.environ
 import modulecmd.command
 import modulecmd.shell
 
-import llnl.util.tty as tty
-import llnl.util.tty.color as color
-from llnl.util.tty.log import log_output
 from modulecmd._util.tty import redirect_stdout
 
 
@@ -107,7 +103,7 @@ def index_commands():
         for p in required_command_properties:
             prop = getattr(cmd_module, p, None)
             if not prop:
-                tty.die(
+                xio.die(
                     "Command doesn't define a property {0!r}: {1}".format(p, command)
                 )
 
@@ -383,80 +379,6 @@ def make_argument_parser(**kwargs):
     return parser
 
 
-class PymodCommand(object):
-    """Callable object that invokes a modulecmd command (for testing).
-
-    Example usage::
-
-        load = PymodCommand('load')
-        load('module')
-
-    Use this to invoke modulecmd commands directly from Python and check
-    their output.
-    """
-
-    def __init__(self, command_name):
-        """Create a new PymodCommand that invokes ``command_name`` when called.
-
-        Args:
-            command_name (str): name of the command to invoke
-        """
-        self.parser = make_argument_parser()
-        self.command = self.parser.add_command(command_name)
-        self.command_name = command_name
-
-    def __call__(self, *argv, **kwargs):
-        """Invoke this PymodCommand.
-
-        Args:
-            argv (list of str): command line arguments.
-
-        Keyword Args:
-            fail_on_error (optional bool): Don't raise an exception on error
-
-        Returns:
-            (str): combined output and error as a string
-
-        On return, if ``fail_on_error`` is False, return value of command
-        is set in ``returncode`` property, and the error is set in the
-        ``error`` property.  Otherwise, raise an error.
-        """
-        # set these before every call to clear them out
-        self.returncode = None
-        self.error = None
-
-        args, unknown = self.parser.parse_known_args([self.command_name] + list(argv))
-
-        fail_on_error = kwargs.get("fail_on_error", True)
-
-        out = StringIO()
-        try:
-            with log_output(out):
-                self.returncode = _invoke_command(
-                    self.command, self.parser, args, unknown
-                )
-
-        except SystemExit as e:
-            self.returncode = e.code
-
-        except BaseException as e:
-            self.error = e
-            if fail_on_error:
-                raise
-
-        if fail_on_error and self.returncode not in (None, 0):
-            raise PymodCommandError(
-                "Command exited with code %d: %s(%s)"
-                % (
-                    self.returncode,
-                    self.command_name,
-                    ", ".join("'%s'" % a for a in argv),
-                )
-            )
-
-        return out.getvalue()
-
-
 def setup_main_options(args):
     """Configure modulecmd globals based on the basic options."""
     # debug must be set first so that it can even affect behavior of
@@ -476,16 +398,13 @@ def setup_main_options(args):
 
     if args.debug:
         # modulecmd.error.debug = True
-        modulecmd.config.set("debug", True, scope="command_line")
+        modulecmd.config.set("debug", True)
 
     if args.dryrun:
-        modulecmd.config.set("dryrun", True, scope="command_line")
+        modulecmd.config.set("dryrun", True)
 
     if args.shell != modulecmd.config.get("default_shell"):
         modulecmd.shell.set_shell(args.shell)
-
-    # when to use color (takes always, auto, or never)
-    color.set_color_when(args.color)
 
 
 def allows_unknown_args(command):
@@ -507,7 +426,7 @@ def _invoke_command(command, parser, args, unknown_args):
         return_val = command(parser, args, unknown_args)
     else:
         if unknown_args:
-            tty.die("unrecognized arguments: {0}".format(" ".join(unknown_args)))
+            xio.die("unrecognized arguments: {0}".format(" ".join(unknown_args)))
         return_val = command(parser, args)
 
     # Allow commands to return and error code if they want
@@ -577,7 +496,7 @@ def main(argv=None):
         except ImportError:
             # if modulecmd.config.get('config:debug'):
             #     raise
-            tty.die("Unknown command: %s" % args.command[0])
+            xio.die("Unknown command: %s" % args.command[0])
 
         # Re-parse with the proper sub-parser added.
         args, unknown = parser.parse_known_args(argv)
@@ -600,11 +519,11 @@ def main(argv=None):
         raise
         if modulecmd.config.get("debug"):
             raise
-        tty.die(str(e))
+        xio.die(str(e))
 
     except KeyboardInterrupt:
         sys.stderr.write("\n")
-        tty.die("Keyboard interrupt.")
+        xio.die("Keyboard interrupt.")
 
     except SystemExit as e:
         return e.code

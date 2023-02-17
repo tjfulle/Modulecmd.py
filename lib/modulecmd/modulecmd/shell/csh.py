@@ -2,7 +2,7 @@ import os
 import re
 
 from .shell import Shell
-import llnl.util.tty as tty
+import modulecmd.xio as xio
 
 CSH_LIMIT = 4000
 
@@ -21,7 +21,7 @@ class Csh(Shell):
                     val = self.truncate_path(val)
                 else:
                     msg = "{0} exceeds {1} characters, truncating..."
-                    tty.warn(msg.format(key, CSH_LIMIT))
+                    xio.warn(msg.format(key, CSH_LIMIT))
                     val = val[:CSH_LIMIT]
         return 'setenv {0} "{1}";'.format(key, val)
 
@@ -48,7 +48,7 @@ class Csh(Shell):
         return "source {0}".format(filename)
 
     def truncate_path(self, path):
-        tty.warn(
+        xio.warn(
             "PATH exceeds {0} characters, truncating "
             "and appending /usr/bin:/bin".format(CSH_LIMIT)
         )

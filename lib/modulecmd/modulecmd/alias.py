@@ -1,6 +1,6 @@
 import os
-import ruamel.yaml as yaml
-from six import StringIO
+from configparser import ConfigParser
+from io import StringIO
 
 import modulecmd.names
 import modulecmd.paths
@@ -38,18 +38,29 @@ class Aliases(object):
 
     def read(self, filename):
         if os.path.isfile(filename):  # pragma: no cover
-            data = yaml.load(open(filename))
-            aliases = data.pop("aliases", dict())
-            if data:
-                raise ValueError(
-                    "Expected single top level key " "'aliases' in {0}".format(filename)
-                )
-            return aliases
+            fp = ConfigParser()
+            fp.read(filename)
+            if not fp.has_section("aliases"):
+                return {}
+            data = {}
+            for (key, value) in fp.items("aliases"):
+                name, attr = key.split(".", 1)
+                data.setdefault(name, {})[attr] = value
+            return data
         return dict()
 
     def write(self, aliases, filename):
+        fp = ConfigParser()
+        if os.path.isfile(filename):  # pragma: no cover
+            fp.read(filename)
+        if not fp.has_section("aliases"):
+            fp.add_section("aliases")
+        for (alias, item) in self.data.items():
+            for (attr, value) in item.items():
+                key = f"{alias}.{attr}"
+                fp.set("aliases", key, value)
         with open(filename, "w") as fh:
-            yaml.dump({"aliases": aliases}, fh, default_flow_style=False)
+            fp.write(fh)
 
     def save(self, target, name):
         """Save the alias 'name' to target"""
@@ -89,8 +100,7 @@ class Aliases(object):
 
 
 def factory():
-    basename = modulecmd.names.aliases_file_basename
-    filename = modulecmd.paths.join_user(basename, cache=True)
+    filename = modulecmd.config.config_file()
     return Aliases(filename)
 
 

@@ -4,10 +4,10 @@ import json
 import time
 import atexit
 import random
-from llnl.util.lang import Singleton
 
 import modulecmd.paths
 import modulecmd.names
+from modulecmd.util import singleton
 
 
 class Session:
@@ -51,7 +51,7 @@ def clean():
             os.remove(filename)
 
 
-session = Singleton(Session)
+session = singleton(Session)
 
 
 def save(**kwds):

@@ -1,10 +1,8 @@
 import os
+import shlex
 import subprocess
 import modulecmd.modes
 import modulecmd.environ
-import llnl.util.tty as tty
-from modulecmd.util import split
-from spack.util.executable import Executable
 
 category = "utility"
 
@@ -34,17 +32,8 @@ def execute(module, mode, command, when=None):
     modulecmd.modes.assert_known_mode(mode)
     if when is not None and not when:
         return
-
-    xc = split(command, " ", 1)
-    exe = Executable(xc[0])
+    args = shlex.split(command)
     with open(os.devnull, "a") as fh:
-        kwargs = {
-            "env": modulecmd.environ.filtered(),
-            "output": fh,
-            "error": subprocess.sys.stdout,
-        }
-        try:
-            exe(*xc[1:], **kwargs)
-        except:  # noqa: E722;  pragma: no cover
-            tty.warn("Command {0!r} failed".format(command))
+        p = subprocess.Popen(args, stdout=fh, stderr=subprocess.STDOUT)
+        p.wait()
     return

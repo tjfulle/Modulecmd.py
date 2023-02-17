@@ -18,8 +18,5 @@ def colorize(module, mode, string, **kwargs):
     Returns:
         colorized (str): The filtered string
 
-    Notes:
-    This is a wrapper to `llnl.util.tty.color.colorize`.
-
     """
     return modulecmd.util.colorize(string, **kwargs)

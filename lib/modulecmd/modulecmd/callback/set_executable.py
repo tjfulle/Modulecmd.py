@@ -1,4 +1,4 @@
-import llnl.util.filesystem
+import modulecmd.util
 
 category = "utility"
 
@@ -11,8 +11,5 @@ def set_executable(module, mode, path):
         mode (Mode): The mode of execution
         path (str): Path to make executable
 
-    Notes:
-    This is a wrapper to `llnl.util.filesystem.set_executable`.
-
     """
-    return llnl.util.filesystem.set_executable(path)
+    return modulecmd.util.set_executable(path)
