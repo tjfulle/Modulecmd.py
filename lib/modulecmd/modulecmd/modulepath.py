@@ -281,7 +281,7 @@ class Modulepath:
                         if long_format:  # pragma: no cover
                             insert_key += " -> %s" % (target)
                         names.insert(i, insert_key)
-                s = util.colify(names, width=width)
+                s = util.colify(names, width=width) + "\n"
             directory = directory.replace(os.path.expanduser("~/"), "~/")
             # sio.write(head(directory) + '\n')
             sio.write(util.colorize("{green}%s{endc}:\n" % directory))

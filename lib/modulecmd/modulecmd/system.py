@@ -140,6 +140,7 @@ class system_state:
         self._swapped_on_family_update.append((old, new))
 
     def format_changes(self, file=None):
+        fown = file is None
         file = file or StringIO()
         self.format_loaded(file=file)
         self.format_swapped(file=file)
@@ -147,6 +148,8 @@ class system_state:
         self.format_updated_v(file=file)
         self.format_unloaded_mp(file=file)
         self.format_updated_mp(file=file)
+        if fown:
+            return file.getvalue()
 
     def format_loaded(self, file=None):
         file = file or StringIO()
@@ -652,7 +655,8 @@ def list(terse=False, show_command=False, regex=None):
             "{0}) {1}".format(i + 1, m) for (i, m) in enumerate(loaded_module_names)
         ]
         width = terminal_size().columns
-        sio.write(colify(loaded, indent=4, width=max(100, width)))
+        output = colify(loaded, indent=4, width=max(100, width))
+        sio.write(output + "\n")
 
     s = sio.getvalue()
     if regex:

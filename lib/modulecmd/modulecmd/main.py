@@ -597,6 +597,7 @@ def main(argv=None):
             return _invoke_command(command, parser, args, unknown)
 
     except Exception as e:
+        raise
         if modulecmd.config.get("debug"):
             raise
         tty.die(str(e))
