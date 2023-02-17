@@ -33,10 +33,6 @@ class Modulepath:
     def __contains__(self, dirname):
         return dirname in self.path
 
-    def __iter__(self):
-        for (dirname, modules) in self.path.items():
-            yield SimpleNamespace(path=dirname, modules=modules)
-
     def __len__(self):
         return len(self.path)
 
@@ -119,9 +115,9 @@ class Modulepath:
         return module
 
     def getby_dirname(self, dirname):
-        for path in self:
-            if path.path == dirname:
-                return path.modules
+        for (path, modules) in self.path.items():
+            if path == dirname:
+                return modules
 
     def getby_filename(self, filename, use_file_modulepath=False):
         tty.debug(filename)
@@ -265,11 +261,8 @@ class Modulepath:
         sio.write("\n")
         _, width = tty.terminal_size()
         # head = lambda x: (" " + x + " ").center(width, "-")
-        for path in self:
-            directory = path.path
-            modules = sorted(
-                [m for m in path.modules if m.is_enabled], key=self.sort_key
-            )
+        for (directory, modules) in self.path.items():
+            modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
             modules = self.filter_modules_by_regex(modules, regex)
             if not os.path.isdir(directory):  # pragma: no cover
                 s = colorize("@r{(Directory not readable)}".center(width))
@@ -296,9 +289,7 @@ class Modulepath:
 
     def avail_terse(self, regex=None):
         sio = StringIO()
-        for path in self:
-            directory = path.path
-            modules = path.modules
+        for (directory, modules) in self.path.items():
             if not os.path.isdir(directory):  # pragma: no cover
                 continue
             modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
@@ -313,10 +304,10 @@ class Modulepath:
     def candidates(self, key):
         # Return a list of modules that might by given by key
         the_candidates = []
-        for path in self:
-            if not path.modules:  # pragma: no cover
+        for modules in self.path.values():
+            if not modules:  # pragma: no cover
                 continue
-            for module in path.modules:
+            for module in modules:
                 if module.name.endswith(key):
                     the_candidates.append(module)  # pragma: no cover
                 elif module.fullname.endswith(key):
