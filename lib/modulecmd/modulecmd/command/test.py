@@ -7,7 +7,7 @@ from six import StringIO
 
 from llnl.util.filesystem import working_dir
 from llnl.util.tty.colify import colify
-from modulecmd.util.tty import redirect_stdout2 as redirect_stdout
+from modulecmd._util.tty import redirect_stdout2 as redirect_stdout
 
 import modulecmd.paths
 import modulecmd.modulepath

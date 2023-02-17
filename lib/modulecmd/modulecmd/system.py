@@ -29,9 +29,8 @@ from modulecmd.error import (
     ModuleNotLoadedError,
     PrereqMissingError,
 )
-from modulecmd.util.lang import split
-from modulecmd.util.tty import grep_pat_in_string
-from modulecmd.util.tty.pager import pager
+from modulecmd.util import split, grep_pat_in_string
+from modulecmd.xio import pager
 from six import StringIO, exec_
 
 

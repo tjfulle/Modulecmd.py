@@ -1,4 +1,4 @@
-from modulecmd.util.lang import which as _which
+import modulecmd.util
 
 category = "utility"
 
@@ -18,4 +18,4 @@ def which(module, mode, exename):
     This is a wrapper to `contib.util.which`.
 
     """
-    return _which(exename)
+    return modulecmd.util.filesystem.which(exename)

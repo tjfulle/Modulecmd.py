@@ -9,8 +9,7 @@ from collections import OrderedDict as ordered_dict
 import modulecmd.alias
 import modulecmd.names
 import modulecmd.module
-from modulecmd.util.lang import join, split
-from modulecmd.util.itertools import groupby
+from modulecmd.util import join, split, groupby
 
 import llnl.util.tty as tty
 from llnl.util.lang import Singleton

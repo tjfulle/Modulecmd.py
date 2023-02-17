@@ -2,7 +2,7 @@ import sys
 import modulecmd.system
 import modulecmd.command
 import modulecmd.modulepath
-from modulecmd.util.tty import redirect_stdout
+from modulecmd._util.tty import redirect_stdout
 
 description = "get help on modulecmd and its commands"
 section = "help"

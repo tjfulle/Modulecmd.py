@@ -1,4 +1,4 @@
-from modulecmd.util.itertools import groupby
+from modulecmd.util import groupby
 
 
 def test_groupby():

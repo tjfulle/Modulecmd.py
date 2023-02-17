@@ -8,9 +8,9 @@ from modulecmd.module.meta import MetaData
 from modulecmd.module.tcl2py import tcl2py
 from modulecmd.module.version import Version
 
-from modulecmd.util.lang import textfill
+import modulecmd.xio as xio
+from modulecmd.util import textfill
 import llnl.util.tty as tty
-from llnl.util.tty import terminal_size
 
 __all__ = ["Namespace", "Module", "PyModule", "TclModule"]
 
@@ -197,7 +197,7 @@ class Module(object):
                 self.fullname
             )
         sio = StringIO()
-        _, width = terminal_size()
+        width = xio.terminal_size().columns
         rule = "=" * width
         head = "{0}".format((" " + self.name + " ").center(width, "="))
         text_width = min(width, 80)
@@ -227,7 +227,7 @@ class Module(object):
             return "{0}: no help string provided".format(self.fullname)
 
         sio = StringIO()
-        _, width = terminal_size()
+        width = xio.terminal_size().columns
         rule = "=" * width
         head = "{0}".format((" " + self.name + " ").center(width, "="))
         sio.write(head + "\n")

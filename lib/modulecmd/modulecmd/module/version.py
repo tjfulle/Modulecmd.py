@@ -1,4 +1,4 @@
-from modulecmd.util.lang import split
+from modulecmd.util import split
 
 
 class Version:

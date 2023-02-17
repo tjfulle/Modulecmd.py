@@ -49,7 +49,7 @@ class Bash(Shell):
         """Switch the underlying module implementation"""
         import os
         from six import StringIO
-        from modulecmd.util.lang import which
+        from modulecmd.util import filesystem
 
         for (key, val) in os.environ.items():
             if key.startswith("BASH_FUNC_module"):
@@ -63,7 +63,7 @@ class Bash(Shell):
             if os.getenv("LMOD_CMD"):
                 modulecmd = os.environ["LMOD_CMD"]
             else:
-                modulecmd = which("modulecmd")
+                modulecmd = filesystem.which("modulecmd")
                 if modulecmd is None:
                     raise Exception("Unable to find modulecmd executable")
             s.write('module() { eval $(%s bash "$@"); };' % modulecmd)

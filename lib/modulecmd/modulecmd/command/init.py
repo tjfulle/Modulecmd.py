@@ -3,7 +3,7 @@ import os
 import modulecmd.system
 import modulecmd.names
 import modulecmd.collection
-from modulecmd.util.lang import split
+from modulecmd.util import split
 
 description = "Initialize modules (should only be called by the startup script)."
 level = "long"

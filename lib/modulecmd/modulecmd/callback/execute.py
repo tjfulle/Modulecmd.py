@@ -3,7 +3,7 @@ import subprocess
 import modulecmd.modes
 import modulecmd.environ
 import llnl.util.tty as tty
-from modulecmd.util.lang import split
+from modulecmd.util import split
 from spack.util.executable import Executable
 
 category = "utility"

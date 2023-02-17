@@ -2,8 +2,7 @@ import os
 import ruamel.yaml as yaml
 import modulecmd.paths
 import modulecmd.names
-from modulecmd.util.lang import split
-from llnl.util.lang import Singleton
+from modulecmd.util import split, singleton
 from spack.util.executable import which
 
 
@@ -81,7 +80,7 @@ class Configuration(object):
 
 
 def factory():
-    """Singleton Configuration instance.
+    """singleton Configuration instance.
 
     This constructs one instance associated with this module and returns
     it. It is bundled inside a function so that configuratoin can be
@@ -130,7 +129,7 @@ def factory():
     return cfg
 
 
-config = Singleton(factory)
+config = singleton(factory)
 
 
 def get(key, default=None, scope=None):

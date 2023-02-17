@@ -1,4 +1,6 @@
-from modulecmd.util.lang import check_output as _check_output
+import shlex
+import subprocess
+
 
 category = "utility"
 
@@ -20,4 +22,5 @@ def check_output(module, mode, command):
     `subprocess.check_output` is provided.
 
     """
-    return _check_output(command)
+    command = shlex.split(command)
+    return subprocess.check_output(command).decode("utf-8")

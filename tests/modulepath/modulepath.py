@@ -4,7 +4,7 @@ import modulecmd.paths
 import modulecmd.system
 import modulecmd.module
 import modulecmd.modulepath
-from modulecmd.util.itertools import groupby
+from modulecmd.util import groupby
 
 
 basic_py_module = """\

@@ -8,7 +8,7 @@ import modulecmd.modulepath
 
 from modulecmd.serialize import serialize, deserialize
 from modulecmd.serialize import serialize_chunked, deserialize_chunked
-from modulecmd.util.lang import join, split, pop, get_system_manpath
+from modulecmd.util import join, split, pop, get_system_manpath
 
 import llnl.util.tty as tty
 from llnl.util.lang import Singleton

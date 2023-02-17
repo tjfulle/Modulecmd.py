@@ -2,7 +2,7 @@ import os
 import pytest
 import modulecmd.names
 import modulecmd.environ
-from modulecmd.util.lang import boolean
+from modulecmd.util import boolean
 
 
 def test_environ_set_get_unset():

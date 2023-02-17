@@ -2,8 +2,8 @@ import os
 import sys
 from contextlib import contextmanager
 
-from modulecmd.util.tty.pager import pager
-from modulecmd.util.tty.grep import grep_pat_in_string
+from modulecmd.xio import pager
+from modulecmd.util import grep_pat_in_string
 
 
 @contextmanager

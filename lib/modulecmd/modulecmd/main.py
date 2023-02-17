@@ -14,6 +14,7 @@ import argparse
 from six import StringIO
 
 
+import modulecmd.xio as xio
 import modulecmd.paths
 import modulecmd.config
 import modulecmd.modulepath
@@ -24,7 +25,7 @@ import modulecmd.shell
 import llnl.util.tty as tty
 import llnl.util.tty.color as color
 from llnl.util.tty.log import log_output
-from modulecmd.util.tty import redirect_stdout
+from modulecmd._util.tty import redirect_stdout
 
 
 #: names of profile statistics
@@ -340,17 +341,18 @@ def make_argument_parser(**kwargs):
         help="show help for all commands (same as modulecmd help --all)",
     )
     parser.add_argument(
-        "--time", action="store_true", default=False, help="time execution of command"
-    )
-    parser.add_argument(
-        "--verbose", action="store_true", default=False, help="print additional output"
-    )
-    parser.add_argument(
         "-d",
         "--debug",
         action="store_true",
         default=False,
         help="run additional debug checks",
+    )
+    parser.add_argument(
+        "-l",
+        "--log-level",
+        type=int,
+        choices=(0, 1, 2, 3, 4),
+        help="Log level.  0: error, 1: warn, 2: info, 3: debug, 4: trace [default: 2]",
     )
     parser.add_argument(
         "--dryrun",
@@ -457,13 +459,21 @@ class PymodCommand(object):
 
 def setup_main_options(args):
     """Configure modulecmd globals based on the basic options."""
-    # Set up environment based on args.
-    tty.set_verbose(args.verbose)
-    tty.set_debug(args.debug)
-    #    tty.set_trace(args.trace)
-
     # debug must be set first so that it can even affect behavior of
     # errors raised by modulecmd.config.
+    if args.debug and args.log_vel is not None:
+        args.log_evel = 3
+    if args.log_level is not None:
+        map: dict[int, int] = {
+            0: xio.ERROR,
+            1: xio.WARN,
+            2: xio.INFO,
+            3: xio.DEBUG,
+            4: xio.TRACE,
+        }
+        level: int = map[args.log_level]
+        xio.set_log_level(level)
+
     if args.debug:
         # modulecmd.error.debug = True
         modulecmd.config.set("debug", True, scope="command_line")

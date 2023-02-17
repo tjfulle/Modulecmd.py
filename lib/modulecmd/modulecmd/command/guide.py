@@ -1,7 +1,7 @@
 import os
 import modulecmd.paths
-from modulecmd.util.tty.pager import pager
-from modulecmd.util.tty import redirect_stdout
+from modulecmd.util import pager
+from modulecmd._util.tty import redirect_stdout
 
 try:
     import docutils
