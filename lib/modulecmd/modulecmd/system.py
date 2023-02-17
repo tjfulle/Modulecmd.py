@@ -1,7 +1,6 @@
 import os
 import sys
 
-import modulecmd.xio as xio
 import modulecmd.alias
 import modulecmd.callback
 import modulecmd.clone
@@ -16,10 +15,9 @@ import modulecmd.names
 import modulecmd.paths
 import modulecmd.shell
 import modulecmd.user
-from modulecmd.util import working_dir, singleton, terminal_size, colify
+from modulecmd.util import working_dir, singleton, terminal_size, colify, colorize
 
 import llnl.util.tty as tty
-from llnl.util.tty.color import colorize
 from modulecmd.error import (
     FamilyLoadedError,
     ModuleConflictError,
@@ -28,8 +26,8 @@ from modulecmd.error import (
     ModuleNotLoadedError,
     PrereqMissingError,
 )
-from modulecmd.util import split, grep_pat_in_string
 from modulecmd.xio import pager
+from modulecmd.util import split, grep_pat_in_string
 from six import StringIO, exec_
 
 
@@ -570,7 +568,7 @@ def find(names):
         if not candidates:
             raise ModuleNotFoundError(name)
         for module in candidates:
-            s = "@*{%s}\n  @C{%s}" % (module.fullname, module.filename)
+            s = "{bold}%s{endc}\n  {cyan}%s{endc}}" % (module.fullname, module.filename)
             sys.stderr.write(colorize(s) + "\n")
 
 
@@ -590,28 +588,28 @@ def info(names):
             raise ModuleNotFoundError(name)
 
         for module in modules:
-            s = "@B{Module:} @*{%s}\n" % module.fullname
-            s += "  @C{Name:}         %s\n" % module.name
+            s = "{blue}Module:{endc} {bold}%s{endc}\n" % module.fullname
+            s += "  {cyan}Name:{endc}         %s\n" % module.name
 
             if module.version:  # pragma: no cover
-                s += "  @C{Version:}      %s\n" % module.version
+                s += "  {cyan}Version:{endc}      %s\n" % module.version
 
             if module.family:  # pragma: no cover
-                s += "  @C{Family:}      %s\n" % module.family
+                s += "  {cyan}Family:{endc}      %s\n" % module.family
 
-            s += "  @C{Loaded:}       %s\n" % module.is_loaded
-            s += "  @C{Filename:}     %s\n" % module.filename
-            s += "  @C{Modulepath:}   %s" % module.modulepath
+            s += "  {cyan}Loaded:{endc}       %s\n" % module.is_loaded
+            s += "  {cyan}Filename:{endc}     %s\n" % module.filename
+            s += "  {cyan}Modulepath:{endc}   %s" % module.modulepath
 
             unlocked_by = module.unlocked_by()
             if unlocked_by:  # pragma: no cover
-                s += "  @C{Unlocked by:}  %s\n"
+                s += "  {cyan}Unlocked by:  %s\n"
                 for m in unlocked_by:
                     s += "                    %s\n" % m.fullname
 
             unlocks = module.unlocks()
             if unlocks:  # pragma: no cover
-                s += "  @C{Unlocks:}      %s\n"
+                s += "  {cyan}Unlocks:{endc}      %s\n"
                 for dirname in unlocks:
                     s += "                    %s\n" % dirname
 

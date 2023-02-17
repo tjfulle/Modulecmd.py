@@ -12,7 +12,6 @@ import modulecmd.module
 import modulecmd.util as util
 
 import llnl.util.tty as tty
-from llnl.util.tty.color import colorize
 
 
 def expand_name(dirname):
@@ -222,7 +221,9 @@ class Modulepath:
             return sort_key
 
         self.defaults = {}
-        grouped = util.groupby([m for _ in self.path.values() for m in _], lambda x: x.name)
+        grouped = util.groupby(
+            [m for _ in self.path.values() for m in _], lambda x: x.name
+        )
         for (_, modules) in grouped:
             for module in modules:
                 module.is_default = False
@@ -235,16 +236,6 @@ class Modulepath:
         if regex:
             modules = [m for m in modules if re.search(regex, m.fullname)]
         return modules
-
-    def colorize(self, string):
-        """Colorize item for output to console"""
-        D = "(%s)" % colorize("@R{D}")
-        L = "(%s)" % colorize("@G{L}")
-        DL = "(%s,%s)" % (colorize("@R{D}"), colorize("@G{L}"))
-        colorized = string.replace("(D)", D)
-        colorized = colorized.replace("(L)", L)
-        colorized = colorized.replace("(D,L)", DL)
-        return colorized
 
     @staticmethod
     def sort_key(module):
@@ -265,25 +256,35 @@ class Modulepath:
             modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
             modules = self.filter_modules_by_regex(modules, regex)
             if not os.path.isdir(directory):  # pragma: no cover
-                s = colorize("@r{(Directory not readable)}".center(width))
+                s = util.colorize("{red}(Directory not readable){endc}".center(width))
             elif not modules:  # pragma: no cover
                 if regex:
                     continue
-                s = colorize("@r{(None)}".center(width))
+                s = util.colorize("{red}(None){endc}".center(width))
             else:
-                modules = [self.colorize(m.format_dl_status()) for m in modules]
+                names = []
+                for module in modules:
+                    name = module.fullname
+                    stat = []
+                    if module.is_default:
+                        stat.append(util.colorize("{bold}{red}D{endc}"))
+                    if module.is_loaded:
+                        stat.append(util.colorize("{bold}{green}L{endc}"))
+                    if stat:
+                        name += f" ({','.join(stat)})"
+                    names.append(name)
                 aliases = modulecmd.alias.get(directory)
                 if aliases:  # pragma: no cover
                     for (alias, target) in aliases:
-                        i = bisect.bisect_left(modules, alias)
-                        insert_key = colorize("@M{%s}@@" % (alias))
+                        i = bisect.bisect_left(names, alias)
+                        insert_key = util.colorize("{magenta}%s{endc}@" % alias)
                         if long_format:  # pragma: no cover
                             insert_key += " -> %s" % (target)
-                        modules.insert(i, insert_key)
-                s = util.colify(modules, width=width)
+                        names.insert(i, insert_key)
+                s = util.colify(names, width=width)
             directory = directory.replace(os.path.expanduser("~/"), "~/")
             # sio.write(head(directory) + '\n')
-            sio.write(colorize("@G{%s}:\n" % (directory)))
+            sio.write(util.colorize("{green}%s{endc}:\n" % directory))
             sio.write(s + "\n")
         return sio.getvalue()
 

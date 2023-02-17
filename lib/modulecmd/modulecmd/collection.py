@@ -10,10 +10,9 @@ import modulecmd.error
 import modulecmd.names
 import modulecmd.paths
 import modulecmd.environ
-from modulecmd.util import singleton, terminal_size, colify
+from modulecmd.util import singleton, terminal_size, colify, colorize
 
 import llnl.util.tty as tty
-from llnl.util.tty.color import colorize
 
 
 class Collections:
@@ -141,7 +140,7 @@ class Collections:
             s = colify(names, width=width)
             # sio.write('{0}\n{1}\n'
             #          .format(' Saved collections '.center(width, '-'), s))
-            sio.write(colorize("@G{Saved collections}:\n%s\n" % (s)))
+            sio.write(colorize("{green}Saved collections{endc}:\n%s\n" % (s)))
         else:
             sio.write("\n".join(c for c in names))
         string = sio.getvalue()

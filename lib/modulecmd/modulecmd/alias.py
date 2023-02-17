@@ -4,9 +4,7 @@ from six import StringIO
 
 import modulecmd.names
 import modulecmd.paths
-from modulecmd.util import singleton, terminal_size, colify
-
-from llnl.util.tty.color import colorize
+from modulecmd.util import singleton, terminal_size, colify, colorize
 
 
 class Aliases(object):
@@ -75,7 +73,7 @@ class Aliases(object):
         fun = lambda key: "{0} -> {1} ({2})".format(
             key,
             self.data[key]["target"],
-            colorize("@C{%s}" % self.data[key]["modulepath"]),
+            colorize("{cyan}%s{endc}" % self.data[key]["modulepath"]),
         )
         names = [fun(_) for _ in keys]
 

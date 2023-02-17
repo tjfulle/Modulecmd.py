@@ -11,7 +11,7 @@ def test_callback_utility_check_output():
 
 def test_callback_utility_colorize():
     colorize = get_callback("colorize")
-    s = "@r{RED}"
+    s = "{red}string{endc}"
     red_s = colorize(None, None, s)
 
 

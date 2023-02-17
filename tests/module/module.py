@@ -38,14 +38,6 @@ def test_module_whatis(basic_python_module):
     m.format_whatis()
 
 
-def test_module_format_dl_status(basic_python_module):
-    m = basic_python_module
-    modulecmd.environ.set(modulecmd.names.loaded_modules, m.fullname)
-    m.format_dl_status()
-    m.is_default = True
-    m.format_dl_status()
-
-
 def test_module_parts(tmpdir):
     d = tmpdir
     parts = list("abcde")

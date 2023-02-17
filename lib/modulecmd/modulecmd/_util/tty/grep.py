@@ -1,12 +1,12 @@
 import re
-from external.llnl.util.tty.color import colorize
+from modulecmd.util import colorize
 
 
-def grep_pat_in_string(string, pat, color="c"):
+def grep_pat_in_string(string, pat, color="cyan"):
     regex = re.compile(pat)
     for line in string.split("\n"):
         for item in line.split():
             if regex.search(item):
-                repl = colorize("@%s{%s}" % (color, item))
+                repl = colorize("{%s}%s{endc}" % (color, item))
                 string = re.sub(re.escape(item), repl, string)
     return string

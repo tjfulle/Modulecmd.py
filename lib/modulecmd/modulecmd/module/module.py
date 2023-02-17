@@ -8,7 +8,6 @@ from modulecmd.module.meta import MetaData
 from modulecmd.module.tcl2py import tcl2py
 from modulecmd.module.version import Version
 
-import modulecmd.xio as xio
 from modulecmd.util import textfill, terminal_size
 import llnl.util.tty as tty
 
@@ -181,15 +180,6 @@ class Module(object):
         elif not self.variant:
             return os.path.sep.join((self.name, self.version.string))
         return os.path.sep.join((self.name, self.version.string, self.variant.string))
-
-    def format_dl_status(self):
-        if self.is_default and self.is_loaded:
-            return self.fullname + " (D,L)"
-        elif self.is_default:  # pragma: no cover
-            return self.fullname + " (D)"
-        elif self.is_loaded:
-            return self.fullname + " (L)"
-        return self.fullname
 
     def format_whatis(self):
         if not self.whatisstr:  # pragma: no cover

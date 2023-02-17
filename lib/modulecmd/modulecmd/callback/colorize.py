@@ -1,4 +1,4 @@
-import llnl.util.tty.color
+import modulecmd.util
 
 category = "utility"
 
@@ -22,4 +22,4 @@ def colorize(module, mode, string, **kwargs):
     This is a wrapper to `llnl.util.tty.color.colorize`.
 
     """
-    return llnl.util.tty.color.colorize(string, **kwargs)
+    return modulecmd.util.colorize(string, **kwargs)
