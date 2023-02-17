@@ -243,7 +243,9 @@ class Module(object):
 
     def add_option(self, *args, **kwargs):
         if not args:
-            raise TypeError("add_option() missing 1 required positional argument: 'name'")
+            raise TypeError(
+                "add_option() missing 1 required positional argument: 'name'"
+            )
         default = kwargs.pop("default", None)
         help = kwargs.pop("help", None)
         name = max(args, key=len)
@@ -251,8 +253,12 @@ class Module(object):
         type = kwargs.pop("type", str)
         if kwargs:
             kwd = list(kwargs.keys())[0]
-            raise TypeError("add_option() got an unexpected keyword argument {0!r}".format(kwd))
-        opt = ModuleOption(name, dest=dest, default=default, keys=list(args), help=help, type=type)
+            raise TypeError(
+                "add_option() got an unexpected keyword argument {0!r}".format(kwd)
+            )
+        opt = ModuleOption(
+            name, dest=dest, default=default, keys=list(args), help=help, type=type
+        )
         self.registered_options.append(opt)
 
     def parse_opts(self):
@@ -322,7 +328,6 @@ class PyModule(Module):
 
 
 class TclModule(Module):
-
     def read(self, mode):
         if not modulecmd.config.has_tclsh:  # pragma: no cover
             raise TCLSHNotFoundError

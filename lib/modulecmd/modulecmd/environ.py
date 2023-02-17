@@ -39,7 +39,7 @@ class Environ(dict):
             aliases=self.aliases,
             shell_functions=self.shell_functions,
             files_to_source=self.files_to_source,
-            raw_shell_commands=self.raw_shell_commands
+            raw_shell_commands=self.raw_shell_commands,
         )
         if self.destination_dir is not None:
             output += "cd {0};".format(self.destination_dir)

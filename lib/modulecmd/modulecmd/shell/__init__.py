@@ -42,7 +42,7 @@ name = None
 
 
 def set_shell(shell_name):
-    """Set the shell singleton to a specific value. """
+    """Set the shell singleton to a specific value."""
     global _shell, name
     if shell_name != _shell.name:
         _shell = get_shell(shell_name)
@@ -57,14 +57,14 @@ def format_output(
     aliases=None,
     shell_functions=None,
     files_to_source=None,
-    raw_shell_commands=None
+    raw_shell_commands=None,
 ):
     return _shell.format_output(
         environ,
         aliases=aliases,
         shell_functions=shell_functions,
         files_to_source=files_to_source,
-        raw_shell_commands=raw_shell_commands
+        raw_shell_commands=raw_shell_commands,
     )
 
 

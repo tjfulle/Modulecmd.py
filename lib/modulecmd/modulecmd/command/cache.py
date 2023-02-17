@@ -35,7 +35,7 @@ def add_remove_command(parser):
 
 def setup_parser(subparser):
     """Parser is only constructed so that this prints a nice help
-       message with -h. """
+    message with -h."""
     sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="subcommand")
     add_build_command(sp)
     add_remove_command(sp)

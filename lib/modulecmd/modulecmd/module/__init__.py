@@ -36,7 +36,7 @@ def from_dict(dikt):
     filename = dikt["file"]
     root = dikt["modulepath"]
     assert filename.startswith(root)
-    path = filename.replace(root+os.path.sep, "")
+    path = filename.replace(root + os.path.sep, "")
     module_type = {"PyModule": PyModule, "TclModule": TclModule}[dikt["type"]]
     try:
         module = module_type(root, path)

@@ -24,7 +24,7 @@ def fileno(file_or_fd):
 @contextmanager
 def redirect_stdout2(to=sys.stderr, stdout=None):
     """From:  http://stackoverflow.com/questions/4675728/
-                        redirect-stdout-to-a-file-in-python/22434262#22434262
+    redirect-stdout-to-a-file-in-python/22434262#22434262
 
     """
     if stdout is None:

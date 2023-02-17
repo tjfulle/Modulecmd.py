@@ -14,4 +14,3 @@ class Python(Shell):
 
     def format_alias(self, key, val=None):  # pragma: no cover
         return "alias_{0} = {1!r}".format(key, val)
-

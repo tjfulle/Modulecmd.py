@@ -8,7 +8,7 @@ section = "info"
 
 def setup_parser(subparser):
     """Parser is only constructed so that this prints a nice help
-       message with -h. """
+    message with -h."""
     subparser.add_argument(
         "regex", nargs="?", help="Regular expression to highlight in the output"
     )

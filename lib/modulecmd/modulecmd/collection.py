@@ -152,7 +152,7 @@ class Collections:
     def show(self, name):
         """Show the high-level commands executed by
 
-            module show <collection>
+        module show <collection>
         """
         collection = self.get(name)
         if collection is None:  # pragma: no cover

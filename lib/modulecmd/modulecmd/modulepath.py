@@ -527,7 +527,6 @@ def isfilelike(item):
     return os.path.exists(item) and not os.path.isdir(item)
 
 
-
 def get_cached_modules(path):
     if not modulecmd.config.get("use_modulepath_cache"):  # pragma: no cover
         return None

@@ -43,14 +43,19 @@ etc_path = os.path.join(prefix, "etc", "modulecmd")
 
 
 #: User configuration location
-user_config_path = os.getenv("PYMOD_USER_CONFIG_PATH", os.path.expanduser("~/.modulecmd"))
-user_cache_path = os.getenv("PYMOD_USER_CACHE_PATH", os.path.expanduser("~/.modulecmd/cache"))
+user_config_path = os.getenv(
+    "PYMOD_USER_CONFIG_PATH", os.path.expanduser("~/.modulecmd")
+)
+user_cache_path = os.getenv(
+    "PYMOD_USER_CACHE_PATH", os.path.expanduser("~/.modulecmd/cache")
+)
 
 if not os.path.isdir(user_config_path):  # pragma: no cover
     os.makedirs(user_config_path)
 
 if not os.path.isdir(user_cache_path):  # pragma: no cover
     os.makedirs(user_cache_path)
+
 
 def join_user(basename, cache=False):
     if cache:

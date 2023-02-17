@@ -269,7 +269,9 @@ def unarchive_module(ar):
 
 
 def avail(terse=False, regex=None, show_all=False, long_format=False):
-    avail = modulecmd.modulepath.avail(terse=terse, regex=regex, long_format=long_format)
+    avail = modulecmd.modulepath.avail(
+        terse=terse, regex=regex, long_format=long_format
+    )
     if show_all:
         avail += modulecmd.collection.avail(terse=terse, regex=regex)
         avail += modulecmd.clone.avail(terse=terse)

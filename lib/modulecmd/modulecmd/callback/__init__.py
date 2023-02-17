@@ -131,7 +131,8 @@ def callback(func_name, module, mode, when=None, **kwds):
 def callback_impl(func, module, mode, when=None, **kwds):
     if when is None:
         when = (
-            mode != modulecmd.modes.load_partial and mode not in modulecmd.modes.informational
+            mode != modulecmd.modes.load_partial
+            and mode not in modulecmd.modes.informational
         )
     if not when:
         func = lambda *args, **kwargs: None
