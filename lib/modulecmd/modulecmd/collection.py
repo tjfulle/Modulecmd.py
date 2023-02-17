@@ -3,19 +3,18 @@ import re
 import sys
 import json
 from six import StringIO
-from ordereddict_backport import OrderedDict
+from collections import OrderedDict
 
 import modulecmd.system
 import modulecmd.error
 import modulecmd.names
 import modulecmd.paths
 import modulecmd.environ
+from modulecmd.util import singleton, terminal_size
 
 import llnl.util.tty as tty
-from llnl.util.tty import terminal_size
 from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
-from llnl.util.lang import Singleton
 
 
 class Collections:
@@ -139,7 +138,7 @@ class Collections:
 
         sio = StringIO()
         if not terse:
-            _, width = terminal_size()
+            width = terminal_size().columns
             s = colified(names, width=width)
             # sio.write('{0}\n{1}\n'
             #          .format(' Saved collections '.center(width, '-'), s))
@@ -185,7 +184,7 @@ def factory():
     return Collections(filename)
 
 
-collections = Singleton(factory)
+collections = singleton(factory)
 
 
 def save(name, loaded_modules):

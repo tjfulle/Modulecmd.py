@@ -1,7 +1,7 @@
 import os
 import sys
 
-import llnl.util.tty as tty
+import modulecmd.xio as xio
 import modulecmd.alias
 import modulecmd.callback
 import modulecmd.clone
@@ -16,9 +16,9 @@ import modulecmd.names
 import modulecmd.paths
 import modulecmd.shell
 import modulecmd.user
-from llnl.util.filesystem import working_dir
-from llnl.util.lang import Singleton
-from llnl.util.tty import terminal_size
+from modulecmd.util import working_dir, singleton, terminal_size
+
+import llnl.util.tty as tty
 from llnl.util.tty.colify import colified
 from llnl.util.tty.color import colorize
 from modulecmd.error import (
@@ -509,7 +509,7 @@ def module_exec_sandbox(module, mode):
         "IS_DARWIN": "darwin" in sys.platform,
         #
         "add_option": module.add_option,
-        "opts": Singleton(module.parse_opts),
+        "opts": singleton(module.parse_opts),
     }
 
     for fun in modulecmd.callback.all_callbacks():
@@ -654,7 +654,7 @@ def list(terse=False, show_command=False, regex=None):
         loaded = [
             "{0}) {1}".format(i + 1, m) for (i, m) in enumerate(loaded_module_names)
         ]
-        _, width = terminal_size()
+        width = terminal_size().columns
         sio.write(colified(loaded, indent=4, width=max(100, width)))
 
     s = sio.getvalue()

@@ -22,8 +22,8 @@ def test_util_lang_which(tmpdir):
     with working_dir(tmpdir.strpath):
         touch("spam")
         out = subprocess.check_output("chmod +x spam".split())
-        assert filesystem.which("spam") == "spam"
-    ls = filesystem.which("ls")
+        assert which("spam") == "spam"
+    ls = which("ls")
     assert ls in ("/bin/ls", "/usr/bin/ls")
 
 

@@ -9,7 +9,7 @@ from modulecmd.module.tcl2py import tcl2py
 from modulecmd.module.version import Version
 
 import modulecmd.xio as xio
-from modulecmd.util import textfill
+from modulecmd.util import textfill, terminal_size
 import llnl.util.tty as tty
 
 __all__ = ["Namespace", "Module", "PyModule", "TclModule"]
@@ -197,7 +197,7 @@ class Module(object):
                 self.fullname
             )
         sio = StringIO()
-        width = xio.terminal_size().columns
+        width = terminal_size().columns
         rule = "=" * width
         head = "{0}".format((" " + self.name + " ").center(width, "="))
         text_width = min(width, 80)
@@ -227,7 +227,7 @@ class Module(object):
             return "{0}: no help string provided".format(self.fullname)
 
         sio = StringIO()
-        width = xio.terminal_size().columns
+        width = terminal_size().columns
         rule = "=" * width
         head = "{0}".format((" " + self.name + " ").center(width, "="))
         sio.write(head + "\n")

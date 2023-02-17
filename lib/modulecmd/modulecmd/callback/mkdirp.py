@@ -1,4 +1,4 @@
-import llnl.util.filesystem
+import modulecmd.util
 
 category = "utility"
 
@@ -19,4 +19,4 @@ def mkdirp(module, mode, *paths, **kwargs):
     This is a wrapper to `llnl.util.filesystem.mkdirp`.
 
     """
-    return llnl.util.filesystem.mkdirp(*paths, **kwargs)
+    return modulecmd.util.mkdirp(*paths, **kwargs)

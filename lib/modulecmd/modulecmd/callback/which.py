@@ -18,4 +18,4 @@ def which(module, mode, exename):
     This is a wrapper to `contib.util.which`.
 
     """
-    return modulecmd.util.filesystem.which(exename)
+    return modulecmd.util.which(exename)

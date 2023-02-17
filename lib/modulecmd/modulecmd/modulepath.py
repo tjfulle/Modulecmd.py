@@ -9,13 +9,11 @@ from collections import OrderedDict as ordered_dict
 import modulecmd.alias
 import modulecmd.names
 import modulecmd.module
-from modulecmd.util import join, split, groupby
+from modulecmd.util import join, split, groupby, working_dir, singleton, terminal_size
 
 import llnl.util.tty as tty
-from llnl.util.lang import Singleton
 from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
-from llnl.util.filesystem import working_dir
 
 
 def expand_name(dirname):
@@ -262,7 +260,7 @@ class Modulepath:
     def avail_full(self, regex=None, long_format=False):
         sio = StringIO()
         sio.write("\n")
-        _, width = tty.terminal_size()
+        width = terminal_size().columns
         # head = lambda x: (" " + x + " ").center(width, "-")
         for (directory, modules) in self.path.items():
             modules = sorted([m for m in modules if m.is_enabled], key=self.sort_key)
@@ -556,7 +554,7 @@ def factory():  # pragma: no cover
     return Modulepath(path)
 
 
-_path = Singleton(factory)
+_path = singleton(factory)
 
 
 def path():

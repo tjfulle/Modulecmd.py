@@ -5,12 +5,12 @@ import argparse
 import pytest
 from six import StringIO
 
-from llnl.util.filesystem import working_dir
 from llnl.util.tty.colify import colify
 from modulecmd._util.tty import redirect_stdout2 as redirect_stdout
 
 import modulecmd.paths
 import modulecmd.modulepath
+from modulecmd.util import working_dir
 
 description = "run modulecmd's unit tests"
 section = "developer"

@@ -2,6 +2,7 @@ import os
 
 category = "utility"
 
+
 def _listdir(dirname, key=None):
     items = os.listdir(dirname)
     if key is None:

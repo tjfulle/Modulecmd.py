@@ -1,4 +1,4 @@
-import llnl.util.filesystem
+import modulecmd.util
 
 category = "utility"
 
@@ -16,4 +16,4 @@ def symlink(module, mode, src, dst):
     This is a wrapper to `llnl.util.filesystem.force_symlink`.
 
     """
-    return llnl.util.filesystem.force_symlink(src, dst)
+    return modulecmd.util.force_symlink(src, dst)

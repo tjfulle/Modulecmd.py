@@ -1,6 +1,4 @@
-import os
-import shutil
-import llnl.util.filesystem
+import modulecmd.util
 
 category = "utility"
 
@@ -18,7 +16,4 @@ def rm(module, mode, *paths):
 
     """
     for path in paths:
-        if os.path.isdir(path):
-            shutil.rmtree(path)
-        else:
-            llnl.util.filesystem.force_remove(path)
+        modulecmd.util.force_remove(path)

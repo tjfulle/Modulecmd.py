@@ -4,9 +4,8 @@ from six import StringIO
 
 import modulecmd.names
 import modulecmd.paths
+from modulecmd.util import singleton, terminal_size
 
-from llnl.util.lang import Singleton
-from llnl.util.tty import terminal_size
 from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
 
@@ -83,7 +82,7 @@ class Aliases(object):
 
         sio = StringIO()
         if not terse:
-            _, width = terminal_size()
+            width = terminal_size().columns
             s = colified(names, width=width)
             sio.write("{0}\n{1}\n".format(" Aliases ".center(width, "-"), s))
         else:
@@ -98,7 +97,7 @@ def factory():
     return Aliases(filename)
 
 
-aliases = Singleton(factory)
+aliases = singleton(factory)
 
 
 def save(target, alias_name):
