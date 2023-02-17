@@ -1,9 +1,7 @@
 import os
 
 import modulecmd.names
-from modulecmd.modulepath.path import Path
-from modulecmd.modulepath.modulepath import Modulepath
-from modulecmd.modulepath.discover import find_modules
+from modulecmd.modulepath.modulepath import *
 
 from modulecmd.util.lang import split
 from llnl.util.lang import Singleton

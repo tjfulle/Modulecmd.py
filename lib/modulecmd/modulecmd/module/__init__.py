@@ -7,24 +7,16 @@ import llnl.util.tty as tty
 
 
 def factory(root, path):
-    filename = os.path.join(root, path)
-    if not os.path.isfile(filename):  # pragma: no cover
-        tty.verbose("{0} does not exist".format(filename))
+    file = os.path.join(root, path)
+    if not ismodule(file):
         return None
-    elif filename.endswith(("~",)) or filename.startswith((".#",)):  # pragma: no cover
-        # Don't read backup files
-        return None
-
-    if filename.endswith(".py"):
-        module_type = PyModule
-    elif is_tcl_module(filename):
+    if is_tcl_module(file):
         module_type = TclModule
-    else:
-        return None
-
+    elif file.endswith(".py"):
+        module_type = PyModule
     module = module_type(root, path)
     if modulecmd.config.get("debug"):  # pragma: no cover
-        if module_type == TclModule and "gcc" in filename:
+        if module_type == TclModule and "gcc" in file:
             tty.debug(module.name)
             tty.debug(module.modulepath)
             tty.debug(module.filename, "\n")
@@ -60,3 +52,18 @@ def is_tcl_module(filename):
         return open(filename).readline().startswith(tcl_header)
     except (IOError, UnicodeDecodeError):  # pragma: no cover
         return False
+
+
+def ishidden(file: str) -> bool:
+    return os.path.basename(file).startswith(".")
+
+
+def ismodule(file: str) -> bool:
+    if file.endswith(("~",)) or file.startswith((".#",)):  # pragma: no cover
+        # Don't read backup files
+        return False
+    if file.endswith(".py"):
+        return True
+    elif is_tcl_module(file):
+        return True
+    return False

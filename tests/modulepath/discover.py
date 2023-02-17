@@ -4,18 +4,18 @@ import modulecmd.modulepath
 
 
 def test_modulepath_discover_root(mock_modulepath):
-    assert modulecmd.modulepath.discover.find_modules("/") is None
+    assert modulecmd.modulepath.find_modules("/") is None
     p = mock_modulepath("/")
     assert not p.path
-    assert modulecmd.modulepath.discover.find_modules("fake") is None
+    assert modulecmd.modulepath.find_modules("fake") is None
 
 
 def test_modulepath_discover_noexist():
-    assert modulecmd.modulepath.discover.find_modules("a fake dir") is None
+    assert modulecmd.modulepath.find_modules("a fake dir") is None
 
 
 def test_modulepath_discover_nomodules(tmpdir):
-    assert modulecmd.modulepath.discover.find_modules(tmpdir.strpath) is None
+    assert modulecmd.modulepath.find_modules(tmpdir.strpath) is None
 
 
 def test_modulepath_discover_bad_marked_default(tmpdir):
@@ -24,7 +24,7 @@ def test_modulepath_discover_bad_marked_default(tmpdir):
     tmpdir.join("a.py").write("")
     tmpdir.join("b.py").write("")
     os.symlink(tmpdir.join("b.py").strpath, os.path.join(tmpdir.strpath, "default"))
-    modules = modulecmd.modulepath.discover.find_modules(tmpdir.strpath)
+    modules = modulecmd.modulepath.find_modules(tmpdir.strpath)
     assert len(modules) == 2
     names = sorted([x.name for x in modules])
     assert names == ["a", "b"]
@@ -38,7 +38,7 @@ def test_modulepath_discover_nvv(tmpdir):
     one = a.mkdir("1")
     one.join("1.0.py").write("")
     one.join("2.0.py").write("")
-    modules = modulecmd.modulepath.discover.find_modules(tmpdir.strpath)
+    modules = modulecmd.modulepath.find_modules(tmpdir.strpath)
     assert len(modules) == 4
     x = sorted([(_.name, _.version.string, _.variant.string) for _ in modules])
     print(x)
@@ -51,7 +51,7 @@ def test_modulepath_discover_bad_linked_default(tmpdir):
     a.join("2.0.py").write("")
     a.join("default").write("")
     assert (
-        modulecmd.modulepath.discover.pop_linked_default(
+        modulecmd.modulepath.pop_linked_default(
             a.strpath, ["1.0.py", "2.0.py", "default"]
         )
         is None
@@ -65,7 +65,7 @@ def test_modulepath_discover_bad_linked_default(tmpdir):
     )
     assert linked_real_dirname == os.path.realpath(tmpdir.strpath)
     assert (
-        modulecmd.modulepath.discover.pop_linked_default(
+        modulecmd.modulepath.pop_linked_default(
             a.strpath, ["1.0.py", "2.0.py", "default"]
         )
         is None
@@ -76,7 +76,7 @@ def test_modulepath_discover_bad_versioned_default(tmpdir):
     a = tmpdir.mkdir("a")
     a.join(".version").write("")
     assert (
-        modulecmd.modulepath.discover.pop_versioned_default(a.strpath, [".version"]) is None
+        modulecmd.modulepath.pop_versioned_default(a.strpath, [".version"]) is None
     )
 
 
@@ -84,10 +84,10 @@ def test_modulepath_discover_versioned_default(tmpdir):
     a = tmpdir.mkdir("a")
     a.join(".version").write('set ModulesVersion "1.0"')
     assert (
-        modulecmd.modulepath.discover.pop_versioned_default(a.strpath, [".version"]) is None
+        modulecmd.modulepath.pop_versioned_default(a.strpath, [".version"]) is None
     )
 
     a.join("1.0").write("")
-    assert modulecmd.modulepath.discover.pop_versioned_default(
+    assert modulecmd.modulepath.pop_versioned_default(
         a.strpath, ["1.0", ".version"]
     ) == os.path.join(a.strpath, "1.0")

@@ -92,7 +92,7 @@ class Cache:
 
         # Build the modulepath cache
         for path in modulecmd.modulepath.path():
-            modulecmd.modulepath.Path(path)
+            modulecmd.modulepath.find_modules(path)
         self.write()
 
 
