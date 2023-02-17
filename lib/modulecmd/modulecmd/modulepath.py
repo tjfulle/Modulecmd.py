@@ -5,14 +5,15 @@ from io import StringIO
 from string import Template
 from collections import OrderedDict as ordered_dict
 
+
 import modulecmd.alias
 import modulecmd.names
 import modulecmd.module
-
-from modulecmd.util.lang import join
+from modulecmd.util.lang import join, split
 from modulecmd.util.itertools import groupby
 
 import llnl.util.tty as tty
+from llnl.util.lang import Singleton
 from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
 
@@ -549,3 +550,56 @@ def cache_modules(path, modules):
     section = modulecmd.names.modulepath
     data = [modulecmd.module.as_dict(m) for m in modules]
     modulecmd.cache.set(section, path, data)
+
+
+def factory():  # pragma: no cover
+    path = split(os.getenv(modulecmd.names.modulepath), os.pathsep)
+    return Modulepath(path)
+
+
+_path = Singleton(factory)
+
+
+def path():
+    return list(_path.path.keys())
+
+
+def set_path(other_path):
+    global _path
+    _path = other_path
+
+
+def get(key, use_file_modulepath=False):
+    return _path.get(key, use_file_modulepath=use_file_modulepath)
+
+
+def append_path(dirname):
+    return _path.append_path(dirname)
+
+
+def remove_path(dirname):
+    return _path.remove_path(dirname)
+
+
+def prepend_path(dirname):
+    return _path.prepend_path(dirname)
+
+
+def avail(**kwargs):
+    return _path.avail(**kwargs)
+
+
+def candidates(name):
+    return _path.candidates(name)
+
+
+def contains(path):
+    return path in _path
+
+
+def size():
+    return _path.size()
+
+
+def clear():
+    return _path.clear()
