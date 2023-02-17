@@ -5,7 +5,6 @@ import time
 import atexit
 import random
 from llnl.util.lang import Singleton
-from modulecmd.util.lang import get_processes
 
 import modulecmd.paths
 import modulecmd.names
@@ -45,7 +44,7 @@ class Session:
 def clean():
     # Remove session files more than 7 days old
     now = time.time()
-    dirname = session.savedir
+    # dirname = session.savedir
     for filename in glob.glob(os.path.join(session.savedir, "*.json")):
         modified_time = os.stat(filename).st_mtime
         if modified_time < now - 7 * 24 * 60 * 60:

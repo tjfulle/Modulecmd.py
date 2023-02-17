@@ -16,6 +16,7 @@ import llnl.util.tty as tty
 from llnl.util.lang import Singleton
 from llnl.util.tty.color import colorize
 from llnl.util.tty.colify import colified
+from llnl.util.filesystem import working_dir
 
 
 def expand_name(dirname):
