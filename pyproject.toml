@@ -6,6 +6,8 @@ exclude = '''
     __pycache__
   | \.cache
   | \.git
-  | ^/lib/pymod/external
+  | ^/modulecmd/third_party
+    ^/tests
+    ^/scripts
 )
 '''
