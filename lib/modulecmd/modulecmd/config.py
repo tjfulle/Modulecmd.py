@@ -15,7 +15,6 @@ default_settings = {
     "stop_on_error": True,
     "resolve_conflicts": False,
     "allow_duplicate_path_entries": False,
-    "editor": "vi",
     "load_after_purge": [],
     "skip_add_devpack": False,
     "color": "auto",
