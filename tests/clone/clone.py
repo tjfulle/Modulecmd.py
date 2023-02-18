@@ -25,9 +25,6 @@ def test_clone_named(tmpdir, mock_modulepath):
     x = modulecmd.clone.get("foo")
     assert x is not None
 
-    s = modulecmd.clone.avail().split("\n")[1].strip()
-    assert s == "foo"
-
     modulecmd.system.purge()
     modulecmd.system.restore_clone("foo")
     for x in "abcd":

@@ -188,7 +188,7 @@ def grep_pat_in_string(string: str, pat: str, color: str = "cyan") -> str:
     for line in string.split("\n"):
         for item in line.split():
             if regex.search(item):
-                repl = xio.colorize("{%s}%s{endc}" % (color, item))
+                repl = colorize("{%s}%s{endc}" % (color, item))
                 string = re.sub(re.escape(item), repl, string)
     return string
 

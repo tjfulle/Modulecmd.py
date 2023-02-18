@@ -118,33 +118,6 @@ class Collections:
         self.write(self.data, self.filename)
         return None
 
-    def filter_collections_by_regex(self, collections, regex):
-        if regex:
-            collections = [c for c in collections if re.search(regex, c)]
-        return collections
-
-    def avail(self, terse=False, regex=None):
-        skip = (modulecmd.names.default_user_collection,)
-        names = sorted([x for x in self.data if x not in skip])
-
-        if regex:
-            names = self.filter_collections_by_regex(names, regex)
-
-        if not names:  # pragma: no cover
-            return ""
-
-        sio = StringIO()
-        if not terse:
-            width = terminal_size().columns
-            s = colify(names, width=width)
-            # sio.write('{0}\n{1}\n'
-            #          .format(' Saved collections '.center(width, '-'), s))
-            sio.write(colorize("{green}Saved collections{endc}:\n%s\n" % (s)))
-        else:
-            sio.write("\n".join(c for c in names))
-        string = sio.getvalue()
-        return string
-
     def show(self, name):
         """Show the high-level commands executed by
 
@@ -204,10 +177,6 @@ def get(name):
     return collections.get(name)
 
 
-def avail(terse=False, regex=None):
-    return collections.avail(terse=terse, regex=regex)
-
-
 def show(name):
     return collections.show(name)
 
@@ -218,3 +187,8 @@ def contains(name):
 
 def version():
     return Collections.version
+
+
+def items():
+    for item in collections.data.items():
+        yield item

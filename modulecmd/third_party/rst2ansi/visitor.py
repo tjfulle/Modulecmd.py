@@ -30,18 +30,17 @@ from docutils.parsers.rst import roles
 
 from .ansi import ANSITranslator
 
+
 class Writer(writers.Writer):
+    def __init__(self, **options):
+        writers.Writer.__init__(self)
+        self.translator_class = ANSITranslator
+        self.options = options
 
-  def __init__(self, **options):
-    writers.Writer.__init__(self)
-    self.translator_class = ANSITranslator
-    self.options = options
+    def translate(self):
+        visitor = self.translator_class(self.document, **self.options)
+        self.document.walkabout(visitor)
+        self.output = visitor.output
 
-  def translate(self):
-    visitor = self.translator_class(self.document, **self.options)
-    self.document.walkabout(visitor)
-    self.output = visitor.output
-
-  def get_transforms(self):
-    return writers.Writer.get_transforms(self) + [writer_aux.Admonitions]
-
+    def get_transforms(self):
+        return writers.Writer.get_transforms(self) + [writer_aux.Admonitions]

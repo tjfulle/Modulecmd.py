@@ -34,23 +34,28 @@ from .ansi import COLORS, STYLES
 
 def decode_str(input_string):
     try:
-        return input_string.decode('utf-8')
+        return input_string.decode("utf-8")
     except AttributeError:
         return input_string
 
-def rst2ansi(input_string, output_encoding='utf-8'):
 
-  overrides = {}
-  overrides['input_encoding'] = 'unicode'
+def rst2ansi(input_string, output_encoding="utf-8"):
 
-  def style_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
-    return [nodes.TextElement(rawtext, text, classes=[name])], []
+    overrides = {}
+    overrides["input_encoding"] = "unicode"
 
-  for color in COLORS:
-    roles.register_local_role('ansi-fg-' + color, style_role)
-    roles.register_local_role('ansi-bg-' + color, style_role)
-  for style in STYLES:
-    roles.register_local_role('ansi-' + style, style_role)
+    def style_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
+        return [nodes.TextElement(rawtext, text, classes=[name])], []
 
-  out = core.publish_string(decode_str(input_string), settings_overrides=overrides, writer=Writer(unicode=output_encoding.startswith('utf')))
-  return out.decode(output_encoding)
+    for color in COLORS:
+        roles.register_local_role("ansi-fg-" + color, style_role)
+        roles.register_local_role("ansi-bg-" + color, style_role)
+    for style in STYLES:
+        roles.register_local_role("ansi-" + style, style_role)
+
+    out = core.publish_string(
+        decode_str(input_string),
+        settings_overrides=overrides,
+        writer=Writer(unicode=output_encoding.startswith("utf")),
+    )
+    return out.decode(output_encoding)

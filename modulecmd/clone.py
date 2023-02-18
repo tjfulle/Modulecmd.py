@@ -42,19 +42,6 @@ class Clones(object):
         self.data.pop(name, None)
         self.write(self.data, self.filename)
 
-    def avail(self, terse=False):
-        names = sorted([x for x in self.data.keys()])
-        if not names:  # pragma: no cover
-            return ""
-        sio = StringIO()
-        if not terse:
-            width = terminal_size().columns
-            s = colify(names, width=width)
-            sio.write("{0}\n{1}\n".format(" Saved clones ".center(width, "-"), s))
-        else:
-            sio.write("\n".join(c for c in names))
-        return sio.getvalue()
-
 
 def factory():
     basename = modulecmd.names.clones_file_basename
@@ -79,3 +66,8 @@ def avail(terse=False):
 
 def get(name):
     return clones.get(name)
+
+
+def items():
+    for item in clones.data.items():
+        yield item

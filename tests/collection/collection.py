@@ -47,9 +47,6 @@ def test_collection_default(modules, mock_modulepath):
     coll = x[0][1]
     assert coll[0]["fullname"] == "a"
     assert coll[1]["fullname"] == "b"
-    s = modulecmd.collection.avail()
-    # None show up available since the default does not show avail
-    assert not s.split()
 
 
 def test_collection_named(modules, mock_modulepath):
@@ -80,9 +77,6 @@ def test_collection_named(modules, mock_modulepath):
     coll = x[1][1]
     assert coll[0]["fullname"] == "c"
     assert coll[1]["fullname"] == "d"
-
-    s = modulecmd.collection.avail().split("\n")[1].strip()
-    assert s == "foo"
 
     s = modulecmd.collection.show("foo")
 

@@ -266,16 +266,6 @@ def unarchive_module(ar):
     return module
 
 
-def avail(terse=False, regex=None, show_all=False, long_format=False):
-    avail = modulecmd.modulepath.avail(
-        terse=terse, regex=regex, long_format=long_format
-    )
-    if show_all:
-        avail += modulecmd.collection.avail(terse=terse, regex=regex)
-        avail += modulecmd.clone.avail(terse=terse)
-    return avail
-
-
 def save_clone(name):
     return modulecmd.clone.save(name)
 
@@ -424,10 +414,6 @@ def more(name):
     pager(get_entity_text(name))
 
 
-def cat(name):
-    pager(get_entity_text(name), plain=True)
-
-
 def format_output():  # pragma: no cover
     """Format the final output for the shell to be evaluated"""
     output = modulecmd.environ.format_output()
@@ -563,17 +549,6 @@ def family(module, mode, family_name):
         modulecmd.environ.set(ver_key, ver)
 
 
-def find(names):
-    for name in names:
-        s = None
-        candidates = modulecmd.modulepath.candidates(name)
-        if not candidates:
-            raise ModuleNotFoundError(name)
-        for module in candidates:
-            s = "{bold}%s{endc}\n  {cyan}%s{endc}}" % (module.fullname, module.filename)
-            sys.stderr.write(colorize(s) + "\n")
-
-
 def help(modulename):
     """Display 'help' message for the module given by `modulename`"""
     module = modulecmd.modulepath.get(modulename)
@@ -581,41 +556,6 @@ def help(modulename):
         raise ModuleNotFoundError(modulename, mp=modulecmd.modulepath)
     load_partial(module, mode=modulecmd.modes.help)
     return module.format_help()
-
-
-def info(names):
-    for name in names:
-        modules = modulecmd.modulepath.candidates(name)
-        if not modules:
-            raise ModuleNotFoundError(name)
-
-        for module in modules:
-            s = "{blue}Module:{endc} {bold}%s{endc}\n" % module.fullname
-            s += "  {cyan}Name:{endc}         %s\n" % module.name
-
-            if module.version:  # pragma: no cover
-                s += "  {cyan}Version:{endc}      %s\n" % module.version
-
-            if module.family:  # pragma: no cover
-                s += "  {cyan}Family:{endc}      %s\n" % module.family
-
-            s += "  {cyan}Loaded:{endc}       %s\n" % module.is_loaded
-            s += "  {cyan}Filename:{endc}     %s\n" % module.filename
-            s += "  {cyan}Modulepath:{endc}   %s" % module.modulepath
-
-            unlocked_by = module.unlocked_by()
-            if unlocked_by:  # pragma: no cover
-                s += "  {cyan}Unlocked by:  %s\n"
-                for m in unlocked_by:
-                    s += "                    %s\n" % m.fullname
-
-            unlocks = module.unlocks()
-            if unlocks:  # pragma: no cover
-                s += "  {cyan}Unlocks:{endc}      %s\n"
-                for dirname in unlocks:
-                    s += "                    %s\n" % dirname
-
-            sys.stderr.write(colorize(s) + "\n")
 
 
 def init(dirnames):
@@ -628,40 +568,6 @@ def init(dirnames):
         use(dirname, append=True)
     modulecmd.environ.set(modulecmd.names.initial_env, initial_env, serialize=True)
     return
-
-
-def list(terse=False, show_command=False, regex=None):
-    Namespace = modulecmd.module.Namespace
-    if not state.loaded_modules:
-        return "No loaded modules\n"
-
-    sio = StringIO()
-    loaded_module_names = []
-    for loaded in state.loaded_modules:
-        fullname = loaded.fullname
-        if loaded.opts:
-            fullname += " " + Namespace(**(loaded.opts)).joined(" ")
-        loaded_module_names.append(fullname)
-
-    if terse:
-        sio.write("\n".join(loaded_module_names))
-    elif show_command:
-        for module in loaded_module_names:
-            sio.write("module load {0}\n".format(module))
-    else:
-        sio.write("Currently loaded modules\n")
-        loaded = [
-            "{0}) {1}".format(i + 1, m) for (i, m) in enumerate(loaded_module_names)
-        ]
-        width = terminal_size().columns
-        output = colify(loaded, indent=4, width=max(100, width))
-        sio.write(output + "\n")
-
-    s = sio.getvalue()
-    if regex:
-        s = grep_pat_in_string(s, regex, color="G")
-
-    return s
 
 
 def load(name, opts=None, insert_at=None, caller="command_line"):
@@ -919,37 +825,6 @@ def reset():
     initial_env = modulecmd.environ.get(modulecmd.names.initial_env, serialized=True)
     restore_clone_impl(initial_env)
     return initial_env
-
-
-def show(name, opts=None, insert_at=None, mode="load"):
-    """Show the commands that would result from loading module given by `name`
-
-    Parameters
-    ----------
-    name : string_like
-        Module name, full name, or file path
-    insert_at : int
-        Load the module as the `insert_at`th module.
-
-    Raises
-    ------
-    ModuleNotFoundError
-
-    """
-    # Execute the module
-    module = modulecmd.modulepath.get(name)
-    if module is None:
-        raise ModuleNotFoundError(name, mp=modulecmd.modulepath)
-
-    # Set the command line options
-    if opts:
-        module.opts = opts
-
-    # Now execute it
-    execmodule(module, modulecmd.modes.show)
-
-    # and show it
-    sys.stderr.write(state.cur_module_command_his.getvalue())
 
 
 def source(filename, *args):

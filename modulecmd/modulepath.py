@@ -7,6 +7,7 @@ from collections import OrderedDict as ordered_dict
 
 
 import modulecmd.xio as xio
+import modulecmd.cache
 import modulecmd.alias
 import modulecmd.names
 import modulecmd.module
@@ -558,6 +559,11 @@ _path = util.singleton(factory)
 
 def path():
     return list(_path.path.keys())
+
+
+def items():
+    for item in _path.path.items():
+        yield item
 
 
 def set_path(other_path):
