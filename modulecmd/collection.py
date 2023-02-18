@@ -11,7 +11,7 @@ import modulecmd.error
 import modulecmd.names
 import modulecmd.paths
 import modulecmd.environ
-from modulecmd.util import singleton
+from modulecmd.util import singleton, terminal_size, colify, colorize
 
 
 class Collections:
@@ -147,6 +147,24 @@ class Collections:
 
         return sio.getvalue()
 
+    def format_avail(self, terse=False, regex=None, file=None):
+        fown = file is None
+        file = file or StringIO()
+        skip = (modulecmd.names.default_user_collection,)
+        names = sorted([_[0] for _ in self.data.items() if _[0] not in skip])
+        if regex:
+            names = [c for c in names if re.search(regex, c)]
+        if not names:  # pragma: no cover
+            return
+        if not terse:
+            width = terminal_size().columns
+            s = colify(names, width=width)
+            file.write(colorize("{green}Saved collections{endc}:\n%s\n" % (s)))
+        else:
+            file.write("\n".join(c for c in names) + "\n")
+        if fown:
+            return file.getvalue()
+
 
 def factory():
     basename = modulecmd.names.collections_file_basename
@@ -192,3 +210,7 @@ def version():
 def items():
     for item in collections.data.items():
         yield item
+
+
+def format_avail(terse=False, file=None):
+    return collections.format_avail(terse=terse, file=file)

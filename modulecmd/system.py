@@ -1,6 +1,8 @@
 import os
 import sys
 from io import StringIO
+from typing import TextIO
+from contextlib import contextmanager
 
 import modulecmd.xio as xio
 import modulecmd.alias
@@ -16,7 +18,7 @@ import modulecmd.modulepath
 import modulecmd.names
 import modulecmd.paths
 import modulecmd.user
-from modulecmd.util import working_dir, singleton, terminal_size, colify, colorize
+from modulecmd.util import working_dir, singleton, colorize
 
 from modulecmd.error import (
     FamilyLoadedError,
@@ -26,11 +28,18 @@ from modulecmd.error import (
     ModuleNotLoadedError,
     PrereqMissingError,
 )
-from modulecmd.xio import pager
-from modulecmd.util import split, grep_pat_in_string
+from modulecmd.util import split
 
 
 builtin_list = list
+
+
+@contextmanager
+def marked_for_deletion(fun):
+    def inner(*args, **kwargs):
+        return fun(*args, **kwargs)
+
+    return inner
 
 
 class system_state:
@@ -401,25 +410,21 @@ def conflict(module, *conflicting):
                 raise ModuleConflictError(other, module.name)
 
 
-def get_entity_text(name):
-    module = modulecmd.modulepath.get(name)
-    if module is not None:
-        return open(module.filename).read()
-    elif modulecmd.collection.contains(name):
-        return str(modulecmd.collection.get(name))
-    raise modulecmd.error.EntityNotFoundError(name)
+def print_changes(file: TextIO = None) -> None:
+    file = file or sys.stdout
+    output = state.format_changes()
+    if output.split():
+        file.write(colorize(output) + "\n")
 
 
-def more(name):
-    pager(get_entity_text(name))
-
-
+@marked_for_deletion
 def format_output():  # pragma: no cover
     """Format the final output for the shell to be evaluated"""
     output = modulecmd.environ.format_output()
     return output
 
 
+@marked_for_deletion
 def dump(stream=None):  # pragma: no cover
     """Dump the final results to the shell to be evaluated"""
     output = format_output()

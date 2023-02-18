@@ -392,3 +392,33 @@ def source_file(filename, *args):
 
 def raw_shell_command(command):
     environ.raw_shell_command(command)
+
+
+def variables():
+    env = environ.copy()
+    for item in env.items():
+        yield item
+
+
+def aliases():
+    for item in environ.aliases.items():
+        yield item
+
+
+def shell_functions():
+    for item in environ.shell_functions.items():
+        yield item
+
+
+def files_to_source():
+    for file in environ.files_to_source:
+        yield file
+
+
+def raw_shell_commands():
+    for command in environ.raw_shell_commands:
+        yield command
+
+
+def destination_dir():
+    return environ.destination_dir

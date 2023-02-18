@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import argparse
+from io import StringIO
 
 import modulecmd.module
 import modulecmd.tutorial
@@ -10,7 +11,7 @@ import modulecmd.util as util
 import modulecmd.config as config
 import modulecmd.system as system
 import modulecmd.modulepath as modulepath
-from modulecmd._shell import set_shell
+import modulecmd._shell as shell
 from modulecmd.error import ModuleNotFoundError
 
 
@@ -54,12 +55,13 @@ def print_loaded_modules(terse=False, show_command=False, regex=None) -> None:
 
 def print_available_modules(terse: bool = False, showall=False, regex=None) -> None:
     xio.trace("Showing avail,able modules")
+    file = StringIO()
     for (path, modules) in modulepath.items():
         if terse:
             names = [m.fullname for m in modules]
-            xio.print(f"{path}:")
+            file.write(f"{path}:\n")
             for name in names:
-                xio.print(name)
+                file.write(name + "\n")
         else:
             names = []
             for module in modules:
@@ -74,47 +76,14 @@ def print_available_modules(terse: bool = False, showall=False, regex=None) -> N
                 names.append(name)
             path = path.replace(os.path.expanduser("~"), "~")
             output = util.colify(names)
-            xio.cprint("{bold}{green}%s{endc}:" % path)
+            xio.cprint("{bold}{green}%s{endc}:" % path, file=file)
             if not output.split():
                 width = util.terminal_size().columns
                 output = util.colorize("{red}(None){endc}").center(width)
-            xio.print(f"{output}\n")
+            file.write(f"{output}\n")
     if showall:
-        print_available_collections(terse=terse, regex=regex)
-        print_clones(terse=terse)
-
-
-def print_available_collections(terse=False, regex=None):
-    skip = (modulecmd.names.default_user_collection,)
-    names = sorted([_[0] for _ in modulecmd.collection.items() if _[0] not in skip])
-
-    if regex:
-        names = [c for c in names if re.search(regex, c)]
-
-        if not names:  # pragma: no cover
-            return
-
-        if not terse:
-            width = util.terminal_size().columns
-            s = util.colify(names, width=width)
-            # sio.write('{0}\n{1}\n'
-            #          .format(' Saved collections '.center(width, '-'), s))
-            xio.print(util.colorize("{green}Saved collections{endc}:\n%s" % (s)))
-        else:
-            xio.print("\n".join(c for c in names))
-
-
-def print_clones(terse=False):
-    names = sorted([x for x in modulecmd.clone.items()])
-    if not names:  # pragma: no cover
-        return
-    if not terse:
-        width = util.terminal_size().columns
-        s = util.colify(names, width=width)
-        xio.print("{0}\n{1}\n".format(" Saved clones ".center(width, "-"), s))
-    else:
-        xio.print("\n".join(c for c in names))
-    return
+        modulecmd.collection.format(terse=terse, regex=regex, file=file)
+        modulecmd.clone.format_avail(file=file)
 
 
 def print_module_contents(name, plain_pager=True):
@@ -147,13 +116,6 @@ def show_module_side_effects(*names, insert_at=None):
             module.opts = group.args
         modulecmd.system.execmodule(module, modulecmd.modes.show)
         xio.print(modulecmd.system.state.cur_module_command_his.getvalue())
-
-
-def load_modules(*names, insert_at=None):
-    groups = group_module_options(names)
-    for (i, group) in enumerate(groups):
-        insert_at = insert_at if i == 0 else None
-        modulecmd.system.load(group.name, opts=group.args, insert_at=insert_at)
 
 
 def print_module_info(names):
@@ -238,6 +200,15 @@ def print_module_help(name):
     modulecmd.system.load_partial(module, mode=modulecmd.modes.help)
     s = module.format_help()
     xio.print(s)
+
+
+@shell.modifies_shell_environment
+def load_modules(*names, insert_at=None):
+    groups = group_module_options(names)
+    for (i, group) in enumerate(groups):
+        insert_at = insert_at if i == 0 else None
+        modulecmd.system.load(group.name, opts=group.args, insert_at=insert_at)
+
 
 def setup_parser(parser):
     # -------------------------------------------------------------------------------- #
@@ -475,7 +446,7 @@ def main(argv=None):
     elif args.subcommand == "more":
         print_module_contents(args.name, False)
     elif args.subcommand == "load":
-        load_modules(*args.names)
+        load_modules(*args.args)
     elif args.subcommand == "unload":
         unload(*args.names)
     elif args.subcommand == "show":

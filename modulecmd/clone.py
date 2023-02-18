@@ -42,6 +42,22 @@ class Clones(object):
         self.data.pop(name, None)
         self.write(self.data, self.filename)
 
+    def format_avail(self, terse=False, file=None):
+        fown = file is None
+        file = file or StringIO()
+        names = sorted([x for x in self.data.items()])
+        if not names:  # pragma: no cover
+            return
+        if not terse:
+            width = terminal_size().columns
+            s = colify(names, width=width)
+            file.write("{0}\n{1}\n".format(" Saved clones ".center(width, "-"), s))
+        else:
+            file.write("\n".join(c for c in names))
+        if fown:
+            return file.getvalue()
+        return
+
 
 def factory():
     basename = modulecmd.names.clones_file_basename
@@ -71,3 +87,7 @@ def get(name):
 def items():
     for item in clones.data.items():
         yield item
+
+
+def format_avail(terse=False, file=None):
+    return clones.format_avail(terse=terse, file=file)

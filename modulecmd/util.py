@@ -17,8 +17,6 @@ from types import SimpleNamespace
 from contextlib import contextmanager
 from typing import Union, Any, Generator, Optional
 
-import modulecmd.xio as xio
-
 
 def colorize(fmt: str) -> str:
     return fmt.format(
