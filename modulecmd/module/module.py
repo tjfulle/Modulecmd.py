@@ -182,22 +182,21 @@ class Module(object):
         return os.path.sep.join((self.name, self.version.string, self.variant.string))
 
     def format_whatis(self):
+        file = StringIO()
         if not self.whatisstr:  # pragma: no cover
-            return '{0}: no "whatis" description has been provided'.format(
-                self.fullname
-            )
-        sio = StringIO()
+            file.write(f'{self.fullname}: no "whatis" description has been provided\n')
+            return
         width = terminal_size().columns
         rule = "=" * width
         head = "{0}".format((" " + self.name + " ").center(width, "="))
         text_width = min(width, 80)
-        sio.write(head + "\n")
-        sio.write(fill(self.whatisstr, width=text_width) + "\n")
+        file.write(head + "\n")
+        file.write(fill(self.whatisstr, width=text_width) + "\n")
         option_help = self.option_help_string()
         if option_help:  # pragma: no cover
-            sio.write("\n" + option_help + "\n")
-        sio.write(rule)
-        return sio.getvalue()
+            file.write("\n" + option_help + "\n")
+        file.write(rule + "\n")
+        return file.getvalue()
 
     def set_whatis(self, *args, **kwargs):
         if isinstance(self, TclModule):
@@ -214,8 +213,7 @@ class Module(object):
 
     def format_help(self):
         if self.helpstr is None:
-            return "{0}: no help string provided".format(self.fullname)
-
+            return f"{self.fullname}: no help string provided"
         sio = StringIO()
         width = terminal_size().columns
         rule = "=" * width

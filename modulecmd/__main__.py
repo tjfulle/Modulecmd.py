@@ -4,6 +4,7 @@ import sys
 import argparse
 
 import modulecmd.module
+import modulecmd.tutorial
 import modulecmd.xio as xio
 import modulecmd.util as util
 import modulecmd.config as config
@@ -80,7 +81,7 @@ def print_available_modules(terse: bool = False, showall=False, regex=None) -> N
             xio.print(f"{output}\n")
     if showall:
         print_available_collections(terse=terse, regex=regex)
-        avail += modulecmd.clone.avail(terse=terse)
+        print_clones(terse=terse)
 
 
 def print_available_collections(terse=False, regex=None):
@@ -148,6 +149,13 @@ def show_module_side_effects(*names, insert_at=None):
         xio.print(modulecmd.system.state.cur_module_command_his.getvalue())
 
 
+def load_modules(*names, insert_at=None):
+    groups = group_module_options(names)
+    for (i, group) in enumerate(groups):
+        insert_at = insert_at if i == 0 else None
+        modulecmd.system.load(group.name, opts=group.args, insert_at=insert_at)
+
+
 def print_module_info(names):
     for name in names:
         modules = modulepath.candidates(name)
@@ -182,6 +190,54 @@ def print_module_info(names):
 
             xio.print(util.colorize(s))
 
+
+def print_modulepath():
+    home = os.path.expanduser("~")
+    paths = []
+    for path in modulepath.path():
+        paths.append(path.replace(home, "~"))
+    s = "\n".join(f"{i}) {dirname}" for i, dirname in enumerate(paths, start=1))
+    xio.print(s)
+
+
+def print_module_short_description(names):
+    """Display 'whatis' message for the module given by `name`"""
+    for name in names:
+        module = modulepath.get(name)
+        if module is None:
+            raise ModuleNotFoundError(name, mp=modulepath)
+        modulecmd.system.load_partial(module, mode=modulecmd.modes.whatis)
+        s = module.format_whatis()
+        xio.print(s)
+
+
+def tutorial(action):
+    if action == "basic":
+        xio.info("Setting up Modulecmd.py's basic mock tutorial MODULEPATH")
+        modulecmd.tutorial.basic_usage()
+    elif action == "teardown":
+        xio.info("Removing Modulecmd.py's mock tutorial MODULEPATH")
+        modulecmd.tutorial.teardown()
+    modulecmd.system.dump()
+
+
+def print_guide(guide):
+    import docutils
+    from docutils import nodes, core  # noqa: F401
+    import modulecmd.third_party.rst2ansi as rst2ansi
+
+    filename = available_guides[guide]
+    xio.pager(rst2ansi.rst2ansi(open(filename, "r").read()))
+
+
+def print_module_help(name):
+    """Display 'help' message for the module given by `modulename`"""
+    module = modulepath.get(name)
+    if module is None:
+        raise ModuleNotFoundError(name, mp=modulepath)
+    modulecmd.system.load_partial(module, mode=modulecmd.modes.help)
+    s = module.format_help()
+    xio.print(s)
 
 def setup_parser(parser):
     # -------------------------------------------------------------------------------- #
@@ -258,22 +314,41 @@ def setup_parser(parser):
 
     # ----
 
+    p = parent.add_parser(
+        "whatis",
+        help="Display module whatis string.  The whatis string is a short informational\n"
+        "message a module can provide.  If not defined by the module, a default is \n"
+        "displayed.",
+    )
+    p.add_argument("names", nargs="+", help="Name of module")
+
+    # ----
+
     p = parent.add_parser("find", help="Show path[s] to module[s]")
     p.add_argument("names", nargs="+", help="Name of module")
 
     # ----
-    p = parent.add_parser("cat", help="Print contents of a module or collection to the console output.")
+    p = parent.add_parser(
+        "cat", help="Print contents of a module or collection to the console output."
+    )
+    p.add_argument("name", help="Name of module, collection, or config file")
+
+    # ---
+    parent.add_parser("path", help="Show MODULEPATH")
+
+    # ----
+    p = parent.add_parser(
+        "more",
+        help="Print contents of a module or collection to the console output one\n"
+        "page at a time.  Allows movement through files similar to shell's `less`\n"
+        "program.",
+    )
     p.add_argument("name", help="Name of module, collection, or config file")
 
     # ----
-    p = parent.add_parser("more",
-    help="Print contents of a module or collection to the console output one\n"
-    "page at a time.  Allows movement through files similar to shell's `less`\n"
-    "program.")
-    p.add_argument("name", help="Name of module, collection, or config file")
-
-    # ----
-    p = parent.add_parser("show", help="Show the commands that would be issued by module load")
+    p = parent.add_parser(
+        "show", help="Show the commands that would be issued by module load"
+    )
     p.add_argument(
         "-i",
         "--insert-at",
@@ -292,14 +367,59 @@ def setup_parser(parser):
     )
 
     # ----
-    p = parent.add_parser("info", help="Provides information on a particular loaded module")
+    p = parent.add_parser("load", help="Load modules into environment")
+    p.add_argument(
+        "-i",
+        "--insert-at",
+        type=int,
+        default=None,
+        help="Load the module as the `i`th module.",
+    )
+    p.add_argument(
+        "args",
+        nargs=argparse.REMAINDER,
+        help=(
+            "Modules and options to load. Additional options can be sent \n"
+            "directly to the module using the syntax, `+option[=value]`. \n"
+            "See the module options help for more details."
+        ),
+    )
+
+    # ----
+    p = parent.add_parser(
+        "info", help="Provides information on a particular loaded module"
+    )
     p.add_argument(
         "names", nargs="+", help="Name[s] of loaded modules to get information for"
     )
 
+    # ----
+    p = parent.add_parser(
+        "tutorial", help="Setup or teardown Modulecmd.py's mock tutorial MODULEPATH"
+    )
+    p.add_argument(
+        "action",
+        choices=("basic", "teardown"),
+        help="Setup or teardown Modulecmd.py's mock tutorial MODULEPATH",
+    )
+
+    # ----
+    p = parent.add_parser("guide", help="Display Modulecmd.py guides in the console")
+    p.add_argument("guide", choices=available_guides, help="Name of guide to display")
+
+    p = parent.add_parser("help", help="Print module help pages")
+    p.add_argument("name", help="Module to print help for")
+
     # -------------------------------------------------------------------------------- #
     # -------------------------------------------------------------------------------- #
 
+
+available_guides = dict(
+    [
+        (os.path.splitext(f)[0], os.path.join(modulecmd.paths.docs_path, f))
+        for f in os.listdir(modulecmd.paths.docs_path)
+    ]
+)
 
 
 class argument_parser(argparse.ArgumentParser):
@@ -346,12 +466,16 @@ def main(argv=None):
         print_available_modules(
             terse=args.terse, showall=args.showall, regex=args.regex
         )
+    elif args.subcommand == "path":
+        print_modulepath()
     elif args.subcommand == "cat":
         print_module_contents(args.name, True)
+    elif args.subcommand == "whatis":
+        print_module_short_description(args.names)
     elif args.subcommand == "more":
         print_module_contents(args.name, False)
     elif args.subcommand == "load":
-        load(*args.names)
+        load_modules(*args.names)
     elif args.subcommand == "unload":
         unload(*args.names)
     elif args.subcommand == "show":
@@ -360,14 +484,16 @@ def main(argv=None):
         print_module_info(args.names)
     elif args.subcommand == "purge":
         purge()
+    elif args.subcommand == "tutorial":
+        tutorial(args.action)
+    elif args.subcommand == "guide":
+        print_guide(args.guide)
     elif args.subcommand in ("list", "ls"):
         print_loaded_modules(
             terse=args.terse, show_command=args.show_command, regex=args.regex
         )
     elif args.subcommand == "help":
         print_module_help(args.name)
-    elif args.subcommand == "whatis":
-        print_module_short_description(args.name)
     else:
         parser.error("missing required subcommand")
 

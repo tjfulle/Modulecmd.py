@@ -11,7 +11,7 @@ import modulecmd.error
 import modulecmd.names
 import modulecmd.paths
 import modulecmd.environ
-from modulecmd.util import singleton, terminal_size, colify, colorize
+from modulecmd.util import singleton
 
 
 class Collections:
