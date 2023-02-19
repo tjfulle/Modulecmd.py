@@ -20,6 +20,7 @@ class Environ(dict):
         self._sys_manpath = None
         self.files_to_source = []
         self.raw_shell_commands = []
+        self.env_updates = {}
 
     def __getitem__(self, key):
         """Overload Environ[] to first check me, then os.environ"""

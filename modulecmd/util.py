@@ -238,27 +238,6 @@ def groupby(iterable: Any, key: Any) -> dict:
     return grouped.items()
 
 
-class filesystem:
-    @staticmethod
-    def isreadable(path: str, validator: callable = os.path.exists) -> bool:
-        return validator(path) and os.access(path, os.R_OK)
-
-    @staticmethod
-    def isempty(path: str) -> bool:
-        try:
-            return os.path.getsize(path) == 0
-        except OSError:
-            return False
-
-    @staticmethod
-    def ispython(path: str) -> bool:
-        return os.path.isfile(path) and path.endswith(".py")
-
-    @staticmethod
-    def ishidden(path: str) -> bool:
-        return os.path.basename(path).startswith(".")
-
-
 # ------------------------------------------------------------------------------------ #
 # --- Filesystem helpers ------------------------------------------------------------- #
 # ------------------------------------------------------------------------------------ #
@@ -313,6 +292,13 @@ def is_executable(path):
     return os.path.isfile(path) and os.access(path, os.X_OK)
 
 
+def isempty(path: str) -> bool:
+    try:
+        return os.path.getsize(path) == 0
+    except OSError:
+        return False
+
+
 def force_symlink(src, dest):
     try:
         os.symlink(src, dest)
@@ -326,6 +312,18 @@ def remove_file(path: str) -> None:
         os.remove(path)
     except OSError:
         pass
+
+
+def isreadable(path: str, validator: callable = os.path.exists) -> bool:
+    return validator(path) and os.access(path, os.R_OK)
+
+
+def ispython(path: str) -> bool:
+    return os.path.isfile(path) and path.endswith(".py")
+
+
+def ishidden(path: str) -> bool:
+    return os.path.basename(path).startswith(".")
 
 
 def remove_directory(path: str) -> None:

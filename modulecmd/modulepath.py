@@ -14,21 +14,32 @@ import modulecmd.module
 import modulecmd.util as util
 
 
-def expand_name(dirname):
-    return os.path.expanduser(Template(dirname).safe_substitute(**(os.environ)))
+def expand_name(dirname: str) -> None:
+    return os.path.expanduser(Template(dirname).safe_substitute(**os.environ))
 
 
 class Modulepath:
-    def __init__(self, directories):
-        self.path = ordered_dict()
-        for directory in directories:
-            path = expand_name(directory)
-            modules = find_modules(path)
-            if not modules:
-                continue
-            self.path[path] = modules
+    def __init__(self, path: str = None, sep: str = None) -> None:
+        sep = sep or os.pathsep
+        path = path or os.getenv("MODULEPATH", "")
+        if isinstance(path, str):
+            path = [_.strip() for _ in path.split(sep) if _.split()]
+        path = util.unique(
+            expand_name(p) for p in path if util.isreadable(p, os.path.isdir)
+        )
+        self.populate(path)
         self.defaults = {}
         self.assign_defaults()
+
+    def populate(self, path):
+        self.path = ordered_dict()
+        for p in path:
+            if p == "/":
+                xio.warn("requested to search / for modules, skipping")
+                continue
+            modules = find_modules(p)
+            if modules:
+                self.path[p] = modules
 
     def __contains__(self, dirname):
         return dirname in self.path
@@ -330,21 +341,21 @@ def find_modules2(root, branch=None):
     modules = []
     if root == "/":
         xio.verbose("Requesting to find modules in root directory")
-        return []
-    elif root in (".git", ".svn", "CVS"):  # pragma: no cover
-        return []
+        return None
+    elif root in skip_dirs:  # pragma: no cover
+        return None
     with util.working_dir(root):
         for p in os.listdir(branch or "."):
             if modulecmd.module.ishidden(p):
                 continue
             f = os.path.normpath(os.path.join(branch or ".", p))
             if modulecmd.module.ismodule(f):
-                m = modulecmd.factory(root, f)
-                if m.enabled:
+                m = modulecmd.module.factory(root, f)
+                if m.is_enabled:
                     modules.append(m)
             elif os.path.isdir(f):
-                modules.extend(find_modules2(root, branch=f))
-    return sorted(modules, key=modulesorter)
+                modules.extend(find_modules2(root, branch=f) or [])
+    return sorted(modules, key=lambda m: (m.name, m.version))
 
 
 def find_modules(directory):
