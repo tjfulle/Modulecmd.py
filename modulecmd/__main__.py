@@ -22,7 +22,7 @@ def find_modules(names):
         if not candidates:
             raise ModuleNotFoundError(name)
         for module in candidates:
-            s = "{bold}%s{endc}\n  {cyan}%s{endc}" % (module.fullname, module.filename)
+            s = "{bold}%s{endc}\n  {cyan}%s{endc}" % (module.fullname, module.file)
             xio.print(util.colorize(s))
 
 
@@ -88,7 +88,7 @@ def print_available_modules(terse: bool = False, showall=False, regex=None) -> N
 
 def print_module_contents(name, plain_pager=True):
     module = modulepath.get(name)
-    text = open(module.filename).read()
+    text = open(module.file).read()
     xio.pager(text, plain=plain_pager)
 
 
@@ -135,7 +135,7 @@ def print_module_info(names):
                 s += "  {cyan}Family:{endc}      %s\n" % module.family
 
             s += "  {cyan}Loaded:{endc}       %s\n" % module.is_loaded
-            s += "  {cyan}Filename:{endc}     %s\n" % module.filename
+            s += "  {cyan}Filename:{endc}     %s\n" % module.file
             s += "  {cyan}Modulepath:{endc}   %s" % module.modulepath
 
             unlocked_by = module.unlocked_by()

@@ -1,6 +1,7 @@
 import os
 from io import StringIO
 from textwrap import fill
+from typing import Optional
 
 import modulecmd.xio as xio
 import modulecmd.system
@@ -9,7 +10,7 @@ from modulecmd.module.meta import MetaData
 from modulecmd.module.tcl2py import tcl2py
 from modulecmd.module.version import Version
 
-from modulecmd.util import textfill, terminal_size
+from modulecmd.util import textfill, terminal_size, read_tcl_default_version
 
 __all__ = ["Namespace", "Module", "PyModule", "TclModule"]
 
@@ -18,40 +19,25 @@ class Module(object):
     ext = None
 
     def __init__(self, root, path):
-
-        self.filename = os.path.join(root, path)
-
-        if not os.path.isfile(self.filename):
-            raise IOError("{0} is not a file".format(self.filename))
-
-        parts = path.split(os.path.sep)
-        if self.ext:
-            parts[-1], ext = os.path.splitext(parts[-1])
-            assert ext == self.ext, "ext={0!r}!={1!r}".format(ext, self.ext)
-
-        version = variant = None
-        if len(parts) == 1:
-            name = parts[0]
-        elif len(parts) == 2:
-            name, version = parts
-        elif len(parts) == 3:
-            name, version, variant = parts
-        else:
-            name = os.path.join(*parts)
-
-        self.name = name
-        self.version = Version(version)
-        self.variant = Version(variant)
+        self.root = root
+        self.path = path
+        self.file = os.path.join(root, path)
+        if not os.path.isfile(self.file):
+            raise IOError("{0} is not a file".format(self.file))
+        self.dirname = os.path.dirname(self.file)
+        self.find_version_split()
 
         self.modulepath = root
         self.family = None
         self.whatisstr = ""
         self.helpstr = None
-        self.is_default = False
         self._unlocked_by_me = []
         self.marked_as_default = False
         self._acquired_as = None  # How the module was initially loaded
         self._refcount = 0
+        self.is_global_default = None
+        self.is_explicit_default = self._is_explicit_default()
+        self.is_highest_version = self._is_highest_version()
 
         # Mapping containing items set on command line (before parsing)
         self.kwargv = {}
@@ -65,10 +51,35 @@ class Module(object):
     def __repr__(self):
         return "Module(name={0})".format(self.fullname)
 
+    def find_version_split(self):
+        self.fullname = self.path if not self.ext else os.path.splitext(self.path)[0]
+        parts = self.fullname.split(os.path.sep)
+        if len(parts) == 1:
+            self.version = Version()
+            self.name = self.fullname
+        elif len(parts) == 2:
+            self.name = parts[0]
+            self.version = Version(parts[1])
+        else:
+            # The fullname is name/version.  The name can have path
+            # separators in it
+            version_string = parts.pop()
+            while parts:
+                dirname = os.path.join(self.root, *parts)
+                if os.path.exists(os.path.join(dirname, ".version")):
+                    self.name = os.path.sep.join(parts)
+                    self.version = Version(version_string)
+                    break
+                version_string = f"{parts.pop()}/{version_string}"
+            else:
+                self.name, version_string = os.path.split(self.fullname)
+                self.version = Version(version_string)
+        return
+
     def asdict(self):
         d = dict(
             fullname=self.fullname,
-            filename=self.filename,
+            file=self.file,
             family=self.family,
             opts=self.opts,
             acquired_as=self.acquired_as,
@@ -77,10 +88,45 @@ class Module(object):
         )
         return d
 
+    def _is_explicit_default(self) -> Optional[bool]:
+        if self.version is None:
+            return None
+        basename = os.path.basename(self.file)
+        link = os.path.join(self.dirname, "default")
+        version_file = os.path.join(self.dirname, ".version")
+        if os.path.islink(link):
+            return os.path.samefile(link, self.file)
+        elif os.path.exists(version_file):
+            default_version = read_tcl_default_version(version_file)
+            if default_version:
+                default_file = os.path.join(self.dirname, default_version)
+                if os.path.exists(default_file):
+                    return default_version == basename
+        return None
+
+    def _is_highest_version(self) -> Optional[bool]:
+        defaults = (".version", "default")
+        members = [f for f in os.listdir(self.dirname) if f not in defaults]
+        if len(members) == 1:
+            return None
+        versions = [Version(os.path.splitext(_)[0]) for _ in members]
+        candidates = sorted(versions)
+        return candidates[-1] == self.version
+
+    @property
+    def is_default(self) -> bool:
+        if self.is_global_default is not None:
+            return self.is_global_default
+        elif self.is_explicit_default is not None:
+            return self.is_explicit_default
+        elif self.is_highest_version is not None:
+            return self.is_highest_version
+        return False
+
     @property
     def is_loaded(self):
-        lm_files = [m.filename for m in modulecmd.system.loaded_modules()]
-        return self.filename in lm_files
+        lm_files = [m.file for m in modulecmd.system.loaded_modules()]
+        return self.file in lm_files
 
     @property
     def is_enabled(self):
@@ -105,7 +151,7 @@ class Module(object):
     @acquired_as.setter
     def acquired_as(self, arg):
         assert (
-            arg == self.filename
+            arg == self.file
             or arg == self.name
             or arg == self.fullname
             or self.endswith(arg)
@@ -126,12 +172,9 @@ class Module(object):
             )
         self._refcount = count
 
-    @property
-    def path(self):
-        return self.filename if self.ext is None else os.path.splitext(self.filename)[0]
-
     def endswith(self, string):
-        return len(string) > len(self.fullname) and self.path.endswith(string)
+        path = os.path.join(self.root, self.fullname)
+        return len(string) >= len(self.fullname) and path.endswith(string)
 
     def unlocks_path(self, path):
         """Called by the callback `use` to register which paths are unlocked
@@ -171,15 +214,6 @@ class Module(object):
 
     def reset_state(self):
         self.kwargv = {}
-
-    @property
-    def fullname(self):
-        if not self.version:
-            assert not self.variant
-            return self.name
-        elif not self.variant:
-            return os.path.sep.join((self.name, self.version.string))
-        return os.path.sep.join((self.name, self.version.string, self.variant.string))
 
     def format_whatis(self):
         file = StringIO()
@@ -305,14 +339,14 @@ class PyModule(Module):
         # strip the file extension off the last part and call class initializer
         super(PyModule, self).__init__(modulepath, *parts)
         self.metadata = MetaData()
-        self.metadata.parse(self.filename)
+        self.metadata.parse(self.file)
 
     @property
     def is_enabled(self):
         return self.metadata.is_enabled
 
     def read(self, mode):
-        return open(self.filename, "r").read()
+        return open(self.file, "r").read()
 
 
 class TclModule(Module):

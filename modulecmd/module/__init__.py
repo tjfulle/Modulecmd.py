@@ -18,7 +18,7 @@ def factory(root, path):
         if module_type == TclModule and "gcc" in file:
             xio.debug(module.name)
             xio.debug(module.modulepath)
-            xio.debug(module.filename, "\n")
+            xio.debug(module.file, "\n")
 
     return module
 
@@ -26,7 +26,7 @@ def factory(root, path):
 def as_dict(module):
     return {
         "type": type(module).__name__,
-        "file": module.filename,
+        "file": module.file,
         "modulepath": module.modulepath,
     }
 
@@ -41,7 +41,7 @@ def from_dict(dikt):
         module = module_type(root, path)
     except IOError:
         return None
-    assert module.filename == filename
+    assert module.file == filename
     return module
 
 

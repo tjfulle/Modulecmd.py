@@ -151,7 +151,7 @@ def test_collection_read(modules, mock_modulepath):
     modulecmd.system.save_collection(modulecmd.names.default_user_collection)
     assert modulecmd.collection.contains(modulecmd.names.default_user_collection)
     x = modulecmd.collection.get(modulecmd.names.default_user_collection)
-    filename = modulecmd.collection.collections.filename
+    filename = modulecmd.collection.collections.file
     collection = modulecmd.collection.Collections(filename)
     default = collection.get(modulecmd.names.default_user_collection)
     default2 = modulecmd.collection.get(modulecmd.names.default_user_collection)

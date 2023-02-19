@@ -10,13 +10,13 @@ from modulecmd.util import singleton, terminal_size, colify
 
 class Clones(object):
     def __init__(self, filename):
-        self.filename = filename
+        self.file = filename
         self._data = None
 
     @property
     def data(self):
         if self._data is None:
-            self._data = self.read(self.filename)
+            self._data = self.read(self.file)
         return self._data
 
     def get(self, name):
@@ -35,12 +35,12 @@ class Clones(object):
         """Clone current environment"""
         env = modulecmd.environ.copy(include_os=True)
         self.data[name] = env
-        self.write(self.data, self.filename)
+        self.write(self.data, self.file)
         return env
 
     def remove(self, name):
         self.data.pop(name, None)
-        self.write(self.data, self.filename)
+        self.write(self.data, self.file)
 
     def format_avail(self, terse=False, file=None):
         fown = file is None

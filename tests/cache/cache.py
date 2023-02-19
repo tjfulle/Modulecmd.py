@@ -15,7 +15,7 @@ def test_cache_load(tmpdir, mock_modulepath):
     tmpdir.join("a.py").write("")
     mock_modulepath(tmpdir.strpath)
     assert modulecmd.cache.modified()
-    filename = modulecmd.cache.cache.filename
+    filename = modulecmd.cache.cache.file
     modulecmd.cache.write()
     new_cache = modulecmd.cache.Cache(filename)
     from_new_cache = new_cache.get(modulecmd.names.modulepath, tmpdir.strpath)

@@ -113,7 +113,7 @@ def test_hierarchy_fixture_layout(hierarchy, mock_modulepath):
         a = modulecmd.modulepath.get("a")
         assert a is not None
         assert a.version.string == "1.0"
-        assert a.filename == os.path.join(
+        assert a.file == os.path.join(
             compiler_unlocks_dir, a.name, a.version.string + ".py"
         )
 
@@ -182,7 +182,7 @@ def test_hierarchy_core_compiler_mpi(hierarchy, mock_modulepath):
     a = modulecmd.modulepath.get("a")
     assert a is not None
     assert a.version.string == "1.0"
-    assert a.filename == os.path.join(
+    assert a.file == os.path.join(
         compiler_unlocks_dir, a.name, a.version.string + ".py"
     )
 
@@ -200,7 +200,7 @@ def test_hierarchy_core_compiler_mpi(hierarchy, mock_modulepath):
     assert modulecmd.modulepath.contains(mpi_unlocks_dir)
 
     b = modulecmd.system.load("b")
-    assert b.filename == os.path.join(mpi_unlocks_dir, b.name, b.version.string + ".py")
+    assert b.file == os.path.join(mpi_unlocks_dir, b.name, b.version.string + ".py")
 
     # Now, load a different compiler and a, mpi, and b modules will all be
     # updated automatically
@@ -214,7 +214,7 @@ def test_hierarchy_core_compiler_mpi(hierarchy, mock_modulepath):
     assert modulecmd.modulepath.contains(compiler_unlocks_dir)
 
     a = modulecmd.modulepath.get("a")
-    assert a.filename == os.path.join(
+    assert a.file == os.path.join(
         compiler_unlocks_dir, a.name, a.version.string + ".py"
     )
 
@@ -227,7 +227,7 @@ def test_hierarchy_core_compiler_mpi(hierarchy, mock_modulepath):
     assert modulecmd.modulepath.contains(mpi_unlocks_dir)
 
     b = modulecmd.modulepath.get("b")
-    assert b.filename == os.path.join(mpi_unlocks_dir, b.name, b.version.string + ".py")
+    assert b.file == os.path.join(mpi_unlocks_dir, b.name, b.version.string + ".py")
 
     unlocked_by = b.unlocked_by()
     assert len(unlocked_by) == 2

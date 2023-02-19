@@ -129,7 +129,7 @@ def mock_module():
         def __init__(self, name, version, filename):
             self.name = name
             self.version = Version(version)
-            self.filename = filename
+            self.file = filename
 
     return Module
 

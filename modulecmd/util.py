@@ -159,8 +159,6 @@ def read_tcl_default_version(filename: str) -> Optional[str]:
     with open(filename) as fh:
         for (i, line) in enumerate(fh.readlines()):
             line = " ".join(line.split())
-            if i == 0 and not line.startswith("#%Module"):
-                return None
             if line.startswith("set ModulesVersion"):
                 raw_version = line.split("#", 1)[0].split()[-1]
                 try:

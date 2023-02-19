@@ -218,23 +218,23 @@ def test_callback_modulepath_ops(tmpdir, mock_modulepath):
     mock_modulepath(one.strpath)
     x = modulecmd.modulepath.get("x")  # just to set `unlocks`
     a = modulecmd.modulepath.get("a")
-    assert a.filename == os.path.join(one.strpath, "a.py")
+    assert a.file == os.path.join(one.strpath, "a.py")
 
     append_path = get_callback("append_path")
     append_path(x, modulecmd.modes.load, modulecmd.names.modulepath, two.strpath)
     a = modulecmd.modulepath.get("a")
-    assert a.filename == os.path.join(one.strpath, "a.py")
+    assert a.file == os.path.join(one.strpath, "a.py")
     assert x.unlocks(two.strpath)
 
     remove_path = get_callback("remove_path")
     remove_path(x, modulecmd.modes.load, modulecmd.names.modulepath, two.strpath)
     a = modulecmd.modulepath.get("a")
-    assert a.filename == os.path.join(one.strpath, "a.py")
+    assert a.file == os.path.join(one.strpath, "a.py")
 
     prepend_path = get_callback("prepend_path")
     prepend_path(x, modulecmd.modes.load, modulecmd.names.modulepath, two.strpath)
     a = modulecmd.modulepath.get("a")
-    assert a.filename == os.path.join(two.strpath, "a.py")
+    assert a.file == os.path.join(two.strpath, "a.py")
     assert x.unlocks(two.strpath)
 
 

@@ -28,7 +28,7 @@ def tcl2py(module, mode):
     ld_preload = env.get(modulecmd.names.ld_preload)
     if ld_preload:
         args.extend(("-P", ld_preload))
-    args.append(module.filename)
+    args.append(module.file)
     p = subprocess.Popen(args, env=env, stdout=subprocess.PIPE)
     p.wait()
     output, _ = p.communicate()

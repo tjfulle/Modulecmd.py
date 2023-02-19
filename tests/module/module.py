@@ -56,8 +56,9 @@ def test_module_parts(tmpdir):
     assert os.path.isfile(ff)
     path = os.path.join(*parts)
     m = modulecmd.module.Module(tmpdir.strpath, path)
-    assert m.version.major is None
-    assert m.variant.major is None
+    assert m.version.major == "f"
+    assert m.version.minor is None
+    assert m.version.patch is None
 
 
 def test_module_basic(tmpdir):

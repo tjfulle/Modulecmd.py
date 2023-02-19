@@ -37,7 +37,7 @@ def test_mc_load_2(tmpdir, mock_modulepath):
         assert modulecmd.system.module_is_loaded(x)
         m = modulecmd.modulepath.get(x)
         assert modulecmd.system.module_is_loaded(m)
-        assert modulecmd.system.module_is_loaded(m.filename)
+        assert modulecmd.system.module_is_loaded(m.file)
 
     # just unload e
     modulecmd.system.unload("d")
@@ -120,9 +120,8 @@ def test_mc_load_nvv(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     m = modulecmd.system.load("a/1.0/base")
     assert m is not None
-    assert m.name == "a"
-    assert m.version.string == "1.0"
-    assert m.variant == "base"
+    assert m.name == "a/1.0"
+    assert m.version.string == "base"
 
 
 def test_mc_load_inserted_2(tmpdir, mock_modulepath):
@@ -252,7 +251,7 @@ def test_mc_load_bad_callback(tmpdir, mock_modulepath):
     lm_cellar = [
         dict(
             fullname=a.fullname,
-            filename=a.filename,
+            filename=a.file,
             family=a.family,
             opts=a.parse_opts().as_dict(),
             acquired_as=a.acquired_as,

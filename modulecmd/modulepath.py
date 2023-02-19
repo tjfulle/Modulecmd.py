@@ -29,7 +29,7 @@ class Modulepath:
         )
         self.populate(path)
         self.defaults = {}
-        self.assign_defaults()
+        self.assign_global_defaults()
 
     def populate(self, path):
         self.path = ordered_dict()
@@ -37,7 +37,7 @@ class Modulepath:
             if p == "/":
                 xio.warn("requested to search / for modules, skipping")
                 continue
-            modules = find_modules(p)
+            modules = find_modules2(p)
             if modules:
                 self.path[p] = modules
 
@@ -70,7 +70,7 @@ class Modulepath:
             xio.debug(key)
             module = self.getby_filename(key, use_file_modulepath=use_file_modulepath)
             if module is not None:
-                module.acquired_as = module.filename
+                module.acquired_as = module.file
             return module
         parts = key.split(os.path.sep)
         if len(parts) == 1:
@@ -136,7 +136,7 @@ class Modulepath:
         for (path, modules) in self.path.items():
             xio.debug(path)
             for module in modules:
-                if filename == module.filename:
+                if filename == module.file:
                     return module
 
         if not use_file_modulepath:
@@ -145,14 +145,14 @@ class Modulepath:
         # This file is not on the MODULEPATH, add it
         modules = self.append_path(os.path.dirname(filename))
         for module in modules:
-            if filename == module.filename:
+            if filename == module.file:
                 return module
 
         # Hmmmm, how did we get this far???
         return None
 
     def path_modified(self):
-        self.assign_defaults()
+        self.assign_global_defaults()
 
     def append_path(self, dirname):
         dirname = expand_name(dirname)
@@ -205,7 +205,7 @@ class Modulepath:
 
         return modules_in_dir
 
-    def assign_defaults(self):
+    def assign_global_defaults(self):
         """Assign defaults to modules.
         1. Look for an exact match in all MODULEPATH directories. Pick the
            first match.
@@ -220,27 +220,20 @@ class Modulepath:
         default. A module is explicitly made the default by creating a symlink
         to it (in the same directory) named 'default'
         """
-
-        def module_default_sort_key(module):
+        def sort_key(module):
             n = list(self.path.keys()).index(module.modulepath)
-            sort_key = (
-                1 if module.marked_as_default else -1,
-                module.version,
-                module.variant,
-                -n,
-            )
-            return sort_key
+            return (1 if module.is_explicit_default else -1, module.version, -n)
 
         self.defaults = {}
         grouped = util.groupby(
             [m for _ in self.path.values() for m in _], lambda x: x.name
         )
-        for (_, modules) in grouped:
+        for (name, modules) in grouped:
             for module in modules:
-                module.is_default = False
+                module.is_global_default = None
             if len(modules) > 1:
-                modules = sorted(modules, key=module_default_sort_key, reverse=True)
-                modules[0].is_default = True
+                modules = sorted(modules, key=sort_key, reverse=True)
+                modules[0].is_global_default = True
             self.defaults[modules[0].name] = modules[0]
 
     def filter_modules_by_regex(self, modules, regex):
@@ -325,7 +318,7 @@ class Modulepath:
                 elif module.fullname.endswith(key):
                     the_candidates.append(module)  # pragma: no cover
                 else:
-                    f = module.filename
+                    f = module.file
                     if not isinstance(module, modulecmd.module.TclModule):
                         f = os.path.splitext(f)[0]
                     if f.endswith(key):  # pragma: no cover
@@ -338,6 +331,9 @@ skip_dirs = (".git", ".svn", "CVS")
 
 
 def find_modules2(root, branch=None):
+    cached_modules = get_cached_modules(root)
+    if cached_modules is not None:
+        return cached_modules
     modules = []
     if root == "/":
         xio.verbose("Requesting to find modules in root directory")
@@ -355,7 +351,10 @@ def find_modules2(root, branch=None):
                     modules.append(m)
             elif os.path.isdir(f):
                 modules.extend(find_modules2(root, branch=f) or [])
-    return sorted(modules, key=lambda m: (m.name, m.version))
+    modules = sorted(modules, key=lambda m: (m.name, m.version))
+    if branch is None:
+        cache_modules(root, modules)
+    return modules
 
 
 def find_modules(directory):
@@ -435,7 +434,7 @@ def mark_explicit_defaults(modules, defaults):
             xio.debug("There is no module named {0}".format(name))
             continue
         for module in mods:
-            if os.path.realpath(module.filename) == os.path.realpath(filename):
+            if os.path.realpath(module.file) == os.path.realpath(filename):
                 module.marked_as_default = True
                 break
         else:

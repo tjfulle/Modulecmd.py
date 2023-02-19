@@ -130,7 +130,7 @@ def test_mc_use_prepend_bumped(tmpdir, mock_modulepath):
 
     a2 = modulecmd.modulepath.get("a/1.0")
     assert a1.version == a2.version
-    assert a1.filename != a2.filename
+    assert a1.file != a2.file
     old, new = modulecmd.system.state._swapped_on_mp_change[0]
     assert old == a1
     assert new == a2

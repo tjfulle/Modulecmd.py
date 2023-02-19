@@ -159,12 +159,12 @@ def test_mc_execmodule_modulepath_ops(tmpdir, mock_modulepath):
 
     x = modulecmd.system.load("x/1")
     a = modulecmd.modulepath.get("a")
-    assert a.filename == os.path.join(one.strpath, "a.py")
+    assert a.file == os.path.join(one.strpath, "a.py")
     assert x.unlocks(one.strpath)
 
     x = modulecmd.system.load("x/2")
     a = modulecmd.modulepath.get("a")
-    assert a.filename == os.path.join(two.strpath, "a.py")
+    assert a.file == os.path.join(two.strpath, "a.py")
     assert x.unlocks(two.strpath)
 
 

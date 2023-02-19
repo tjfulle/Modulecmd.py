@@ -11,7 +11,7 @@ def test_mc_opts_preserve(tmpdir, mock_modulepath):
 
     modules = modulecmd.system.loaded_modules()
     assert len(modules) == 1
-    assert modules[0].filename == a.filename
+    assert modules[0].file == a.file
     assert modules[0].parse_opts().as_dict() == {"x": "spam"}
     modulecmd.system.unload("a")
     a = modulecmd.system.load("a")

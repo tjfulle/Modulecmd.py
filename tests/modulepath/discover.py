@@ -30,7 +30,7 @@ def test_modulepath_discover_bad_marked_default(tmpdir):
     assert names == ["a", "b"]
 
 
-def test_modulepath_discover_nvv(tmpdir):
+def test_modulepath_discover_n2v(tmpdir):
     a = tmpdir.mkdir("a")
     # These next two will be skipped
     a.join("1.0.py").write("")
@@ -40,9 +40,23 @@ def test_modulepath_discover_nvv(tmpdir):
     one.join("2.0.py").write("")
     modules = modulecmd.modulepath.find_modules(tmpdir.strpath)
     assert len(modules) == 4
-    x = sorted([(_.name, _.version.string, _.variant.string) for _ in modules])
-    print(x)
-    assert x == [("a", "1", "1.0"), ("a", "1", "2.0"), ("a", "1.0", ""), ("a", "2.0", "")]
+    x = sorted([(_.name, _.version.string) for _ in modules])
+    assert x == [("a", "1.0"), ("a", "2.0"), ("a/1", "1.0"), ("a/1", "2.0")]
+
+
+def test_modulepath_discover_nvv(tmpdir):
+    a = tmpdir.mkdir("a")
+    # These next two will be skipped
+    a.join(".version").write("")
+    a.join("1.0.py").write("")
+    a.join("2.0.py").write("")
+    one = a.mkdir("1")
+    one.join("1.0.py").write("")
+    one.join("2.0.py").write("")
+    modules = modulecmd.modulepath.find_modules(tmpdir.strpath)
+    assert len(modules) == 4
+    x = sorted([(_.name, _.version.string) for _ in modules])
+    assert x == [('a', '1.0'), ('a', '1/1.0'), ('a', '1/2.0'), ('a', '2.0')]
 
 
 def test_modulepath_discover_bad_linked_default(tmpdir):

@@ -105,7 +105,7 @@ def test_mc_unuse_2(modules_path, mock_modulepath):
     a3 = modulecmd.modulepath.get("a/1.0")
     assert a3.modulepath == modules_path.three
     assert a2.version == a3.version
-    assert a2.filename != a3.filename
+    assert a2.file != a3.file
     old, new = modulecmd.system.state._swapped_on_mp_change[0]
     assert old == a2
     assert new == a3

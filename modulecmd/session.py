@@ -17,17 +17,17 @@ class Session:
         self.savedir = os.path.join(modulecmd.paths.user_cache_path, "sessions")
         if not os.path.isdir(self.savedir):
             os.makedirs(self.savedir)
-        self.filename = os.path.join(self.savedir, "{0}.json".format(self.id))
+        self.file = os.path.join(self.savedir, "{0}.json".format(self.id))
         self.data = self.load()
 
     def load(self):
-        if not os.path.isfile(self.filename):
+        if not os.path.isfile(self.file):
             return {}
-        with open(self.filename) as fh:
+        with open(self.file) as fh:
             return json.load(fh)
 
     def dump(self):
-        with open(self.filename, "w") as fh:
+        with open(self.file, "w") as fh:
             json.dump(self.data, fh, indent=4)
 
     def save(self, **kwds):

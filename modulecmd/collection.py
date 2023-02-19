@@ -20,7 +20,7 @@ class Collections:
     version = (1, 0)
 
     def __init__(self, filename):
-        self.filename = filename
+        self.file = filename
         self._data = None
 
     def __contains__(self, collection_name):
@@ -29,7 +29,7 @@ class Collections:
     @property
     def data(self):
         if self._data is None:
-            self._data = self.read(self.filename)
+            self._data = self.read(self.file)
         return self._data
 
     def read(self, filename):
@@ -57,7 +57,7 @@ class Collections:
             collection.setdefault(module.modulepath, []).append(ar)
         collection = list(collection.items())
         self.data.update({name: collection})
-        self.write(self.data, self.filename)
+        self.write(self.data, self.file)
         return None
 
     def get(self, name):
@@ -65,7 +65,7 @@ class Collections:
 
     def remove(self, name):
         self.data.pop(name, None)
-        self.write(self.data, self.filename)
+        self.write(self.data, self.file)
 
     def add_to_loaded_collection(self, name):
         """Add a module `name` to the currently loaded collection"""
@@ -92,7 +92,7 @@ class Collections:
         data.setdefault(module.modulepath, []).append(ar)
         data = list(data.items())
         self.data.update({collection_name: data})
-        self.write(self.data, self.filename)
+        self.write(self.data, self.file)
         return None
 
     def pop_from_loaded_collection(self, name):
@@ -115,7 +115,7 @@ class Collections:
             break
         data = list(data.items())
         self.data.update({collection_name: data})
-        self.write(self.data, self.filename)
+        self.write(self.data, self.file)
         return None
 
     def show(self, name):

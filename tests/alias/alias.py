@@ -20,7 +20,7 @@ def test_alias_save(tmpdir, mock_modulepath):
     assert os.path.isfile(x["filename"])
     alias = modulecmd.modulepath.get("a-alias")
     assert alias is not None
-    assert alias.filename == target.filename
+    assert alias.file == target.file
 
     s = modulecmd.alias.avail()
     assert "a-alias" in s

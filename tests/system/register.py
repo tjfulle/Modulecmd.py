@@ -10,7 +10,7 @@ def test_mc_register_1(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     a = modulecmd.modulepath.get("a")
     modulecmd.system.register_module(a)
-    assert a.filename in [_.filename for _ in modulecmd.system.loaded_modules()]
+    assert a.file in [_.file for _ in modulecmd.system.loaded_modules()]
 
 
 def test_mc_register_2(tmpdir, mock_modulepath):
@@ -20,7 +20,7 @@ def test_mc_register_2(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     m = factory(tmpdir.strpath, "devpack.py")
     modulecmd.system.register_module(m)
-    assert m.filename not in [_.filename for _ in modulecmd.system.loaded_modules()]
+    assert m.file not in [_.file for _ in modulecmd.system.loaded_modules()]
     modulecmd.config.set("skip_add_devpack", value)
 
 

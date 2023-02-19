@@ -11,13 +11,13 @@ class Aliases(object):
     """Provides mechanism for having aliases to other modules"""
 
     def __init__(self, filename):
-        self.filename = filename
+        self.file = filename
         self._data = None
 
     @property
     def data(self):
         if self._data is None:
-            self._data = self.read(self.filename)
+            self._data = self.read(self.file)
         return self._data
 
     def get(self, name):
@@ -66,15 +66,15 @@ class Aliases(object):
         """Save the alias 'name' to target"""
         self.data[name] = {
             "target": target.fullname,
-            "filename": target.filename,
+            "filename": target.file,
             "modulepath": target.modulepath,
         }
-        self.write(self.data, self.filename)
+        self.write(self.data, self.file)
         return
 
     def remove(self, name):
         self.data.pop(name, None)
-        self.write(self.data, self.filename)
+        self.write(self.data, self.file)
 
     def avail(self, terse=False):
         if not self.data:  # pragma: no cover

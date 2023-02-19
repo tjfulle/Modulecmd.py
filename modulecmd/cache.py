@@ -26,7 +26,7 @@ def modifies_cache(fun):
 class Cache:
     def __init__(self, filename):
         self._modified = False
-        self.filename = filename
+        self.file = filename
         self._data = None
 
     @property
@@ -51,22 +51,22 @@ class Cache:
 
     def load(self):
         data = dict()
-        if os.path.isfile(self.filename):
+        if os.path.isfile(self.file):
             try:
-                data.update(dict(json.load(open(self.filename))))
+                data.update(dict(json.load(open(self.file))))
             except json.decoder.JSONDecodeError:  # pragma: no cover
                 self.remove()
         return data
 
     def write(self):
-        with open(self.filename, "w") as fh:
+        with open(self.file, "w") as fh:
             json.dump(self.data, fh, indent=2)
 
     @modifies_cache
     def remove(self):
         xio.info("Removing the MODULEPATH cache")
-        if os.path.isfile(self.filename):
-            os.remove(self.filename)
+        if os.path.isfile(self.file):
+            os.remove(self.file)
         self._data = dict()
 
     def get(self, section, key, default=None):

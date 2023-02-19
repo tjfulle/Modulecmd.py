@@ -134,32 +134,32 @@ def test_modulepath_get(dirtrees, mock_modulepath):
     module = modulecmd.modulepath.get("a")
     assert module.fullname == "a"
     assert isinstance(module, modulecmd.module.PyModule)
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     module = modulecmd.modulepath.get("b")
     assert module.fullname == "b"
     assert isinstance(module, modulecmd.module.PyModule)
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     module = modulecmd.modulepath.get("py")
     assert module.fullname == "py/2.0.0"
     assert isinstance(module, modulecmd.module.PyModule)
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     module = modulecmd.modulepath.get("tcl")
     assert module.fullname == "tcl/1.0.0"
     assert isinstance(module, modulecmd.module.TclModule)
-    assert module.filename == os.path.join(d1, module.fullname)
+    assert module.file == os.path.join(d1, module.fullname)
 
     module = modulecmd.modulepath.get("ucc")
     assert module.fullname == "ucc/2.0.0"
     assert isinstance(module, modulecmd.module.PyModule)
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     module = modulecmd.modulepath.get("ucc/1.0.0")
     assert module.fullname == "ucc/1.0.0"
     assert isinstance(module, modulecmd.module.PyModule)
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     modules = modulecmd.modulepath.get(d1)
     assert len(modules) == 12
@@ -171,14 +171,14 @@ def test_modulepath_get(dirtrees, mock_modulepath):
     module = modulecmd.modulepath.get("ucc/1.0.0")
     assert module.fullname == "ucc/1.0.0"
     assert isinstance(module, modulecmd.module.PyModule)
-    assert module.filename == os.path.join(d2, module.fullname + ".py")
+    assert module.file == os.path.join(d2, module.fullname + ".py")
 
     # use more of d1, to get its module
     f = os.path.join(d1, "ucc/1.0.0")[-15:]
     module = modulecmd.modulepath.get(f)
     assert module.fullname == "ucc/1.0.0"
     assert isinstance(module, modulecmd.module.PyModule)
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
 
 def test_modulepath_append_path(dirtrees, mock_modulepath):
@@ -188,11 +188,11 @@ def test_modulepath_append_path(dirtrees, mock_modulepath):
 
     module = modulecmd.modulepath.get("ucc/1.0.0")
     assert module.fullname == "ucc/1.0.0"
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     module = modulecmd.modulepath.get("ucc")
     assert module.fullname == "ucc/2.0.0"
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     d2 = dirtrees.join("2").strpath
     d2_modules = modulecmd.modulepath.append_path(d2)
@@ -202,11 +202,11 @@ def test_modulepath_append_path(dirtrees, mock_modulepath):
 
     module = modulecmd.modulepath.get("ucc/1.0.0")
     assert module.fullname == "ucc/1.0.0"
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     module = modulecmd.modulepath.get("ucc")
     assert module.fullname == "ucc/4.0.0"
-    assert module.filename == os.path.join(d2, module.fullname + ".py")
+    assert module.file == os.path.join(d2, module.fullname + ".py")
 
     xxx = modulecmd.system.load("xxx")
 
@@ -219,7 +219,7 @@ def test_modulepath_append_path(dirtrees, mock_modulepath):
 
     module = modulecmd.modulepath.get("ucc")
     assert module.fullname == "ucc/2.0.0"
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     # No modules
     dirtrees.mkdir("FOO")
@@ -233,22 +233,22 @@ def test_modulepath_prepend_path(dirtrees, mock_modulepath):
 
     module = modulecmd.modulepath.get("ucc/1.0.0")
     assert module.fullname == "ucc/1.0.0"
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     module = modulecmd.modulepath.get("ucc")
     assert module.fullname == "ucc/2.0.0"
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     d2 = dirtrees.join("2").strpath
     modulecmd.modulepath.prepend_path(d2)
 
     module = modulecmd.modulepath.get("ucc/1.0.0")
     assert module.fullname == "ucc/1.0.0"
-    assert module.filename == os.path.join(d2, module.fullname + ".py")
+    assert module.file == os.path.join(d2, module.fullname + ".py")
 
     module = modulecmd.modulepath.get("ucc")
     assert module.fullname == "ucc/4.0.0"
-    assert module.filename == os.path.join(d2, module.fullname + ".py")
+    assert module.file == os.path.join(d2, module.fullname + ".py")
 
     removed = modulecmd.modulepath.remove_path(d2)
     assert len(removed) == 3
@@ -259,16 +259,16 @@ def test_modulepath_prepend_path(dirtrees, mock_modulepath):
 
     module = modulecmd.modulepath.get("ucc/1.0.0")
     assert module.fullname == "ucc/1.0.0"
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     module = modulecmd.modulepath.get("ucc")
     assert module.fullname == "ucc/2.0.0"
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     modulecmd.modulepath.prepend_path(d1)
     module = modulecmd.modulepath.get("ucc/1.0.0")
     assert module.fullname == "ucc/1.0.0"
-    assert module.filename == os.path.join(d1, module.fullname + ".py")
+    assert module.file == os.path.join(d1, module.fullname + ".py")
 
     dirtrees.mkdir("FOO")
     a = modulecmd.modulepath.prepend_path(dirtrees.join("FOO").strpath)

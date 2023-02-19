@@ -57,7 +57,7 @@ class system_state:
         if isinstance(key, modulecmd.module.Module):
             return key in self.loaded_modules
         elif os.path.isfile(key):
-            return key in [m.filename for m in self.loaded_modules]
+            return key in [m.file for m in self.loaded_modules]
         else:
             for module in self.loaded_modules:
                 if module.name == key or module.fullname == key:
@@ -98,7 +98,7 @@ class system_state:
         lm_names = [m.fullname for m in self._loaded_modules]
         modulecmd.environ.set_path(modulecmd.names.loaded_modules, lm_names)
 
-        lm_files = [m.filename for m in self._loaded_modules]
+        lm_files = [m.file for m in self._loaded_modules]
         modulecmd.environ.set_path(modulecmd.names.loaded_module_files, lm_files)
 
     def register_module(self, module):
@@ -125,7 +125,7 @@ class system_state:
         # Those modules are automaically unloaded since they are no longer
         # available.
         for (i, loaded) in enumerate(self.loaded_modules):
-            if loaded.filename == module.filename:
+            if loaded.file == module.file:
                 break
         else:
             raise ModuleNotRegisteredError(module)
@@ -211,9 +211,9 @@ class system_state:
         file = file or StringIO()
         # Report changes due to to change in modulepath
         if self._unloaded_on_mp_change:  # pragma: no cover
-            lm_files = [_.filename for _ in self.loaded_modules]
+            lm_files = [_.file for _ in self.loaded_modules]
             unloaded = [
-                _ for _ in self._unloaded_on_mp_change if _.filename not in lm_files
+                _ for _ in self._unloaded_on_mp_change if _.file not in lm_files
             ]
             file.write(
                 "The following modules have been @G{unloaded with a MODULEPATH change}\n"
@@ -264,7 +264,7 @@ def unarchive_module(ar):
     path = ar.get("modulepath")
     if path and not modulecmd.modulepath.contains(path):  # pragma: no cover
         use(path)
-    module = modulecmd.modulepath.get(ar["filename"])
+    module = modulecmd.modulepath.get(ar["file"])
     if module is None:
         raise modulecmd.error.ModuleNotFoundError(ar["fullname"])
     assert module.fullname == ar["fullname"]
@@ -319,7 +319,7 @@ def restore_clone_impl(the_clone):
                 module = unarchive_module(ar)
             except modulecmd.error.ModuleNotFoundError:
                 raise modulecmd.error.CloneModuleNotFoundError(
-                    ar["fullname"], ar["filename"]
+                    ar["fullname"], ar["file"]
                 )
             loaded_modules.append(module)
         state.loaded_modules = loaded_modules
@@ -382,7 +382,7 @@ def restore_collection_impl(name, the_collection):
                 xio.verbose("Loading part of collection: {0}".format(module))
             except modulecmd.error.ModuleNotFoundError:
                 raise modulecmd.error.CollectionModuleNotFoundError(
-                    ar["fullname"], ar["filename"]
+                    ar["fullname"], ar["file"]
                 )
             load_impl(module)
             module.acquired_as = module.fullname
@@ -472,8 +472,8 @@ def execmodule_in_sandbox(module, mode):
     xio.debug("Executing module {0} with mode {1}".format(module, mode))
     module.prepare()
     ns = module_exec_sandbox(module, mode)
-    code = compile(module.read(mode), module.filename, "exec")
-    with working_dir(os.path.dirname(module.filename)):
+    code = compile(module.read(mode), module.file, "exec")
+    with working_dir(os.path.dirname(module.file)):
         try:
             if isinstance(module, modulecmd.module.TclModule):
                 clone = modulecmd.environ.clone()
@@ -713,7 +713,7 @@ def load_inserted_impl(module, insert_at):
             state.unloaded_on_mp_change(other)
             continue
 
-        if other_module.filename != other.filename:
+        if other_module.file != other.file:
             state.swapped_on_mp_change(other, other_module)
         else:
             other_module.opts = opts[i]
@@ -911,7 +911,7 @@ def swap_impl(module_a, module_b, maintain_state=False, caller="command_line"):
     # Reload any that need to be unloaded first
     for other in to_unload_and_reload[1:]:
         if maintain_state:
-            this_module = modulecmd.modulepath.get(other.filename)
+            this_module = modulecmd.modulepath.get(other.file)
         else:
             this_module = modulecmd.modulepath.get(other.acquired_as)
         if this_module is None:
@@ -921,7 +921,7 @@ def swap_impl(module_a, module_b, maintain_state=False, caller="command_line"):
             state.unloaded_on_mp_change(other)
             continue
 
-        if this_module.filename != other.filename:
+        if this_module.file != other.file:
             state.swapped_on_mp_change(other, this_module)
 
         # Now load the thing
@@ -1098,7 +1098,7 @@ def determine_swaps_due_to_prepend(prepended_modules):
         if module.fullname not in fullnames:
             continue
         prepended_module = prepended_modules[fullnames.index(module.fullname)]
-        if prepended_module.filename != module.filename:
+        if prepended_module.file != module.file:
             # The new module has the same name, but different filename. Since
             # new module has higher precedence (since its path was prepended to
             # modulepath), we swap them
@@ -1112,7 +1112,7 @@ def determine_swaps_due_to_prepend(prepended_modules):
         if module.acquired_as == module.fullname:  # pragma: no cover
             continue
         prepended_module = prepended_modules[names.index(module.name)]
-        if prepended_module.filename != module.filename:
+        if prepended_module.file != module.file:
             bumped.append((module, prepended_modules[i]))
 
     return bumped
