@@ -220,6 +220,7 @@ class Modulepath:
         default. A module is explicitly made the default by creating a symlink
         to it (in the same directory) named 'default'
         """
+
         def sort_key(module):
             n = list(self.path.keys()).index(module.modulepath)
             return (1 if module.is_explicit_default else -1, module.version, -n)
@@ -249,7 +250,9 @@ class Modulepath:
         if terse:
             return self.format_avail_terse(regex=regex, file=file)
         else:
-            return self.format_avail_full(regex=regex, long_format=long_format, file=file)
+            return self.format_avail_full(
+                regex=regex, long_format=long_format, file=file
+            )
 
     def format_avail_full(self, regex=None, long_format=False, file=None):
         file = file or sys.stdout

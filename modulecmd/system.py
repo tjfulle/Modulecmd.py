@@ -168,7 +168,7 @@ class system_state:
                 if m.fullname not in self._initial_loaded_modules
             ]
             if new_modules:
-                file.write("The following modules were @G{loaded}\n")
+                file.write(colorize("The following modules were {green}loaded{endc}\n"))
                 for (i, m) in enumerate(new_modules):
                     file.write("  {0}) {1}\n".format(i + 1, m.fullname))
                 file.write("\n")
@@ -177,7 +177,9 @@ class system_state:
         file = file or StringIO()
         # Report swapped
         if self._swapped_explicitly:
-            file.write("The following modules have been @G{swapped}\n")
+            file.write(
+                colorize("The following modules have been {green}swapped{endc}\n")
+            )
             for (i, (m1, m2)) in enumerate(self._swapped_explicitly):
                 a, b = m1.fullname, m2.fullname
                 file.write("  {0}) {1} => {2}\n".format(i + 1, a, b))
@@ -187,10 +189,11 @@ class system_state:
         file = file or StringIO()
         # Report reloaded
         if self._swapped_on_family_update:  # pragma: no cover
-            file.write(
+            s = colorize(
                 "The following modules in the same family have "
-                "been @G{updated with a version change}\n"
+                "been {green}updated with a version change{endc}\n"
             )
+            file.write(s)
             for (i, (m1, m2)) in enumerate(self._swapped_on_family_update):
                 a, b, fam = m1.fullname, m2.fullname, m1.family
                 file.write("  {0}) {1} => {2} ({3})\n".format(i + 1, a, b, fam))
@@ -199,9 +202,8 @@ class system_state:
     def format_updated_v(self, file=None):
         file = file or StringIO()
         if self._swapped_on_version_change:
-            file.write(
-                "The following modules have been @G{updated with a version change}\n"
-            )
+            s = "The following modules have been {green}updated with a version change{endc}\n"
+            file.write(colorize(s))
             for (i, (m1, m2)) in enumerate(self._swapped_on_version_change):
                 a, b = m1.fullname, m2.fullname
                 file.write("  {0}) {1} => {2}\n".format(i + 1, a, b))
@@ -215,9 +217,8 @@ class system_state:
             unloaded = [
                 _ for _ in self._unloaded_on_mp_change if _.file not in lm_files
             ]
-            file.write(
-                "The following modules have been @G{unloaded with a MODULEPATH change}\n"
-            )
+            s = "The following modules have been {green}unloaded with a MODULEPATH change{endc}\n"
+            file.write(colorize(s))
             for (i, m) in enumerate(unloaded):
                 file.write("  {0}) {1}\n".format(i + 1, m.fullname))
             file.write("\n")
@@ -226,9 +227,8 @@ class system_state:
         file = file or StringIO()
         debug_mode = modulecmd.config.get("debug")
         if self._swapped_on_mp_change:
-            file.write(
-                "The following modules have been @G{updated with a MODULEPATH change}\n"
-            )
+            s = "The following modules have been {green}updated with a MODULEPATH change{endc}\n"
+            file.write(colorize(s))
             for (i, (m1, m2)) in enumerate(self._swapped_on_mp_change):
                 a, b = m1.fullname, m2.fullname
                 if debug_mode:  # pragma: no cover

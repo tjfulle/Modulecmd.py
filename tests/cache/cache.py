@@ -29,5 +29,5 @@ def test_cache_remove(tmpdir, mock_modulepath):
     mock_modulepath(tmpdir.strpath)
     assert modulecmd.cache.modified()
     # this will create the cache
-    modulecmd.modulepath.avail()
+    modulecmd.modulepath.format_avail()
     modulecmd.cache.remove()

@@ -212,5 +212,5 @@ def items():
         yield item
 
 
-def format_avail(terse=False, file=None):
-    return collections.format_avail(terse=terse, file=file)
+def format_avail(terse=False, regex=None, file=None):
+    return collections.format_avail(terse=terse, file=file, regex=regex)

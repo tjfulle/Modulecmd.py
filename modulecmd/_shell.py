@@ -67,13 +67,13 @@ def apply_environment_modifications() -> None:
         file.write(f"cd {dest};\n")
     text = file.getvalue()
     dryrun = config.get("dryrun")
-    xio.print(text, file=sys.stderr if dryrun else sys.stdout)
+    xio.print(text.rstrip(), file=sys.stderr if dryrun else sys.stdout)
 
     file = StringIO()
     system.print_changes(file=file)
     text = file.getvalue()
     if text.split():
-        xio.print(text)
+        xio.print(text.rstrip())
 
 
 class posix:
