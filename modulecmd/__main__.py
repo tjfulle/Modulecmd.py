@@ -56,34 +56,11 @@ def print_loaded_modules(terse=False, show_command=False, regex=None) -> None:
 def print_available_modules(terse: bool = False, showall=False, regex=None) -> None:
     xio.trace("Showing avail,able modules")
     file = StringIO()
-    for (path, modules) in modulepath.items():
-        if terse:
-            names = [m.fullname for m in modules]
-            file.write(f"{path}:\n")
-            for name in names:
-                file.write(name + "\n")
-        else:
-            names = []
-            for module in modules:
-                name = module.fullname
-                opts = []
-                if module.is_default:
-                    opts.append(util.colorize("{bold}{red}D{endc}"))
-                if module.is_loaded:
-                    opts.append(util.colorize("{bold}{green}L{endc}"))
-                if opts:
-                    name += f" ({','.join(opts)})"
-                names.append(name)
-            path = path.replace(os.path.expanduser("~"), "~")
-            output = util.colify(names)
-            xio.cprint("{bold}{green}%s{endc}:" % path, file=file)
-            if not output.split():
-                width = util.terminal_size().columns
-                output = util.colorize("{red}(None){endc}").center(width)
-            file.write(f"{output}\n")
+    modulepath.format_avail(terse=terse, regex=regex, file=file)
     if showall:
-        modulecmd.collection.format(terse=terse, regex=regex, file=file)
+        modulecmd.collection.format_avail(terse=terse, regex=regex, file=file)
         modulecmd.clone.format_avail(file=file)
+    xio.print(file.getvalue().rstrip())
 
 
 def print_module_contents(name, plain_pager=True):

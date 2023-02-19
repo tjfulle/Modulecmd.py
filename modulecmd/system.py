@@ -264,7 +264,10 @@ def unarchive_module(ar):
     path = ar.get("modulepath")
     if path and not modulecmd.modulepath.contains(path):  # pragma: no cover
         use(path)
-    module = modulecmd.modulepath.get(ar["file"])
+    if "filename" in ar:
+        module = modulecmd.modulepath.get(ar["filename"])
+    else:
+        module = modulecmd.modulepath.get(ar["file"])
     if module is None:
         raise modulecmd.error.ModuleNotFoundError(ar["fullname"])
     assert module.fullname == ar["fullname"]

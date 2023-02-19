@@ -1,7 +1,7 @@
 import os
 import re
+import sys
 import bisect
-from io import StringIO
 from string import Template
 from collections import OrderedDict as ordered_dict
 
@@ -245,15 +245,15 @@ class Modulepath:
     def sort_key(module):
         return (module.name, module.version)
 
-    def avail(self, terse=False, regex=None, long_format=False):
+    def format_avail(self, terse=False, regex=None, long_format=False, file=None):
         if terse:
-            return self.avail_terse(regex=regex)
+            return self.format_avail_terse(regex=regex, file=file)
         else:
-            return self.avail_full(regex=regex, long_format=long_format)
+            return self.format_avail_full(regex=regex, long_format=long_format, file=file)
 
-    def avail_full(self, regex=None, long_format=False):
-        sio = StringIO()
-        sio.write("\n")
+    def format_avail_full(self, regex=None, long_format=False, file=None):
+        file = file or sys.stdout
+        file.write("\n")
         width = util.terminal_size().columns
         # head = lambda x: (" " + x + " ").center(width, "-")
         for (directory, modules) in self.path.items():
@@ -287,13 +287,12 @@ class Modulepath:
                         names.insert(i, insert_key)
                 s = util.colify(names, width=width) + "\n"
             directory = directory.replace(os.path.expanduser("~/"), "~/")
-            # sio.write(head(directory) + '\n')
-            sio.write(util.colorize("{green}%s{endc}:\n" % directory))
-            sio.write(s + "\n")
-        return sio.getvalue()
+            file.write(util.colorize("{green}%s{endc}:\n" % directory))
+            file.write(s + "\n")
+        return
 
-    def avail_terse(self, regex=None):
-        sio = StringIO()
+    def format_avail_terse(self, regex=None, file=None):
+        file = file or sys.stdout
         for (directory, modules) in self.path.items():
             if not os.path.isdir(directory):  # pragma: no cover
                 continue
@@ -301,10 +300,10 @@ class Modulepath:
             modules = self.filter_modules_by_regex(modules, regex)
             if not modules:  # pragma: no cover
                 continue
-            sio.write(directory + ":\n")
-            sio.write("\n".join(m.fullname for m in modules))
-        sio.write("\n")
-        return sio.getvalue()
+            file.write(directory + ":\n")
+            file.write("\n".join(m.fullname for m in modules))
+        file.write("\n")
+        return
 
     def candidates(self, key):
         # Return a list of modules that might by given by key
@@ -441,8 +440,8 @@ def prepend_path(dirname):
     return _path.prepend_path(dirname)
 
 
-def avail(**kwargs):
-    return _path.avail(**kwargs)
+def format_avail(**kwargs):
+    return _path.format_avail(**kwargs)
 
 
 def candidates(name):
