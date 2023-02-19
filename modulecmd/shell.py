@@ -163,3 +163,16 @@ class python:
             file.write(f"alias_{name} = {body!r}")
         for (name, body) in environ.shell_functions():
             file.write(f"shell_function_{name} = {body!r}")
+
+
+def filter_env(environ):
+    env = dict()
+    for (key, val) in environ.items():
+        if filter_key(key):
+            continue
+        env[key] = val
+    return env
+
+
+def filter_key(key):
+    return key.startswith(("BASH_FUNC",))

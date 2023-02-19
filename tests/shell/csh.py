@@ -4,7 +4,6 @@ import pytest
 import string
 
 import modulecmd.shell
-import modulecmd.shell.csh
 from modulecmd.environ import Environ
 
 

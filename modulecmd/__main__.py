@@ -12,7 +12,7 @@ import modulecmd.util as util
 import modulecmd.config as config
 import modulecmd.system as system
 import modulecmd.modulepath as modulepath
-import modulecmd._shell as shell
+import modulecmd.shell as shell
 from modulecmd.error import ModuleNotFoundError
 from modulecmd._util.tty import redirect_stdout2 as redirect_stdout
 

@@ -12,20 +12,19 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && cd .. && pwd )"
 
-PYMOD_DIR="${DIR}"
-PYMOD_PKG_DIR="${PYMOD_DIR}"/modulecmd
-PYMOD_CMD="${PYMOD_DIR}"/scripts/modulecmd.py
-PYMOD_SESSION_ID=$$
+MODULECMD_DIR="${DIR}"
+MODULECMD_PKG_DIR="${MODULECMD_DIR}"/modulecmd
+MODULECMD_SESSION_ID=$$
 MODULESHOME="${DIR}"
-export PYMOD_PKG_DIR
-export PYMOD_CMD
-export PYMOD_DIR
-export PYMOD_SESSION_ID
+export MODULECMD_PKG_DIR
+export MODULECMD_CMD
+export MODULECMD_DIR
+export MODULECMD_SESSION_ID
 export MODULESHOME
-export PYTHONPATH=${PYMOD_DIR}
+export PYTHONPATH=${MODULECMD_DIR}
 
 ########################################################################
 mc()
 {
-  python3 -E -m modulecmd "$@"
+  PYTHONPATH=${MODULECMD_DIR} python3 -E -m modulecmd "$@"
 }

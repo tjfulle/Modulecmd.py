@@ -2,9 +2,9 @@ import os
 import sys
 from argparse import Namespace
 
-import modulecmd.xio as xio
 import modulecmd.names
 import modulecmd.shell
+import modulecmd.xio as xio
 import modulecmd.modulepath
 
 from modulecmd.serialize import serialize, deserialize
@@ -30,19 +30,6 @@ class Environ(dict):
 
     def is_empty(self):
         return not len(self) and not len(self.aliases) and not len(self.shell_functions)
-
-    def format_output(self):
-        env = self.copy()
-        output = modulecmd.shell.format_output(
-            env,
-            aliases=self.aliases,
-            shell_functions=self.shell_functions,
-            files_to_source=self.files_to_source,
-            raw_shell_commands=self.raw_shell_commands,
-        )
-        if self.destination_dir is not None:
-            output += "cd {0};".format(self.destination_dir)
-        return output
 
     def set_destination_dir(self, dirname):
         if not os.path.isdir(dirname):
