@@ -25,16 +25,7 @@ export MODULESHOME
 export PYTHONPATH=${PYMOD_DIR}
 
 ########################################################################
-#  Define the module command:  The first line runs the "pymod" command
-#  to generate text:
-#      export PATH="..."
-#  then the "eval" converts the text into changes in the current shell.
-m2()
+mc()
 {
-  python3 -E $PYMOD_CMD bash "$@"
-}
-
-m3()
-{
-  python3 -m modulecmd "$@"
+  python3 -E -m modulecmd "$@"
 }
