@@ -677,6 +677,7 @@ def do_list(args):
     """Print a lists of tests than what pytest offers."""
     # Run test collection and get the tree out.
     import pytest
+
     old_output = sys.stderr
     try:
         sys.stderr = output = StringIO()
